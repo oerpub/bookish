@@ -1,3 +1,17 @@
+# What is this?
+
+This is a Javascript book editor that saves to GitHub.
+Since it is just javascript, it can be hosted on github.com by using the `gh-pages` branch.
+
+Editing various mime-types is supported by writing plugins (ie SVG, Markdown, etc).
+
+# How does it work?
+
+Unzip an EPUB3 document and push it to GitHub.
+
+This editor uses the GitHub API to read/write EPUB3 files (defined in http://idpf.org/epub/30/spec/epub30-overview.html ).
+
+
 # Development and Building
 
 Below are instructions for building the book editor yourself and a layout
@@ -20,6 +34,10 @@ Check the `./docs` directory to read through the different modules.
 
 ## Directory Layout
 
+* `atc/*`   Base models and views for editing books (TOC navigation, HTML content, media resources)
+* `epub/*`  Models specific to manipulating EPUB3 books (ie a book is an OPF file plus a separate navigation HTML file)
+* `gh-book/*` GitHub-specific views and `Backbone.sync` calls that communicate to read/write files to GitHub
+
 * `atc/models.coffee`    Backbone Models
 * `atc/views.coffee`     Marionette Views
 * `atc/views/*`          Handlebars Templates
@@ -28,8 +46,7 @@ Check the `./docs` directory to read through the different modules.
 * `config/*`             Custom configuration of 3rd party libraries (Aloha Editor and MathJax)
 * `config/atc-config.coffee` Includes paths to 3rd party libs so we can minify them
 
-* `atc.coffee`   The starting point for all javascript
-* `atc.less`     Includes all other css files (including external libs) so we can minify
+* `gh-book.coffee`   The starting point for all javascript
 
 ## Adding a 3rd party library
 
