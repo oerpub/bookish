@@ -11,8 +11,6 @@ require.config
     base64: 'lib/github/lib/base64'
     github: 'lib/github/github'
 
-    angular: 'lib/angular'
-
 
   # # Shims
   # To support libraries that were not written for AMD
@@ -24,5 +22,5 @@ require.config
 
     # ## Github-Specific libraries
     github:
-      deps: ['underscore', 'base64', 'angular']
+      deps: ['underscore', 'base64']
       exports: 'Github'

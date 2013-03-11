@@ -5,12 +5,11 @@
     paths: {
       'atc/auth': 'gh-book/auth',
       base64: 'lib/github/lib/base64',
-      github: 'lib/github/github',
-      angular: 'lib/angular'
+      github: 'lib/github/github'
     },
     shim: {
       github: {
-        deps: ['underscore', 'base64', 'angular'],
+        deps: ['underscore', 'base64'],
         exports: 'Github'
       }
     }
