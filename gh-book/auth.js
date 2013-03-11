@@ -16,7 +16,8 @@
         rootPath: ''
       },
       _update: function() {
-        var credentials, json;
+        var credentials, json,
+          _this = this;
         credentials = {
           username: this.get('username'),
           password: this.get('password'),
@@ -27,12 +28,23 @@
         repo = null;
         json = this.toJSON();
         if (json.repoUser && json.repoName) {
-          return repo = github.getRepo(json.repoUser, json.repoName);
+          repo = github.getRepo(json.repoUser, json.repoName);
         }
+        return github.onRateLimitChanged(function(remaining, limit) {
+          return _this.set({
+            rateRemaining: remaining,
+            rateLimit: limit
+          });
+        });
       },
       initialize: function() {
         this._update();
-        return this.on('change', this._update);
+        this.on('change:username', this._update);
+        this.on('change:password', this._update);
+        this.on('change:token', this._update);
+        this.on('change:auth', this._update);
+        this.on('change:repoUser', this._update);
+        return this.on('change:repoName', this._update);
       },
       authenticate: function(credentials) {
         return this.set(credentials);

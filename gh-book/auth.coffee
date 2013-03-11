@@ -32,10 +32,21 @@ define ['github', 'backbone'], (Github, Backbone) ->
       if json.repoUser and json.repoName
         repo = github.getRepo json.repoUser, json.repoName
 
+      # Listen to the RateLimit changes and update the model
+      # @set {rateRemaining: -1, rateLimit: -1}
+      github.onRateLimitChanged (remaining, limit) =>
+        @set {rateRemaining: remaining, rateLimit: limit}
+
+
     initialize: ->
       @_update()
 
-      @on 'change', @_update
+      @on 'change:username', @_update
+      @on 'change:password', @_update
+      @on 'change:token',    @_update
+      @on 'change:auth',     @_update
+      @on 'change:repoUser', @_update
+      @on 'change:repoName', @_update
 
     authenticate: (credentials) -> @set credentials
     setRepo: (repoUser, repoName) -> @set

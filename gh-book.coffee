@@ -16,33 +16,12 @@ define [
     (if a then (a ^ Math.random() * 16 >> a / 4).toString(16) else ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b))
 
 
-  defer = (fn) ->
-    return () ->
-      # splice off the callback (the last arg)
-      [args..., cb] = arguments
 
-      deferred = jQuery.Deferred()
-      callback = (err, value) ->
-        cb(err, value)
-        if err
-          deferred.reject err, value
-        else
-          deferred.resolve value
+  writeFile = (path, text, commitText) ->
+    Auth.getRepo().write Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", text, commitText
 
-      # Put our callback which updates the promise on as the last argument
-      args.push callback
-      # Do the asynchronous work (read/write)
-      fn.apply(@, args)
-
-      return deferred.promise()
-
-
-
-  writeFile = defer (path, text, commitText, cb) ->
-    Auth.getRepo().write Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", text, commitText, cb
-
-  readFile = defer (path, cb) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", cb
-  readDir =  defer (path, cb) -> Auth.getRepo().contents Auth.get('branch'), path, cb
+  readFile = (path) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}"
+  readDir =  (path) -> Auth.getRepo().contents Auth.get('branch'), path
 
 
 
@@ -58,18 +37,20 @@ define [
     path = model.id or model.url?() or model.url
 
     console.log method, path if DEBUG
+    ret = null
     switch method
-      when 'read' then return readFile(path, callback)
-      when 'update' then return writeFile(path, model.serialize(), 'Editor Save', callback)
+      when 'read' then ret = readFile(path, callback)
+      when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save', callback)
       when 'create'
         # Create an id if this model has not been saved yet
         id = _uuid()
         model.set 'id', id
-        return writeFile(path, model.serialize(), callback)
+        ret = writeFile(path, model.serialize(), callback)
       else throw "Model sync method not supported: #{method}"
 
-
-
+    ret.done (value) => success?(model, value, options)
+    ret.fail (error) => error?(model, error, options)
+    return ret
 
 
 

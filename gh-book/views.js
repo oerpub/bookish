@@ -48,7 +48,10 @@
           return $save.removeClass('btn-primary');
         };
         this.listenTo(AtcModels.ALL_CONTENT, 'sync', disableSave);
-        return this.listenTo(AtcModels.ALL_CONTENT, 'reset', disableSave);
+        this.listenTo(AtcModels.ALL_CONTENT, 'reset', disableSave);
+        return this.listenTo(this.model, 'change', function() {
+          return _this.render();
+        });
       },
       templateHelpers: function() {
         return {
@@ -56,11 +59,7 @@
         };
       },
       onRender: function() {
-        var _this = this;
-        this.$el.find('*[title]').tooltip();
-        return this.listenTo(this.model, 'change', function() {
-          return _this.render();
-        });
+        return this.$el.find('*[title]').tooltip();
       },
       signIn: function() {
         return this.model.set({

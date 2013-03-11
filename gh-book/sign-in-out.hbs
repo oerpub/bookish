@@ -2,6 +2,14 @@
   <a data-bypass="true" target="_new" href="https://github.com/{{repoUser}}/{{repoName}}/tree/{{branch}}/{{rootPath}}"><code>{{repoUser}}/{{repoName}}#{{branch}}</code></a>
 </small>
 
+{{#if rateLimit}}
+  {{#if rateRemaining}}
+    <span class="label label-info" data-placement="bottom" title="Github requests remaining">{{rateRemaining}}/{{rateLimit}}</span>
+  {{else}}
+    <span class="label label-important">Out of Github Karma. Sign in!</span>
+  {{/if}}
+{{/if}}
+
 <button id="save-content" type="button" class="btn disabled" data-placement="bottom" title="Save all changes to github"><i class="icon-save"></i> Save</button>
 
 

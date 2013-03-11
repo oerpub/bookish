@@ -64,6 +64,9 @@ define [
       @listenTo AtcModels.ALL_CONTENT, 'sync', disableSave
       @listenTo AtcModels.ALL_CONTENT, 'reset', disableSave
 
+      # Listen to model changes
+      @listenTo @model, 'change', => @render()
+
     # Add the `canFork` bit to the resulting JSON so the template knows if the
     # current user is the same as the current `repoUser` (Do not show the fork button).
     templateHelpers: ->
@@ -72,9 +75,6 @@ define [
     onRender: ->
       # Enable tooltips
       @$el.find('*[title]').tooltip()
-
-      # Listen to model changes
-      @listenTo @model, 'change', => @render()
 
     signIn: ->
       # Set the username and password in the `Auth` model

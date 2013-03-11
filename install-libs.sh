@@ -49,7 +49,7 @@ fromGithub "https://github.com/appendto/jquery-mockjax"
 fromGithub "https://github.com/wysiwhat/Aloha-Editor" "dev"
 
 # For github-hosted ebooks
-fromGithub "https://github.com/michael/github"
+fromGithub "https://github.com/philschatz/github"
 
 
 singleFile "http://code.jquery.com/jquery-1.8.3.js" "jquery-1.8.3.js"
