@@ -142,11 +142,10 @@ define [
       # Always scroll to the top of the page
       window.scrollTo(0)
 
-      model.loaded().then =>
-        mainToolbar.close()
+      mainToolbar.close()
 
-        view = new Views.BookEditView {model: model}
-        mainSidebar.show view
+      view = new Views.BookEditView {model: model}
+      mainSidebar.show view
 
     # Edit a piece of HTML content
     editContent: (content) ->
@@ -156,41 +155,42 @@ define [
       # ## Bind Metadata Dialogs
       mainArea.show contentLayout
 
+      # Load the various views:
+      #
+      # - The Aloha toolbar
+      # - The editable title at the top of the document under the toolbar
+      # - The metadata/roles accordion
+      # - The main editable content area
+
+      # Wrap each 'tab' in the accordion with a Save/Cancel dialog
+      configAccordionDialog = (region, view) ->
+        dialog = new Views.DialogWrapper {view: view}
+        region.show dialog
+        # When save/cancel are clicked collapse the accordion
+        dialog.on 'saved',     => region.$el.parent().collapse 'hide'
+        dialog.on 'cancelled', => region.$el.parent().collapse 'hide'
+
+      # Set up the metadata dialog
+      configAccordionDialog contentLayout.metadata, new Views.MetadataEditView {model: content}
+      configAccordionDialog contentLayout.roles,    new Views.RolesEditView {model: content}
+
+      view = new Views.ContentToolbarView(model: content)
+      mainToolbar.show view
+
+      view = new Views.TitleEditView(model: content)
+      contentLayout.title.show view
+
+      # Enable the tooltip letting the user know to edit
+      contentLayout.title.$el.popover
+        trigger: 'hover'
+        placement: 'right'
+        content: __('Click to change title')
+
+      view = new Views.ContentEditView(model: content)
+      contentLayout.body.show view
+
+
       content.loaded().then =>
-        # Load the various views:
-        #
-        # - The Aloha toolbar
-        # - The editable title at the top of the document under the toolbar
-        # - The metadata/roles accordion
-        # - The main editable content area
-
-        # Wrap each 'tab' in the accordion with a Save/Cancel dialog
-        configAccordionDialog = (region, view) ->
-          dialog = new Views.DialogWrapper {view: view}
-          region.show dialog
-          # When save/cancel are clicked collapse the accordion
-          dialog.on 'saved',     => region.$el.parent().collapse 'hide'
-          dialog.on 'cancelled', => region.$el.parent().collapse 'hide'
-
-        # Set up the metadata dialog
-        configAccordionDialog contentLayout.metadata, new Views.MetadataEditView {model: content}
-        configAccordionDialog contentLayout.roles,    new Views.RolesEditView {model: content}
-
-        view = new Views.ContentToolbarView(model: content)
-        mainToolbar.show view
-
-        view = new Views.TitleEditView(model: content)
-        contentLayout.title.show view
-
-        # Enable the tooltip letting the user know to edit
-        contentLayout.title.$el.popover
-          trigger: 'hover'
-          placement: 'right'
-          content: __('Click to change title')
-
-        view = new Views.ContentEditView(model: content)
-        contentLayout.body.show view
-
         # Update the URL
         Backbone.history.navigate "content/#{content.get 'id'}"
 

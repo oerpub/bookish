@@ -105,60 +105,57 @@
         return editAction(model);
       },
       editBook: function(model) {
-        var _this = this;
+        var view;
         window.scrollTo(0);
-        return model.loaded().then(function() {
-          var view;
-          mainToolbar.close();
-          view = new Views.BookEditView({
-            model: model
-          });
-          return mainSidebar.show(view);
+        mainToolbar.close();
+        view = new Views.BookEditView({
+          model: model
         });
+        return mainSidebar.show(view);
       },
       editContent: function(content) {
-        var _this = this;
+        var configAccordionDialog, view,
+          _this = this;
         window.scrollTo(0);
         mainArea.show(contentLayout);
+        configAccordionDialog = function(region, view) {
+          var dialog,
+            _this = this;
+          dialog = new Views.DialogWrapper({
+            view: view
+          });
+          region.show(dialog);
+          dialog.on('saved', function() {
+            return region.$el.parent().collapse('hide');
+          });
+          return dialog.on('cancelled', function() {
+            return region.$el.parent().collapse('hide');
+          });
+        };
+        configAccordionDialog(contentLayout.metadata, new Views.MetadataEditView({
+          model: content
+        }));
+        configAccordionDialog(contentLayout.roles, new Views.RolesEditView({
+          model: content
+        }));
+        view = new Views.ContentToolbarView({
+          model: content
+        });
+        mainToolbar.show(view);
+        view = new Views.TitleEditView({
+          model: content
+        });
+        contentLayout.title.show(view);
+        contentLayout.title.$el.popover({
+          trigger: 'hover',
+          placement: 'right',
+          content: __('Click to change title')
+        });
+        view = new Views.ContentEditView({
+          model: content
+        });
+        contentLayout.body.show(view);
         return content.loaded().then(function() {
-          var configAccordionDialog, view;
-          configAccordionDialog = function(region, view) {
-            var dialog,
-              _this = this;
-            dialog = new Views.DialogWrapper({
-              view: view
-            });
-            region.show(dialog);
-            dialog.on('saved', function() {
-              return region.$el.parent().collapse('hide');
-            });
-            return dialog.on('cancelled', function() {
-              return region.$el.parent().collapse('hide');
-            });
-          };
-          configAccordionDialog(contentLayout.metadata, new Views.MetadataEditView({
-            model: content
-          }));
-          configAccordionDialog(contentLayout.roles, new Views.RolesEditView({
-            model: content
-          }));
-          view = new Views.ContentToolbarView({
-            model: content
-          });
-          mainToolbar.show(view);
-          view = new Views.TitleEditView({
-            model: content
-          });
-          contentLayout.title.show(view);
-          contentLayout.title.$el.popover({
-            trigger: 'hover',
-            placement: 'right',
-            content: __('Click to change title')
-          });
-          view = new Views.ContentEditView({
-            model: content
-          });
-          contentLayout.body.show(view);
           return Backbone.history.navigate("content/" + (content.get('id')));
         });
       }
