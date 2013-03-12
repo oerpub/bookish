@@ -17,6 +17,9 @@
 
 .has-changed { color: #cc0; }
 
+/* Bootstrap progress bars have a margin-bottom: 20px. Remove it */
+.progress { margin-bottom: 0 !important; }
+
 #layout-main-sidebar {
   height: 100%;
   -webkit-box-sizing: border-box;

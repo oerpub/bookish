@@ -14,6 +14,8 @@ define ['jquery'], (jQuery) ->
       info: false
       debug: false
 
+    sidebar: {disabled:true}
+
     requireConfig:
       paths:
         # Override location of jquery-ui and use our own. Because

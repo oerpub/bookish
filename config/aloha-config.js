@@ -11,6 +11,9 @@
         info: false,
         debug: false
       },
+      sidebar: {
+        disabled: true
+      },
       requireConfig: {
         paths: {
           jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
