@@ -11,6 +11,9 @@
         info: false,
         debug: false
       },
+      sidebar: {
+        disabled: true
+      },
       requireConfig: {
         paths: {
           jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
@@ -18,7 +21,7 @@
       },
       errorhandling: true,
       plugins: {
-        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'common/table', 'extra/draganddropfiles', 'common/image', 'oer/popover', 'oer/math', 'oer/assorted', 'oer/note', 'contrib/angular'],
+        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'common/table', 'extra/draganddropfiles', 'common/image', 'oer/popover', 'oer/math', 'oer/assorted', 'oer/note'],
         draganddropfiles: {
           upload: {
             config: {
