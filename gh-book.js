@@ -104,6 +104,9 @@
     Auth.on('change', function() {
       var key, value, _ref, _ref1, _results;
       if (!_.isEmpty(_.pick(Auth.changed, STORED_KEYS))) {
+        if (Auth.get('rateRemaining') && Auth.get('password') && !Auth.previousAttributes()['password']) {
+          return;
+        }
         resetDesktop();
         _ref = Auth.toJSON();
         _results = [];

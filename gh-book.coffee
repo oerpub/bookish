@@ -98,6 +98,9 @@ define [
   STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'username', 'password']
   Auth.on 'change', () =>
     if not _.isEmpty(_.pick Auth.changed, STORED_KEYS)
+      # If the user changed login state then don't reset the desktop
+      return if Auth.get('rateRemaining') and Auth.get('password') and not Auth.previousAttributes()['password']
+
       resetDesktop()
       # Update session storage
       for key, value of Auth.toJSON()
