@@ -69,8 +69,7 @@
         }
       }),
       initialize: function() {
-        var promise,
-          _this = this;
+        var _this = this;
         BaseBook.prototype.initialize.apply(this, arguments);
         this.on('change:navTreeStr', function(model, navTreeStr) {
           var $body, $bodyNodes, $nav, $newTree, $wrap, bodyStr, newTree;
@@ -99,8 +98,7 @@
             silent: true
           });
         });
-        promise = jQuery.Deferred();
-        this.loaded().then(function() {
+        return this._promise = this.loaded().then(function() {
           return _this.navModel.loaded().then(function() {
             var navTree, recSetTitles;
             _this.navModel.on('change:body', function(model, xmlStr) {
@@ -130,10 +128,9 @@
               return _results;
             };
             recSetTitles(navTree);
-            return promise.resolve(_this);
+            return _this;
           });
         });
-        return this._promise = promise;
       },
       _updateNavTreeFromXML: function(xmlStr, options) {
         var $body, $nav, $xml, navTree;
