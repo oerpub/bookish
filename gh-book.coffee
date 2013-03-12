@@ -96,7 +96,7 @@ define [
 
   # Clear everything and refetch when the
   Auth.on 'change', () ->
-    if not _.isEmpty(_.pick Auth.changed, 'repoUser', 'repoName', 'branch', 'rootPath')
+    if not _.isEmpty(_.pick Auth.changed, 'repoUser', 'repoName', 'branch', 'rootPath', 'password')
       resetDesktop()
   #Auth.on 'change:repoName', resetDesktop
   #Auth.on 'change:branch', resetDesktop

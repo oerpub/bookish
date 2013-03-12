@@ -100,7 +100,7 @@
       });
     };
     Auth.on('change', function() {
-      if (!_.isEmpty(_.pick(Auth.changed, 'repoUser', 'repoName', 'branch', 'rootPath'))) {
+      if (!_.isEmpty(_.pick(Auth.changed, 'repoUser', 'repoName', 'branch', 'rootPath', 'password'))) {
         return resetDesktop();
       }
     });
