@@ -1,4 +1,5 @@
 {{! The initial context is an array so the 1st thing we do is loop over each item using '#.' }}
+
 <td data-media-type="{{mediaType}}"><i class="icon-content"></i><a href="#content/{{id}}">
   <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
   {{#if title}}
@@ -10,4 +11,14 @@
 {{#if hasChanged}}
   <span class="has-changed" title="This has unsaved changes">*</span>
 {{/if}}
-</td><td><!-- modified --></td>
+
+{{! Display a progress bar if the file has not loaded yet }}
+{{#if _loading}}
+{{#if _done}}
+{{else}}
+<div class="progress progress-striped active" style="display: inline-block; width: 100px;"><div class="bar" style="width: 100%;"></div></div>
+{{/if}}
+{{/if}}
+</td>
+
+<td><!-- modified --></td>

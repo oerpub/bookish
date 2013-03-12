@@ -18,6 +18,7 @@ define [
   'atc/controller'
   './languages'
   # Load the Handlebar templates
+  'hbs!atc/views/content-edit'
   'hbs!atc/views/search-box'
   'hbs!atc/views/search-results'
   'hbs!atc/views/search-results-item'
@@ -36,7 +37,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Languages, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
@@ -145,6 +146,10 @@ define [
     alohaOptions: null
 
     initialize: ->
+
+      # Update the view when the content is done loading
+      @listenTo @model, 'change:_done', (model, value, options) => @render()
+
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
 
@@ -159,43 +164,39 @@ define [
 
     onRender: ->
       # Wait until Aloha is started before loading MathJax.
-      # Also, wrap all math in a span/div. MathJax replaces the MathJax element
-      # losing all jQuery data attached to it (like popover data, the original Math Formula, etc).
-      #
-      # Add `aloha-cleanme` so this span is unwrapped when serialized to XHTML
-      @$el.find('math').wrap '<span class="math-element aloha-cleanme"></span>'
-      MathJax.Hub.Configured() if MathJax?
+      MathJax?.Hub.Configured()
 
-      # Once Aloha has finished loading enable
-      @$el.addClass('disabled')
-      Aloha.ready =>
-        @$el.aloha(@alohaOptions)
-        @$el.removeClass('disabled')
+      if @model.get '_done'
+        # Once Aloha has finished loading enable
+        @$el.addClass('disabled')
+        Aloha.ready =>
+          @$el.aloha(@alohaOptions)
+          @$el.removeClass('disabled')
 
-      # Auto save after the user has stopped making changes
-      updateModelAndSave = =>
-        alohaId = @$el.attr('id')
-        # Sometimes Aloha hasn't loaded up yet
-        # Only save when the editable has changed
-        if alohaId
-          alohaEditable = Aloha.getEditableById(alohaId)
-          editableBody = alohaEditable.getContents()
-          # Change the contents but do not update the Aloha editable area
-          @model.set @modelKey, editableBody, {internalAlohaUpdate: true}
+        # Auto save after the user has stopped making changes
+        updateModelAndSave = =>
+          alohaId = @$el.attr('id')
+          # Sometimes Aloha hasn't loaded up yet
+          # Only save when the editable has changed
+          if alohaId
+            alohaEditable = Aloha.getEditableById(alohaId)
+            editableBody = alohaEditable.getContents()
+            # Change the contents but do not update the Aloha editable area
+            @model.set @modelKey, editableBody, {internalAlohaUpdate: true}
 
-      # Grr, the `aloha-smart-content-changed` can only be listened to globally
-      # (via `Aloha.bind`) instead of on each editable.
-      #
-      # This is problematic when we have multiple Aloha editors on a page.
-      # Instead, autosave after some period of inactivity.
-      @$el.on 'blur', updateModelAndSave
+        # Grr, the `aloha-smart-content-changed` can only be listened to globally
+        # (via `Aloha.bind`) instead of on each editable.
+        #
+        # This is problematic when we have multiple Aloha editors on a page.
+        # Instead, autosave after some period of inactivity.
+        @$el.on 'blur', updateModelAndSave
 
 
 
   # ## Edit Content Body
   exports.ContentEditView = exports.AlohaEditView.extend
     # **NOTE:** This template is not wrapped in an element
-    template: (serialized_model) -> "#{serialized_model.body or 'This module is empty. Please change it'}"
+    template: CONTENT_EDIT
     modelKey: 'body'
 
   # Edit the title field of a piece of Content

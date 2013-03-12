@@ -37,8 +37,36 @@
       return this._promise;
     };
     Deferrable = Backbone.Model.extend({
-      loaded: function() {
-        return loaded.apply(this, arguments);
+      loaded: function(flag) {
+        var deferred,
+          _this = this;
+        if (flag == null) {
+          flag = false;
+        }
+        if (flag) {
+          deferred = jQuery.Deferred();
+          deferred.resolve(this);
+          this._promise = deferred.promise();
+        }
+        if (!this._promise || 'rejected' === this._promise.state()) {
+          this.set({
+            _loading: true
+          });
+          this._promise = this.fetch();
+          this._promise.progress(function(progress) {
+            return _this.set({
+              _progress: progress
+            });
+          }).done(function() {
+            delete _this.changed;
+            return _this.set({
+              _done: true
+            });
+          }).fail(function(error) {
+            return _this.trigger('error', error);
+          });
+        }
+        return this._promise;
       },
       toJSON: function() {
         var json;

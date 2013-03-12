@@ -102,12 +102,10 @@ define [
         @navModel.set 'body', bodyStr, {silent:true}
 
 
-
-
-
-      # Once the OPF is populated
-      promise = jQuery.Deferred()
-      @loaded().then =>
+      # Once the OPF is populated load the navigation HTML file.
+      # Change the model promise to wait for the navigation file to load
+      # before considering the Book Loaded (daisy-chain the navigation file).
+      @_promise = @loaded().then =>
         # Now we know what the navigation HTML file is so go pull it.
         # Then, this model is loaded and views can stop spinning and waiting
 
@@ -135,8 +133,7 @@ define [
 
           # Finally, this model is completely loaded.
           # Begin callbacks
-          promise.resolve(@)
-      @_promise = promise
+          return @
 
     _updateNavTreeFromXML: (xmlStr, options) ->
       # Re-parse the tree and set it as the navTree
