@@ -48,7 +48,30 @@ define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/string
     return @_promise
 
   Deferrable = Backbone.Model.extend
-    loaded: () -> loaded.apply(@, arguments)
+    loaded: (flag=false) ->
+      if flag
+        deferred = jQuery.Deferred()
+        deferred.resolve @
+        @_promise = deferred.promise()
+
+      # Silently update the model (the user has not seen the model yet)
+      # so `model.hasChanged()` returns `false` (to know when to enable Saving)
+      if not @_promise or 'rejected' == @_promise.state()
+        @set {_loading: true}
+        @_promise = @fetch() # {silent:true}
+        @_promise
+        .progress (progress) =>
+          @set {_progress: progress}
+        .done =>
+          # Once we are done fetching and the change events have fired
+          # clear all the `.changed` flag so save does not think it has dirty models
+          delete @changed
+          @set {_done: true}
+        .fail (error) =>
+          @trigger 'error', error
+
+      return @_promise
+
     toJSON: ->
       json = Backbone.Model.prototype.toJSON.apply(@, arguments)
       json.mediaType = @mediaType
