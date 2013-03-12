@@ -7,7 +7,7 @@ define ['github', 'backbone'], (Github, Backbone) ->
   # For the UI, provide a backbone "interface" to the auth piece
   AuthModel = Backbone.Model.extend
     defaults:
-      username: 'philschatz'
+      username: ''
       password: ''
       auth: 'basic'
 

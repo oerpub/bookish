@@ -1,10 +1,10 @@
-<small class="disabled" title="See the commits on github!" data-placement="bottom">Editing:
-  <a data-bypass="true" target="_new" href="https://github.com/{{repoUser}}/{{repoName}}/tree/{{branch}}/{{rootPath}}"><code>{{repoUser}}/{{repoName}}#{{branch}}</code></a>
+<small class="disabled">
+  <span data-placement="bottom" title="Github karma remaining: {{rateRemaining}}/{{rateLimit}}">Editing: </span>
+  <a title="See the commits on github!" data-placement="bottom" data-bypass="true" target="_new" href="https://github.com/{{repoUser}}/{{repoName}}/tree/{{branch}}/{{rootPath}}"><code>{{repoUser}}/{{repoName}}#{{branch}}</code></a>
 </small>
 
 {{#if rateLimit}}
   {{#if rateRemaining}}
-    <span class="label label-info" data-placement="bottom" title="Github requests remaining">{{rateRemaining}}/{{rateLimit}}</span>
   {{else}}
     <span class="label label-important">Out of Github Karma. Sign in!</span>
   {{/if}}
@@ -67,7 +67,7 @@
 
       <p>This information is not stored anywhere and if you refresh this page you will need to re-enter this information.</p>
       <div class="form-inline">
-        <input id="github-username" class="input-small" type="text" required="true" placeholder="Username or Email" value="{{username}}"/>
+        <input id="github-username" class="input-small" type="text" required="true" placeholder="Username" value="{{username}}"/>
         <input id="github-password" type="password" required="true" class="input-small" placeholder="Password"/>
         <button id="sign-in" type="submit" class="btn btn-primary" data-dismiss="modal">Sign In</button>
       </div>

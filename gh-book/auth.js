@@ -7,7 +7,7 @@
     repo = null;
     AuthModel = Backbone.Model.extend({
       defaults: {
-        username: 'philschatz',
+        username: '',
         password: '',
         auth: 'basic',
         repoUser: 'philschatz',

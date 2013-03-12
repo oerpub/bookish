@@ -2,7 +2,8 @@
 (function() {
 
   define(['underscore', 'backbone', 'atc/controller', 'atc/models', 'epub/models', 'atc/auth', 'gh-book/views', 'css!atc'], function(_, Backbone, Controller, AtcModels, EpubModels, Auth, Views) {
-    var $signin, DEBUG, b, readDir, readFile, resetDesktop, uuid, writeFile;
+    var $signin, DEBUG, STORED_KEYS, b, props, readDir, readFile, resetDesktop, uuid, writeFile,
+      _this = this;
     DEBUG = true;
     uuid = b = function(a) {
       if (a) {
@@ -99,15 +100,33 @@
         });
       });
     };
+    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'username', 'password'];
     Auth.on('change', function() {
-      if (!_.isEmpty(_.pick(Auth.changed, 'repoUser', 'repoName', 'branch', 'rootPath', 'password'))) {
-        return resetDesktop();
+      var key, value, _ref, _ref1, _results;
+      if (!_.isEmpty(_.pick(Auth.changed, STORED_KEYS))) {
+        resetDesktop();
+        _ref = Auth.toJSON();
+        _results = [];
+        for (key in _ref) {
+          value = _ref[key];
+          _results.push((_ref1 = _this.sessionStorage) != null ? _ref1.setItem(key, value) : void 0);
+        }
+        return _results;
       }
     });
     if (!Backbone.History.started) {
       Controller.start();
     }
     Backbone.history.navigate('workspace');
+    props = {};
+    _.each(STORED_KEYS, function(key) {
+      var value, _ref;
+      value = (_ref = this.sessionStorage) != null ? _ref.getItem(key) : void 0;
+      if (value) {
+        return props[key] = value;
+      }
+    });
+    Auth.set(props);
     $signin = jQuery('#sign-in-modal');
     $signin.modal('show');
     return $signin.on('hide', function() {
