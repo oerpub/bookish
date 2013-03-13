@@ -309,18 +309,18 @@
         A = a.mediaType || '';
         B = b.mediaType || '';
         if (B < A) {
-          return 1;
+          return -1;
         }
         if (A < B) {
-          return -1;
+          return 1;
         }
         A = a.get('title') || a.id || '';
         B = b.get('title') || b.id || '';
         if (B < A) {
-          return -1;
+          return 1;
         }
         if (A < B) {
-          return 1;
+          return -1;
         }
         return 0;
       }
