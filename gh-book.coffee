@@ -58,11 +58,7 @@ define [
 
   AtcModels.SearchResults = AtcModels.SearchResults.extend
     initialize: ->
-      for model in AtcModels.ALL_CONTENT.models
-        if model.get('mediaType') != 'text/x-module'
-          @add model, {at: 0}
-        else
-          @add model
+      @add AtcModels.ALL_CONTENT.models
 
       AtcModels.ALL_CONTENT.on 'reset',  () => @reset()
       AtcModels.ALL_CONTENT.on 'add',    (model) => @add model

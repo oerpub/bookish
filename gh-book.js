@@ -62,19 +62,8 @@
     };
     AtcModels.SearchResults = AtcModels.SearchResults.extend({
       initialize: function() {
-        var model, _i, _len, _ref,
-          _this = this;
-        _ref = AtcModels.ALL_CONTENT.models;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          model = _ref[_i];
-          if (model.get('mediaType') !== 'text/x-module') {
-            this.add(model, {
-              at: 0
-            });
-          } else {
-            this.add(model);
-          }
-        }
+        var _this = this;
+        this.add(AtcModels.ALL_CONTENT.models);
         AtcModels.ALL_CONTENT.on('reset', function() {
           return _this.reset();
         });
