@@ -5,6 +5,9 @@ Since it is just javascript, it can be hosted on github.com by using the `gh-pag
 
 Editing various mime-types is supported by writing plugins (ie SVG, Markdown, etc).
 
+**Developers**: If you're looking to contribute, check out the [#TODO](#TODO) section at the bottom of this file!
+
+
 # How does it work?
 
 Unzip an EPUB3 document and push it to GitHub.
@@ -58,3 +61,25 @@ Check the `./docs` directory to read through the different modules.
     * Don't use `/` or `.`
 
 4. Use it in your module by adding it to the dependencies in `define`
+
+# TODO
+
+There is still a lot of work that needs to be done before this editor is adoptable.
+Here are some things on my roadmap.
+
+If you're looking to contribute, tackling one of these would be a great place to start!
+
+* `[ ]` Add Markdown plugin that edits Markdown and autogenerates HTML (search for `MIME_TYPES` in the code)
+* `[ ]` Save images as resources instead of embedded data URIs (plug into Aloha Upload/Repository API)
+* `[ ]` Update the OPF file with added resources
+* `[ ]` Add UI for intra-book links (needs to be separate Aloha plugin)
+* `[ ]` Add "cleanup" button that deletes content/resources that are no longer referred to
+* `[ ]` Save `<html><head/><body/></html>` wrapper around HTML content instead of just saving `<div/>` tags
+* `[ ]` Generate `toc.ncx` file for EPUB2 compatibility
+* `[ ]` Get 'Add Content' working again (when should the id be assigned and the content saved?)
+
+* `[X]` Notify user when github karma (requests/hour) runs out so they know to sign in
+* `[X]` Only enable Save button when content has changed
+* `[X]` Show user unsaved files
+* `[X]` Only show 'Copy this book!' when the current user is different than the repo user
+
