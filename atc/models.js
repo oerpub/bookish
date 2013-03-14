@@ -27,6 +27,9 @@
         deferred = jQuery.Deferred();
         deferred.resolve(this);
         this._promise = deferred.promise();
+        this.set({
+          _done: true
+        });
       }
       if (!this._promise || 'rejected' === this._promise.state()) {
         this._promise = this.fetch();
@@ -47,6 +50,9 @@
           deferred = jQuery.Deferred();
           deferred.resolve(this);
           this._promise = deferred.promise();
+          this.set({
+            _done: true
+          });
         }
         if (!this._promise || 'rejected' === this._promise.state()) {
           this.set({
@@ -286,9 +292,9 @@
           }
           ContentType = MEDIA_TYPES.get(mediaType).constructor;
           model = new ContentType(config);
+          model.loaded(true);
           this.manifest.add(model);
           console.warn('FIXME: Hack for new content');
-          model.loaded(true);
         } else {
           model = new Backbone.Model(model);
         }
