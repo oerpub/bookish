@@ -1,12 +1,21 @@
+require.config
+  paths:
+
+    # Change the Stub Auth piece
+    'aloha': 'lib/Aloha-Editor/src/lib/aloha'
+
+
 # This file acts as a mock store so a connection to github is not necessary
 # Useful for local development
-require ['gh-book/app', 'gh-book/store'], (Store) ->
+require ['jquery', 'backbone', 'gh-book'], (jQuery, Backbone) ->
 
   # The number of milliseconds before calling a callback
   # If set to 0 then the callback will be called immediately
 
   # Setting a delay simulates network latency while 0 delay simulates loading the content on page load
   CALLBACK_DELAY = 0
+
+  DEBUG = true
 
   OPF_ID = '12345'
   OPF_TITLE = 'Github EPUB Editor'
@@ -70,11 +79,10 @@ require ['gh-book/app', 'gh-book/store'], (Store) ->
       <nav>
         <ol>
           <li><a href="#{CH1_PATH}">Background Information</a></li>
-          <li><a href="#{CH2_PATH}">Introduction to gh-book</a></li>
           <li>
             <span>Chapter 1</span>
             <ol>
-              <li><a href="section.html">Section 1</a></li>
+              <li><a href="#{CH2_PATH}">Introduction to gh-book</a></li>
             </ol>
           </li>
         </ol>
@@ -84,31 +92,41 @@ require ['gh-book/app', 'gh-book/store'], (Store) ->
   FILES[CH2_PATH] = '<h1>Introduction</h1>'
   FILES['background.json'] = JSON.stringify {title: 'Background Module Title'}
 
-  _pushFile = (path, text, commitText, cb) ->
-    console.log "Saving #{path}"
-    FILES[path] = text
-    cb(null)
-
-  _pullFile = (path, cb) ->
+  readFile = (path) -> (promise) ->
     if path of FILES
-      console.log "Loading #{path}"
-      cb null, FILES[path]
+      promise.resolve FILES[path]
     else
-      console.log "LOAD PROBLEM: COULD NOT FIND #{path}"
-      cb 'COULD_NOT_FIND_FILE'
+      promise.fail {message: 'IN_MEM_COULD_NOT_FIND_FILE'}
 
-  _pullDir = (path, cb) ->
-    # TODO: filter using path
-    dirFiles = ({name: name} for name in Object.keys(FILES))
-    cb null, dirFiles
+  writeFile = (path, data) -> (promise) ->
+    FILES[path] = data
+    promise.resolve {message: 'IN_MEM_SAVED'}
 
-  # Wrap each of the operations with a delay function to simulate network latency
-  wrap = (fn) ->
-    return () ->
-      args = arguments # squirrel away the args to be ued 2 lines later
-      fn.apply Store, args if 0 == CALLBACK_DELAY
-      setTimeout (-> fn.apply Store, args), CALLBACK_DELAY if CALLBACK_DELAY
+  delay = (operation) ->
+    promise = new jQuery.Deferred()
+    fn = -> operation(promise)
+    if 0 == CALLBACK_DELAY
+      fn()
+    else
+      setTimeout fn, CALLBACK_DELAY
+    return promise
 
-  Store._pushFile = wrap _pushFile
-  Store._pullFile = wrap _pullFile
-  Store._pullDir  = wrap _pullDir
+
+  Backbone.sync = (method, model, options) ->
+    path = model.id or model.url?() or model.url
+
+    console.log method, path if DEBUG?
+
+    switch method
+      when 'read' then ret = delay readFile(path)
+      when 'update' then ret = delay writeFile(path, model.serialize())
+      when 'create'
+        # Create an id if this model has not been saved yet
+        id = _uuid()
+        model.set 'id', id
+        ret = delay writeFile(path, model.serialize())
+      else throw "Model sync method not supported: #{method}"
+
+    ret.done (value) => options?.success?(model, value, options)
+    ret.fail (error) => options?.error?(model, error, options)
+    return ret
