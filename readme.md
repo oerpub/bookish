@@ -5,7 +5,7 @@ Since it is just javascript, it can be hosted on github.com by using the `gh-pag
 
 Editing various mime-types is supported by writing plugins (ie SVG, Markdown, etc).
 
-**Developers**: If you're looking to contribute, check out the [#TODO](#TODO) section at the bottom of this file!
+**Developers**: If you're looking to contribute, check out the [TODO](#todo) section at the bottom of this file!
 
 
 # How does it work?
