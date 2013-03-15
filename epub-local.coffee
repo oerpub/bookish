@@ -1,4 +1,4 @@
-define [ 'jquery', 'backbone', 'atc/controller', 'atc/models', 'epub/models', 'css!atc' ], (jQuery, Backbone, AtcController, AtcModels, Models) ->
+define [ 'jquery', 'backbone', 'bookish/controller', 'bookish/models', 'epub/models', 'css!bookish' ], (jQuery, Backbone, BookishController, BookishModels, Models) ->
 
   # # Application Code
 
@@ -118,17 +118,17 @@ define [ 'jquery', 'backbone', 'atc/controller', 'atc/models', 'epub/models', 'c
     console.log 'Workspace loaded!'
 
 
-    AtcModels.SearchResults = AtcModels.SearchResults.extend
+    BookishModels.SearchResults = BookishModels.SearchResults.extend
       initialize: ->
-        for model in AtcModels.ALL_CONTENT.models
+        for model in BookishModels.ALL_CONTENT.models
           if model.get('mediaType') != 'text/x-module'
             @add model, {at: 0}
           else
             @add model
 
     # Set the loaded flag so we don't try and populate them from the server
-    #AtcModels.ALL_CONTENT.each (model) -> model.loaded(true)
+    #BookishModels.ALL_CONTENT.each (model) -> model.loaded(true)
 
     # Begin listening to route changes
     # and load the initial views based on the URL.
-    AtcController.start()
+    BookishController.start()
