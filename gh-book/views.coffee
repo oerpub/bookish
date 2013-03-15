@@ -2,14 +2,14 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'atc/controller'
-  'atc/models'
+  'bookish/controller'
+  'bookish/models'
   'epub/models'
-  'atc/auth'
-  'atc/views'
+  'bookish/auth'
+  'bookish/views'
   'hbs!gh-book/sign-in-out'
   'hbs!gh-book/fork-book-item'
-  'css!atc'
+  'css!bookish'
 ], (_, Backbone, Marionette, Controller, AtcModels, EpubModels, Auth, Views, SIGN_IN_OUT, FORK_BOOK_ITEM) ->
 
 

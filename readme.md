@@ -37,17 +37,17 @@ Check the `./docs` directory to read through the different modules.
 
 ## Directory Layout
 
-* `atc/*`   Base models and views for editing books (TOC navigation, HTML content, media resources)
+* `bookish/*`   Base models and views for editing books (TOC navigation, HTML content, media resources)
 * `epub/*`  Models specific to manipulating EPUB3 books (ie a book is an OPF file plus a separate navigation HTML file)
 * `gh-book/*` GitHub-specific views and `Backbone.sync` calls that communicate to read/write files to GitHub
 
-* `atc/models.coffee`    Backbone Models
-* `atc/views.coffee`     Marionette Views
-* `atc/views/*`          Handlebars Templates
-* `atc/nls/*.coffee`     i18n strings (and HTML) http://requirejs.org/docs/api.html#i18n
+* `bookish/models.coffee`    Backbone Models
+* `bookish/views.coffee`     Marionette Views
+* `bookish/views/*`          Handlebars Templates
+* `bookish/nls/*.coffee`     i18n strings (and HTML) http://requirejs.org/docs/api.html#i18n
 * `lib/`                 3rd party libraries
 * `config/*`             Custom configuration of 3rd party libraries (Aloha Editor and MathJax)
-* `config/atc-config.coffee` Includes paths to 3rd party libs so we can minify them
+* `config/bookish-config.coffee` Includes paths to 3rd party libs so we can minify them
 
 * `gh-book.coffee`   The starting point for all javascript
 
@@ -55,7 +55,7 @@ Check the `./docs` directory to read through the different modules.
 
 1. If a npm version of it exists, add it to `package.json`
 2. Otherwise, add it to `install-libs.sh` (which is called when you run `npm install .`)
-3. Add the lib to `config/atc-config.coffee` (both in `path` and `shim`)
+3. Add the lib to `config/bookish-config.coffee` (both in `path` and `shim`)
     * The name should be all lowercase
     * Use a `-` if the library name is more than one word
     * Don't use `/` or `.`

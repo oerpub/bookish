@@ -1,12 +1,12 @@
 define [
   'underscore'
   'backbone'
-  'atc/controller'
-  'atc/models'
+  'bookish/controller'
+  'bookish/models'
   'epub/models'
-  'atc/auth'
+  'bookish/auth'
   'gh-book/views'
-  'css!atc'
+  'css!bookish'
 ], (_, Backbone, Controller, AtcModels, EpubModels, Auth, Views) ->
 
   DEBUG = true

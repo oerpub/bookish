@@ -3,7 +3,7 @@
 
   require.config({
     paths: {
-      'atc/auth': 'gh-book/auth',
+      'bookish/auth': 'gh-book/auth',
       base64: 'lib/github/lib/base64',
       github: 'lib/github/github'
     },

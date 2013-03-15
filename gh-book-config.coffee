@@ -5,7 +5,7 @@ require.config
   paths:
 
     # Change the Stub Auth piece
-    'atc/auth': 'gh-book/auth'
+    'bookish/auth': 'gh-book/auth'
 
     # Github-Specific libraries
     base64: 'lib/github/lib/base64'
