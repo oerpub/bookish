@@ -9,17 +9,17 @@ define [
   'jquery'
   'backbone'
   'marionette'
-  'atc/media-types'
-  'atc/auth'
-  'atc/models'
+  'bookish/media-types'
+  'bookish/auth'
+  'bookish/models'
   # There is a cyclic dependency between views and controllers
   # so we use the `exports` module to get around that problem.
-  'atc/views'
-  'hbs!atc/layouts/main'
-  'hbs!atc/layouts/content'
-  'hbs!atc/layouts/workspace'
+  'bookish/views'
+  'hbs!bookish/layouts/main'
+  'hbs!bookish/layouts/content'
+  'hbs!bookish/layouts/workspace'
   'exports'
-  'i18n!atc/nls/strings'
+  'i18n!bookish/nls/strings'
 ], (jQuery, Backbone, Marionette, MEDIA_TYPES, Auth, Models, Views, LAYOUT_MAIN, LAYOUT_CONTENT, LAYOUT_WORKSPACE, exports, __) ->
 
   mainRegion = new Marionette.Region

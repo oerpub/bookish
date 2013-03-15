@@ -1,6 +1,6 @@
 # # Backbone Models
 # This module contains backbone models used throughout the application
-define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
+define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
 
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`
@@ -36,6 +36,8 @@ define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/string
       deferred = jQuery.Deferred()
       deferred.resolve @
       @_promise = deferred.promise()
+      # Mark it as loaded for the views
+      @set {_done: true}
 
     # Silently update the model (the user has not seen the model yet)
     # so `model.hasChanged()` returns `false` (to know when to enable Saving)
@@ -53,6 +55,8 @@ define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/string
         deferred = jQuery.Deferred()
         deferred.resolve @
         @_promise = deferred.promise()
+        # Mark it as loaded for the views
+        @set {_done: true}
 
       # Silently update the model (the user has not seen the model yet)
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
@@ -259,10 +263,12 @@ define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/string
         # Create the model from a config and add it to the manifest
         ContentType = MEDIA_TYPES.get(mediaType).constructor
         model = new ContentType config
+        # Mark it as sync'd so we don't try to fetch a non-existent file
+        model.loaded(true)
+
         @manifest.add model
         # HACK: Since it is new content there is nothing to load but we already set an `id`
         console.warn 'FIXME: Hack for new content'
-        model.loaded(true)
 
       else
         # Otherwise, just add a container
@@ -280,13 +286,13 @@ define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/string
     comparator: (a, b) ->
       A = a.mediaType or ''
       B = b.mediaType or ''
-      return 1 if B < A
-      return -1  if A < B
+      return -1 if B < A
+      return 1  if A < B
 
       A = a.get('title') or a.id or ''
       B = b.get('title') or b.id or ''
-      return -1 if B < A
-      return 1  if A < B
+      return 1 if B < A
+      return -1  if A < B
 
       return 0
 
