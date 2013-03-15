@@ -22,10 +22,8 @@
       return Auth.getRepo().contents(Auth.get('branch'), path);
     };
     Backbone.sync = function(method, model, options) {
-      var callback, error, id, path, ret, success,
+      var callback, id, path, ret,
         _this = this;
-      success = options != null ? options.success : void 0;
-      error = options != null ? options.error : void 0;
       callback = function(err, value) {
         if (err) {
           return typeof error === "function" ? error(model, err, options) : void 0;
@@ -53,10 +51,10 @@
           throw "Model sync method not supported: " + method;
       }
       ret.done(function(value) {
-        return typeof success === "function" ? success(model, value, options) : void 0;
+        return options != null ? typeof options.success === "function" ? options.success(model, value, options) : void 0 : void 0;
       });
       ret.fail(function(error) {
-        return typeof error === "function" ? error(model, error, options) : void 0;
+        return options != null ? typeof options.error === "function" ? options.error(model, error, options) : void 0 : void 0;
       });
       return ret;
     };
@@ -74,6 +72,11 @@
           return _this.remove(model);
         });
       }
+    });
+    EpubModels.EPUB_CONTAINER.on('error', function(model) {
+      var url;
+      url = "https://github.com/" + (Auth.get('repoUser')) + "/" + (Auth.get('repoName')) + "/tree/" + (Auth.get('branch')) + "/" + (Auth.get('rootPath')) + (model.url());
+      return alert("There was a problem getting " + url + "\nPlease check your settings and try again.");
     });
     resetDesktop = function() {
       AtcModels.ALL_CONTENT.reset();

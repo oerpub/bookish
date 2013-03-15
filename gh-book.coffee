@@ -27,8 +27,6 @@ define [
 
 
   Backbone.sync = (method, model, options) ->
-    success = options?.success
-    error = options?.error
 
     callback = (err, value) ->
       return error?(model, err, options) if err
@@ -48,11 +46,9 @@ define [
         ret = writeFile(path, model.serialize(), callback)
       else throw "Model sync method not supported: #{method}"
 
-    ret.done (value) => success?(model, value, options)
-    ret.fail (error) => error?(model, error, options)
+    ret.done (value) => options?.success?(model, value, options)
+    ret.fail (error) => options?.error?(model, error, options)
     return ret
-
-
 
 
 
@@ -65,6 +61,9 @@ define [
       AtcModels.ALL_CONTENT.on 'remove', (model) => @remove model
 
 
+  EpubModels.EPUB_CONTAINER.on 'error', (model) ->
+    url = "https://github.com/#{Auth.get('repoUser')}/#{Auth.get('repoName')}/tree/#{Auth.get('branch')}/#{Auth.get('rootPath')}#{model.url()}"
+    alert "There was a problem getting #{url}\nPlease check your settings and try again."
 
   resetDesktop = ->
     # Clear out all the content and reset `EPUB_CONTAINER` so it is always fetched
