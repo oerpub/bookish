@@ -1,6 +1,6 @@
 # # Backbone Models
 # This module contains backbone models used throughout the application
-define ['exports', 'jquery', 'backbone', 'atc/media-types', 'i18n!atc/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
+define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
 
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`

@@ -12,7 +12,7 @@ require.config
 
 
 
-require ['underscore', 'atc/models'], (_, Models) ->
+require ['underscore', 'bookish/models'], (_, Models) ->
 
   book = new Models.BaseBook
     id: 'col1'
