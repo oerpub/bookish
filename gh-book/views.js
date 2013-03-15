@@ -13,13 +13,20 @@
         'click .other-books': 'otherBooks'
       },
       initialize: function() {
-        var disableSave,
+        var beforeUnload, disableSave,
           _this = this;
+        beforeUnload = function() {
+          if (_this.hasChanged) {
+            return 'You have unsaved changes. Are you sure you want to leave this page?';
+          }
+        };
+        jQuery(window).on('beforeunload', beforeUnload);
         this.listenTo(AtcModels.ALL_CONTENT, 'change', function(model, b, c) {
           var $save, attribute, changes, checkIfContentActuallyChanged;
           $save = _this.$el.find('#save-content');
           checkIfContentActuallyChanged = function() {
             if (model.hasChanged()) {
+              _this.hasChanged = true;
               $save.removeClass('disabled');
               return $save.addClass('btn-primary');
             }
@@ -35,6 +42,7 @@
               }
             }
             if (_.keys(changes).length) {
+              _this.hasChanged = true;
               $save = _this.$el.find('#save-content');
               $save.removeClass('disabled');
               return $save.addClass('btn-primary');
@@ -43,6 +51,7 @@
         });
         disableSave = function() {
           var $save;
+          _this.hasChanged = false;
           $save = _this.$el.find('#save-content');
           $save.addClass('disabled');
           return $save.removeClass('btn-primary');

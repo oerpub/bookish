@@ -31,6 +31,12 @@ define [
       'click .other-books':   'otherBooks'
 
     initialize: ->
+      # Bind a function to the window if the user tries to navigate away from this page
+      beforeUnload = =>
+        return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
+      jQuery(window).on 'beforeunload', beforeUnload
+
+
       # Listen to all changes made on Content so we can update the save button
       @listenTo AtcModels.ALL_CONTENT, 'change', (model, b,c) =>
         # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
@@ -39,6 +45,7 @@ define [
         $save = @$el.find '#save-content'
         checkIfContentActuallyChanged = =>
           if model.hasChanged()
+            @hasChanged = true
             $save.removeClass('disabled')
             $save.addClass('btn-primary')
 
@@ -51,12 +58,14 @@ define [
 
           # If there was anything that was actually changed (not null before) then mark the save button.
           if _.keys(changes).length
+            @hasChanged = true
             $save = @$el.find '#save-content'
             $save.removeClass('disabled')
             $save.addClass('btn-primary')
 
       # If the repo changes and all of the content is reset, update the button
       disableSave = =>
+        @hasChanged = false
         $save = @$el.find '#save-content'
         $save.addClass('disabled')
         $save.removeClass('btn-primary')
