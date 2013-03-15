@@ -14,7 +14,7 @@
     }
   });
 
-  require(['underscore', 'atc/models'], function(_, Models) {
+  require(['underscore', 'bookish/models'], function(_, Models) {
     var book, recAdd, workspace;
     book = new Models.BaseBook({
       id: 'col1',
