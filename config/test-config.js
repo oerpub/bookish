@@ -9,6 +9,7 @@
   ALOHA_PATH = 'http://wysiwhat.github.com/Aloha-Editor';
 
   require.config({
+    baseUrl: '../',
     paths: {
       aloha: ALOHA_PATH + '/src/lib/aloha'
     }
