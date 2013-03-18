@@ -4,8 +4,8 @@
   require.config({
     paths: {
       'bookish/auth': 'gh-book/auth',
-      base64: 'lib/github/lib/base64',
-      github: 'lib/github/github'
+      base64: 'node_modules/github-js/lib/base64',
+      github: 'node_modules/github-js/github'
     },
     shim: {
       github: {
