@@ -502,7 +502,7 @@ define [
     # Save each model in sequence.
     # **FIXME:** This should be done in a commit batch
     saveContent: ->
-      return alert 'You need to sign (and make sure you can edit) before you can save changes' if not @model.get 'id'
+      return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'
       $save = @$el.find('#save-progress-modal')
       $saving     = $save.find('.saving')
       $alertError = $save.find('.alert-error')
