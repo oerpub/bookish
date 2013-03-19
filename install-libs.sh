@@ -46,12 +46,11 @@ fromGithub "https://github.com/ivaynberg/select2"
 fromGithub "https://github.com/pivotal/jasmine"
 fromGithub "https://github.com/appendto/jquery-mockjax"
 
-fromGithub "https://github.com/wysiwhat/Aloha-Editor" "dev"
-
 singleFile "http://code.jquery.com/jquery-1.8.3.js" "jquery-1.8.3.js"
 singleFile "http://requirejs.org/docs/release/2.1.2/comments/require.js" "require-2.1.2.js"
 singleFile "http://marionettejs.com/downloads/backbone.marionette.js" "backbone.marionette.js"
-singleFile "https://ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.js" "angular.js"
+
+fromGithub "https://github.com/wysiwhat/Aloha-Editor" "dev"
 
 ##fromGithub "https://github.com/twitter/bootstrap"
 TEMP="bootstrap.zip"
