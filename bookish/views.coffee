@@ -16,6 +16,7 @@ define [
   'jquery'
   'aloha'
   'bookish/controller'
+  'bookish/models'
   './languages'
   # Load the Handlebar templates
   'hbs!bookish/views/content-edit'
@@ -37,7 +38,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
@@ -417,11 +418,49 @@ define [
   exports.AuthView = Marionette.ItemView.extend
     template: SIGN_IN_OUT
     events:
-      'click #sign-in': 'signIn'
-      'submit #sign-out': 'signOut'
-    onRender: ->
+      'click #sign-in':       'signIn'
+      'click #sign-out':      'signOut'
+      'click #save-content':  'saveContent'
+
+    initialize: ->
+      # Bind a function to the window if the user tries to navigate away from this page
+      beforeUnload = =>
+        return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
+      jQuery(window).on 'beforeunload', beforeUnload
+
       @listenTo @model, 'change', => @render()
       @listenTo @model, 'change:userid', => @render()
+
+      # Listen to all changes made on Content so we can update the save button
+      @listenTo Models.ALL_CONTENT, 'change', (model, b,c) =>
+        # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
+        # or if the attributes did actually change
+
+        $save = @$el.find '#save-content'
+        checkIfContentActuallyChanged = =>
+          if model.hasChanged()
+            @hasChanged = true
+            $save.removeClass('disabled')
+            $save.addClass('btn-primary')
+
+        setTimeout (=> checkIfContentActuallyChanged()), 100
+
+      # If the repo changes and all of the content is reset, update the button
+      disableSave = =>
+        @hasChanged = false
+        $save = @$el.find '#save-content'
+        $save.addClass('disabled')
+        $save.removeClass('btn-primary')
+
+      @listenTo Models.ALL_CONTENT, 'sync', disableSave
+      @listenTo Models.ALL_CONTENT, 'reset', disableSave
+
+      # Listen to model changes
+      @listenTo @model, 'change', => @render()
+
+    onRender: ->
+      # Enable tooltips
+      @$el.find('*[title]').tooltip()
 
     signIn: ->
       # The browser will go to the login page because `#sign-in` is a link
@@ -429,6 +468,66 @@ define [
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model
     signOut: -> @model.signOut()
+
+    # Save each model in sequence.
+    # **FIXME:** This should be done in a commit batch
+    saveContent: ->
+      return alert 'You need to sign (and make sure you can edit) before you can save changes' if not @model.get 'password'
+      $save = @$el.find('#save-progress-modal')
+      $saving     = $save.find('.saving')
+      $alertError = $save.find('.alert-error')
+      $successBar = $save.find('.progress > .bar.success')
+      $errorBar   = $save.find('.progress > .bar.error')
+      $label = $save.find('.label')
+
+      allContent = Models.ALL_CONTENT.filter (model) -> model.hasChanged()
+      total = allContent.length
+      errorCount = 0
+      finished = false
+
+      recSave = ->
+        $successBar.width(((total - allContent.length - errorCount) * 100 / total) + '%')
+        $errorBar.width((  errorCount                               * 100 / total) + '%')
+
+        if allContent.length == 0
+          if errorCount == 0
+            finished = true
+            Models.ALL_CONTENT.trigger 'sync'
+            # Clear the dirty flag
+            Models.ALL_CONTENT.each (model) -> delete model.changed
+            $save.modal('hide')
+          else
+            $alertError.removeClass 'hide'
+
+        else
+          model = allContent.shift()
+          $label.text(model.get('title'))
+
+          # Clear the changed bit since it is saved.
+          #     delete model.changed
+          #     saving = true; recSave()
+          saving = model.save null,
+              success: recSave
+              error: -> errorCount += 1
+          if not saving
+            console.log "Skipping #{model.id} because it is not valid"
+            recSave()
+
+      $alertError.addClass('hide')
+      $saving.removeClass('hide')
+      $save.modal('show')
+      recSave()
+
+      # Only show the 'Saving...' alert box if the save takes longer than 5 seconds
+      setTimeout(->
+        if total and (not finished or errorCount)
+          $save.modal('show')
+          $alertError.removeClass('hide')
+          $saving.addClass('hide')
+      , 5000)
+
+
+
 
   # ## Book Editing
 
