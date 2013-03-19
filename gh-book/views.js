@@ -2,73 +2,17 @@
 (function() {
 
   define(['underscore', 'backbone', 'marionette', 'bookish/controller', 'bookish/models', 'epub/models', 'bookish/auth', 'bookish/views', 'hbs!gh-book/sign-in-out', 'hbs!gh-book/fork-book-item', 'css!bookish'], function(_, Backbone, Marionette, Controller, AtcModels, EpubModels, Auth, Views, SIGN_IN_OUT, FORK_BOOK_ITEM) {
-    return Views.AuthView = Marionette.ItemView.extend({
+    return Views.AuthView = Views.AuthView.extend({
       template: SIGN_IN_OUT,
-      events: {
-        'click #sign-in': 'signIn',
-        'click #sign-out': 'signOut',
+      events: _.extend(Views.AuthView.prototype.events, {
         'click #save-settings': 'saveSettings',
-        'click #save-content': 'saveContent',
         'click #fork-book': 'forkBook',
         'click .other-books': 'otherBooks'
-      },
-      initialize: function() {
-        var beforeUnload, disableSave,
-          _this = this;
-        beforeUnload = function() {
-          if (_this.hasChanged) {
-            return 'You have unsaved changes. Are you sure you want to leave this page?';
-          }
-        };
-        jQuery(window).on('beforeunload', beforeUnload);
-        this.listenTo(AtcModels.ALL_CONTENT, 'change', function(model, b, c) {
-          var $save, attribute, changes, checkIfContentActuallyChanged;
-          $save = _this.$el.find('#save-content');
-          checkIfContentActuallyChanged = function() {
-            if (model.hasChanged()) {
-              _this.hasChanged = true;
-              $save.removeClass('disabled');
-              return $save.addClass('btn-primary');
-            }
-          };
-          setTimeout((function() {
-            return checkIfContentActuallyChanged();
-          }), 100);
-          if (false) {
-            changes = model.changedAttributes();
-            for (attribute in changes) {
-              if (!model.previous(attribute)) {
-                delete changes[attribute];
-              }
-            }
-            if (_.keys(changes).length) {
-              _this.hasChanged = true;
-              $save = _this.$el.find('#save-content');
-              $save.removeClass('disabled');
-              return $save.addClass('btn-primary');
-            }
-          }
-        });
-        disableSave = function() {
-          var $save;
-          _this.hasChanged = false;
-          $save = _this.$el.find('#save-content');
-          $save.addClass('disabled');
-          return $save.removeClass('btn-primary');
-        };
-        this.listenTo(AtcModels.ALL_CONTENT, 'sync', disableSave);
-        this.listenTo(AtcModels.ALL_CONTENT, 'reset', disableSave);
-        return this.listenTo(this.model, 'change', function() {
-          return _this.render();
-        });
-      },
+      }),
       templateHelpers: function() {
         return {
           canFork: this.model.get('username') !== this.model.get('repoUser') || !this.model.get('password')
         };
-      },
-      onRender: function() {
-        return this.$el.find('*[title]').tooltip();
       },
       signIn: function() {
         return this.model.set({
@@ -145,65 +89,6 @@
           branch: this.$el.find('#github-branch').val(),
           rootPath: rootPath
         });
-      },
-      saveContent: function() {
-        var $alertError, $errorBar, $label, $save, $saving, $successBar, allContent, errorCount, finished, recSave, total;
-        if (!Auth.get('password')) {
-          return alert('You need to sign (and probably fork this book) before you can save to github');
-        }
-        $save = this.$el.find('#save-progress-modal');
-        $saving = $save.find('.saving');
-        $alertError = $save.find('.alert-error');
-        $successBar = $save.find('.progress > .bar.success');
-        $errorBar = $save.find('.progress > .bar.error');
-        $label = $save.find('.label');
-        allContent = AtcModels.ALL_CONTENT.filter(function(model) {
-          return model.hasChanged();
-        });
-        total = allContent.length;
-        errorCount = 0;
-        finished = false;
-        recSave = function() {
-          var model, saving;
-          $successBar.width(((total - allContent.length - errorCount) * 100 / total) + '%');
-          $errorBar.width((errorCount * 100 / total) + '%');
-          if (allContent.length === 0) {
-            if (errorCount === 0) {
-              finished = true;
-              AtcModels.ALL_CONTENT.trigger('sync');
-              AtcModels.ALL_CONTENT.each(function(model) {
-                return delete model.changed;
-              });
-              return $save.modal('hide');
-            } else {
-              return $alertError.removeClass('hide');
-            }
-          } else {
-            model = allContent.shift();
-            $label.text(model.get('title'));
-            saving = model.save(null, {
-              success: recSave,
-              error: function() {
-                return errorCount += 1;
-              }
-            });
-            if (!saving) {
-              console.log("Skipping " + model.id + " because it is not valid");
-              return recSave();
-            }
-          }
-        };
-        $alertError.addClass('hide');
-        $saving.removeClass('hide');
-        $save.modal('show');
-        recSave();
-        return setTimeout(function() {
-          if (total && (!finished || errorCount)) {
-            $save.modal('show');
-            $alertError.removeClass('hide');
-            return $saving.addClass('hide');
-          }
-        }, 5000);
       }
     });
   });
