@@ -5,9 +5,12 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`
   BaseContent = Backbone.Model.extend
+    # New content is given an id before it is saved so it can be added to a book
+    isNew = -> not @id or @id.match(/^_NEW:/)
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
+      @id = "_NEW:#{@cid}" if not @id
 
   # This gets used by `DeferrableCollection` but is instantiated afterwards
   ALL_CONTENT = null
@@ -236,6 +239,21 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @manifest.on 'add',   (model, collection) -> ALL_CONTENT.add model
       @manifest.on 'reset', (model, collection) -> ALL_CONTENT.add model
 
+      # If a model's id changes then update the `navTree` (it was a new model that got saved)
+      @manifest.on 'change:id', (model, newValue, oldValue) =>
+        navTree = JSON.parse @get('navTreeStr')
+        # Find the node that has an `id` to this model
+        recFind = (nodes) ->
+          for node in nodes
+            return node if model.id == oldValue
+            if node.children
+              found = recFind node.children
+              return found if found
+        node = recFind(navTree)
+        return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
+        node.id = newValue
+        @set 'navTreeStr', JSON.stringify navTree
+
       @manifest.on 'change:title', (model, newValue, oldValue) =>
         navTree = JSON.parse @get('navTreeStr')
         # Find the node that has an `id` to this model
@@ -268,9 +286,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       else if mediaType
         config = model
         throw 'BUG: Media type not registered' if not MEDIA_TYPES.get mediaType
-        uuid = b = (a) ->
-          (if a then (a ^ Math.random() * 16 >> a / 4).toString(16) else ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b))
-        config.id = uuid() if not config.id
 
         # Create the model from a config and add it to the manifest
         ContentType = MEDIA_TYPES.get(mediaType).constructor
