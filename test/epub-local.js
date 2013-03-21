@@ -65,7 +65,7 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             model = _ref[_i];
-            if (model.get('mediaType') !== 'text/x-module') {
+            if (model.get('mediaType') !== 'application/vnd.org.cnx.module') {
               _results.push(this.add(model, {
                 at: 0
               }));

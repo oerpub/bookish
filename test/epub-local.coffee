@@ -121,7 +121,7 @@ define 'epub-local', [ 'jquery', 'backbone', 'bookish/controller', 'bookish/mode
     BookishModels.SearchResults = BookishModels.SearchResults.extend
       initialize: ->
         for model in BookishModels.ALL_CONTENT.models
-          if model.get('mediaType') != 'text/x-module'
+          if model.get('mediaType') != 'application/vnd.org.cnx.module'
             @add model, {at: 0}
           else
             @add model
