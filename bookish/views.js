@@ -92,7 +92,13 @@
       itemView: exports.SearchResultsItemView,
       initialize: function() {
         var _this = this;
-        return this.listenTo(this.collection, 'reset', function() {
+        this.listenTo(this.collection, 'reset', function() {
+          return _this.render();
+        });
+        this.listenTo(this.collection, 'add', function() {
+          return _this.render();
+        });
+        return this.listenTo(this.collection, 'remove', function() {
           return _this.render();
         });
       }

@@ -122,6 +122,8 @@ define [
 
     initialize: ->
       @listenTo @collection, 'reset',   => @render()
+      @listenTo @collection, 'add',     => @render()
+      @listenTo @collection, 'remove',  => @render()
 
   # The search box. Changing the text will cause the underlying collection to filter
   # and fire off `add/remove` events.
