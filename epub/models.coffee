@@ -59,7 +59,7 @@ define [
       copyrightDate: null
     )
     getterField: 'content'
-    mediaType: 'text/x-collection'
+    mediaType: 'application/vnd.org.cnx.collection'
 
     template: OPF_TEMPLATE
     manifestType: Backbone.Collection.extend
