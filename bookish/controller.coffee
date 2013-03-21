@@ -97,7 +97,7 @@ define [
     # Shows the workspace listing and updates the URL
     workspace: ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       mainSidebar.close()
       mainToolbar.close()
@@ -138,7 +138,7 @@ define [
     # Edit a book in the main area
     editBook: (model) ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       mainToolbar.close()
 
@@ -148,7 +148,7 @@ define [
     # Edit a piece of HTML content
     editContent: (content) ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       # ## Bind Metadata Dialogs
       mainArea.show contentLayout
