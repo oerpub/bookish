@@ -66,7 +66,7 @@
       workspace: function() {
         var view, workspace,
           _this = this;
-        window.scrollTo(0);
+        window.scrollTo(0, 0);
         mainSidebar.close();
         mainToolbar.close();
         workspace = new Models.FilteredCollection(null, {
@@ -105,7 +105,7 @@
       },
       editBook: function(model) {
         var view;
-        window.scrollTo(0);
+        window.scrollTo(0, 0);
         mainToolbar.close();
         view = new Views.BookEditView({
           model: model
@@ -115,7 +115,7 @@
       editContent: function(content) {
         var configAccordionDialog, view,
           _this = this;
-        window.scrollTo(0);
+        window.scrollTo(0, 0);
         mainArea.show(contentLayout);
         configAccordionDialog = function(region, view) {
           var dialog,
