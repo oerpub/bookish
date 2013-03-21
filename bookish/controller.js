@@ -168,12 +168,12 @@
         'content/:id': 'editModelId'
       }
     });
-    MEDIA_TYPES.add('text/x-module', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.module', {
       editAction: function(model) {
         return mainController.editContent(model);
       }
     });
-    MEDIA_TYPES.add('text/x-collection', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
       editAction: function(model) {
         return mainController.editBook(model);
       }

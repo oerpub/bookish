@@ -203,8 +203,8 @@ define [
       'content/:id':  'editModelId' # Edit an existing piece of content
 
   # ## Attach mediaType edit views
-  MEDIA_TYPES.add 'text/x-module',     {editAction: (model) -> mainController.editContent model}
-  MEDIA_TYPES.add 'text/x-collection', {editAction: (model) -> mainController.editBook model}
+  MEDIA_TYPES.add 'application/vnd.org.cnx.module',     {editAction: (model) -> mainController.editContent model}
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection', {editAction: (model) -> mainController.editBook model}
 
 
   # Start listening to URL changes

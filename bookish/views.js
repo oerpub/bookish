@@ -559,7 +559,7 @@
       prependContent: function() {
         return this.model.prependNewContent({
           title: 'Untitled Content'
-        }, 'text/x-module');
+        }, 'application/vnd.org.cnx.module');
       },
       closeView: function() {
         return Controller.hideSidebar();

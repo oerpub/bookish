@@ -549,7 +549,7 @@ define [
     initialize: ->
       @listenTo @model, 'all', => @render()
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'text/x-module'
+    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
     closeView: -> Controller.hideSidebar()
 
