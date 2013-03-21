@@ -102,8 +102,7 @@ define [
       mainSidebar.close()
       mainToolbar.close()
       # List the workspace
-      workspace = new Models.SearchResults()
-      workspace = new Models.FilteredCollection null, {collection: workspace}
+      workspace = new Models.FilteredCollection null, {collection: Models.WORKSPACE}
 
       view = new Views.SearchBoxView {model: workspace}
       mainToolbar.show view
@@ -112,10 +111,9 @@ define [
       mainArea.show view
 
       # Update the URL
-      Backbone.history.navigate 'workspace'
-
-      workspace.on 'change', ->
-        view.render()
+      Models.WORKSPACE.loaded().done =>
+        # Update the URL
+        Backbone.history.navigate 'workspace'
 
     # ### Edit existing content
     # Calling this method directly will start editing an existing piece of content

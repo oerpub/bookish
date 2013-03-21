@@ -9,18 +9,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
 
-  # ## All Content
-  #
-  # To prevent multiple copies of a model from floating around a single
-  # copy of all referenced content (loaded or not) is kept in this Collection
-  #
-  # This should be read-only by others
-  # New content models should be created by calling `ALL_CONTENT.add {}`
-  AllContent = Backbone.Collection.extend
-    model: BaseContent
-
-  ALL_CONTENT = new AllContent()
-
+  # This gets used by `DeferrableCollection` but is instantiated afterwards
+  ALL_CONTENT = null
 
   # ## Promises
   # A model representing a piece of content may have been instantiated
@@ -72,7 +62,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         deferred.resolve @
         @_promise = deferred.promise()
         # Mark it as loaded for the views
-        @set {_done: true}
+        @_done = true
 
       # Silently update the model (the user has not seen the model yet)
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
@@ -92,6 +82,22 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @on 'add',   (model) -> ALL_CONTENT.add model
       @on 'reset', (collection, options) -> ALL_CONTENT.add collection.toArray()
 
+
+  # ## All Content
+  #
+  # To prevent multiple copies of a model from floating around a single
+  # copy of all referenced content (loaded or not) is kept in this Collection
+  #
+  # This should be read-only by others
+  # New content models should be created by calling `ALL_CONTENT.add {}`
+  AllContent = DeferrableCollection.extend
+    model: BaseContent
+    # Override the `DeferrableCollection` initialize because this is the `ALL_CONTENT`
+    initialize: ->
+      # Never wait to fetch
+      @loaded(true)
+
+  ALL_CONTENT = new AllContent()
 
 
   # When searching for text, perform a local filter on content while we wait
@@ -126,11 +132,13 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @add (@collection.filter (model) => @isMatch(model))
 
 
-      @collection.on 'add', (model) => @add model if @isMatch(model)
-      @collection.on 'remove', (model) => @remove model
-      @collection.on 'reset', (model) => @reset()
+      @listenTo @collection, 'add',    (model) => @add model if @isMatch(model)
+      @listenTo @collection, 'remove', (model) => @remove model
+      @listenTo @collection, 'reset',  (model, options) =>
+        @reset()
+        @add (@collection.filter (model) => @isMatch(model))
 
-      @collection.on 'change', (model) =>
+      @listenTo @collection, 'change', (model) =>
         if @isMatch(model)
           @add model
         else
@@ -283,22 +291,20 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       navTree.unshift {id: model.get('id'), title: model.get('title')}
       @set 'navTreeStr', JSON.stringify navTree
 
-  SearchResults = DeferrableCollection.extend
-    defaults:
-      parameters: []
-    # Compare by `mediaType` (Collections/Books 1st), then by title/URL
-    comparator: (a, b) ->
-      A = a.mediaType or ''
-      B = b.mediaType or ''
-      return -1 if B < A
-      return 1  if A < B
 
-      A = a.get('title') or a.id or ''
-      B = b.get('title') or b.id or ''
-      return 1 if B < A
-      return -1  if A < B
+  # Compare by `mediaType` (Collections/Books 1st), then by title/URL
+  CONTENT_COMPARATOR = (a, b) ->
+    A = a.mediaType or ''
+    B = b.mediaType or ''
+    return -1 if B < A
+    return 1  if A < B
 
-      return 0
+    A = a.get('title') or a.id or ''
+    B = b.get('title') or b.id or ''
+    return 1 if B < A
+    return -1  if A < B
+
+    return 0
 
   # Add the 2 basic Media Types already defined above
   MEDIA_TYPES.add 'application/vnd.org.cnx.module',
@@ -314,5 +320,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
   exports.MEDIA_TYPES = MEDIA_TYPES
-  exports.SearchResults = SearchResults
+  exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR
+  # Other implementations can override this
+  exports.WORKSPACE = ALL_CONTENT
   return exports
