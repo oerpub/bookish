@@ -5,33 +5,35 @@ define [
   'bookish/models'
   'bookish/media-types'
   'bookish/auth'
+  'hbs!atc-nav-serialize'
   'css!bookish'
-], (_, Backbone, Controller, Models, MEDIA_TYPES, Auth) ->
+], (_, Backbone, Controller, Models, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
   DEBUG = true
 
-  # Generate UUIDv4 id's (from http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript)
-  uuid = b = (a) ->
-    (if a then (a ^ Math.random() * 16 >> a / 4).toString(16) else ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b))
-
-
-
-  writeFile = (path, text, commitText) ->
-    Auth.getRepo().write Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", text, commitText
-
-  readFile = (path) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}"
-  readDir =  (path) -> Auth.getRepo().contents Auth.get('branch'), path
 
   ROOT_URL = ''
   WORKSPACE_URL = "#{ROOT_URL}/workspace/"
 
-  Models.BaseContent::url = -> "#{ROOT_URL}/module/#{@id}"
+  # Find out who the current user is logged in as
+  Auth.url = -> "#{ROOT_URL}/me/"
+  Auth.fetch()
+
+  Models.BaseContent::url = ->
+    return "#{ROOT_URL}/module/" if @isNew()
+    "#{ROOT_URL}/module/#{@id}"
   Models.BaseBook::url = -> "#{ROOT_URL}/collection/#{@id}"
 
-  # HACK: so the user is always logged in
-  Auth.set
-    username: 'test'
-    password: 'test'
+
+  # When the `navTreeStr` changes, update the body with HTML
+  oldBaseBook_initialize = Models.BaseBook::initialize
+  Models.BaseBook::initialize = ->
+    oldBaseBook_initialize.apply(@, arguments)
+    # When the `navTreeStr` is changed on the package,
+    # Change it in the book body
+    @on 'change:navTreeStr', (model, navTreeStr) =>
+      @set {body: NAV_SERIALIZE JSON.parse navTreeStr}
+
 
   # HACK: to always get an authenticated user
   # Originally from `Backbone.sync`.
@@ -39,6 +41,7 @@ define [
   Backbone.ajax = (config) ->
     config = _.extend config, {headers: {'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'}}
     Backbone.$.ajax.apply(Backbone.$, [config])
+
 
   AtcWorkspace = Models.DeferrableCollection.extend
     url: WORKSPACE_URL
@@ -58,6 +61,14 @@ define [
         model
 
       results
+
+    # If new content is created/loaded, add it to the workspace
+    initialize: ->
+      @on 'add', (model) => Models.ALL_CONTENT.add model
+      @on 'reset', (collection) => Models.ALL_CONTENT.add @models
+
+      @listenTo Models.ALL_CONTENT, 'add', (model) =>
+        @add model
 
 
   Models.WORKSPACE = new AtcWorkspace()
