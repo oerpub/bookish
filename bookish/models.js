@@ -2,7 +2,7 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, BaseBook, BaseContent, Deferrable, DeferrableCollection, SearchResults, loaded;
+    var ALL_CONTENT, AllContent, BaseBook, BaseContent, Deferrable, DeferrableCollection, SearchResults;
     BaseContent = Backbone.Model.extend({
       initialize: function() {
         if (!this.mediaType) {
@@ -17,28 +17,6 @@
       model: BaseContent
     });
     ALL_CONTENT = new AllContent();
-    loaded = function(flag) {
-      var deferred,
-        _this = this;
-      if (flag == null) {
-        flag = false;
-      }
-      if (flag) {
-        deferred = jQuery.Deferred();
-        deferred.resolve(this);
-        this._promise = deferred.promise();
-        this.set({
-          _done: true
-        });
-      }
-      if (!this._promise || 'rejected' === this._promise.state()) {
-        this._promise = this.fetch();
-        this._promise.then(function() {
-          return delete _this.changed;
-        });
-      }
-      return this._promise;
-    };
     Deferrable = Backbone.Model.extend({
       loaded: function(flag) {
         var deferred,
@@ -58,7 +36,11 @@
           this.set({
             _loading: true
           });
-          this._promise = this.fetch();
+          this._promise = this.fetch({
+            error: function(model, message, options) {
+              return _this.trigger('error', model, message, options);
+            }
+          });
           this._promise.progress(function(progress) {
             return _this.set({
               _progress: progress
@@ -82,8 +64,28 @@
       }
     });
     DeferrableCollection = Backbone.Collection.extend({
-      loaded: function() {
-        return loaded.apply(this, arguments);
+      loaded: function(flag) {
+        var deferred,
+          _this = this;
+        if (flag) {
+          deferred = jQuery.Deferred();
+          deferred.resolve(this);
+          this._promise = deferred.promise();
+          this.set({
+            _done: true
+          });
+        }
+        if (!this._promise || 'rejected' === this._promise.state()) {
+          this._promise = this.fetch({
+            error: function(model, message, options) {
+              return _this.trigger('error', model, message, options);
+            }
+          });
+          this._promise.then(function() {
+            return delete _this.changed;
+          });
+        }
+        return this._promise;
       },
       toJSON: function() {
         var model, _i, _len, _ref, _results;
@@ -164,7 +166,7 @@
       }
     });
     BaseContent = Deferrable.extend({
-      mediaType: 'text/x-module',
+      mediaType: 'application/vnd.org.cnx.module',
       defaults: {
         title: null,
         subjects: [],
@@ -175,7 +177,7 @@
       }
     });
     BaseBook = Deferrable.extend({
-      mediaType: 'text/x-collection',
+      mediaType: 'application/vnd.org.cnx.collection',
       defaults: {
         manifest: null,
         navTreeStr: '[]'
@@ -257,7 +259,7 @@
                 contentModel = _this.manifest.add({
                   id: node.id,
                   title: node.title,
-                  mediaType: 'text/x-module'
+                  mediaType: 'application/vnd.org.cnx.module'
                 });
               }
               if (node.children) {
@@ -331,10 +333,10 @@
         return 0;
       }
     });
-    MEDIA_TYPES.add('text/x-module', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.module', {
       constructor: BaseContent
     });
-    MEDIA_TYPES.add('text/x-collection', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
       constructor: BaseBook
     });
     exports.BaseContent = BaseContent;

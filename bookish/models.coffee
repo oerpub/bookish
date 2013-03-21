@@ -31,24 +31,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   #
   # Once the model is loaded (fetched) call the callbacks.
 
-  loaded = (flag=false) ->
-    if flag
-      deferred = jQuery.Deferred()
-      deferred.resolve @
-      @_promise = deferred.promise()
-      # Mark it as loaded for the views
-      @set {_done: true}
-
-    # Silently update the model (the user has not seen the model yet)
-    # so `model.hasChanged()` returns `false` (to know when to enable Saving)
-    if not @_promise or 'rejected' == @_promise.state()
-      @_promise = @fetch() # {silent:true}
-      # Once we are done fetching and the change events have fired
-      # clear all the `.changed` flag so save does not think it has dirty models
-      @_promise.then => delete @changed
-
-    return @_promise
-
   Deferrable = Backbone.Model.extend
     loaded: (flag=false) ->
       if flag
@@ -62,7 +44,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
       if not @_promise or 'rejected' == @_promise.state()
         @set {_loading: true}
-        @_promise = @fetch() # {silent:true}
+        @_promise = @fetch # {silent:true}
+          error: (model, message, options) =>
+            @trigger 'error', model, message, options
         @_promise
         .progress (progress) =>
           @set {_progress: progress}
@@ -82,7 +66,27 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       return json
 
   DeferrableCollection = Backbone.Collection.extend
-    loaded: () -> loaded.apply(@, arguments)
+    loaded: (flag) ->
+      if flag
+        deferred = jQuery.Deferred()
+        deferred.resolve @
+        @_promise = deferred.promise()
+        # Mark it as loaded for the views
+        @set {_done: true}
+
+      # Silently update the model (the user has not seen the model yet)
+      # so `model.hasChanged()` returns `false` (to know when to enable Saving)
+      if not @_promise or 'rejected' == @_promise.state()
+        @_promise = @fetch # {silent:true}
+          error: (model, message, options) =>
+            @trigger 'error', model, message, options
+
+        # Once we are done fetching and the change events have fired
+        # clear all the `.changed` flag so save does not think it has dirty models
+        @_promise.then => delete @changed
+
+      return @_promise
+
     toJSON: -> (model.toJSON() for model in @models)
     initialize: ->
       @on 'add',   (model) -> ALL_CONTENT.add model
@@ -142,7 +146,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
   BaseContent = Deferrable.extend
-    mediaType: 'text/x-module'
+    mediaType: 'application/vnd.org.cnx.module'
     defaults:
       title: null
       subjects: []
@@ -155,7 +159,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
   BaseBook = Deferrable.extend
-    mediaType: 'text/x-collection'
+    mediaType: 'application/vnd.org.cnx.collection'
     defaults:
       manifest: null
       # `navTreeStr` is stored as a JSON string so events are fired when changes are made
@@ -243,7 +247,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         recAdd = (nodes) =>
           for node in nodes
             if node.id
-              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'text/x-module'}
+              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'application/vnd.org.cnx.module'}
             recAdd node.children if node.children
         recAdd(JSON.parse navTreeStr)
 
@@ -297,10 +301,10 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       return 0
 
   # Add the 2 basic Media Types already defined above
-  MEDIA_TYPES.add 'text/x-module',
+  MEDIA_TYPES.add 'application/vnd.org.cnx.module',
     constructor: BaseContent
 
-  MEDIA_TYPES.add 'text/x-collection',
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
     constructor: BaseBook
 
   # Finally, export only the pieces needed
