@@ -146,7 +146,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
   BaseContent = Deferrable.extend
-    mediaType: 'text/x-module'
+    mediaType: 'application/vnd.org.cnx.module'
     defaults:
       title: null
       subjects: []
@@ -159,7 +159,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
   BaseBook = Deferrable.extend
-    mediaType: 'text/x-collection'
+    mediaType: 'application/vnd.org.cnx.collection'
     defaults:
       manifest: null
       # `navTreeStr` is stored as a JSON string so events are fired when changes are made
@@ -247,7 +247,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         recAdd = (nodes) =>
           for node in nodes
             if node.id
-              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'text/x-module'}
+              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'application/vnd.org.cnx.module'}
             recAdd node.children if node.children
         recAdd(JSON.parse navTreeStr)
 
@@ -301,10 +301,10 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       return 0
 
   # Add the 2 basic Media Types already defined above
-  MEDIA_TYPES.add 'text/x-module',
+  MEDIA_TYPES.add 'application/vnd.org.cnx.module',
     constructor: BaseContent
 
-  MEDIA_TYPES.add 'text/x-collection',
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
     constructor: BaseBook
 
   # Finally, export only the pieces needed

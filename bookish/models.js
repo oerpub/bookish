@@ -166,7 +166,7 @@
       }
     });
     BaseContent = Deferrable.extend({
-      mediaType: 'text/x-module',
+      mediaType: 'application/vnd.org.cnx.module',
       defaults: {
         title: null,
         subjects: [],
@@ -177,7 +177,7 @@
       }
     });
     BaseBook = Deferrable.extend({
-      mediaType: 'text/x-collection',
+      mediaType: 'application/vnd.org.cnx.collection',
       defaults: {
         manifest: null,
         navTreeStr: '[]'
@@ -259,7 +259,7 @@
                 contentModel = _this.manifest.add({
                   id: node.id,
                   title: node.title,
-                  mediaType: 'text/x-module'
+                  mediaType: 'application/vnd.org.cnx.module'
                 });
               }
               if (node.children) {
@@ -333,10 +333,10 @@
         return 0;
       }
     });
-    MEDIA_TYPES.add('text/x-module', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.module', {
       constructor: BaseContent
     });
-    MEDIA_TYPES.add('text/x-collection', {
+    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
       constructor: BaseBook
     });
     exports.BaseContent = BaseContent;
