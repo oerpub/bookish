@@ -3,16 +3,17 @@ define [
   'backbone'
   'bookish/controller'
   'bookish/models'
+  'bookish/views'
   'bookish/media-types'
   'bookish/auth'
   'hbs!atc-nav-serialize'
   'css!bookish'
-], (_, Backbone, Controller, Models, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
+], (_, Backbone, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
   DEBUG = true
 
 
-  ROOT_URL = ''
+  ROOT_URL = 'http://beta.cnx.org'
   WORKSPACE_URL = "#{ROOT_URL}/workspace/"
 
   # Find out who the current user is logged in as
@@ -41,6 +42,56 @@ define [
   Backbone.ajax = (config) ->
     config = _.extend config, {headers: {'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'}}
     Backbone.$.ajax.apply(Backbone.$, [config])
+
+
+  # A folder contains a title and a collection of items in the folder
+  Folder = Models.Deferrable.extend
+    mediaType: 'application/vnd.org.cnx.folder'
+    url: -> "#{ROOT_URL}/folder/#{@id}"
+    parse: (obj) ->
+      models = for item in obj.body or []
+        Type = MEDIA_TYPES.get(item.mediaType).constructor
+        model = new Type(item)
+        model
+      @collection.reset(models)
+
+      delete obj.body
+      obj
+    initialize: (obj) ->
+      @collection = new Backbone.Collection()
+      for item in obj.body or []
+        Type = MEDIA_TYPES.get(item.mediaType).constructor
+        model = new Type(item)
+        @collection.add model
+
+  MEDIA_TYPES.add 'application/vnd.org.cnx.folder',
+    constructor: Folder
+    # ### Show Folder
+    # Shows a single folder in the workspace
+    editAction: (model) ->
+      # Always scroll to the top of the page
+      window.scrollTo(0, 0)
+
+      mainSidebar = Controller.mainLayout.sidebar
+      mainToolbar = Controller.mainLayout.toolbar
+      mainArea = Controller.mainLayout.area
+
+      mainSidebar.close()
+      mainToolbar.close()
+      # List the workspace
+      workspace = new Models.FilteredCollection null, {collection: model.collection}
+
+      view = new Views.SearchBoxView {model: workspace}
+      mainToolbar.show view
+
+      view = new Views.SearchResultsView {collection: workspace}
+      mainArea.show view
+
+      # Update the URL
+      model.loaded().done =>
+        # Update the URL
+        Backbone.history.navigate "content/#{model.get 'id'}"
+
 
 
   AtcWorkspace = Models.DeferrableCollection.extend

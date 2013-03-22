@@ -69,6 +69,7 @@
 .search-results *[data-media-type='application/xhtml+xml']  .icon-content:before,
 .search-results *[data-media-type='application/vnd.org.cnx.module']          .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
 .search-results *[data-media-type='application/vnd.org.cnx.collection']      .icon-content:before { content:"\f02d"; /* icon-book */ }
+.search-results *[data-media-type='application/vnd.org.cnx.folder']          .icon-content:before { content:"\f07c"; /* icon-folder-open */ }
 
 .search-results > tbody > tr { cursor: pointer; }
 
