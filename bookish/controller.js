@@ -60,6 +60,7 @@
       getRegion: function() {
         return mainRegion;
       },
+      mainLayout: mainLayout,
       hideSidebar: function() {
         return mainSidebar.close();
       },
