@@ -71,6 +71,7 @@ define [
   #
   # Methods on this object can be called directly and will update the URL.
   mainController =
+
     # Begin monitoring URL changes and match the current route
     # In here so App can call it once it has completed loading
     start: ->
@@ -90,6 +91,9 @@ define [
     # Provide the main region that this controller uses.
     # Useful for applications that want to extend this editor.
     getRegion: -> mainRegion
+
+    # Give others access to the main layout so they can change pieces of it
+    mainLayout: mainLayout
 
     hideSidebar: -> mainSidebar.close()
 
