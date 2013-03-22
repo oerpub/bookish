@@ -83,7 +83,7 @@ require.config
     #
     # Also, configure Aloha for the application using the `aloha-config` module.
     aloha:
-      deps: ['bootstrap', 'config/aloha-config', 'css!lib/Aloha-Editor/src/css/aloha']
+      deps: ['bootstrap', 'config/aloha-config']
       exports: 'Aloha'
 
   # Maps prefixes (like `less!path/to/less-file`) to use the LESS CSS plugin
