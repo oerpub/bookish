@@ -485,7 +485,7 @@
       },
       saveContent: function() {
         var $alertError, $errorBar, $label, $save, $saving, $successBar, allContent, errorCount, finished, recSave, total;
-        if (!this.model.get('password')) {
+        if (!this.model.get('id')) {
           return alert('You need to sign (and make sure you can edit) before you can save changes');
         }
         $save = this.$el.find('#save-progress-modal');
