@@ -52,9 +52,6 @@ singleFile "http://marionettejs.com/downloads/backbone.marionette.js" "backbone.
 
 fromGithub "https://github.com/wysiwhat/Aloha-Editor" "dev"
 
-# For github-hosted ebooks
-fromGithub "https://github.com/philschatz/github"
-
 ##fromGithub "https://github.com/twitter/bootstrap"
 TEMP="bootstrap.zip"
 if [ -d "bootstrap" ]; then
