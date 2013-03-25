@@ -147,7 +147,9 @@ define [
       mainToolbar.close()
 
       view = new Views.BookEditView {model: model}
-      mainSidebar.show view
+
+      # Wait until the book is loaded
+      model.loaded().done => mainSidebar.show view
 
     # Edit a piece of HTML content
     editContent: (content) ->

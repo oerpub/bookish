@@ -105,13 +105,16 @@
         return editAction(model);
       },
       editBook: function(model) {
-        var view;
+        var view,
+          _this = this;
         window.scrollTo(0, 0);
         mainToolbar.close();
         view = new Views.BookEditView({
           model: model
         });
-        return mainSidebar.show(view);
+        return model.loaded().done(function() {
+          return mainSidebar.show(view);
+        });
       },
       editContent: function(content) {
         var configAccordionDialog, view,
