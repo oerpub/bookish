@@ -92,7 +92,13 @@
       itemView: exports.SearchResultsItemView,
       initialize: function() {
         var _this = this;
-        return this.listenTo(this.collection, 'reset', function() {
+        this.listenTo(this.collection, 'reset', function() {
+          return _this.render();
+        });
+        this.listenTo(this.collection, 'add', function() {
+          return _this.render();
+        });
+        return this.listenTo(this.collection, 'remove', function() {
           return _this.render();
         });
       }
@@ -479,7 +485,7 @@
       },
       saveContent: function() {
         var $alertError, $errorBar, $label, $save, $saving, $successBar, allContent, errorCount, finished, recSave, total;
-        if (!this.model.get('password')) {
+        if (!this.model.get('id')) {
           return alert('You need to sign (and make sure you can edit) before you can save changes');
         }
         $save = this.$el.find('#save-progress-modal');

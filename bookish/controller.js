@@ -60,17 +60,18 @@
       getRegion: function() {
         return mainRegion;
       },
+      mainLayout: mainLayout,
       hideSidebar: function() {
         return mainSidebar.close();
       },
       workspace: function() {
-        var view, workspace;
-        window.scrollTo(0);
+        var view, workspace,
+          _this = this;
+        window.scrollTo(0, 0);
         mainSidebar.close();
         mainToolbar.close();
-        workspace = new Models.SearchResults();
         workspace = new Models.FilteredCollection(null, {
-          collection: workspace
+          collection: Models.WORKSPACE
         });
         view = new Views.SearchBoxView({
           model: workspace
@@ -80,9 +81,8 @@
           collection: workspace
         });
         mainArea.show(view);
-        Backbone.history.navigate('workspace');
-        return workspace.on('change', function() {
-          return view.render();
+        return Models.WORKSPACE.loaded().done(function() {
+          return Backbone.history.navigate('workspace');
         });
       },
       editModelId: function(id) {
@@ -106,7 +106,7 @@
       },
       editBook: function(model) {
         var view;
-        window.scrollTo(0);
+        window.scrollTo(0, 0);
         mainToolbar.close();
         view = new Views.BookEditView({
           model: model
@@ -116,7 +116,7 @@
       editContent: function(content) {
         var configAccordionDialog, view,
           _this = this;
-        window.scrollTo(0);
+        window.scrollTo(0, 0);
         mainArea.show(contentLayout);
         configAccordionDialog = function(region, view) {
           var dialog,
