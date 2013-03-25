@@ -97,6 +97,8 @@ define [
   exports.SearchResultsItemView = Marionette.ItemView.extend
     tagName: 'tr'
     template: SEARCH_RESULT_ITEM
+    initialize: ->
+      @listenTo @model, 'change', => @render()
     onRender: ->
       @$el.on 'click', => Controller.editModel(@model)
 

@@ -67,6 +67,12 @@
     exports.SearchResultsItemView = Marionette.ItemView.extend({
       tagName: 'tr',
       template: SEARCH_RESULT_ITEM,
+      initialize: function() {
+        var _this = this;
+        return this.listenTo(this.model, 'change', function() {
+          return _this.render();
+        });
+      },
       onRender: function() {
         var _this = this;
         return this.$el.on('click', function() {
