@@ -1,6 +1,7 @@
 define [
   'underscore'
   'backbone'
+  'jquery'
   'bookish/controller'
   'bookish/models'
   'bookish/views'
@@ -8,12 +9,12 @@ define [
   'bookish/auth'
   'hbs!atc-nav-serialize'
   'css!bookish'
-], (_, Backbone, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
+], (_, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
   DEBUG = true
 
 
-  ROOT_URL = 'http://beta.cnx.org'
+  ROOT_URL = ''
   WORKSPACE_URL = "#{ROOT_URL}/workspace/"
 
   # Find out who the current user is logged in as
@@ -30,6 +31,15 @@ define [
   oldBaseBook_initialize = Models.BaseBook::initialize
   Models.BaseBook::initialize = ->
     oldBaseBook_initialize.apply(@, arguments)
+
+    # When the body of the collection changes, update the `navTreeStr`
+    @on 'change:body', (model, body) =>
+      $body = jQuery(body)
+      $root = $body.find('ul').first()
+      if $root[0]
+        navTree = @parseNavTree($root)
+        @set 'navTreeStr', JSON.stringify navTree
+
     # When the `navTreeStr` is changed on the package,
     # Change it in the book body
     @on 'change:navTreeStr', (model, navTreeStr) =>
