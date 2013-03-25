@@ -35,13 +35,14 @@ define [
   # The `MainLayout` contains all areas of the page that do not change
   MainLayout = Marionette.Layout.extend
     template: LAYOUT_MAIN
-    regionType: HidingRegion
     regions:
       home:         '#layout-main-home'
       toolbar:      '#layout-main-toolbar'
       auth:         '#layout-main-auth'
-      sidebar:      '#layout-main-sidebar'
-      area:         '#layout-main-area'
+      # The sidebar and main area will get a 'hidden' class when hiding
+      # so CSS transitions can be applied.
+      sidebar:      {selector: '#layout-main-sidebar', regionType: HidingRegion}
+      area:         {selector: '#layout-main-area', regionType: HidingRegion}
   mainLayout = new MainLayout()
   # Keep the regions so views can just update the regions they need
   mainToolbar = mainLayout.toolbar
