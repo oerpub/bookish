@@ -5,22 +5,15 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`
   BaseContent = Backbone.Model.extend
+    # New content is given an id before it is saved so it can be added to a book
+    isNew = -> not @id or @id.match(/^_NEW:/)
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
+      @id = "_NEW:#{@cid}" if not @id
 
-  # ## All Content
-  #
-  # To prevent multiple copies of a model from floating around a single
-  # copy of all referenced content (loaded or not) is kept in this Collection
-  #
-  # This should be read-only by others
-  # New content models should be created by calling `ALL_CONTENT.add {}`
-  AllContent = Backbone.Collection.extend
-    model: BaseContent
-
-  ALL_CONTENT = new AllContent()
-
+  # This gets used by `DeferrableCollection` but is instantiated afterwards
+  ALL_CONTENT = null
 
   # ## Promises
   # A model representing a piece of content may have been instantiated
@@ -72,7 +65,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         deferred.resolve @
         @_promise = deferred.promise()
         # Mark it as loaded for the views
-        @set {_done: true}
+        @_done = true
 
       # Silently update the model (the user has not seen the model yet)
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
@@ -92,6 +85,22 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @on 'add',   (model) -> ALL_CONTENT.add model
       @on 'reset', (collection, options) -> ALL_CONTENT.add collection.toArray()
 
+
+  # ## All Content
+  #
+  # To prevent multiple copies of a model from floating around a single
+  # copy of all referenced content (loaded or not) is kept in this Collection
+  #
+  # This should be read-only by others
+  # New content models should be created by calling `ALL_CONTENT.add {}`
+  AllContent = DeferrableCollection.extend
+    model: BaseContent
+    # Override the `DeferrableCollection` initialize because this is the `ALL_CONTENT`
+    initialize: ->
+      # Never wait to fetch
+      @loaded(true)
+
+  ALL_CONTENT = new AllContent()
 
 
   # When searching for text, perform a local filter on content while we wait
@@ -126,11 +135,13 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @add (@collection.filter (model) => @isMatch(model))
 
 
-      @collection.on 'add', (model) => @add model if @isMatch(model)
-      @collection.on 'remove', (model) => @remove model
-      @collection.on 'reset', (model) => @reset()
+      @listenTo @collection, 'add',    (model) => @add model if @isMatch(model)
+      @listenTo @collection, 'remove', (model) => @remove model
+      @listenTo @collection, 'reset',  (model, options) =>
+        @reset()
+        @add (@collection.filter (model) => @isMatch(model))
 
-      @collection.on 'change', (model) =>
+      @listenTo @collection, 'change', (model) =>
         if @isMatch(model)
           @add model
         else
@@ -228,6 +239,21 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @manifest.on 'add',   (model, collection) -> ALL_CONTENT.add model
       @manifest.on 'reset', (model, collection) -> ALL_CONTENT.add model
 
+      # If a model's id changes then update the `navTree` (it was a new model that got saved)
+      @manifest.on 'change:id', (model, newValue, oldValue) =>
+        navTree = JSON.parse @get('navTreeStr')
+        # Find the node that has an `id` to this model
+        recFind = (nodes) ->
+          for node in nodes
+            return node if model.id == oldValue
+            if node.children
+              found = recFind node.children
+              return found if found
+        node = recFind(navTree)
+        return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
+        node.id = newValue
+        @set 'navTreeStr', JSON.stringify navTree
+
       @manifest.on 'change:title', (model, newValue, oldValue) =>
         navTree = JSON.parse @get('navTreeStr')
         # Find the node that has an `id` to this model
@@ -260,9 +286,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       else if mediaType
         config = model
         throw 'BUG: Media type not registered' if not MEDIA_TYPES.get mediaType
-        uuid = b = (a) ->
-          (if a then (a ^ Math.random() * 16 >> a / 4).toString(16) else ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b))
-        config.id = uuid() if not config.id
 
         # Create the model from a config and add it to the manifest
         ContentType = MEDIA_TYPES.get(mediaType).constructor
@@ -283,22 +306,20 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       navTree.unshift {id: model.get('id'), title: model.get('title')}
       @set 'navTreeStr', JSON.stringify navTree
 
-  SearchResults = DeferrableCollection.extend
-    defaults:
-      parameters: []
-    # Compare by `mediaType` (Collections/Books 1st), then by title/URL
-    comparator: (a, b) ->
-      A = a.mediaType or ''
-      B = b.mediaType or ''
-      return -1 if B < A
-      return 1  if A < B
 
-      A = a.get('title') or a.id or ''
-      B = b.get('title') or b.id or ''
-      return 1 if B < A
-      return -1  if A < B
+  # Compare by `mediaType` (Collections/Books 1st), then by title/URL
+  CONTENT_COMPARATOR = (a, b) ->
+    A = a.mediaType or ''
+    B = b.mediaType or ''
+    return -1 if B < A
+    return 1  if A < B
 
-      return 0
+    A = a.get('title') or a.id or ''
+    B = b.get('title') or b.id or ''
+    return 1 if B < A
+    return -1  if A < B
+
+    return 0
 
   # Add the 2 basic Media Types already defined above
   MEDIA_TYPES.add 'application/vnd.org.cnx.module',
@@ -314,5 +335,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
   exports.MEDIA_TYPES = MEDIA_TYPES
-  exports.SearchResults = SearchResults
+  exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR
+  # Other implementations can override this
+  exports.WORKSPACE = ALL_CONTENT
   return exports

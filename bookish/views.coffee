@@ -97,6 +97,8 @@ define [
   exports.SearchResultsItemView = Marionette.ItemView.extend
     tagName: 'tr'
     template: SEARCH_RESULT_ITEM
+    initialize: ->
+      @listenTo @model, 'change', => @render()
     onRender: ->
       @$el.on 'click', => Controller.editModel(@model)
 
@@ -122,6 +124,8 @@ define [
 
     initialize: ->
       @listenTo @collection, 'reset',   => @render()
+      @listenTo @collection, 'add',     => @render()
+      @listenTo @collection, 'remove',  => @render()
 
   # The search box. Changing the text will cause the underlying collection to filter
   # and fire off `add/remove` events.
@@ -472,7 +476,7 @@ define [
     # Save each model in sequence.
     # **FIXME:** This should be done in a commit batch
     saveContent: ->
-      return alert 'You need to sign (and make sure you can edit) before you can save changes' if not @model.get 'password'
+      return alert 'You need to sign (and make sure you can edit) before you can save changes' if not @model.get 'id'
       $save = @$el.find('#save-progress-modal')
       $saving     = $save.find('.saving')
       $alertError = $save.find('.alert-error')

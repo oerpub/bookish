@@ -118,14 +118,6 @@ define 'epub-local', [ 'jquery', 'backbone', 'bookish/controller', 'bookish/mode
     console.log 'Workspace loaded!'
 
 
-    BookishModels.SearchResults = BookishModels.SearchResults.extend
-      initialize: ->
-        for model in BookishModels.ALL_CONTENT.models
-          if model.get('mediaType') != 'application/vnd.org.cnx.module'
-            @add model, {at: 0}
-          else
-            @add model
-
     # Set the loaded flag so we don't try and populate them from the server
     #BookishModels.ALL_CONTENT.each (model) -> model.loaded(true)
 

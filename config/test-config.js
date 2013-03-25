@@ -6,7 +6,7 @@
     return console.error(err);
   };
 
-  ALOHA_PATH = 'http://wysiwhat.github.com/Aloha-Editor';
+  ALOHA_PATH = 'lib/Aloha-Editor';
 
   require.config({
     baseUrl: '../',
@@ -1091,13 +1091,8 @@
     book.manifest.add(workspace);
     workspace.unshift(book);
     Models.ALL_CONTENT.add(workspace);
-    Models.ALL_CONTENT.each(function(model) {
+    return Models.ALL_CONTENT.each(function(model) {
       return model.loaded(true);
-    });
-    return Models.SearchResults = Models.SearchResults.extend({
-      initialize: function() {
-        return this.add(workspace);
-      }
     });
   });
 
