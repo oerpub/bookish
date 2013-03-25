@@ -58,21 +58,6 @@
       });
       return ret;
     };
-    AtcModels.SearchResults = AtcModels.SearchResults.extend({
-      initialize: function() {
-        var _this = this;
-        this.add(AtcModels.ALL_CONTENT.models);
-        AtcModels.ALL_CONTENT.on('reset', function() {
-          return _this.reset();
-        });
-        AtcModels.ALL_CONTENT.on('add', function(model) {
-          return _this.add(model);
-        });
-        return AtcModels.ALL_CONTENT.on('remove', function(model) {
-          return _this.remove(model);
-        });
-      }
-    });
     EpubModels.EPUB_CONTAINER.on('error', function(model) {
       var url;
       url = "https://github.com/" + (Auth.get('repoUser')) + "/" + (Auth.get('repoName')) + "/tree/" + (Auth.get('branch')) + "/" + (Auth.get('rootPath')) + (model.url());

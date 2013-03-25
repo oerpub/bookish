@@ -52,15 +52,6 @@ define [
 
 
 
-  AtcModels.SearchResults = AtcModels.SearchResults.extend
-    initialize: ->
-      @add AtcModels.ALL_CONTENT.models
-
-      AtcModels.ALL_CONTENT.on 'reset',  () => @reset()
-      AtcModels.ALL_CONTENT.on 'add',    (model) => @add model
-      AtcModels.ALL_CONTENT.on 'remove', (model) => @remove model
-
-
   EpubModels.EPUB_CONTAINER.on 'error', (model) ->
     url = "https://github.com/#{Auth.get('repoUser')}/#{Auth.get('repoName')}/tree/#{Auth.get('branch')}/#{Auth.get('rootPath')}#{model.url()}"
     alert "There was a problem getting #{url}\nPlease check your settings and try again."
