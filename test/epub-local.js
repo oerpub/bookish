@@ -58,24 +58,6 @@
     });
     return Models.EPUB_CONTAINER.loaded().then(function() {
       console.log('Workspace loaded!');
-      BookishModels.SearchResults = BookishModels.SearchResults.extend({
-        initialize: function() {
-          var model, _i, _len, _ref, _results;
-          _ref = BookishModels.ALL_CONTENT.models;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            model = _ref[_i];
-            if (model.get('mediaType') !== 'application/vnd.org.cnx.module') {
-              _results.push(this.add(model, {
-                at: 0
-              }));
-            } else {
-              _results.push(this.add(model));
-            }
-          }
-          return _results;
-        }
-      });
       return BookishController.start();
     });
   });
