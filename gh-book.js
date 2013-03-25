@@ -51,10 +51,10 @@
           throw "Model sync method not supported: " + method;
       }
       ret.done(function(value) {
-        return options != null ? typeof options.success === "function" ? options.success(value, options) : void 0 : void 0;
+        return options != null ? typeof options.success === "function" ? options.success(value) : void 0 : void 0;
       });
       ret.fail(function(error) {
-        return options != null ? typeof options.error === "function" ? options.error(error, options) : void 0 : void 0;
+        return options != null ? typeof options.error === "function" ? options.error(ret, error) : void 0 : void 0;
       });
       return ret;
     };

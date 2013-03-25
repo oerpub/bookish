@@ -46,8 +46,8 @@ define [
         ret = writeFile(path, model.serialize(), callback)
       else throw "Model sync method not supported: #{method}"
 
-    ret.done (value) => options?.success?(value, options)
-    ret.fail (error) => options?.error?(error, options)
+    ret.done (value) => options?.success?(value)
+    ret.fail (error) => options?.error?(ret, error)
     return ret
 
 
