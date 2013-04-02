@@ -37,6 +37,7 @@ define [
   'aloha'
   'bookish/controller'
   'bookish/models'
+  'bookish/media-types'
   './languages'
   # Load the Handlebar templates
   'hbs!bookish/views/content-edit'
@@ -58,7 +59,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
@@ -121,11 +122,46 @@ define [
       @listenTo @model, 'change', => @render()
     onRender: ->
       @$el.on 'click', => Controller.editModel(@model)
-      @$el.children('*[data-media-type]').draggable
+      # Add DnD options to content
+      $content = @$el.children('*[data-media-type]')
+
+      $content.draggable
         revert: 'invalid'
         helper: (evt) ->
           $clone = jQuery(evt.currentTarget).clone(true)
           $clone
+
+      # Figure out which mediaTypes can be dropped onto each element
+      $content.each (i, el) =>
+        $el = jQuery(el)
+        validSelectors = []
+        mediaType = MEDIA_TYPES.get @model.mediaType
+        for acceptsType in _.keys mediaType?.accepts or {}
+          validSelectors.push "*[data-media-type=\"#{acceptsType}\"]"
+
+        validSelectors = validSelectors.join ','
+
+        if validSelectors
+          $el.droppable
+            accept: validSelectors
+            activeClass: 'editor-drop-zone-active'
+            hoverClass: 'editor-drop-zone-hover'
+            drop: (evt, ui) =>
+              # Possible drop cases:
+              #
+              # - On the node
+              # - Before the node
+              # - After the node
+
+              $drag = ui.draggable
+              $drop = jQuery(evt.target)
+
+              # Find the model representing the id that was dragged
+              model = Models.ALL_CONTENT.get $drag.data 'content-id'
+              drop = Models.ALL_CONTENT.get $drop.data 'content-id'
+              mediaType.accepts[model.mediaType](drop, model)
+
+
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk

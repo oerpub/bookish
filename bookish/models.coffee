@@ -6,7 +6,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Custom Models defined above are mixed in using `BaseContent.initialize`
   BaseContent = Backbone.Model.extend
     # New content is given an id before it is saved so it can be added to a book
-    isNew = -> not @id or @id.match(/^_NEW:/)
+    isNew: -> not @id or @id.match(/^_NEW:/)
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
@@ -327,6 +327,11 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
     constructor: BaseBook
+    accepts:
+      'application/xhtml+xml': (book, model) ->
+        book.prependNewContent model
+      'application/vnd.org.cnx.module': (book, model) ->
+        book.prependNewContent model
 
   # Finally, export only the pieces needed
   exports.BaseContent = BaseContent
