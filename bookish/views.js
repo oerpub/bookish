@@ -567,7 +567,10 @@
       },
       initialize: function() {
         var _this = this;
-        return this.listenTo(this.model, 'all', function() {
+        this.listenTo(this.model, 'all', function() {
+          return _this.render();
+        });
+        return this.listenTo(this.model.manifest, 'all', function() {
           return _this.render();
         });
       },

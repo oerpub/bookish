@@ -578,6 +578,7 @@ define [
 
     initialize: ->
       @listenTo @model, 'all', => @render()
+      @listenTo @model.manifest, 'all', => @render()
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
     prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
