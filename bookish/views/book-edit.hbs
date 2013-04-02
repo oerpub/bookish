@@ -1,0 +1,51 @@
+<button id="nav-close" class="btn pull-right close"><i class="icon-remove-sign"></i></button>
+
+<div class="btn-group">
+  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+    Add
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><button class="btn btn-link" id="add-section" href="#"><i class="icon-folder-close-alt"></i> Chapter</button></li>
+    <li><button class="btn btn-link" id="add-content" href="#"><i class="icon-file-alt"></i> Content</button></li>
+  </ul>
+</div>
+
+<p>Reorder the Table of Contents, add new content, or edit a piece of content by clicking <i class="icon-edit"></i>.</p>
+
+<h3>{{title}}</h3>
+
+<nav data-type="toc">
+{{#with navTreePlus}}
+  <ol>
+  {{#recursive .}}
+    {{#if id}}
+      <li data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}" class="{{class}}">
+      {{! Note: This <li> tag is not closed yet}}
+    {{else}}
+      <li class="organization-node {{class}}">
+      {{! Note: This <li> tag is not closed yet}}
+    {{/if}}
+
+    <div class="editor-drop-zone editor-drop-zone-before"></div>
+
+    {{#if id}}
+      <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button><span class="editor-drop-zone editor-drop-zone-in" data-id="{{id}}" data-class="{{class}}">{{title}}</span>
+    {{else}}
+      <span class="editor-drop-zone editor-drop-zone-in" data-class="{{class}}">{{title}}</span>
+    {{/if}}
+
+    <div class="editor-drop-zone editor-drop-zone-after"></div>
+
+
+    {{#if children}}
+      <ol>
+        {{{recursive children}}}
+      </ol>
+    {{/if}}
+      </li>
+
+  {{/recursive}}
+  </ol>
+{{/with}}
+</nav>

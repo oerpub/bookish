@@ -15,9 +15,9 @@ define [
   'backbone'
   'marionette'
   'aloha'
-  'atc/auth'
-  'atc/controller'
-  'css!atc'
+  'bookish/auth'
+  'bookish/controller'
+  'css!bookish'
 ], (jQuery, _, Backbone, Marionette, Aloha, Auth, Controller) ->
 
   # # Application Code
@@ -63,7 +63,7 @@ define [
   jQuery(document).on 'click', 'a:not([data-bypass])', (evt) ->
     evt.preventDefault()
     href = $(@).attr('href')
-    console.warn "User clicked on an internal link. Use the atc/controller module instead of the URL #{href}"
+    console.warn "User clicked on an internal link. Use the bookish/controller module instead of the URL #{href}"
 
     # `Backbone.history.navigate` is sufficient for all Routers and will
     # trigger the correct events. The Router's internal `navigate` method

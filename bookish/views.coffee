@@ -7,6 +7,26 @@
 # 4. Navigate to a different "page" (see `Controller.*` in the `jQuery.on` handlers)
 #
 
+
+# Drag and Drop Behavior
+# -------
+#
+# Several views allow content to be dragged around.
+# Each item that is draggable **must** contain 3 DOM attributes:
+#
+# - `data-content-id`:    The unique id of the piece of content (it can be a path)
+# - `data-media-type`:    The mime-type of the content being dragged
+# - `data-content-title`: A  human-readable title for the content
+#
+# In addition it may contain the following attributes:
+#
+# - `data-drag-operation="copy"`: Specifies the CSS to add a "+" when dragging
+#                                 hinting that the element will not be removed.
+#                                 (For example, content in a search result)
+#
+# Additionally, each draggable element should not contain any text children
+# so CSS can hide children and properly style the cloned element that is being dragged.
+
 #
 define [
   'exports'
@@ -15,29 +35,30 @@ define [
   'marionette'
   'jquery'
   'aloha'
-  'atc/controller'
+  'bookish/controller'
+  'bookish/models'
   './languages'
   # Load the Handlebar templates
-  'hbs!atc/views/content-edit'
-  'hbs!atc/views/search-box'
-  'hbs!atc/views/search-results'
-  'hbs!atc/views/search-results-item'
-  'hbs!atc/views/modal-wrapper'
-  'hbs!atc/views/edit-metadata'
-  'hbs!atc/views/edit-roles'
-  'hbs!atc/views/language-variants'
-  'hbs!atc/views/aloha-toolbar'
-  'hbs!atc/views/sign-in-out'
-  'hbs!atc/views/book-edit'
+  'hbs!bookish/views/content-edit'
+  'hbs!bookish/views/search-box'
+  'hbs!bookish/views/search-results'
+  'hbs!bookish/views/search-results-item'
+  'hbs!bookish/views/modal-wrapper'
+  'hbs!bookish/views/edit-metadata'
+  'hbs!bookish/views/edit-roles'
+  'hbs!bookish/views/language-variants'
+  'hbs!bookish/views/aloha-toolbar'
+  'hbs!bookish/views/sign-in-out'
+  'hbs!bookish/views/book-edit'
   # Load internationalized strings
-  'i18n!atc/nls/strings'
+  'i18n!bookish/nls/strings'
   # `bootstrap` and `select2` add to jQuery and don't export anything of their own
   # so they are 'defined' _after_ everything else
   'bootstrap'
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
@@ -96,8 +117,16 @@ define [
   exports.SearchResultsItemView = Marionette.ItemView.extend
     tagName: 'tr'
     template: SEARCH_RESULT_ITEM
+    initialize: ->
+      @listenTo @model, 'change', => @render()
     onRender: ->
       @$el.on 'click', => Controller.editModel(@model)
+      @$el.children('*[data-media-type]').draggable
+        revert: 'invalid'
+        helper: (evt) ->
+          $clone = jQuery(evt.currentTarget).clone(true)
+          $clone
+
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
     # if this piece of content has unsaved changes
@@ -121,6 +150,8 @@ define [
 
     initialize: ->
       @listenTo @collection, 'reset',   => @render()
+      @listenTo @collection, 'add',     => @render()
+      @listenTo @collection, 'remove',  => @render()
 
   # The search box. Changing the text will cause the underlying collection to filter
   # and fire off `add/remove` events.
@@ -417,11 +448,49 @@ define [
   exports.AuthView = Marionette.ItemView.extend
     template: SIGN_IN_OUT
     events:
-      'click #sign-in': 'signIn'
-      'submit #sign-out': 'signOut'
-    onRender: ->
+      'click #sign-in':       'signIn'
+      'click #sign-out':      'signOut'
+      'click #save-content':  'saveContent'
+
+    initialize: ->
+      # Bind a function to the window if the user tries to navigate away from this page
+      beforeUnload = =>
+        return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
+      jQuery(window).on 'beforeunload', beforeUnload
+
       @listenTo @model, 'change', => @render()
       @listenTo @model, 'change:userid', => @render()
+
+      # Listen to all changes made on Content so we can update the save button
+      @listenTo Models.ALL_CONTENT, 'change', (model, b,c) =>
+        # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
+        # or if the attributes did actually change
+
+        $save = @$el.find '#save-content'
+        checkIfContentActuallyChanged = =>
+          if model.hasChanged()
+            @hasChanged = true
+            $save.removeClass('disabled')
+            $save.addClass('btn-primary')
+
+        setTimeout (=> checkIfContentActuallyChanged()), 100
+
+      # If the repo changes and all of the content is reset, update the button
+      disableSave = =>
+        @hasChanged = false
+        $save = @$el.find '#save-content'
+        $save.addClass('disabled')
+        $save.removeClass('btn-primary')
+
+      @listenTo Models.ALL_CONTENT, 'sync', disableSave
+      @listenTo Models.ALL_CONTENT, 'reset', disableSave
+
+      # Listen to model changes
+      @listenTo @model, 'change', => @render()
+
+    onRender: ->
+      # Enable tooltips
+      @$el.find('*[title]').tooltip()
 
     signIn: ->
       # The browser will go to the login page because `#sign-in` is a link
@@ -429,6 +498,66 @@ define [
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model
     signOut: -> @model.signOut()
+
+    # Save each model in sequence.
+    # **FIXME:** This should be done in a commit batch
+    saveContent: ->
+      return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'
+      $save = @$el.find('#save-progress-modal')
+      $saving     = $save.find('.saving')
+      $alertError = $save.find('.alert-error')
+      $successBar = $save.find('.progress > .bar.success')
+      $errorBar   = $save.find('.progress > .bar.error')
+      $label = $save.find('.label')
+
+      allContent = Models.ALL_CONTENT.filter (model) -> model.hasChanged()
+      total = allContent.length
+      errorCount = 0
+      finished = false
+
+      recSave = ->
+        $successBar.width(((total - allContent.length - errorCount) * 100 / total) + '%')
+        $errorBar.width((  errorCount                               * 100 / total) + '%')
+
+        if allContent.length == 0
+          if errorCount == 0
+            finished = true
+            Models.ALL_CONTENT.trigger 'sync'
+            # Clear the dirty flag
+            Models.ALL_CONTENT.each (model) -> delete model.changed
+            $save.modal('hide')
+          else
+            $alertError.removeClass 'hide'
+
+        else
+          model = allContent.shift()
+          $label.text(model.get('title'))
+
+          # Clear the changed bit since it is saved.
+          #     delete model.changed
+          #     saving = true; recSave()
+          saving = model.save null,
+              success: recSave
+              error: -> errorCount += 1
+          if not saving
+            console.log "Skipping #{model.id} because it is not valid"
+            recSave()
+
+      $alertError.addClass('hide')
+      $saving.removeClass('hide')
+      $save.modal('show')
+      recSave()
+
+      # Only show the 'Saving...' alert box if the save takes longer than 5 seconds
+      setTimeout(->
+        if total and (not finished or errorCount)
+          $save.modal('show')
+          $alertError.removeClass('hide')
+          $saving.addClass('hide')
+      , 5000)
+
+
+
 
   # ## Book Editing
 
@@ -449,31 +578,44 @@ define [
 
     initialize: ->
       @listenTo @model, 'all', => @render()
+      @listenTo @model.manifest, 'all', => @render()
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'text/x-module'
+    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
     closeView: -> Controller.hideSidebar()
 
     editModel: (evt) ->
       evt.preventDefault()
-      href = jQuery(evt.target).parents('li').first().children('span').attr 'data-id'
+      href = jQuery(evt.currentTarget).parents('li').first().children('span').attr 'data-id'
       # The id may point to an element inside the HTML document
       [path, id] = href.split('#')
       model = @model.manifest.get path
       Controller.editModel model, id
+
+    templateHelpers: ->
+      recAnnotateNavTree = (roots) =>
+        for root in roots
+          root.mediaType = @model.manifest.get(root.id).mediaType if root.id
+          recAnnotateNavTree root.children if root.children
+      navTree = JSON.parse @model.get('navTreeStr')
+      recAnnotateNavTree(navTree)
+      return {
+        navTreePlus: navTree
+      }
+
     onRender: ->
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
         model = @model # keep reference to model for drop event
-        @$el.find('.editor-node').draggable
+        @$el.find('.organization-node,*[data-media-type]').draggable
           revert: 'invalid'
           helper: (evt) ->
-            $clone = jQuery(evt.target).clone(true)
+            $clone = jQuery(evt.currentTarget).clone(true)
             $clone.children('ol').remove()
             $clone
         @$el.find('.editor-drop-zone').droppable
-          accept: '.editor-node'
+          accept: '.organization-node,*[data-media-type]'
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
           drop: (evt, ui) =>
@@ -491,6 +633,21 @@ define [
             # Perform all of these DOM cleanup events once jQueryUI is finished with its events
             delay = =>
               $drag.parent().remove() if $drag.parent().children().length == 1
+
+              # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
+              # and should be converted to a link inside an `li`
+              if not $drag.is('li.organization-node')
+                id = $drag.data 'content-id'
+                title = $drag.data 'content-title'
+                $link = jQuery('<a></a>')
+                .attr('href', id)
+                .text(title)
+
+                $drag = jQuery('<li></li>').append $link
+
+                # **TODO:** Remove a node if it already exists in the book
+                @$el.find("*[data-content-id=\"#{id}\"]").remove()
+
 
               if $drop.hasClass 'editor-drop-zone-before'
                 # If `$drag` is the only child in a `<ol>` then remove the `ol`

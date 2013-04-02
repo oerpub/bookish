@@ -9,17 +9,17 @@ define [
   'jquery'
   'backbone'
   'marionette'
-  'atc/media-types'
-  'atc/auth'
-  'atc/models'
+  'bookish/media-types'
+  'bookish/auth'
+  'bookish/models'
   # There is a cyclic dependency between views and controllers
   # so we use the `exports` module to get around that problem.
-  'atc/views'
-  'hbs!atc/layouts/main'
-  'hbs!atc/layouts/content'
-  'hbs!atc/layouts/workspace'
+  'bookish/views'
+  'hbs!bookish/layouts/main'
+  'hbs!bookish/layouts/content'
+  'hbs!bookish/layouts/workspace'
   'exports'
-  'i18n!atc/nls/strings'
+  'i18n!bookish/nls/strings'
 ], (jQuery, Backbone, Marionette, MEDIA_TYPES, Auth, Models, Views, LAYOUT_MAIN, LAYOUT_CONTENT, LAYOUT_WORKSPACE, exports, __) ->
 
   mainRegion = new Marionette.Region
@@ -35,13 +35,14 @@ define [
   # The `MainLayout` contains all areas of the page that do not change
   MainLayout = Marionette.Layout.extend
     template: LAYOUT_MAIN
-    regionType: HidingRegion
     regions:
       home:         '#layout-main-home'
       toolbar:      '#layout-main-toolbar'
       auth:         '#layout-main-auth'
-      sidebar:      '#layout-main-sidebar'
-      area:         '#layout-main-area'
+      # The sidebar and main area will get a 'hidden' class when hiding
+      # so CSS transitions can be applied.
+      sidebar:      {selector: '#layout-main-sidebar', regionType: HidingRegion}
+      area:         {selector: '#layout-main-area', regionType: HidingRegion}
   mainLayout = new MainLayout()
   # Keep the regions so views can just update the regions they need
   mainToolbar = mainLayout.toolbar
@@ -71,6 +72,7 @@ define [
   #
   # Methods on this object can be called directly and will update the URL.
   mainController =
+
     # Begin monitoring URL changes and match the current route
     # In here so App can call it once it has completed loading
     start: ->
@@ -91,19 +93,21 @@ define [
     # Useful for applications that want to extend this editor.
     getRegion: -> mainRegion
 
+    # Give others access to the main layout so they can change pieces of it
+    mainLayout: mainLayout
+
     hideSidebar: -> mainSidebar.close()
 
     # ### Show Workspace
     # Shows the workspace listing and updates the URL
     workspace: ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       mainSidebar.close()
       mainToolbar.close()
       # List the workspace
-      workspace = new Models.SearchResults()
-      workspace = new Models.FilteredCollection null, {collection: workspace}
+      workspace = new Models.FilteredCollection null, {collection: Models.WORKSPACE}
 
       view = new Views.SearchBoxView {model: workspace}
       mainToolbar.show view
@@ -112,10 +116,9 @@ define [
       mainArea.show view
 
       # Update the URL
-      Backbone.history.navigate 'workspace'
-
-      workspace.on 'change', ->
-        view.render()
+      Models.WORKSPACE.loaded().done =>
+        # Update the URL
+        Backbone.history.navigate 'workspace'
 
     # ### Edit existing content
     # Calling this method directly will start editing an existing piece of content
@@ -140,7 +143,7 @@ define [
     # Edit a book in the main area
     editBook: (model) ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       mainToolbar.close()
 
@@ -150,7 +153,7 @@ define [
     # Edit a piece of HTML content
     editContent: (content) ->
       # Always scroll to the top of the page
-      window.scrollTo(0)
+      window.scrollTo(0, 0)
 
       # ## Bind Metadata Dialogs
       mainArea.show contentLayout
@@ -203,8 +206,8 @@ define [
       'content/:id':  'editModelId' # Edit an existing piece of content
 
   # ## Attach mediaType edit views
-  MEDIA_TYPES.add 'text/x-module',     {editAction: (model) -> mainController.editContent model}
-  MEDIA_TYPES.add 'text/x-collection', {editAction: (model) -> mainController.editBook model}
+  MEDIA_TYPES.add 'application/vnd.org.cnx.module',     {editAction: (model) -> mainController.editContent model}
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection', {editAction: (model) -> mainController.editBook model}
 
 
   # Start listening to URL changes

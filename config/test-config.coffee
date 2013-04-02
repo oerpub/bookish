@@ -1,6 +1,6 @@
 require.onError = (err) -> console.error err
 
-ALOHA_PATH = 'http://wysiwhat.github.com/Aloha-Editor' # '../Aloha-Editor'
+ALOHA_PATH = 'lib/Aloha-Editor'
 
 # Configure paths to all the JS libs
 require.config
@@ -12,7 +12,7 @@ require.config
 
 
 
-require ['underscore', 'atc/models'], (_, Models) ->
+require ['underscore', 'bookish/models'], (_, Models) ->
 
   book = new Models.BaseBook
     id: 'col1'
@@ -348,6 +348,3 @@ require ['underscore', 'atc/models'], (_, Models) ->
 
   # Mark all the content as loaded so we do not try to fetch
   Models.ALL_CONTENT.each (model) -> model.loaded(true)
-
-  Models.SearchResults = Models.SearchResults.extend
-    initialize: -> @add workspace

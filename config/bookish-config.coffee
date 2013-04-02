@@ -97,7 +97,7 @@ require.config
       Handlebars: 'handlebars'
 
   # ## Module and requirejs Plugin Configuration
-  # This configures `requirejs` plugins (like `'hbs!...'`) and our modules (like `'atc/views'`).
+  # This configures `requirejs` plugins (like `'hbs!...'`) and our modules (like `'bookish/views'`).
   #
   # Modules can get to the configuration by including the `module` dependency
   # and then calling `module.config()`
