@@ -16,23 +16,35 @@
 <h3>{{title}}</h3>
 
 <nav data-type="toc">
-{{#with navTree}}
+{{#with navTreePlus}}
   <ol>
   {{#recursive .}}
-    <li class="editor-node {{class}}">
-      <div class="editor-drop-zone editor-drop-zone-before"></div>
-      {{#if id}}
-        <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button><span class="editor-drop-zone editor-drop-zone-in" data-id="{{id}}" data-class="{{class}}">{{title}}</span>
-      {{else}}
-        <span class="editor-drop-zone editor-drop-zone-in" data-class="{{class}}">{{title}}</span>
-      {{/if}}
-      <div class="editor-drop-zone editor-drop-zone-after"></div>
-      {{#if children}}
-        <ol>
-          {{{recursive children}}}
-        </ol>
-      {{/if}}
-    </li>
+    {{#if id}}
+      <li data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}" class="{{class}}">
+      {{! Note: This <li> tag is not closed yet}}
+    {{else}}
+      <li class="organization-node {{class}}">
+      {{! Note: This <li> tag is not closed yet}}
+    {{/if}}
+
+    <div class="editor-drop-zone editor-drop-zone-before"></div>
+
+    {{#if id}}
+      <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button><span class="editor-drop-zone editor-drop-zone-in" data-id="{{id}}" data-class="{{class}}">{{title}}</span>
+    {{else}}
+      <span class="editor-drop-zone editor-drop-zone-in" data-class="{{class}}">{{title}}</span>
+    {{/if}}
+
+    <div class="editor-drop-zone editor-drop-zone-after"></div>
+
+
+    {{#if children}}
+      <ol>
+        {{{recursive children}}}
+      </ol>
+    {{/if}}
+      </li>
+
   {{/recursive}}
   </ol>
 {{/with}}

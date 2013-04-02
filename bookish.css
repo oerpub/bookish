@@ -67,8 +67,8 @@
  */
 .search-results *[data-media-type]                          .icon-content { margin-right: 0.5em; }
 .search-results *[data-media-type='application/xhtml+xml']  .icon-content:before,
-.search-results *[data-media-type='text/x-module']          .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
-.search-results *[data-media-type='text/x-collection']      .icon-content:before { content:"\f02d"; /* icon-book */ }
+.search-results *[data-media-type='application/vnd.org.cnx.module']          .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
+.search-results *[data-media-type='application/vnd.org.cnx.collection']      .icon-content:before { content:"\f02d"; /* icon-book */ }
 
 .search-results > tbody > tr { cursor: pointer; }
 
@@ -77,13 +77,13 @@
 .editor-drop-zone-in:not([data-id]) { font-weight: bold; }
 
 
-.editor-node { cursor: move; }
-.editor-node > a:hover,
-.editor-node > span:hover {
-  background-color: #eee;
+#layout-main-sidebar .ui-draggable { cursor: move; }
+#layout-main-sidebar .ui-draggable > a:hover,
+#layout-main-sidebar .ui-draggable > span:hover {
+  background-color: #ccc;
 }
-.editor-node > a,
-.editor-node > span {
+#layout-main-sidebar .ui-draggable > a,
+#layout-main-sidebar .ui-draggable > span {
   display: block;
 }
 
