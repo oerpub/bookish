@@ -75,8 +75,16 @@
       },
       onRender: function() {
         var _this = this;
-        return this.$el.on('click', function() {
+        this.$el.on('click', function() {
           return Controller.editModel(_this.model);
+        });
+        return this.$el.children('*[data-media-type]').draggable({
+          revert: 'invalid',
+          helper: function(evt) {
+            var $clone;
+            $clone = jQuery(evt.currentTarget).clone(true);
+            return $clone;
+          }
         });
       },
       templateHelpers: function() {
@@ -492,7 +500,7 @@
       saveContent: function() {
         var $alertError, $errorBar, $label, $save, $saving, $successBar, allContent, errorCount, finished, recSave, total;
         if (!this.model.get('id')) {
-          return alert('You need to sign (and make sure you can edit) before you can save changes');
+          return alert('You need to Sign In (and make sure you can edit) before you can save changes');
         }
         $save = this.$el.find('#save-progress-modal');
         $saving = $save.find('.saving');
@@ -559,7 +567,10 @@
       },
       initialize: function() {
         var _this = this;
-        return this.listenTo(this.model, 'all', function() {
+        this.listenTo(this.model, 'all', function() {
+          return _this.render();
+        });
+        return this.listenTo(this.model.manifest, 'all', function() {
           return _this.render();
         });
       },
@@ -579,27 +590,52 @@
       editModel: function(evt) {
         var href, id, model, path, _ref1;
         evt.preventDefault();
-        href = jQuery(evt.target).parents('li').first().children('span').attr('data-id');
+        href = jQuery(evt.currentTarget).parents('li').first().children('span').attr('data-id');
         _ref1 = href.split('#'), path = _ref1[0], id = _ref1[1];
         model = this.model.manifest.get(path);
         return Controller.editModel(model, id);
+      },
+      templateHelpers: function() {
+        var navTree, recAnnotateNavTree,
+          _this = this;
+        recAnnotateNavTree = function(roots) {
+          var root, _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = roots.length; _i < _len; _i++) {
+            root = roots[_i];
+            if (root.id) {
+              root.mediaType = _this.model.manifest.get(root.id).mediaType;
+            }
+            if (root.children) {
+              _results.push(recAnnotateNavTree(root.children));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+        navTree = JSON.parse(this.model.get('navTreeStr'));
+        recAnnotateNavTree(navTree);
+        return {
+          navTreePlus: navTree
+        };
       },
       onRender: function() {
         var _this = this;
         return Aloha.ready(function() {
           var model;
           model = _this.model;
-          _this.$el.find('.editor-node').draggable({
+          _this.$el.find('.organization-node,*[data-media-type]').draggable({
             revert: 'invalid',
             helper: function(evt) {
               var $clone;
-              $clone = jQuery(evt.target).clone(true);
+              $clone = jQuery(evt.currentTarget).clone(true);
               $clone.children('ol').remove();
               return $clone;
             }
           });
           return _this.$el.find('.editor-drop-zone').droppable({
-            accept: '.editor-node',
+            accept: '.organization-node,*[data-media-type]',
             activeClass: 'editor-drop-zone-active',
             hoverClass: 'editor-drop-zone-hover',
             drop: function(evt, ui) {
@@ -609,9 +645,16 @@
               $root = $drop.parents('nav[data-type="toc"]');
               $li = $drop.parent();
               delay = function() {
-                var $ol;
+                var $link, $ol, id, title;
                 if ($drag.parent().children().length === 1) {
                   $drag.parent().remove();
+                }
+                if (!$drag.is('li.organization-node')) {
+                  id = $drag.data('content-id');
+                  title = $drag.data('content-title');
+                  $link = jQuery('<a></a>').attr('href', id).text(title);
+                  $drag = jQuery('<li></li>').append($link);
+                  _this.$el.find("*[data-content-id=\"" + id + "\"]").remove();
                 }
                 if ($drop.hasClass('editor-drop-zone-before')) {
                   $drag.insertBefore($li);

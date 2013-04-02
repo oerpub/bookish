@@ -7,6 +7,26 @@
 # 4. Navigate to a different "page" (see `Controller.*` in the `jQuery.on` handlers)
 #
 
+
+# Drag and Drop Behavior
+# -------
+#
+# Several views allow content to be dragged around.
+# Each item that is draggable **must** contain 3 DOM attributes:
+#
+# - `data-content-id`:    The unique id of the piece of content (it can be a path)
+# - `data-media-type`:    The mime-type of the content being dragged
+# - `data-content-title`: A  human-readable title for the content
+#
+# In addition it may contain the following attributes:
+#
+# - `data-drag-operation="copy"`: Specifies the CSS to add a "+" when dragging
+#                                 hinting that the element will not be removed.
+#                                 (For example, content in a search result)
+#
+# Additionally, each draggable element should not contain any text children
+# so CSS can hide children and properly style the cloned element that is being dragged.
+
 #
 define [
   'exports'
@@ -101,6 +121,12 @@ define [
       @listenTo @model, 'change', => @render()
     onRender: ->
       @$el.on 'click', => Controller.editModel(@model)
+      @$el.children('*[data-media-type]').draggable
+        revert: 'invalid'
+        helper: (evt) ->
+          $clone = jQuery(evt.currentTarget).clone(true)
+          $clone
+
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
     # if this piece of content has unsaved changes
@@ -476,7 +502,7 @@ define [
     # Save each model in sequence.
     # **FIXME:** This should be done in a commit batch
     saveContent: ->
-      return alert 'You need to sign (and make sure you can edit) before you can save changes' if not @model.get 'id'
+      return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'
       $save = @$el.find('#save-progress-modal')
       $saving     = $save.find('.saving')
       $alertError = $save.find('.alert-error')
@@ -552,6 +578,7 @@ define [
 
     initialize: ->
       @listenTo @model, 'all', => @render()
+      @listenTo @model.manifest, 'all', => @render()
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
     prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
@@ -559,24 +586,36 @@ define [
 
     editModel: (evt) ->
       evt.preventDefault()
-      href = jQuery(evt.target).parents('li').first().children('span').attr 'data-id'
+      href = jQuery(evt.currentTarget).parents('li').first().children('span').attr 'data-id'
       # The id may point to an element inside the HTML document
       [path, id] = href.split('#')
       model = @model.manifest.get path
       Controller.editModel model, id
+
+    templateHelpers: ->
+      recAnnotateNavTree = (roots) =>
+        for root in roots
+          root.mediaType = @model.manifest.get(root.id).mediaType if root.id
+          recAnnotateNavTree root.children if root.children
+      navTree = JSON.parse @model.get('navTreeStr')
+      recAnnotateNavTree(navTree)
+      return {
+        navTreePlus: navTree
+      }
+
     onRender: ->
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
         model = @model # keep reference to model for drop event
-        @$el.find('.editor-node').draggable
+        @$el.find('.organization-node,*[data-media-type]').draggable
           revert: 'invalid'
           helper: (evt) ->
-            $clone = jQuery(evt.target).clone(true)
+            $clone = jQuery(evt.currentTarget).clone(true)
             $clone.children('ol').remove()
             $clone
         @$el.find('.editor-drop-zone').droppable
-          accept: '.editor-node'
+          accept: '.organization-node,*[data-media-type]'
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
           drop: (evt, ui) =>
@@ -594,6 +633,21 @@ define [
             # Perform all of these DOM cleanup events once jQueryUI is finished with its events
             delay = =>
               $drag.parent().remove() if $drag.parent().children().length == 1
+
+              # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
+              # and should be converted to a link inside an `li`
+              if not $drag.is('li.organization-node')
+                id = $drag.data 'content-id'
+                title = $drag.data 'content-title'
+                $link = jQuery('<a></a>')
+                .attr('href', id)
+                .text(title)
+
+                $drag = jQuery('<li></li>').append $link
+
+                # **TODO:** Remove a node if it already exists in the book
+                @$el.find("*[data-content-id=\"#{id}\"]").remove()
+
 
               if $drop.hasClass 'editor-drop-zone-before'
                 # If `$drag` is the only child in a `<ol>` then remove the `ol`
