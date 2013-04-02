@@ -113,13 +113,13 @@
 .editor-drop-zone-in:not([data-id]) { font-weight: bold; }
 
 
-.editor-node { cursor: move; }
-.editor-node > a:hover,
-.editor-node > span:hover {
-  background-color: #eee;
+#layout-main-sidebar .ui-draggable { cursor: move; }
+#layout-main-sidebar .ui-draggable > a:hover,
+#layout-main-sidebar .ui-draggable > span:hover {
+  background-color: #ccc;
 }
-.editor-node > a,
-.editor-node > span {
+#layout-main-sidebar .ui-draggable > a,
+#layout-main-sidebar .ui-draggable > span {
   display: block;
 }
 

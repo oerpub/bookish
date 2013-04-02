@@ -17,13 +17,18 @@
     });
     MainLayout = Marionette.Layout.extend({
       template: LAYOUT_MAIN,
-      regionType: HidingRegion,
       regions: {
         home: '#layout-main-home',
         toolbar: '#layout-main-toolbar',
         auth: '#layout-main-auth',
-        sidebar: '#layout-main-sidebar',
-        area: '#layout-main-area'
+        sidebar: {
+          selector: '#layout-main-sidebar',
+          regionType: HidingRegion
+        },
+        area: {
+          selector: '#layout-main-area',
+          regionType: HidingRegion
+        }
       }
     });
     mainLayout = new MainLayout();
