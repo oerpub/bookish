@@ -4,12 +4,18 @@
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
     var ALL_CONTENT, AllContent, BaseBook, BaseContent, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
     BaseContent = Backbone.Model.extend({
+      isNew: function() {
+        return !this.id || this.id.match(/^_NEW:/);
+      },
       initialize: function() {
         if (!this.mediaType) {
           throw 'BUG: No mediaType set';
         }
         if (!MEDIA_TYPES.get(this.mediaType)) {
           throw 'BUG: No mediaType not registered';
+        }
+        if (!this.id) {
+          return this.id = "_NEW:" + this.cid;
         }
       }
     });
@@ -228,6 +234,31 @@
         this.manifest.on('reset', function(model, collection) {
           return ALL_CONTENT.add(model);
         });
+        this.manifest.on('change:id', function(model, newValue, oldValue) {
+          var navTree, node, recFind;
+          navTree = JSON.parse(_this.get('navTreeStr'));
+          recFind = function(nodes) {
+            var found, node, _i, _len;
+            for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+              node = nodes[_i];
+              if (model.id === oldValue) {
+                return node;
+              }
+              if (node.children) {
+                found = recFind(node.children);
+                if (found) {
+                  return found;
+                }
+              }
+            }
+          };
+          node = recFind(navTree);
+          if (!node) {
+            return console.error('BUG: There is an entry in the tree but no corresponding model in the manifest');
+          }
+          node.id = newValue;
+          return _this.set('navTreeStr', JSON.stringify(navTree));
+        });
         this.manifest.on('change:title', function(model, newValue, oldValue) {
           var navTree, node, recFind;
           navTree = JSON.parse(_this.get('navTreeStr'));
@@ -279,23 +310,13 @@
         });
       },
       prependNewContent: function(model, mediaType) {
-        var ContentType, b, config, navTree, uuid;
+        var ContentType, config, navTree;
         if (model instanceof Backbone.Model) {
           this.manifest.add(model);
         } else if (mediaType) {
           config = model;
           if (!MEDIA_TYPES.get(mediaType)) {
             throw 'BUG: Media type not registered';
-          }
-          uuid = b = function(a) {
-            if (a) {
-              return (a ^ Math.random() * 16 >> a / 4).toString(16);
-            } else {
-              return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
-            }
-          };
-          if (!config.id) {
-            config.id = uuid();
           }
           ContentType = MEDIA_TYPES.get(mediaType).constructor;
           model = new ContentType(config);
@@ -337,7 +358,15 @@
       constructor: BaseContent
     });
     MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
-      constructor: BaseBook
+      constructor: BaseBook,
+      accepts: {
+        'application/xhtml+xml': function(book, model) {
+          return book.prependNewContent(model);
+        },
+        'application/vnd.org.cnx.module': function(book, model) {
+          return book.prependNewContent(model);
+        }
+      }
     });
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
