@@ -7,26 +7,6 @@
 # 4. Navigate to a different "page" (see `Controller.*` in the `jQuery.on` handlers)
 #
 
-
-# Drag and Drop Behavior
-# -------
-#
-# Several views allow content to be dragged around.
-# Each item that is draggable **must** contain 3 DOM attributes:
-#
-# - `data-content-id`:    The unique id of the piece of content (it can be a path)
-# - `data-media-type`:    The mime-type of the content being dragged
-# - `data-content-title`: A  human-readable title for the content
-#
-# In addition it may contain the following attributes:
-#
-# - `data-drag-operation="copy"`: Specifies the CSS to add a "+" when dragging
-#                                 hinting that the element will not be removed.
-#                                 (For example, content in a search result)
-#
-# Additionally, each draggable element should not contain any text children
-# so CSS can hide children and properly style the cloned element that is being dragged.
-
 #
 define [
   'exports'
@@ -44,6 +24,7 @@ define [
   'hbs!bookish/views/search-box'
   'hbs!bookish/views/search-results'
   'hbs!bookish/views/search-results-item'
+  'hbs!bookish/views/dnd-handle'
   'hbs!bookish/views/modal-wrapper'
   'hbs!bookish/views/edit-metadata'
   'hbs!bookish/views/edit-roles'
@@ -59,7 +40,49 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+
+
+  # Drag and Drop Behavior
+  # -------
+  #
+  # Several views allow content to be dragged around.
+  # Each item that is draggable **must** contain 3 DOM attributes:
+  #
+  # - `data-content-id`:    The unique id of the piece of content (it can be a path)
+  # - `data-media-type`:    The mime-type of the content being dragged
+  # - `data-content-title`: A  human-readable title for the content
+  #
+  # In addition it may contain the following attributes:
+  #
+  # - `data-drag-operation="copy"`: Specifies the CSS to add a "+" when dragging
+  #                                 hinting that the element will not be removed.
+  #                                 (For example, content in a search result)
+  #
+  # Additionally, each draggable element should not contain any text children
+  # so CSS can hide children and properly style the cloned element that is being dragged.
+  _EnableContentDragging = ($els) ->
+    $els.each (i, el) ->
+      $el = jQuery(el)
+      $el.draggable
+        revert: 'invalid'
+        # Ensure the handle is on top and not bound visually
+        appendTo: 'body'
+        # Place the little handle right next to the mouse
+        cursorAt:
+          top: 0
+          left: 0
+        helper: (evt) ->
+          title = $el.data 'content-title'
+          shortTitle = title
+          shortTitle = title.substring(0, 20) + '...' if title.length > 20
+          $handle = jQuery DND_HANDLE
+            id: $el.data 'content-id'
+            mediaType: $el.data 'media-type'
+            title: title
+            shortTitle: shortTitle
+          return $handle
+
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
@@ -125,11 +148,7 @@ define [
       # Add DnD options to content
       $content = @$el.children('*[data-media-type]')
 
-      $content.draggable
-        revert: 'invalid'
-        helper: (evt) ->
-          $clone = jQuery(evt.currentTarget).clone(true)
-          $clone
+      _EnableContentDragging($content)
 
       # Figure out which mediaTypes can be dropped onto each element
       $content.each (i, el) =>
@@ -644,12 +663,8 @@ define [
       # delay until Aloha is finished loading
       Aloha.ready =>
         model = @model # keep reference to model for drop event
-        @$el.find('.organization-node,*[data-media-type]').draggable
-          revert: 'invalid'
-          helper: (evt) ->
-            $clone = jQuery(evt.currentTarget).clone(true)
-            $clone.children('ol').remove()
-            $clone
+        _EnableContentDragging(@$el.find '.organization-node,*[data-media-type]')
+
         @$el.find('.editor-drop-zone').droppable
           accept: '.organization-node,*[data-media-type]'
           activeClass: 'editor-drop-zone-active'
