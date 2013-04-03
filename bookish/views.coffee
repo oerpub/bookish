@@ -716,7 +716,12 @@ define [
               $root.find('.ui-draggable-dragging').remove()
               $root.find('*').removeClass('editor-drop-zone-in ui-droppable ui-draggable')
 
-              @model.set 'navTreeStr', JSON.stringify @model.parseNavTree($root).children
+              newNavTreeStr = JSON.stringify @model.parseNavTree($root).children
+              # If nothing changed in the nav tree still rerender so events are attached to the DOM element
+              if newNavTreeStr == @model.get 'navTreeStr'
+                @render()
+              else
+                @model.set 'navTreeStr', newNavTreeStr
 
             setTimeout delay, 10
 

@@ -688,7 +688,7 @@
               $root = $drop.parents('nav[data-type="toc"]');
               $li = $drop.parent();
               delay = function() {
-                var $link, $ol, id, title;
+                var $link, $ol, id, newNavTreeStr, title;
                 if ($drag.parent().children().length === 1) {
                   $drag.parent().remove();
                 }
@@ -714,7 +714,12 @@
                 }
                 $root.find('.ui-draggable-dragging').remove();
                 $root.find('*').removeClass('editor-drop-zone-in ui-droppable ui-draggable');
-                return _this.model.set('navTreeStr', JSON.stringify(_this.model.parseNavTree($root).children));
+                newNavTreeStr = JSON.stringify(_this.model.parseNavTree($root).children);
+                if (newNavTreeStr === _this.model.get('navTreeStr')) {
+                  return _this.render();
+                } else {
+                  return _this.model.set('navTreeStr', newNavTreeStr);
+                }
               };
               return setTimeout(delay, 10);
             }
