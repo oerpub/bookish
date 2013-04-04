@@ -32,6 +32,7 @@ define [
   'hbs!bookish/views/aloha-toolbar'
   'hbs!bookish/views/sign-in-out'
   'hbs!bookish/views/book-edit'
+  'hbs!bookish/views/book-edit-node'
   # Load internationalized strings
   'i18n!bookish/nls/strings'
   # `bootstrap` and `select2` add to jQuery and don't export anything of their own
@@ -40,7 +41,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
 
 
   # Drag and Drop Behavior
@@ -65,6 +66,7 @@ define [
     $els.each (i, el) ->
       $el = jQuery(el)
       $el.draggable
+        addClasses: false
         revert: 'invalid'
         # Ensure the handle is on top and not bound visually
         appendTo: 'body'
@@ -148,37 +150,43 @@ define [
       # Add DnD options to content
       $content = @$el.children('*[data-media-type]')
 
-      _EnableContentDragging($content)
+      # Since we use jqueryui's draggable which is loaded when Aloha loads
+      # delay until Aloha is finished loading
+      Aloha.ready =>
 
-      # Figure out which mediaTypes can be dropped onto each element
-      $content.each (i, el) =>
-        $el = jQuery(el)
-        validSelectors = []
-        mediaType = MEDIA_TYPES.get @model.mediaType
-        for acceptsType in _.keys mediaType?.accepts or {}
-          validSelectors.push "*[data-media-type=\"#{acceptsType}\"]"
+        _EnableContentDragging($content)
 
-        validSelectors = validSelectors.join ','
+        # Figure out which mediaTypes can be dropped onto each element
+        $content.each (i, el) =>
+          $el = jQuery(el)
+          validSelectors = []
+          mediaType = MEDIA_TYPES.get @model.mediaType
+          for acceptsType in _.keys mediaType?.accepts or {}
+            validSelectors.push "*[data-media-type=\"#{acceptsType}\"]"
 
-        if validSelectors
-          $el.droppable
-            accept: validSelectors
-            activeClass: 'editor-drop-zone-active'
-            hoverClass: 'editor-drop-zone-hover'
-            drop: (evt, ui) =>
-              # Possible drop cases:
-              #
-              # - On the node
-              # - Before the node
-              # - After the node
+          validSelectors = validSelectors.join ','
 
-              $drag = ui.draggable
-              $drop = jQuery(evt.target)
+          if validSelectors
+            $el.droppable
+              greedy: true
+              addClasses: false
+              accept: validSelectors
+              activeClass: 'editor-drop-zone-active'
+              hoverClass: 'editor-drop-zone-hover'
+              drop: (evt, ui) =>
+                # Possible drop cases:
+                #
+                # - On the node
+                # - Before the node
+                # - After the node
 
-              # Find the model representing the id that was dragged
-              model = Models.ALL_CONTENT.get $drag.data 'content-id'
-              drop = Models.ALL_CONTENT.get $drop.data 'content-id'
-              mediaType.accepts[model.mediaType](drop, model)
+                $drag = ui.draggable
+                $drop = jQuery(evt.target)
+
+                # Find the model representing the id that was dragged
+                model = Models.ALL_CONTENT.get $drag.data 'content-id'
+                drop = Models.ALL_CONTENT.get $drop.data 'content-id'
+                mediaType.accepts[model.mediaType](drop, model)
 
 
 
@@ -616,56 +624,50 @@ define [
 
   # ## Book Editing
 
-
-  # Use this to generate HTML with extra divs for Drag-and-Drop zones.
-  #
-  # To update the Book model when a `drop` occurs we convert the new DOM into
-  # a JSON tree and set it on the model.
-  #
-  # **FIXME:** Instead of a JSON tree this Model should be implemented using a Tree-Like Collection that has a `.toJSON()` and methods like `.insertBefore()`
-  exports.BookEditView = Marionette.ItemView.extend
-    template: BOOK_EDIT
+  BookEditNodeView = Marionette.CompositeView.extend
+    template: BOOK_EDIT_NODE
+    tagName: 'li'
     events:
-      'click .edit-content': 'editModel'
-      'click #nav-close': 'closeView'
-      'click #add-section': 'prependSection'
-      'click #add-content': 'prependContent'
+      'click > span[data-content-id] > .edit-content': 'editModel'
+      'click > .editor-expand-collapse': 'toggleExpanded'
+
+    editModel: (evt) -> Controller.editModel @model.content
+    toggleExpanded: ->
+      # Set the expanded state silently so we don't regenerate the `navTreeStr`
+      # (since the model changed)
+      @model.set 'expanded', !@model.get('expanded'), {silent:true}
+      @render()
 
     initialize: ->
-      @listenTo @model, 'all', => @render()
-      @listenTo @model.manifest, 'all', => @render()
-    prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
+      # grab the child collection from the parent model
+      # so that we can render the collection as children
+      # of this parent node
+      @collection = @model.children
 
-    closeView: -> Controller.hideSidebar()
+      @collection.on 'all', => @render()
 
-    editModel: (evt) ->
-      evt.preventDefault()
-      href = jQuery(evt.currentTarget).parents('li').first().children('span').attr 'data-id'
-      # The id may point to an element inside the HTML document
-      [path, id] = href.split('#')
-      model = @model.manifest.get path
-      Controller.editModel model, id
+    templateHelpers: -> {mediaType: @model.content?.mediaType}
 
-    templateHelpers: ->
-      recAnnotateNavTree = (roots) =>
-        for root in roots
-          root.mediaType = @model.manifest.get(root.id).mediaType if root.id
-          recAnnotateNavTree root.children if root.children
-      navTree = JSON.parse @model.get('navTreeStr')
-      recAnnotateNavTree(navTree)
-      return {
-        navTreePlus: navTree
-      }
+    # From `Marionette.CompositeView`.
+    # Added check to only render when model is `expanded`
+    _renderChildren: ->
+      if @isRendered and @model.get('expanded')
+        Marionette.CollectionView.prototype._renderChildren.call(@)
+        this.triggerMethod('composite:collection:rendered')
 
     onRender: ->
+
+      @$el.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
+
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        model = @model # keep reference to model for drop event
-        _EnableContentDragging(@$el.find '.organization-node,*[data-media-type]')
+        _EnableContentDragging(@$el.children '.organization-node,*[data-media-type]')
 
-        @$el.find('.editor-drop-zone').droppable
+        @$el.addClass 'editor-drop-zone editor-drop-zone-in'
+        @$el.add(@$el.children('.editor-drop-zone')).droppable
+          greedy: true
+          addClasses: false
           accept: '.organization-node,*[data-media-type]'
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
@@ -678,51 +680,90 @@ define [
 
             $drag = ui.draggable
             $drop = jQuery(evt.target)
-            $root = $drop.parents('nav[data-type="toc"]')
-            $li = $drop.parent()
 
             # Perform all of these DOM cleanup events once jQueryUI is finished with its events
             delay = =>
-              $drag.parent().remove() if $drag.parent().children().length == 1
 
               # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
               # and should be converted to a link inside an `li`
-              if not $drag.is('li.organization-node')
-                id = $drag.data 'content-id'
-                title = $drag.data 'content-title'
-                $link = jQuery('<a></a>')
-                .attr('href', id)
-                .text(title)
 
-                $drag = jQuery('<li></li>').append $link
+              drag = $drag.data('content-tree-node') or {
+                id: $drag.data 'content-id'
+                title: $drag.data 'content-title'
+                mediaType: $drag.data 'media-type'
+              }
 
-                # **TODO:** Remove a node if it already exists in the book
-                @$el.find("*[data-content-id=\"#{id}\"]").remove()
+              # Ignore if you drop on yourself or your children
+              testNode = @model
+              while testNode
+                return if (drag.cid == testNode.cid) or (testNode.id and drag.id == testNode.id)
+                testNode = testNode.parent
 
+
+              drag.collection.remove drag if drag.collection
 
               if $drop.hasClass 'editor-drop-zone-before'
-                # If `$drag` is the only child in a `<ol>` then remove the `ol`
-                $drag.insertBefore $li
-              if $drop.hasClass 'editor-drop-zone-after'
-                $drag.insertAfter $li
-              if $drop.hasClass 'editor-drop-zone-in'
-                # create an `ol` in the drop target if necessary
-                $li.append '<ol></ol>' if not $li.children('ol')[0]
-                $ol = $li.children('ol')
-                $ol.append $drag
-
-              # Serialize it back to HTML
-              # Remove the drag node (a clone of the element that's being dragged)
-              $root.find('.ui-draggable-dragging').remove()
-              $root.find('*').removeClass('editor-drop-zone-in ui-droppable ui-draggable')
-
-              newNavTreeStr = JSON.stringify @model.parseNavTree($root).children
-              # If nothing changed in the nav tree still rerender so events are attached to the DOM element
-              if newNavTreeStr == @model.get 'navTreeStr'
-                @render()
+                col = @model.parent.children
+                index = col.indexOf(@model)
+                col.add drag, {at: index}
+              else if $drop.hasClass 'editor-drop-zone-after'
+                col = @model.parent.children
+                index = col.indexOf(@model)
+                col.add drag, {at: index + 1}
+              else if $drop.hasClass 'editor-drop-zone-in'
+                @model.children.add drag
               else
-                @model.set 'navTreeStr', newNavTreeStr
+                throw 'BUG. UNKNOWN DROP CLASS'
 
-            setTimeout delay, 10
+            setTimeout delay, 100
+
+    appendHtml: (cv, iv) -> cv.$('ol:first').append(iv.el)
+
+
+  # Use this to generate HTML with extra divs for Drag-and-Drop zones.
+  #
+  # To update the Book model when a `drop` occurs we convert the new DOM into
+  # a JSON tree and set it on the model.
+  #
+  # **FIXME:** Instead of a JSON tree this Model should be implemented using a Tree-Like Collection that has a `.toJSON()` and methods like `.insertBefore()`
+  exports.BookEditView = Marionette.CompositeView.extend
+    template: BOOK_EDIT
+    itemView: BookEditNodeView
+    itemViewContainer: '> nav > ol'
+
+    events:
+      'click #nav-close': 'closeView'
+      'click #add-section': 'prependSection'
+      'click #add-content': 'prependContent'
+
+    initialize: ->
+      @parseNavTreeStr()
+
+      @listenTo @model, 'change:navTreeStr', => @parseNavTreeStr()
+      @listenTo @collection, 'change:treeNode', =>
+        setTimeout (=> @model.set 'navTreeStr', JSON.stringify(@collection.toJSON())), 100
+
+    prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
+    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
+
+    closeView: -> Controller.hideSidebar()
+
+    parseNavTreeStr: ->
+      # Wrap the root of the tree so we can insert into the middle of the list of children
+      # (need to do `@model.parent.children.add` and `.parent` always needs to a valid model)
+      navTree = JSON.parse(@model.get 'navTreeStr')
+      if @collection
+        @collection.reset navTree
+      else
+        root = new Models.BookTocNode {children: navTree}
+        @collection = root.children
+
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
 
   return exports

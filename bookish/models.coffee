@@ -167,6 +167,41 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # Default language for new content is the browser's language
       language: (navigator?.userLanguage or navigator?.language or 'en').toLowerCase()
 
+  # Used below to create JSON representation of model
+  Backbone_Model_toJSON = Backbone.Model::toJSON
+
+  # ## Book ToC Tree Model
+  # This model represents the ToC
+  BookTocNode = Backbone.Model.extend
+    toJSON: ->
+      json = Backbone_Model_toJSON.apply(@)
+      json.children = @children.toJSON() if @children.length
+      json
+
+    initialize: ->
+      @on 'change', => @trigger 'change:treeNode'
+
+      children = @get 'children'
+      @unset 'children'
+
+      @children = new BookTocNodeCollection()
+      @children.add children
+
+      @children.each (child) => child.parent = @
+
+      @children.on 'add', (child) =>
+        child.parent = @
+        @trigger 'change:treeNode'
+      @children.on 'remove', (child) =>
+        delete child.parent
+        @trigger 'change:treeNode'
+
+      @content = ALL_CONTENT.get(@id) if @id
+
+
+  BookTocNodeCollection = Backbone.Collection.extend
+    model: BookTocNode
+
 
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
   BaseBook = Deferrable.extend
@@ -281,6 +316,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # **FIXME:** Somewhat hacky way of creating a new piece of content
     prependNewContent: (model, mediaType) ->
       if model instanceof Backbone.Model
+        # If the model is already in the book then do not add it again
+        return if @manifest.get model.id
+
         @manifest.add model
 
       else if mediaType
@@ -336,6 +374,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Finally, export only the pieces needed
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
+  exports.BookTocNode = BookTocNode
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
