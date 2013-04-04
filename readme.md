@@ -83,3 +83,8 @@ If you're looking to contribute, tackling one of these would be a great place to
 * `[X]` Show user unsaved files
 * `[X]` Only show 'Copy this book!' when the current user is different than the repo user
 
+
+License
+-------
+
+This software is subject to the provisions of the GNU Affero General Public License Version 3.0 (AGPL). See license.txt for details. Copyright (c) 2013 Rice University
