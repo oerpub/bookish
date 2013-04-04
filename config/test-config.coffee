@@ -5,6 +5,8 @@ ALOHA_PATH = 'lib/Aloha-Editor'
 # Configure paths to all the JS libs
 require.config
 
+  baseUrl: '../'
+
   # # Configure Library Locations
   paths:
     aloha: ALOHA_PATH + '/src/lib/aloha'

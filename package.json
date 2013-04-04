@@ -1,8 +1,8 @@
 {
-  "name": "atc",
+  "name": "github-book",
   "version": "0.0.0",
-  "description": "Authoring Tools Client (Javascript Book Editor)",
-  "main": "app.js",
+  "description": "Javascript Book Editor for Github(EPUB3)",
+  "main": "gh-book.js",
   "directories": {
     "test": "test"
   },
@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "underscore": ">=1.4.3",
-    "backbone": ">=0.9.9"
+    "backbone": ">=0.9.9",
+    "github-js": "*"
   },
   "devDependencies": {
     "docco": "~0.4.0",
@@ -20,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/philschatz/atc.git"
+    "url": "https://github.com/philschatz/github-book.git"
   },
   "keywords": [
     "javascript",
