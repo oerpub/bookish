@@ -89,33 +89,42 @@
 .dnd-content-handle > .title-content { font-weight: bold; }
 
 /* Style TOC sections different from content */
-.editor-drop-zone-in:not([data-id]) { font-weight: bold; }
+.organization-node { font-weight: bold; }
 
 
 #layout-main-sidebar .ui-draggable { cursor: move; }
-#layout-main-sidebar .ui-draggable > a:hover,
-#layout-main-sidebar .ui-draggable > span:hover {
-  background-color: #ccc;
-}
-#layout-main-sidebar .ui-draggable > a,
-#layout-main-sidebar .ui-draggable > span {
-  display: block;
-}
 
 .editor-drop-zone {
   min-height: 3px;
 }
+
 .editor-drop-zone-active {
-  background-color: #eee;
+  min-height: 3px;
 }
 
 .editor-drop-zone-hover {
   background-color: #ccc;
-  min-height: 1em;
 }
+
+li.editor-drop-zone-hover {
+  background-color: inherit;
+}
+
 .editor-drop-zone-before {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
+
+.editor-drop-zone-hover.editor-drop-zone-before:before {
+  content: "(insert before)";
+  color: #888;
+  font-size: small;
+}
+.editor-drop-zone-hover.editor-drop-zone-after:before {
+  content: "(insert after)";
+  color: #888;
+  font-size: small;
+}
+
 
 #nav-close {
   position: relative;
@@ -123,14 +132,9 @@
   line-height: 20px;
 }
 
-.editor-node > .edit-content {
-  visibility: hidden;
-}
-.editor-node:hover > .edit-content {
-  visibility: visible;
-}
-
-
+.editor-expand-collapse { cursor: pointer; }
+/* All elements with this attribute are draggable */
+*[data-media-type] { cursor: pointer; }
 
 
 .layout-content .content-title:before {

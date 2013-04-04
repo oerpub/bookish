@@ -2,7 +2,7 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, BaseBook, BaseContent, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
+    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BookTocNode, BookTocNodeCollection, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
     BaseContent = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
@@ -187,6 +187,45 @@
         language: ((typeof navigator !== "undefined" && navigator !== null ? navigator.userLanguage : void 0) || (typeof navigator !== "undefined" && navigator !== null ? navigator.language : void 0) || 'en').toLowerCase()
       }
     });
+    Backbone_Model_toJSON = Backbone.Model.prototype.toJSON;
+    BookTocNode = Backbone.Model.extend({
+      toJSON: function() {
+        var json;
+        json = Backbone_Model_toJSON.apply(this);
+        if (this.children.length) {
+          json.children = this.children.toJSON();
+        }
+        return json;
+      },
+      initialize: function() {
+        var children,
+          _this = this;
+        this.on('change', function() {
+          return _this.trigger('tree-modified');
+        });
+        children = this.get('children');
+        this.unset('children');
+        this.children = new BookTocNodeCollection();
+        this.children.add(children);
+        this.children.each(function(child) {
+          return child.parent = _this;
+        });
+        this.children.on('add', function(child) {
+          child.parent = _this;
+          return _this.trigger('tree-modified');
+        });
+        this.children.on('remove', function(child) {
+          delete child.parent;
+          return _this.trigger('tree-modified');
+        });
+        if (this.id) {
+          return this.content = ALL_CONTENT.get(this.id);
+        }
+      }
+    });
+    BookTocNodeCollection = Backbone.Collection.extend({
+      model: BookTocNode
+    });
     BaseBook = Deferrable.extend({
       mediaType: 'application/vnd.org.cnx.collection',
       defaults: {
@@ -312,6 +351,9 @@
       prependNewContent: function(model, mediaType) {
         var ContentType, config, navTree;
         if (model instanceof Backbone.Model) {
+          if (this.manifest.get(model.id)) {
+            return;
+          }
           this.manifest.add(model);
         } else if (mediaType) {
           config = model;
@@ -370,6 +412,7 @@
     });
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
+    exports.BookTocNode = BookTocNode;
     exports.Deferrable = Deferrable;
     exports.DeferrableCollection = DeferrableCollection;
     exports.ALL_CONTENT = ALL_CONTENT;
