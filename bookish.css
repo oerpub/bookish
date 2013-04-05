@@ -125,6 +125,7 @@ li.editor-drop-zone-hover {
   font-size: small;
 }
 
+.editor-node-title-overridden { color: #666; }
 
 #nav-close {
   position: relative;
