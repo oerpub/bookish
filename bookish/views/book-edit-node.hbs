@@ -1,0 +1,30 @@
+<div class="editor-drop-zone editor-drop-zone-before"></div>
+
+{{#if children}}
+  {{#if expanded}}
+    <span class="editor-expand-collapse" title="Click to collapse"><i class="icon-minus-sign"></i></span>
+  {{else}}
+    <span class="editor-expand-collapse" title="Click to expand"><i class="icon-plus-sign"></i></span>
+  {{/if}}
+{{/if}}
+
+<button class="btn btn-mini pull-right edit-settings" title="Advanced Settings"><i class="icon-pencil"></i></button>
+{{#if id}}
+  <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button>
+  <span data-media-type="{{_contentMediaType}}" data-content-id="{{id}}" data-content-title="{{_contentTitle}}" class="editor-drop-zone editor-drop-zone-in">
+    {{#if title}}
+      <span class="editor-node-title editor-node-title-overridden">{{title}}</span>
+    {{else}}
+      <span class="editor-node-title editor-node-title-default">{{_contentTitle}}</span>
+    {{/if}}
+  </span>
+{{else}}
+  <span data-content-title="{{title}}" class="organization-node editor-expand-collapse editor-drop-zone editor-drop-zone-in">{{title}}</span>
+{{/if}}
+
+<div class="editor-drop-zone editor-drop-zone-after"></div>
+
+{{#if children}}
+  <ol>
+  </ol>
+{{/if}}

@@ -167,14 +167,86 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # Default language for new content is the browser's language
       language: (navigator?.userLanguage or navigator?.language or 'en').toLowerCase()
 
+  # Used below to create JSON representation of model
+  Backbone_Model_toJSON = Backbone.Model::toJSON
+
+  # ## Book ToC Tree Model
+  # This model represents the ToC
+  BookTocNode = Backbone.Model.extend
+    toJSON: ->
+      json = Backbone_Model_toJSON.apply(@)
+      json.children = @children.toJSON() if @children.length
+      json
+
+    contentId: -> @id
+
+    initialize: ->
+      @on 'change', => @trigger 'change:treeNode'
+
+      children = @get 'children'
+      @unset 'children', {silent:true}
+
+      @children = new BookTocNodeCollection()
+
+      @children.on 'add', (child, collection, options) =>
+        child.parent = @
+        @trigger 'add:treeNode', child, @, options
+      @children.on 'remove', (child, collection, options) =>
+        delete child.parent
+        @trigger 'remove:treeNode', child, @, options
+
+      @children.add children
+      @children.each (child) => child.parent = @
+
+
+  BookTocNodeCollection = Backbone.Collection.extend
+    model: BookTocNode
+
+
+  BookTocTree = BookTocNode.extend
+    # Used for views. **TODO:** This should probably be moved out into the view
+    toJSON: -> @children.toJSON()
+    initialize: ->
+      BookTocNode::initialize.call(@)
+      @descendants = new BookTocNodeCollection()
+
+      # Populate the descendants collection
+      recDescendants = (node) =>
+        @descendants.add node
+        node.children.each (child) -> recDescendants(child)
+
+      @children.each (child) -> recDescendants(child)
+
+      # These events are created when someone adds to `BookTocNode.children`
+      # And fired from the `BookTocNode`
+      @descendants.on 'add:treeNode', (node) =>
+        @descendants.add node
+        @trigger 'add:treeNode', node
+      # **TODO:** I think this one does not work because the node is removed
+      # from the collection before the event bubbles up so it does not bubble up
+      @descendants.on 'remove:treeNode', (node) =>
+        @descendants.remove node
+        @trigger 'remove:treeNode', node
+
+      @descendants.on 'change:treeNode', (node) =>
+        @trigger 'change:treeNode', node
+
+    reset: (nodes) ->
+      @descendants.reset()
+      @children.reset nodes
+      # recursively add nodes to the descendants
+      recAddDescendants = (node) =>
+        @descendants.add node
+        node.children.each (child) => recAddDescendants child
+
+      @children.each (child) => child.parent = @; recAddDescendants child
+
 
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
   BaseBook = Deferrable.extend
     mediaType: 'application/vnd.org.cnx.collection'
     defaults:
       manifest: null
-      # `navTreeStr` is stored as a JSON string so events are fired when changes are made
-      navTreeStr: '[]'
 
     # Subclasses can provide a better Collection for storing Content items in a book
     # so the book can listen to changes.
@@ -182,7 +254,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     toJSON: ->
       json = Deferrable.prototype.toJSON.apply(@, arguments)
-      json.navTree = JSON.parse @get 'navTreeStr'
+      json.navTree = @navTreeRoot.toJSON()
       return json
 
     # Takes an element representing a `<nav epub:type="toc"/>` element
@@ -233,54 +305,41 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     #
     # Similarly, an update to the navigation tree will create new models.
     initialize: ->
-      ALL_CONTENT.add @
 
       @manifest = new @manifestType()
-      @manifest.on 'add',   (model, collection) -> ALL_CONTENT.add model
-      @manifest.on 'reset', (model, collection) -> ALL_CONTENT.add model
+      @navTreeRoot = new BookTocTree()
+
+      @listenTo @manifest, 'add',   (model, collection) -> ALL_CONTENT.add model
+      @listenTo @manifest, 'reset', (model, collection) -> ALL_CONTENT.add model
 
       # If a model's id changes then update the `navTree` (it was a new model that got saved)
-      @manifest.on 'change:id', (model, newValue, oldValue) =>
-        navTree = JSON.parse @get('navTreeStr')
-        # Find the node that has an `id` to this model
-        recFind = (nodes) ->
-          for node in nodes
-            return node if model.id == oldValue
-            if node.children
-              found = recFind node.children
-              return found if found
-        node = recFind(navTree)
+      @listenTo @manifest, 'change:id', (model, newValue, oldValue) =>
+        node = @navTreeRoot.descendants.get oldValue
         return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
-        node.id = newValue
-        @set 'navTreeStr', JSON.stringify navTree
+        node.set('id', newValue)
 
-      @manifest.on 'change:title', (model, newValue, oldValue) =>
-        navTree = JSON.parse @get('navTreeStr')
-        # Find the node that has an `id` to this model
-        recFind = (nodes) ->
-          for node in nodes
-            return node if model.id == node.id
-            if node.children
-              found = recFind node.children
-              return found if found
-        node = recFind(navTree)
-        return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
-        node.title = newValue
-        @set 'navTreeStr', JSON.stringify navTree
+      # If a piece of content is linked to in the navigation document
+      # always include it in the manifest
+      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add ALL_CONTENT.get(navNode.contentId())
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove ALL_CONTENT.get(navNode.contentId())
 
-      @on 'change:navTreeStr', (model, navTreeStr, options) =>
-        # **TODO:** Remove manifest entries if they are not referred to by the navTree or any modules in the book.
-        recAdd = (nodes) =>
-          for node in nodes
-            if node.id
-              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'application/vnd.org.cnx.module'}
-            recAdd node.children if node.children
-        recAdd(JSON.parse navTreeStr)
+      # Trigger a change so `save` works
+      @listenTo @navTreeRoot, 'add:treeNode',    (navNode) => @trigger 'add:treeNode', @
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @trigger 'remove:treeNode', @
+      @listenTo @navTreeRoot, 'change:treeNode', (navNode) =>
+        @trigger 'change:treeNode', @
+        @trigger 'change', @
+
+      # Do this last so `.toJSON()` has the `navTreeRoot` already initialized
+      ALL_CONTENT.add @
 
 
     # **FIXME:** Somewhat hacky way of creating a new piece of content
     prependNewContent: (model, mediaType) ->
       if model instanceof Backbone.Model
+        # If the model is already in the book then do not add it again
+        return if @manifest.get model.id
+
         @manifest.add model
 
       else if mediaType
@@ -302,9 +361,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         model = new Backbone.Model model
 
       # Prepend to the navTree
-      navTree = JSON.parse @get('navTreeStr')
-      navTree.unshift {id: model.get('id'), title: model.get('title')}
-      @set 'navTreeStr', JSON.stringify navTree
+      @navTreeRoot.children.add {id: model.get('id')}, {at: 0}
 
 
   # Compare by `mediaType` (Collections/Books 1st), then by title/URL
@@ -336,6 +393,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Finally, export only the pieces needed
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
+  exports.BookTocTree = BookTocTree
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
