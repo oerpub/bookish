@@ -617,11 +617,25 @@
       template: BOOK_EDIT_NODE,
       tagName: 'li',
       events: {
-        'click > span[data-content-id] > .edit-content': 'editModel',
+        'click > .edit-content': 'editContent',
+        'click > .edit-settings': 'editSettings',
         'click > .editor-expand-collapse': 'toggleExpanded'
       },
-      editModel: function(evt) {
-        return Controller.editModel(this.model.content);
+      editContent: function() {
+        return Controller.editModelId(this.model.contentId());
+      },
+      editSettings: function() {
+        var contentModel, newTitle, originalTitle;
+        contentModel = Models.ALL_CONTENT.get(this.model.contentId());
+        originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
+        newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
+        if ('-' === newTitle) {
+          return this.model.parent.children.remove(this.model);
+        } else if (newTitle === (contentModel != null ? contentModel.get('title') : void 0)) {
+          return this.model.unset('title');
+        } else if (newTitle) {
+          return this.model.set('title', newTitle);
+        }
       },
       toggleExpanded: function() {
         this.model.set('expanded', !this.model.get('expanded'), {
@@ -630,17 +644,33 @@
         return this.render();
       },
       initialize: function() {
-        var _this = this;
+        var contentModel,
+          _this = this;
         this.collection = this.model.children;
-        return this.collection.on('all', function() {
+        this.model.on('all', function() {
           return _this.render();
         });
+        this.collection.on('all', function() {
+          return _this.render();
+        });
+        if (this.model.contentId()) {
+          contentModel = Models.ALL_CONTENT.get(this.model.contentId());
+          return this.listenTo(contentModel, 'change:title', function(newTitle, model, options) {
+            if (!_this.model.get('title')) {
+              return _this.render();
+            }
+          });
+        }
       },
       templateHelpers: function() {
-        var _ref1;
-        return {
-          mediaType: (_ref1 = this.model.content) != null ? _ref1.mediaType : void 0
-        };
+        var content;
+        if (this.model.contentId()) {
+          content = Models.ALL_CONTENT.get(this.model.contentId());
+          return {
+            _contentTitle: content.get('title'),
+            _contentMediaType: content.mediaType
+          };
+        }
       },
       _renderChildren: function() {
         if (this.isRendered && this.model.get('expanded')) {
@@ -667,9 +697,7 @@
               delay = function() {
                 var col, drag, index, testNode;
                 drag = $drag.data('content-tree-node') || {
-                  id: $drag.data('content-id'),
-                  title: $drag.data('content-title'),
-                  mediaType: $drag.data('media-type')
+                  id: $drag.data('content-id')
                 };
                 testNode = _this.model;
                 while (testNode) {
@@ -718,16 +746,7 @@
         'click #add-content': 'prependContent'
       },
       initialize: function() {
-        var _this = this;
-        this.parseNavTreeStr();
-        this.listenTo(this.model, 'change:navTreeStr', function() {
-          return _this.parseNavTreeStr();
-        });
-        return this.listenTo(this.collection, 'change:treeNode', function() {
-          return setTimeout((function() {
-            return _this.model.set('navTreeStr', JSON.stringify(_this.collection.toJSON()));
-          }), 100);
-        });
+        return this.collection = this.model.navTreeRoot.children;
       },
       prependSection: function() {
         return this.model.prependNewContent({
@@ -741,18 +760,6 @@
       },
       closeView: function() {
         return Controller.hideSidebar();
-      },
-      parseNavTreeStr: function() {
-        var navTree, root;
-        navTree = JSON.parse(this.model.get('navTreeStr'));
-        if (this.collection) {
-          return this.collection.reset(navTree);
-        } else {
-          root = new Models.BookTocNode({
-            children: navTree
-          });
-          return this.collection = root.children;
-        }
       },
       appendHtml: function(cv, iv, index) {
         var $container, $prevChild;

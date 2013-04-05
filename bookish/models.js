@@ -2,7 +2,7 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BookTocNode, BookTocNodeCollection, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
+    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
     BaseContent = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
@@ -197,46 +197,88 @@
         }
         return json;
       },
+      contentId: function() {
+        return this.id;
+      },
       initialize: function() {
         var children,
           _this = this;
         this.on('change', function() {
-          return _this.trigger('tree-modified');
+          return _this.trigger('change:treeNode');
         });
         children = this.get('children');
-        this.unset('children');
+        this.unset('children', {
+          silent: true
+        });
         this.children = new BookTocNodeCollection();
+        this.children.on('add', function(child, collection, options) {
+          child.parent = _this;
+          return _this.trigger('add:treeNode', child, _this, options);
+        });
+        this.children.on('remove', function(child, collection, options) {
+          delete child.parent;
+          return _this.trigger('remove:treeNode', child, _this, options);
+        });
         this.children.add(children);
-        this.children.each(function(child) {
+        return this.children.each(function(child) {
           return child.parent = _this;
         });
-        this.children.on('add', function(child) {
-          child.parent = _this;
-          return _this.trigger('tree-modified');
-        });
-        this.children.on('remove', function(child) {
-          delete child.parent;
-          return _this.trigger('tree-modified');
-        });
-        if (this.id) {
-          return this.content = ALL_CONTENT.get(this.id);
-        }
       }
     });
     BookTocNodeCollection = Backbone.Collection.extend({
       model: BookTocNode
     });
+    BookTocTree = BookTocNode.extend({
+      toJSON: function() {
+        return this.children.toJSON();
+      },
+      initialize: function() {
+        var recDescendants,
+          _this = this;
+        BookTocNode.prototype.initialize.call(this);
+        this.descendants = new BookTocNodeCollection();
+        recDescendants = function(node) {
+          _this.descendants.add(node);
+          return node.children.each(function(child) {
+            return recDescendants(child);
+          });
+        };
+        this.children.each(function(child) {
+          return recDescendants(child);
+        });
+        this.descendants.on('add:treeNode', function(node) {
+          return _this.descendants.add(node);
+        });
+        return this.descendants.on('remove:treeNode', function(node) {
+          return _this.descendants.remove(node);
+        });
+      },
+      init: function(nodes) {
+        var recAddDescendants,
+          _this = this;
+        this.children.reset(nodes);
+        recAddDescendants = function(node) {
+          _this.descendants.add(node);
+          return node.children.each(function(child) {
+            return recAddDescendants(child);
+          });
+        };
+        return this.children.each(function(child) {
+          child.parent = _this;
+          return recAddDescendants(child);
+        });
+      }
+    });
     BaseBook = Deferrable.extend({
       mediaType: 'application/vnd.org.cnx.collection',
       defaults: {
-        manifest: null,
-        navTreeStr: '[]'
+        manifest: null
       },
       manifestType: Backbone.Collection,
       toJSON: function() {
         var json;
         json = Deferrable.prototype.toJSON.apply(this, arguments);
-        json.navTree = JSON.parse(this.get('navTreeStr'));
+        json.navTree = this.navTreeRoot.toJSON();
         return json;
       },
       parseNavTree: function(li) {
@@ -266,6 +308,7 @@
       initialize: function() {
         var _this = this;
         ALL_CONTENT.add(this);
+        this.navTreeRoot = new BookTocTree();
         this.manifest = new this.manifestType();
         this.manifest.on('add', function(model, collection) {
           return ALL_CONTENT.add(model);
@@ -274,82 +317,22 @@
           return ALL_CONTENT.add(model);
         });
         this.manifest.on('change:id', function(model, newValue, oldValue) {
-          var navTree, node, recFind;
-          navTree = JSON.parse(_this.get('navTreeStr'));
-          recFind = function(nodes) {
-            var found, node, _i, _len;
-            for (_i = 0, _len = nodes.length; _i < _len; _i++) {
-              node = nodes[_i];
-              if (model.id === oldValue) {
-                return node;
-              }
-              if (node.children) {
-                found = recFind(node.children);
-                if (found) {
-                  return found;
-                }
-              }
-            }
-          };
-          node = recFind(navTree);
+          var node;
+          node = _this.navTreeRoot.descendants.get(oldValue);
           if (!node) {
             return console.error('BUG: There is an entry in the tree but no corresponding model in the manifest');
           }
-          node.id = newValue;
-          return _this.set('navTreeStr', JSON.stringify(navTree));
+          return node.set('id', newValue);
         });
-        this.manifest.on('change:title', function(model, newValue, oldValue) {
-          var navTree, node, recFind;
-          navTree = JSON.parse(_this.get('navTreeStr'));
-          recFind = function(nodes) {
-            var found, node, _i, _len;
-            for (_i = 0, _len = nodes.length; _i < _len; _i++) {
-              node = nodes[_i];
-              if (model.id === node.id) {
-                return node;
-              }
-              if (node.children) {
-                found = recFind(node.children);
-                if (found) {
-                  return found;
-                }
-              }
-            }
-          };
-          node = recFind(navTree);
-          if (!node) {
-            return console.error('BUG: There is an entry in the tree but no corresponding model in the manifest');
-          }
-          node.title = newValue;
-          return _this.set('navTreeStr', JSON.stringify(navTree));
+        this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
+          return _this.manifest.add(ALL_CONTENT.get(navNode.contentId()));
         });
-        return this.on('change:navTreeStr', function(model, navTreeStr, options) {
-          var recAdd;
-          recAdd = function(nodes) {
-            var contentModel, node, _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = nodes.length; _i < _len; _i++) {
-              node = nodes[_i];
-              if (node.id) {
-                contentModel = _this.manifest.add({
-                  id: node.id,
-                  title: node.title,
-                  mediaType: 'application/vnd.org.cnx.module'
-                });
-              }
-              if (node.children) {
-                _results.push(recAdd(node.children));
-              } else {
-                _results.push(void 0);
-              }
-            }
-            return _results;
-          };
-          return recAdd(JSON.parse(navTreeStr));
+        return this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
+          return _this.manifest.remove(ALL_CONTENT.get(navNode.contentId()));
         });
       },
       prependNewContent: function(model, mediaType) {
-        var ContentType, config, navTree;
+        var ContentType, config;
         if (model instanceof Backbone.Model) {
           if (this.manifest.get(model.id)) {
             return;
@@ -368,12 +351,11 @@
         } else {
           model = new Backbone.Model(model);
         }
-        navTree = JSON.parse(this.get('navTreeStr'));
-        navTree.unshift({
-          id: model.get('id'),
-          title: model.get('title')
+        return this.navTreeRoot.children.add({
+          id: model.get('id')
+        }, {
+          at: 0
         });
-        return this.set('navTreeStr', JSON.stringify(navTree));
       }
     });
     CONTENT_COMPARATOR = function(a, b) {
@@ -412,7 +394,7 @@
     });
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
-    exports.BookTocNode = BookTocNode;
+    exports.BookTocTree = BookTocTree;
     exports.Deferrable = Deferrable;
     exports.DeferrableCollection = DeferrableCollection;
     exports.ALL_CONTENT = ALL_CONTENT;

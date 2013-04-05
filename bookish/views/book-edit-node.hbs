@@ -8,10 +8,15 @@
   {{/if}}
 {{/if}}
 
+<button class="btn btn-mini pull-right edit-settings" title="Advanced Settings"><i class="icon-pencil"></i></button>
 {{#if id}}
-  <span data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}" class="editor-drop-zone editor-drop-zone-in">
-    <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button>
-    <span class="editor-node-title">{{title}}</span>
+  <button class="btn btn-mini pull-right edit-content" title="Edit Content"><i class="icon-edit"></i></button>
+  <span data-media-type="{{_contentMediaType}}" data-content-id="{{id}}" data-content-title="{{_contentTitle}}" class="editor-drop-zone editor-drop-zone-in">
+    {{#if title}}
+      <span class="editor-node-title editor-node-title-overridden">{{title}}</span>
+    {{else}}
+      <span class="editor-node-title editor-node-title-default">{{_contentTitle}}</span>
+    {{/if}}
   </span>
 {{else}}
   <span data-content-title="{{title}}" class="organization-node editor-expand-collapse editor-drop-zone editor-drop-zone-in">{{title}}</span>

@@ -628,15 +628,30 @@ define [
     template: BOOK_EDIT_NODE
     tagName: 'li'
     events:
-      'click > span[data-content-id] > .edit-content': 'editModel'
+      'click > .edit-content': 'editContent'
+      'click > .edit-settings': 'editSettings'
       'click > .editor-expand-collapse': 'toggleExpanded'
 
-    editModel: (evt) -> Controller.editModel @model.content
+    editContent: -> Controller.editModelId @model.contentId()
+
+    editSettings: ->
+      contentModel = Models.ALL_CONTENT.get @model.contentId()
+      originalTitle = contentModel?.get('title') or @model.get 'title'
+      newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
+      if '-' == newTitle
+        @model.parent.children.remove @model
+      else if newTitle == contentModel?.get('title')
+        @model.unset 'title'
+      else if newTitle
+        @model.set 'title', newTitle
+
+
     toggleExpanded: ->
       # Set the expanded state silently so we don't regenerate the `navTreeStr`
       # (since the model changed)
       @model.set 'expanded', !@model.get('expanded'), {silent:true}
       @render()
+
 
     initialize: ->
       # grab the child collection from the parent model
@@ -644,9 +659,27 @@ define [
       # of this parent node
       @collection = @model.children
 
+      @model.on 'all', => @render()
       @collection.on 'all', => @render()
 
-    templateHelpers: -> {mediaType: @model.content?.mediaType}
+      # If the content title changes and we have not overridden the title
+      # rerender the node
+      if @model.contentId()
+        contentModel = Models.ALL_CONTENT.get @model.contentId()
+        @listenTo contentModel, 'change:title', (newTitle, model, options) =>
+          @render() if !@model.get 'title'
+
+
+    templateHelpers: ->
+      if @model.contentId()
+        content = Models.ALL_CONTENT.get @model.contentId()
+        # Provide the original module title to view templates
+        # if the title has not been overridden
+        return {
+          _contentTitle: content.get 'title'
+          _contentMediaType: content.mediaType
+        }
+
 
     # From `Marionette.CompositeView`.
     # Added check to only render when model is `expanded`
@@ -654,6 +687,7 @@ define [
       if @isRendered and @model.get('expanded')
         Marionette.CollectionView.prototype._renderChildren.call(@)
         this.triggerMethod('composite:collection:rendered')
+
 
     onRender: ->
 
@@ -689,8 +723,9 @@ define [
 
               drag = $drag.data('content-tree-node') or {
                 id: $drag.data 'content-id'
-                title: $drag.data 'content-title'
-                mediaType: $drag.data 'media-type'
+                # The title and mediaType should inherit from the actual piece of content
+                #    title: $drag.data 'content-title'
+                #    mediaType: $drag.data 'media-type'
               }
 
               # Ignore if you drop on yourself or your children
@@ -698,7 +733,6 @@ define [
               while testNode
                 return if (drag.cid == testNode.cid) or (testNode.id and drag.id == testNode.id)
                 testNode = testNode.parent
-
 
               drag.collection.remove drag if drag.collection
 
@@ -737,26 +771,12 @@ define [
       'click #add-content': 'prependContent'
 
     initialize: ->
-      @parseNavTreeStr()
-
-      @listenTo @model, 'change:navTreeStr', => @parseNavTreeStr()
-      @listenTo @collection, 'change:treeNode', =>
-        setTimeout (=> @model.set 'navTreeStr', JSON.stringify(@collection.toJSON())), 100
+      @collection = @model.navTreeRoot.children
 
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
     prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
     closeView: -> Controller.hideSidebar()
-
-    parseNavTreeStr: ->
-      # Wrap the root of the tree so we can insert into the middle of the list of children
-      # (need to do `@model.parent.children.add` and `.parent` always needs to a valid model)
-      navTree = JSON.parse(@model.get 'navTreeStr')
-      if @collection
-        @collection.reset navTree
-      else
-        root = new Models.BookTocNode {children: navTree}
-        @collection = root.children
 
     appendHtml: (cv, iv, index)->
       $container = @getItemViewContainer(cv)

@@ -178,29 +178,60 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       json.children = @children.toJSON() if @children.length
       json
 
+    contentId: -> @id
+
     initialize: ->
       @on 'change', => @trigger 'change:treeNode'
 
       children = @get 'children'
-      @unset 'children'
+      @unset 'children', {silent:true}
 
       @children = new BookTocNodeCollection()
-      @children.add children
 
-      @children.each (child) => child.parent = @
-
-      @children.on 'add', (child) =>
+      @children.on 'add', (child, collection, options) =>
         child.parent = @
-        @trigger 'change:treeNode'
-      @children.on 'remove', (child) =>
+        @trigger 'add:treeNode', child, @, options
+      @children.on 'remove', (child, collection, options) =>
         delete child.parent
-        @trigger 'change:treeNode'
+        @trigger 'remove:treeNode', child, @, options
 
-      @content = ALL_CONTENT.get(@id) if @id
+      @children.add children
+      @children.each (child) => child.parent = @
 
 
   BookTocNodeCollection = Backbone.Collection.extend
     model: BookTocNode
+
+
+  BookTocTree = BookTocNode.extend
+    # Used for views. **TODO:** This should probably be moved out into the view
+    toJSON: -> @children.toJSON()
+    initialize: ->
+      BookTocNode::initialize.call(@)
+      @descendants = new BookTocNodeCollection()
+
+      # Populate the descendants collection
+      recDescendants = (node) =>
+        @descendants.add node
+        node.children.each (child) -> recDescendants(child)
+
+      @children.each (child) -> recDescendants(child)
+
+      # These events are created when someone adds to `BookTocNode.children`
+      # And fired from the `BookTocNode`
+      @descendants.on 'add:treeNode', (node) => @descendants.add node
+      # **TODO:** I think this one does not work because the node is removed
+      # from the collection before the event bubbles up so it does not bubble up
+      @descendants.on 'remove:treeNode', (node) => @descendants.remove node
+
+    init: (nodes) ->
+      @children.reset nodes
+      # recursively add nodes to the descendants
+      recAddDescendants = (node) =>
+        @descendants.add node
+        node.children.each (child) => recAddDescendants child
+
+      @children.each (child) => child.parent = @; recAddDescendants child
 
 
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
@@ -208,8 +239,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     mediaType: 'application/vnd.org.cnx.collection'
     defaults:
       manifest: null
-      # `navTreeStr` is stored as a JSON string so events are fired when changes are made
-      navTreeStr: '[]'
 
     # Subclasses can provide a better Collection for storing Content items in a book
     # so the book can listen to changes.
@@ -217,7 +246,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     toJSON: ->
       json = Deferrable.prototype.toJSON.apply(@, arguments)
-      json.navTree = JSON.parse @get 'navTreeStr'
+      json.navTree = @navTreeRoot.toJSON()
       return json
 
     # Takes an element representing a `<nav epub:type="toc"/>` element
@@ -270,47 +299,22 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     initialize: ->
       ALL_CONTENT.add @
 
+      @navTreeRoot = new BookTocTree()
+
       @manifest = new @manifestType()
       @manifest.on 'add',   (model, collection) -> ALL_CONTENT.add model
       @manifest.on 'reset', (model, collection) -> ALL_CONTENT.add model
 
       # If a model's id changes then update the `navTree` (it was a new model that got saved)
       @manifest.on 'change:id', (model, newValue, oldValue) =>
-        navTree = JSON.parse @get('navTreeStr')
-        # Find the node that has an `id` to this model
-        recFind = (nodes) ->
-          for node in nodes
-            return node if model.id == oldValue
-            if node.children
-              found = recFind node.children
-              return found if found
-        node = recFind(navTree)
+        node = @navTreeRoot.descendants.get oldValue
         return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
-        node.id = newValue
-        @set 'navTreeStr', JSON.stringify navTree
+        node.set('id', newValue)
 
-      @manifest.on 'change:title', (model, newValue, oldValue) =>
-        navTree = JSON.parse @get('navTreeStr')
-        # Find the node that has an `id` to this model
-        recFind = (nodes) ->
-          for node in nodes
-            return node if model.id == node.id
-            if node.children
-              found = recFind node.children
-              return found if found
-        node = recFind(navTree)
-        return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
-        node.title = newValue
-        @set 'navTreeStr', JSON.stringify navTree
-
-      @on 'change:navTreeStr', (model, navTreeStr, options) =>
-        # **TODO:** Remove manifest entries if they are not referred to by the navTree or any modules in the book.
-        recAdd = (nodes) =>
-          for node in nodes
-            if node.id
-              contentModel = @manifest.add {id: node.id, title: node.title, mediaType: 'application/vnd.org.cnx.module'}
-            recAdd node.children if node.children
-        recAdd(JSON.parse navTreeStr)
+      # If a piece of content is linked to in the navigation document
+      # always include it in the manifest
+      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add ALL_CONTENT.get(navNode.contentId())
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove ALL_CONTENT.get(navNode.contentId())
 
 
     # **FIXME:** Somewhat hacky way of creating a new piece of content
@@ -340,9 +344,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         model = new Backbone.Model model
 
       # Prepend to the navTree
-      navTree = JSON.parse @get('navTreeStr')
-      navTree.unshift {id: model.get('id'), title: model.get('title')}
-      @set 'navTreeStr', JSON.stringify navTree
+      @navTreeRoot.children.add {id: model.get('id')}, {at: 0}
 
 
   # Compare by `mediaType` (Collections/Books 1st), then by title/URL
@@ -374,7 +376,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Finally, export only the pieces needed
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
-  exports.BookTocNode = BookTocNode
+  exports.BookTocTree = BookTocTree
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
