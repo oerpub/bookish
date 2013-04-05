@@ -2,9 +2,9 @@ define [
   'exports'
   'underscore'
   'backbone'
-  'atc/media-types'
-  'atc/controller'
-  'atc/models'
+  'bookish/media-types'
+  'bookish/controller'
+  'bookish/models'
   'hbs!./opf-file'
   'hbs!./container-file'
   'hbs!./nav-serialize'
@@ -59,7 +59,7 @@ define [
       copyrightDate: null
     )
     getterField: 'content'
-    mediaType: 'text/x-collection'
+    mediaType: 'application/vnd.org.cnx.collection'
 
     template: OPF_TEMPLATE
     manifestType: Backbone.Collection.extend
@@ -71,11 +71,11 @@ define [
 
       # When the `navTreeStr` is changed on the package,
       # CHange it on the navigation.html file
-      @on 'change:navTreeStr', (model, navTreeStr) =>
+      @listenTo @navTreeRoot, 'change:treeNode add:treeNode remove:treeNode', =>
 
         $newTree = jQuery(@navModel.get 'body')
 
-        newTree = NAV_SERIALIZE JSON.parse navTreeStr
+        newTree = NAV_SERIALIZE @navTreeRoot.toJSON()
         $newTree = jQuery(newTree)
 
         $bodyNodes = jQuery(@navModel.get 'body')
@@ -99,7 +99,7 @@ define [
             $body = $wrap
           # TODO: Add `<html><head>...</head>` tags around the `$body`
           bodyStr = $body[0].innerHTML
-        @navModel.set 'body', bodyStr, {silent:true}
+        @navModel.set 'body', bodyStr
 
 
       # Once the OPF is populated load the navigation HTML file.
@@ -152,7 +152,7 @@ define [
       $nav = $nav.first()
 
       navTree = @parseNavTree($nav).children
-      @set 'navTreeStr', JSON.stringify(navTree), options
+      @navTreeRoot.reset navTree
       return navTree
 
     parse: (xmlStr) ->
