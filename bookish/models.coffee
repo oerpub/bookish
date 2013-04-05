@@ -231,7 +231,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @descendants.on 'change:treeNode', (node) =>
         @trigger 'change:treeNode', node
 
-    init: (nodes) ->
+    reset: (nodes) ->
+      @descendants.reset()
       @children.reset nodes
       # recursively add nodes to the descendants
       recAddDescendants = (node) =>
@@ -304,7 +305,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     #
     # Similarly, an update to the navigation tree will create new models.
     initialize: ->
-      ALL_CONTENT.add @
 
       @manifest = new @manifestType()
       @navTreeRoot = new BookTocTree()
@@ -329,6 +329,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @listenTo @navTreeRoot, 'change:treeNode', (navNode) =>
         @trigger 'change:treeNode', @
         @trigger 'change', @
+
+      # Do this last so `.toJSON()` has the `navTreeRoot` already initialized
+      ALL_CONTENT.add @
 
 
     # **FIXME:** Somewhat hacky way of creating a new piece of content
