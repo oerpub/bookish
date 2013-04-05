@@ -533,6 +533,13 @@
             return checkIfContentActuallyChanged();
           }), 100);
         });
+        this.listenTo(Models.ALL_CONTENT, 'change:treeNode add:treeNode remove:treeNode', function(model, b, c) {
+          var $save;
+          _this.hasChanged = true;
+          $save = _this.$el.find('#save-content');
+          $save.removeClass('disabled');
+          return $save.addClass('btn-primary');
+        });
         disableSave = function() {
           var $save;
           _this.hasChanged = false;

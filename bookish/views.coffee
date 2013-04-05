@@ -538,6 +538,13 @@ define [
 
         setTimeout (=> checkIfContentActuallyChanged()), 100
 
+      @listenTo Models.ALL_CONTENT, 'change:treeNode add:treeNode remove:treeNode', (model, b,c) =>
+        @hasChanged = true
+        $save = @$el.find '#save-content'
+        $save.removeClass('disabled')
+        $save.addClass('btn-primary')
+
+
       # If the repo changes and all of the content is reset, update the button
       disableSave = =>
         @hasChanged = false

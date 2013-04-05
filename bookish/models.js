@@ -247,10 +247,15 @@
           return recDescendants(child);
         });
         this.descendants.on('add:treeNode', function(node) {
-          return _this.descendants.add(node);
+          _this.descendants.add(node);
+          return _this.trigger('add:treeNode', node);
         });
-        return this.descendants.on('remove:treeNode', function(node) {
-          return _this.descendants.remove(node);
+        this.descendants.on('remove:treeNode', function(node) {
+          _this.descendants.remove(node);
+          return _this.trigger('remove:treeNode', node);
+        });
+        return this.descendants.on('change:treeNode', function(node) {
+          return _this.trigger('change:treeNode', node);
         });
       },
       init: function(nodes) {
@@ -308,15 +313,15 @@
       initialize: function() {
         var _this = this;
         ALL_CONTENT.add(this);
-        this.navTreeRoot = new BookTocTree();
         this.manifest = new this.manifestType();
-        this.manifest.on('add', function(model, collection) {
+        this.navTreeRoot = new BookTocTree();
+        this.listenTo(this.manifest, 'add', function(model, collection) {
           return ALL_CONTENT.add(model);
         });
-        this.manifest.on('reset', function(model, collection) {
+        this.listenTo(this.manifest, 'reset', function(model, collection) {
           return ALL_CONTENT.add(model);
         });
-        this.manifest.on('change:id', function(model, newValue, oldValue) {
+        this.listenTo(this.manifest, 'change:id', function(model, newValue, oldValue) {
           var node;
           node = _this.navTreeRoot.descendants.get(oldValue);
           if (!node) {
@@ -327,8 +332,18 @@
         this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
           return _this.manifest.add(ALL_CONTENT.get(navNode.contentId()));
         });
-        return this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
+        this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
           return _this.manifest.remove(ALL_CONTENT.get(navNode.contentId()));
+        });
+        this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
+          return _this.trigger('add:treeNode', _this);
+        });
+        this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
+          return _this.trigger('remove:treeNode', _this);
+        });
+        return this.listenTo(this.navTreeRoot, 'change:treeNode', function(navNode) {
+          _this.trigger('change:treeNode', _this);
+          return _this.trigger('change', _this);
         });
       },
       prependNewContent: function(model, mediaType) {

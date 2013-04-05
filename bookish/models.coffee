@@ -219,10 +219,17 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       # These events are created when someone adds to `BookTocNode.children`
       # And fired from the `BookTocNode`
-      @descendants.on 'add:treeNode', (node) => @descendants.add node
+      @descendants.on 'add:treeNode', (node) =>
+        @descendants.add node
+        @trigger 'add:treeNode', node
       # **TODO:** I think this one does not work because the node is removed
       # from the collection before the event bubbles up so it does not bubble up
-      @descendants.on 'remove:treeNode', (node) => @descendants.remove node
+      @descendants.on 'remove:treeNode', (node) =>
+        @descendants.remove node
+        @trigger 'remove:treeNode', node
+
+      @descendants.on 'change:treeNode', (node) =>
+        @trigger 'change:treeNode', node
 
     init: (nodes) ->
       @children.reset nodes
@@ -299,14 +306,14 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     initialize: ->
       ALL_CONTENT.add @
 
+      @manifest = new @manifestType()
       @navTreeRoot = new BookTocTree()
 
-      @manifest = new @manifestType()
-      @manifest.on 'add',   (model, collection) -> ALL_CONTENT.add model
-      @manifest.on 'reset', (model, collection) -> ALL_CONTENT.add model
+      @listenTo @manifest, 'add',   (model, collection) -> ALL_CONTENT.add model
+      @listenTo @manifest, 'reset', (model, collection) -> ALL_CONTENT.add model
 
       # If a model's id changes then update the `navTree` (it was a new model that got saved)
-      @manifest.on 'change:id', (model, newValue, oldValue) =>
+      @listenTo @manifest, 'change:id', (model, newValue, oldValue) =>
         node = @navTreeRoot.descendants.get oldValue
         return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
         node.set('id', newValue)
@@ -315,6 +322,13 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # always include it in the manifest
       @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add ALL_CONTENT.get(navNode.contentId())
       @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove ALL_CONTENT.get(navNode.contentId())
+
+      # Trigger a change so `save` works
+      @listenTo @navTreeRoot, 'add:treeNode',    (navNode) => @trigger 'add:treeNode', @
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @trigger 'remove:treeNode', @
+      @listenTo @navTreeRoot, 'change:treeNode', (navNode) =>
+        @trigger 'change:treeNode', @
+        @trigger 'change', @
 
 
     # **FIXME:** Somewhat hacky way of creating a new piece of content
