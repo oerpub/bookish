@@ -71,10 +71,10 @@
       initialize: function() {
         var _this = this;
         BaseBook.prototype.initialize.apply(this, arguments);
-        this.on('change:navTreeStr', function(model, navTreeStr) {
+        this.listenTo(this.navTreeRoot, 'change:treeNode add:treeNode remove:treeNode', function() {
           var $body, $bodyNodes, $nav, $newTree, $wrap, bodyStr, newTree;
           $newTree = jQuery(_this.navModel.get('body'));
-          newTree = NAV_SERIALIZE(JSON.parse(navTreeStr));
+          newTree = NAV_SERIALIZE(_this.navTreeRoot.toJSON());
           $newTree = jQuery(newTree);
           $bodyNodes = jQuery(_this.navModel.get('body'));
           $body = jQuery('<div></div>').append($bodyNodes);
@@ -94,9 +94,7 @@
             }
             bodyStr = $body[0].innerHTML;
           }
-          return _this.navModel.set('body', bodyStr, {
-            silent: true
-          });
+          return _this.navModel.set('body', bodyStr);
         });
         return this._promise = this.loaded().then(function() {
           return _this.navModel.loaded().then(function() {
@@ -145,7 +143,7 @@
         }
         $nav = $nav.first();
         navTree = this.parseNavTree($nav).children;
-        this.set('navTreeStr', JSON.stringify(navTree), options);
+        this.navTreeRoot.reset(navTree);
         return navTree;
       },
       parse: function(xmlStr) {
