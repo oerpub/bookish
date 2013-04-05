@@ -20,7 +20,7 @@ require ['underscore', 'bookish/models'], (_, Models) ->
     id: 'col1'
     title: 'Physics: Volume 1'
 
-  book.navTreeRoot.init [{class:'preface', id:"m42955", title:"Preface"
+  book.navTreeRoot.reset [{class:'preface', id:"m42955", title:"Preface"
      },{class:'chapter', title:"Introduction: The Nature of Science and Physics","children":[
       {id:"m42119", title:"Introduction to Science and the Realm of Physics, Physical Quantities, and Units"},
 

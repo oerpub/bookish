@@ -258,9 +258,10 @@
           return _this.trigger('change:treeNode', node);
         });
       },
-      init: function(nodes) {
+      reset: function(nodes) {
         var recAddDescendants,
           _this = this;
+        this.descendants.reset();
         this.children.reset(nodes);
         recAddDescendants = function(node) {
           _this.descendants.add(node);
@@ -312,7 +313,6 @@
       },
       initialize: function() {
         var _this = this;
-        ALL_CONTENT.add(this);
         this.manifest = new this.manifestType();
         this.navTreeRoot = new BookTocTree();
         this.listenTo(this.manifest, 'add', function(model, collection) {
@@ -341,10 +341,11 @@
         this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
           return _this.trigger('remove:treeNode', _this);
         });
-        return this.listenTo(this.navTreeRoot, 'change:treeNode', function(navNode) {
+        this.listenTo(this.navTreeRoot, 'change:treeNode', function(navNode) {
           _this.trigger('change:treeNode', _this);
           return _this.trigger('change', _this);
         });
+        return ALL_CONTENT.add(this);
       },
       prependNewContent: function(model, mediaType) {
         var ContentType, config;

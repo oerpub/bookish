@@ -21,7 +21,7 @@
       id: 'col1',
       title: 'Physics: Volume 1'
     });
-    book.navTreeRoot.init([
+    book.navTreeRoot.reset([
       {
         "class": 'preface',
         id: "m42955",
