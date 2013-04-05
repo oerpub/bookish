@@ -26,16 +26,23 @@
       oldBaseBook_initialize.apply(this, arguments);
       this.on('change:body', function(model, body) {
         var $body, $root, navTree;
+        if (body instanceof Array) {
+          return model.set('body', body.join(''));
+        }
         $body = jQuery(body);
-        $root = $body.find('ul').first();
+        if ($body.is('nav')) {
+          $root = $body;
+        } else {
+          $root = $body.find('nav').first();
+        }
         if ($root[0]) {
           navTree = _this.parseNavTree($root);
-          return _this.set('navTreeStr', JSON.stringify(navTree));
+          return _this.navTreeRoot.reset(navTree.children);
         }
       });
-      return this.on('change:navTreeStr', function(model, navTreeStr) {
+      return this.on('change:treeNode add:treeNode remove:treeNode', function() {
         return _this.set({
-          body: NAV_SERIALIZE(JSON.parse(navTreeStr))
+          body: NAV_SERIALIZE(_this.navTreeRoot.toJSON())
         });
       });
     };

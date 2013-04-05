@@ -27,23 +27,28 @@ define [
   Models.BaseBook::url = -> "#{ROOT_URL}/collection/#{@id}"
 
 
-  # When the `navTreeStr` changes, update the body with HTML
+  # When the `navTreeRoot` changes, update the body with HTML
   oldBaseBook_initialize = Models.BaseBook::initialize
   Models.BaseBook::initialize = ->
     oldBaseBook_initialize.apply(@, arguments)
 
-    # When the body of the collection changes, update the `navTreeStr`
+    # When the body of the collection changes, update the `navTreeRoot`
     @on 'change:body', (model, body) =>
+      if body instanceof Array
+        return model.set 'body', body.join('')
       $body = jQuery(body)
-      $root = $body.find('ul').first()
+      if $body.is 'nav'
+        $root = $body
+      else
+        $root = $body.find('nav').first()
       if $root[0]
         navTree = @parseNavTree($root)
-        @set 'navTreeStr', JSON.stringify navTree
+        @navTreeRoot.reset navTree.children
 
-    # When the `navTreeStr` is changed on the package,
+    # When the `navTreeRoot` is changed on the package,
     # Change it in the book body
-    @on 'change:navTreeStr', (model, navTreeStr) =>
-      @set {body: NAV_SERIALIZE JSON.parse navTreeStr}
+    @on 'change:treeNode add:treeNode remove:treeNode', =>
+      @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}
 
 
   # HACK: to always get an authenticated user
