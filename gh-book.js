@@ -2,7 +2,7 @@
 (function() {
 
   define(['underscore', 'backbone', 'bookish/media-types', 'bookish/controller', 'bookish/models', 'epub/models', 'bookish/auth', 'gh-book/views', 'css!bookish'], function(_, Backbone, MEDIA_TYPES, Controller, AtcModels, EpubModels, Auth, Views) {
-    var $signin, DEBUG, STORED_KEYS, XhtmlModel, b, props, readDir, readFile, resetDesktop, uuid, writeFile,
+    var $signin, DEBUG, STORED_KEYS, XhtmlModel, b, props, readBinaryFile, readDir, readFile, resetDesktop, uuid, writeFile,
       _this = this;
     DEBUG = true;
     uuid = b = function(a) {
@@ -15,8 +15,11 @@
     writeFile = function(path, text, commitText) {
       return Auth.getRepo().write(Auth.get('branch'), "" + (Auth.get('rootPath')) + path, text, commitText);
     };
-    readFile = function(path, isBinary) {
-      return Auth.getRepo().read(Auth.get('branch'), "" + (Auth.get('rootPath')) + path, isBinary);
+    readFile = function(path) {
+      return Auth.getRepo().read(Auth.get('branch'), "" + (Auth.get('rootPath')) + path);
+    };
+    readBinaryFile = function(path) {
+      return Auth.getRepo().readBinary(Auth.get('branch'), "" + (Auth.get('rootPath')) + path);
     };
     readDir = function(path) {
       return Auth.getRepo().contents(Auth.get('branch'), path);
@@ -113,20 +116,11 @@
           var $img, doneLoading, src;
           $img = jQuery(img);
           src = $img.attr('data-src');
-          return doneLoading = readFile(src, true).done(function(bytes, statusMessage, xhr) {
-            var dataToBinary, encode, encoded, mediaType, _ref;
+          return doneLoading = readBinaryFile(src).done(function(bytes, statusMessage, xhr) {
+            var encode, encoded, mediaType, _ref;
             mediaType = AtcModels.ALL_CONTENT.get(src).mediaType;
-            dataToBinary = function(data) {
-              var char, str, _i, _len;
-              str = '';
-              for (_i = 0, _len = data.length; _i < _len; _i++) {
-                char = data[_i];
-                str += String.fromCharCode(char.charCodeAt(0) & 0xff);
-              }
-              return str;
-            };
             encode = btoa || ((_ref = _this.Base64) != null ? _ref.encode : void 0);
-            encoded = encode(dataToBinary(bytes));
+            encoded = encode(bytes);
             $img.attr('src', "data:" + mediaType + ";base64," + encoded);
             counter--;
             if (counter === 0) {

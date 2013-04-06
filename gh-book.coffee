@@ -21,8 +21,9 @@ define [
   writeFile = (path, text, commitText) ->
     Auth.getRepo().write Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", text, commitText
 
-  readFile = (path, isBinary) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", isBinary
-  readDir =  (path) -> Auth.getRepo().contents Auth.get('branch'), path
+  readFile =       (path) -> Auth.getRepo().read       Auth.get('branch'), "#{Auth.get('rootPath')}#{path}"
+  readBinaryFile = (path) -> Auth.getRepo().readBinary Auth.get('branch'), "#{Auth.get('rootPath')}#{path}"
+  readDir =        (path) -> Auth.getRepo().contents   Auth.get('branch'), path
 
 
 
@@ -121,22 +122,15 @@ define [
         $img = jQuery(img)
         src = $img.attr 'data-src'
         # Load the image file somehow (see below for my github.js changes)
-        doneLoading = readFile(src, true) # isBinaryResponse = true
+        doneLoading = readBinaryFile(src)
         .done (bytes, statusMessage, xhr) =>
           # Grab the mediaType from the response header (or look in the EPUB3 OPF file)
           mediaType = AtcModels.ALL_CONTENT.get(src).mediaType # xhr.getResponseHeader('Content-Type').split(';')[0]
 
-          # Convert raw image to binary and then to Base64 encoded text
-          dataToBinary = (data) ->
-            str = ''
-            for char in data
-              str += String.fromCharCode(char.charCodeAt(0) & 0xff)
-            str
-
           # Use the browser's Base64 encode if available
           encode = btoa or @Base64?.encode
 
-          encoded = encode(dataToBinary(bytes))
+          encoded = encode(bytes)
           $img.attr('src', "data:#{mediaType};base64,#{encoded}")
 
           counter--
