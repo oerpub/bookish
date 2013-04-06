@@ -11,12 +11,12 @@
       }),
       templateHelpers: function() {
         return {
-          canFork: this.model.get('username') !== this.model.get('repoUser') || !this.model.get('password')
+          canFork: this.model.get('id') !== this.model.get('repoUser') || !this.model.get('password')
         };
       },
       signIn: function() {
         return this.model.set({
-          username: this.$el.find('#github-username').val(),
+          id: this.$el.find('#github-id').val(),
           password: this.$el.find('#github-password').val()
         });
       },
@@ -25,7 +25,7 @@
       },
       forkBook: function() {
         var $fork, forkHandler;
-        if (!this.model.get('password')) {
+        if (!this.model.get('id')) {
           return alert('Please log in to fork or just go to the github page and fork the book!');
         }
         $fork = this.$el.find('#fork-book-modal');
@@ -37,7 +37,7 @@
                 throw "Problem forking: " + err;
               }
               setTimeout(function() {
-                return Auth.set('repoUser', org || Auth.get('username'));
+                return Auth.set('repoUser', org || Auth.get('id'));
               }, 10000);
               return alert('Thanks for copying!\nThe current repository (in settings) will be updated to point to your copy of the book. \nThe next time you click Save the changes will be saved to your copied book.\nIf not, refresh the page and change the Repo User in Settings.');
             });
@@ -47,7 +47,7 @@
           var $item, $list;
           $list = $fork.find('.modal-body').empty();
           $item = this.$(FORK_BOOK_ITEM({
-            login: Auth.get('username')
+            login: Auth.get('id')
           }));
           $item.find('button').on('click', forkHandler(null));
           $list.append($item);

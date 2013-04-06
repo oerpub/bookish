@@ -81,7 +81,7 @@ define [
 
 
   # Clear everything and refetch when the
-  STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'username', 'password']
+  STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']
   Auth.on 'change', () =>
     if not _.isEmpty(_.pick Auth.changed, STORED_KEYS)
       # If the user changed login state then don't reset the desktop

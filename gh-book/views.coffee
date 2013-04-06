@@ -31,12 +31,12 @@ define [
     # Add the `canFork` bit to the resulting JSON so the template knows if the
     # current user is the same as the current `repoUser` (Do not show the fork button).
     templateHelpers: ->
-      return {canFork: @model.get('username') != @model.get('repoUser') or not @model.get('password')}
+      return {canFork: @model.get('id') != @model.get('repoUser') or not @model.get('password')}
 
     signIn: ->
       # Set the username and password in the `Auth` model
       @model.set
-        username: @$el.find('#github-username').val()
+        id:       @$el.find('#github-id').val()
         password: @$el.find('#github-password').val()
 
     # Clicking on the link will redirect to the logoff page
@@ -45,7 +45,7 @@ define [
 
     forkBook: ->
       # Show an alert if the user is not logged in
-      return alert 'Please log in to fork or just go to the github page and fork the book!' if not @model.get 'password'
+      return alert 'Please log in to fork or just go to the github page and fork the book!' if not @model.get 'id'
 
       # Populate the fork modal before showing it
       $fork = @$el.find '#fork-book-modal'
@@ -59,7 +59,7 @@ define [
           throw "Problem forking: #{err}" if err
 
           setTimeout(->
-            Auth.set 'repoUser', (org or Auth.get('username'))
+            Auth.set 'repoUser', (org or Auth.get('id'))
           , 10000)
 
           alert 'Thanks for copying!\nThe current repository (in settings) will be updated to point to your copy of the book. \nThe next time you click Save the changes will be saved to your copied book.\nIf not, refresh the page and change the Repo User in Settings.'
@@ -68,7 +68,7 @@ define [
       Auth.getUser().orgs (err, orgs) ->
         $list = $fork.find('.modal-body').empty()
 
-        $item = @$(FORK_BOOK_ITEM {login: Auth.get 'username'})
+        $item = @$(FORK_BOOK_ITEM {login: Auth.get 'id'})
         $item.find('button').on 'click', forkHandler(null)
         $list.append $item
 

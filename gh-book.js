@@ -77,7 +77,7 @@
         });
       });
     };
-    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'username', 'password'];
+    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password'];
     Auth.on('change', function() {
       var key, value, _ref, _ref1, _results;
       if (!_.isEmpty(_.pick(Auth.changed, STORED_KEYS))) {

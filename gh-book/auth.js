@@ -7,7 +7,7 @@
     repo = null;
     AuthModel = Backbone.Model.extend({
       defaults: {
-        username: '',
+        id: '',
         password: '',
         auth: 'basic',
         repoUser: 'philschatz',
@@ -19,7 +19,7 @@
         var credentials, json,
           _this = this;
         credentials = {
-          username: this.get('username'),
+          username: this.get('id'),
           password: this.get('password'),
           token: this.get('token'),
           auth: this.get('auth')
@@ -39,7 +39,7 @@
       },
       initialize: function() {
         this._update();
-        this.on('change:username', this._update);
+        this.on('change:id', this._update);
         this.on('change:password', this._update);
         this.on('change:token', this._update);
         this.on('change:auth', this._update);
@@ -65,7 +65,7 @@
         github = null;
         repo = null;
         return this.set({
-          username: 'philschatz',
+          id: '',
           password: ''
         });
       },
