@@ -8,8 +8,8 @@ require.config
     'bookish/auth': 'gh-book/auth'
 
     # Github-Specific libraries
-    base64: 'node_modules/github-js/lib/base64'
-    github: 'node_modules/github-js/github'
+    base64: 'node_modules/github-client/lib/base64'
+    github: 'node_modules/github-client/github'
 
 
   # # Shims
