@@ -1,13 +1,14 @@
 define [
   'underscore'
   'backbone'
+  'bookish/media-types'
   'bookish/controller'
   'bookish/models'
   'epub/models'
   'bookish/auth'
   'gh-book/views'
   'css!bookish'
-], (_, Backbone, Controller, AtcModels, EpubModels, Auth, Views) ->
+], (_, Backbone, MEDIA_TYPES, Controller, AtcModels, EpubModels, Auth, Views) ->
 
   DEBUG = true
 
@@ -20,7 +21,7 @@ define [
   writeFile = (path, text, commitText) ->
     Auth.getRepo().write Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", text, commitText
 
-  readFile = (path) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}"
+  readFile = (path, isBinary) -> Auth.getRepo().read Auth.get('branch'), "#{Auth.get('rootPath')}#{path}", isBinary
   readDir =  (path) -> Auth.getRepo().contents Auth.get('branch'), path
 
 
@@ -74,7 +75,105 @@ define [
       EpubModels.EPUB_CONTAINER.each (book) -> book.loaded()
 
 
+  XhtmlModel = AtcModels.BaseContent.extend
+    mediaType: 'application/xhtml+xml'
 
+    parse: (html) ->
+
+      # The result of a Github PUT is an object instead of the new state of the model.
+      # Basically ignore it.
+      return {} if 'string' != typeof html
+
+      # Rename elements before jQuery parses and removes them
+      # (because they are not valid children of a div)
+
+      html = "<body>#{html}</body>" if not /<body/.test html
+      html = "<html>#{html}</html>" if not /<html/.test html
+
+      html = html.replace(/html>/g, "prefix-html>")
+      html = html.replace(/<\/head>/g, "</prefix-head>")
+      html = html.replace(/body>/g, "prefix-body>")
+
+      html = html.replace(/<html/g, "<prefix-html")
+      html = html.replace(/<head>/g, "<prefix-head>")
+      html = html.replace(/<body/g, "<prefix-body")
+
+      $html = jQuery(html)
+
+      $head = $html.find('prefix-head')
+      $body = $html.find('prefix-body')
+
+      # Change the `src` attribute to be a `data-src` attribute if the URL is relative
+      $html.find('img').each (i, img) ->
+        $img = jQuery(img)
+        src = $img.attr 'src'
+        return if /^https?:/.test src
+        return if /^data:/.test src
+
+        $img.removeAttr 'src'
+        $img.attr 'data-src', src
+
+
+      $images = $html.find('img[data-src]')
+      counter = $images.length
+
+      $images.each (i, img) =>
+        $img = jQuery(img)
+        src = $img.attr 'data-src'
+        # Load the image file somehow (see below for my github.js changes)
+        doneLoading = readFile(src, true) # isBinaryResponse = true
+        .done (bytes, statusMessage, xhr) =>
+          # Grab the mediaType from the response header (or look in the EPUB3 OPF file)
+          mediaType = AtcModels.ALL_CONTENT.get(src).mediaType # xhr.getResponseHeader('Content-Type').split(';')[0]
+
+          # Convert raw image to binary and then to Base64 encoded text
+          dataToBinary = (data) ->
+            str = ''
+            for char in data
+              str += String.fromCharCode(char.charCodeAt(0) & 0xff)
+            str
+
+          # Use the browser's Base64 encode if available
+          encode = btoa or @Base64?.encode
+
+          encoded = encode(dataToBinary(bytes))
+          $img.attr('src', "data:#{mediaType};base64,#{encoded}")
+
+          counter--
+          @set 'body', $body[0].innerHTML if counter == 0
+
+        .fail ->
+          counter--
+          $img.attr('src', 'path/to/failure.png')
+
+      return {head: $head[0]?.innerHTML, body: $body[0]?.innerHTML}
+
+
+    serialize: ->
+      head = @get 'head'
+      body = @get 'body'
+      $head = jQuery("<div class='unwrap-me'>#{head}</div>")
+      $body = jQuery("<div class='unwrap-me'>#{body}</div>")
+
+      # Replace all the `img[data-src]` attributes with `img[src]`
+      $body.find('img[data-src]').each (i, img) ->
+        $img = jQuery(img)
+        src = $img.attr('data-src')
+        $img.removeAttr('data-src')
+        $img.attr 'src', src
+
+      return """
+        <html>
+          <head>
+            #{$head[0].innerHTML}
+          </head>
+          <body>
+            #{$body[0].innerHTML}
+          </body>
+        </html>
+        """
+
+  MEDIA_TYPES.add XhtmlModel::mediaType, {constructor: XhtmlModel}
 
   # Clear everything and refetch when the
   STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']

@@ -70,13 +70,13 @@ Here are some things on my roadmap.
 If you're looking to contribute, tackling one of these would be a great place to start!
 
 * `[ ]` Add Markdown plugin that edits Markdown and autogenerates HTML (search for `MIME_TYPES` in the code)
-* `[ ]` Save images as resources instead of embedded data URIs (plug into Aloha Upload/Repository API)
-* `[ ]` Update the OPF file with added resources
+* `[X]` Save images as resources instead of embedded data URIs (plug into Aloha Upload/Repository API)
+* `[X]` Update the OPF file with added resources
 * `[ ]` Add UI for intra-book links (needs to be separate Aloha plugin)
 * `[ ]` Add "cleanup" button that deletes content/resources that are no longer referred to
-* `[ ]` Save `<html><head/><body/></html>` wrapper around HTML content instead of just saving `<div/>` tags
+* `[X]` Save `<html><head/><body/></html>` wrapper around HTML content instead of just saving `<div/>` tags
 * `[ ]` Generate `toc.ncx` file for EPUB2 compatibility
-* `[ ]` Get 'Add Content' working again (when should the id be assigned and the content saved?)
+* `[X]` Get 'Add Content' working again (when should the id be assigned and the content saved?)
 
 * `[X]` Notify user when github karma (requests/hour) runs out so they know to sign in
 * `[X]` Only enable Save button when content has changed
