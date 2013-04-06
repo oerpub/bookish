@@ -22,14 +22,8 @@
       return Auth.getRepo().contents(Auth.get('branch'), path);
     };
     Backbone.sync = function(method, model, options) {
-      var callback, id, path, ret,
+      var id, path, ret,
         _this = this;
-      callback = function(err, value) {
-        if (err) {
-          return typeof error === "function" ? error(model, err, options) : void 0;
-        }
-        return typeof success === "function" ? success(model, value, options) : void 0;
-      };
       path = model.id || (typeof model.url === "function" ? model.url() : void 0) || model.url;
       if (DEBUG) {
         console.log(method, path);
@@ -37,15 +31,15 @@
       ret = null;
       switch (method) {
         case 'read':
-          ret = readFile(path, callback);
+          ret = readFile(path);
           break;
         case 'update':
-          ret = writeFile(path, model.serialize(), 'Editor Save', callback);
+          ret = writeFile(path, model.serialize(), 'Editor Save');
           break;
         case 'create':
           id = _uuid();
           model.set('id', id);
-          ret = writeFile(path, model.serialize(), callback);
+          ret = writeFile(path, model.serialize());
           break;
         default:
           throw "Model sync method not supported: " + method;

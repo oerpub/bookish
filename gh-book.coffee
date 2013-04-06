@@ -28,22 +28,18 @@ define [
 
   Backbone.sync = (method, model, options) ->
 
-    callback = (err, value) ->
-      return error?(model, err, options) if err
-      return success?(model, value, options)
-
     path = model.id or model.url?() or model.url
 
     console.log method, path if DEBUG
     ret = null
     switch method
-      when 'read' then ret = readFile(path, callback)
-      when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save', callback)
+      when 'read' then ret = readFile(path)
+      when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save')
       when 'create'
         # Create an id if this model has not been saved yet
         id = _uuid()
         model.set 'id', id
-        ret = writeFile(path, model.serialize(), callback)
+        ret = writeFile(path, model.serialize())
       else throw "Model sync method not supported: #{method}"
 
     ret.done (value) => options?.success?(value)
