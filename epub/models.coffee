@@ -184,6 +184,10 @@ define [
           id: resolvePath(@id, path)
           properties: $item.attr 'properties'
 
+        # if We could not find a suitable editor for the `mediaType` make sure
+        # we do not lose that information when saving out the OPF file.
+        model.mediaType = mediaType if !(mediaType in MEDIA_TYPES.list())
+
         AtcModels.ALL_CONTENT.add model
         @manifest.add model
 
@@ -199,6 +203,11 @@ define [
     toJSON: ->
       json = BaseBook.prototype.toJSON.apply(@, arguments)
       json.manifest = @manifest?.toJSON()
+
+      # Loop through everything in the manifest and add a `mediaType`
+      _.each json.manifest, (item) ->
+        item.mediaType = AtcModels.ALL_CONTENT.get(item.id).mediaType
+
       json
 
   PackageFile = BaseBook.extend PackageFileMixin
