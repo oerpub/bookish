@@ -1,4 +1,5 @@
-# ## Extension point for editing Custom Media Types
+# Extension point for handling various Media Types (Content)
+# =======
 #
 # Several languages translate to HTML (Markdown, ASCIIDoc, cnxml).
 #
@@ -11,16 +12,17 @@
 #
 # Entries in here contain a mapping from mime-type to an object that provides:
 #
-# - A constructor for instantiating new content
-# - An `.editAction` which will change the page to become an edit page
+# - `.constructor` for instantiating a new `Backbone.Model` for this media type
+# - `.editAction` which will change the page to become an edit page
+# - `.accepts` hash of `mediaType -> addOperation` that is used for Drag-and-Dropping onto the content in the workspace list
 #
-# Different plugins (Markdown, ASCIIDoc, cnxml) can add themselves to this
+# Different plugins (EPUB OPF, XHTML, Markdown, ASCIIDoc, cnxml) can add themselves to this
 define ['backbone'], (Backbone) ->
 
   # Collection used for storing the various mediaTypes.
-  # When something registers a new mediaType views can update
+  # When something registers a "New... mediaType" view can update
   MediaTypes = Backbone.Collection.extend
-    # Just a glorified JSON holder
+    # Just a glorified JSON holder (that cannot `sync`)
     model: Backbone.Model.extend
       sync: -> throw 'This model cannot be syncd'
     sync: -> throw 'This model cannot be syncd'

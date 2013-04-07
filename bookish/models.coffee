@@ -5,38 +5,64 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`
   BaseContent = Backbone.Model.extend
-    # New content is given an id before it is saved so it can be added to a book
+    # New content is given an id before it is saved so it can be added to a book.
+    # A book can refer to a new piece of content in its Table of Contents
+    # (which could be stored in a HTML `<a href="[id]"/>` tag) so it needs some `id`.
+    #
+    # The Book Model can then listen to `change:id` and update the link when the
+    # new content is saved and the id is updated.
     isNew: -> not @id or @id.match(/^_NEW:/)
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
       @id = "_NEW:#{@cid}" if not @id
 
-  # This gets used by `DeferrableCollection` but is instantiated afterwards
+  # ALL_CONTENT
+  # =======
+  # `ALL_CONTENT` stores all Content models known to the editor and provides a
+  # way to look up any content by `id` if needed.
+  #
+  # It is also used by the **Save** button to decide if content has been changed.
+  #
+  # It is initially declared `null` because it is used by `DeferrableCollection`
+  # and instantiated afterwards (cyclic dependency)
   ALL_CONTENT = null
 
-  # ## Promises
+  # Fully loading Content
+  # =======
   # A model representing a piece of content may have been instantiated
   # (ie an entry as a result of a search) but not fetched yet.
   #
   # When dealing with a model (except for `id`, `title`, or `mediaType`)
-  # be sure to call `.loaded().then(cb)` first.
+  # be sure to call `.loaded().done(cb).fail(cb)` first.
   #
   # Once the model is loaded (fetched) call the callbacks.
 
   Deferrable = Backbone.Model.extend
+    # Returns a promise that the piece of content will be fully populated from
+    # the server.
+    # Initially the content is partially populated from a Search result, folder
+    # listing, or some other method that allowed the user to 'click' on to begin
+    # viewing/editing the full piece of content.
+    #
+    # **FIXME:** If `@isNew()` then the Model should always be fully loaded.
     loaded: (flag=false) ->
-      if flag
+      if flag # or @isNew()
         deferred = jQuery.Deferred()
         deferred.resolve @
         @_promise = deferred.promise()
-        # Mark it as loaded for the views
+        # Mark it as loaded for the views.
+        # By setting an attribute views can listen to a change and rerender,
+        # replacing the progress bar with the actual view
         @set {_done: true}
 
       # Silently update the model (the user has not seen the model yet)
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
       if not @_promise or 'rejected' == @_promise.state()
         @set {_loading: true}
+        # **TODO:** Set `silent:true` during the fetch (So save doesn't trigger)
+        # but make sure all the views listen to `change:_done` so they always update
+        # instead of relying on `change:*`.
         @_promise = @fetch # {silent:true}
           error: (model, message, options) =>
             @trigger 'error', model, message, options
@@ -53,12 +79,16 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       return @_promise
 
+    # Add the `mediaType` to the JSON
     toJSON: ->
       json = Backbone.Model.prototype.toJSON.apply(@, arguments)
       json.mediaType = @mediaType
       return json
 
+  # Collection analog of `Deferrable`
   DeferrableCollection = Backbone.Collection.extend
+
+    # This is mostly the same code in `Deferrable.loaded`.
     loaded: (flag) ->
       if flag
         deferred = jQuery.Deferred()
@@ -70,6 +100,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # Silently update the model (the user has not seen the model yet)
       # so `model.hasChanged()` returns `false` (to know when to enable Saving)
       if not @_promise or 'rejected' == @_promise.state()
+        # **TODO:** Match the "Set `silent:true` " TODO in `Deferrable`
         @_promise = @fetch # {silent:true}
           error: (model, message, options) =>
             @trigger 'error', model, message, options
@@ -82,11 +113,14 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     toJSON: -> (model.toJSON() for model in @models)
     initialize: ->
+      # When a collection is updated make sure `ALL_CONTENT` has a reference to all
+      # the added models.
       @on 'add',   (model) -> ALL_CONTENT.add model
       @on 'reset', (collection, options) -> ALL_CONTENT.add collection.toArray()
 
 
-  # ## All Content
+  # All Content
+  # =======
   #
   # To prevent multiple copies of a model from floating around a single
   # copy of all referenced content (loaded or not) is kept in this Collection
@@ -97,19 +131,22 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     model: BaseContent
     # Override the `DeferrableCollection` initialize because this is the `ALL_CONTENT`
     initialize: ->
-      # Never wait to fetch
+      # Never wait to fetch this collection
       @loaded(true)
 
   ALL_CONTENT = new AllContent()
 
 
-  # When searching for text, perform a local filter on content while we wait
-  # for the server to respond.
+  # When searching for text, perform a local filter on content while the search
+  # waits for the server to respond.
   #
   # This Collection takes another Collection and maintains an active filter on it.
+  #
+  # **FIXME:** Move the `exports.` part down to the bottom of this file.
   exports.FilteredCollection = Backbone.Collection.extend
     defaults:
       collection: null
+
     setFilter: (str) ->
       return if @filterStr == str
       @filterStr = str
@@ -120,27 +157,34 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     isMatch: (model) ->
       return true if not @filterStr
+      # Search inside the `title` attribute first.
       title = model.get('title') or ''
       found = title.toLowerCase().search(@filterStr.toLowerCase()) >= 0
       return true if found
 
+      # Search inside the `body` attribute if it exists,
+      # filtering out HTML tag names and attributes.
       body = model.get('body') or ''
       bodyText = body.replace(/\<(\/?[^\\>]+)\\>/, ' ').replace(/\s+/, ' ').trim()
+
+      # **FIXME:** Whoops! Add code to actually search the `body`
 
     initialize: (models, options) ->
       @filterStr = options.filterStr or ''
       @collection = options.collection
       throw 'BUG: Cannot filter on a non-existent collection' if not @collection
 
+      # Initially add all models that match the current filter
       @add (@collection.filter (model) => @isMatch(model))
 
-
+      # Update the filtered collection when items are added/removed
       @listenTo @collection, 'add',    (model) => @add model if @isMatch(model)
       @listenTo @collection, 'remove', (model) => @remove model
       @listenTo @collection, 'reset',  (model, options) =>
         @reset()
         @add (@collection.filter (model) => @isMatch(model))
 
+      # If the model changes and the filter now does/does-not apply then update
       @listenTo @collection, 'change', (model) =>
         if @isMatch(model)
           @add model
@@ -170,19 +214,41 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Used below to create JSON representation of model
   Backbone_Model_toJSON = Backbone.Model::toJSON
 
-  # ## Book ToC Tree Model
-  # This model represents the ToC
+  # Book ToC Tree Model
+  # =======
+  # The Book editor contains a tree (`BookTocTree`) of nested models `BookTocNode`
+  # representing the book structure.
+  #
+  # Events fire on `BookTocNode` items so their views can be updated but
+  # `BookTocTree` can be listened to for events that "bubble up" to the root.
+  #
+  # Examples include:
+  #
+  # - `add:treeNode` when a new node is added somewhere in the tree
+  # - `remove:treeNode` when a node is removed somewhere in the tree
+  # - `change:treeNode` when the title or id of a node in the tree has changed
+  #
+  # Additionally, each Node has a `.parent` that is updated when it is moved
+  # (used by Views to remove/detach a node).
+
+  # Represents an item in the ToC
   BookTocNode = Backbone.Model.extend
+    # Recursively include child nodes in the returned JSON
     toJSON: ->
       json = Backbone_Model_toJSON.apply(@)
       json.children = @children.toJSON() if @children.length
       json
 
+    # Return the `id` of the corresponding Content Model represented by this node.
+    # This is used to "look up" the original title of content if it has not been
+    # Overridden in the book.
     contentId: -> @id
 
     initialize: ->
       @on 'change', => @trigger 'change:treeNode'
 
+      # If the Tree Node is initialized with a `children` property
+      # then use that config to recursively create new child nodes.
       children = @get 'children'
       @unset 'children', {silent:true}
 
@@ -203,9 +269,18 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     model: BookTocNode
 
 
+  # Root of a Tree
+  # -------
+  # Events that "bubble up" the tree can be listened to on this object
+  #
+  # Additionally, it contains a `Backbone.Collection` of `descendants` which
+  # contains all nodes in the tree (That's how the events "bubble up").
+  #
+  # The Model can be thought of as a `<ul>` since it does not contain
+  # any interesting fields itself except for `children`.
   BookTocTree = BookTocNode.extend
-    # Used for views. **TODO:** This should probably be moved out into the view
     toJSON: -> @children.toJSON()
+
     initialize: ->
       BookTocNode::initialize.call(@)
       @descendants = new BookTocNodeCollection()
@@ -231,6 +306,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @descendants.on 'change:treeNode', (node) =>
         @trigger 'change:treeNode', node
 
+    # When the whole tree needs to be reset call this.
     reset: (nodes) ->
       @descendants.reset()
       @children.reset nodes
@@ -242,6 +318,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       @children.each (child) => child.parent = @; recAddDescendants child
 
 
+  # BaseBook (Connexions Collection)
+  # =======
   # Represents a "collection" in [Connexions](http://cnx.org) terminology and an `.opf` file in an EPUB
   BaseBook = Deferrable.extend
     mediaType: 'application/vnd.org.cnx.collection'
@@ -252,6 +330,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # so the book can listen to changes.
     manifestType: Backbone.Collection
 
+    # **FIXME:** Adding the `navTreeRoot` should probably be removed since the views are recursive
+    # and never need the entire JSON
     toJSON: ->
       json = Deferrable.prototype.toJSON.apply(@, arguments)
       json.navTree = @navTreeRoot.toJSON()
@@ -291,7 +371,10 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       $a = $li.children 'a, span'
       $ol = $li.children 'ol'
 
-      obj = {id: $a.attr('href') or $a.data('id'), title: $a.text()}
+      obj = {id: $a.attr('href') or $a.data('id')}
+
+      # Don't set the title if we have not overridden it
+      obj.title = $a.text() if !$a.hasClass 'autogenerated-text'
 
       # The custom class is either set on the `$span` (if parsing from the editor) or on the `$a` (if parsing from an EPUB)
       obj.class = $a.data('class') or $a.not('span').attr('class')
@@ -334,7 +417,12 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       ALL_CONTENT.add @
 
 
-    # **FIXME:** Somewhat hacky way of creating a new piece of content
+    # Used by `MEDIA_TYPES.get(...).accepts` to add new content when content
+    # is dropped on the book in the Workspace/Search Results views.
+    #
+    # Convenience method for `.navTreeRoot.children.add {id: model.get('id')}, {at: 0}`
+    #
+    # **FIXME:** Somewhat hacky way of creating a new piece of content (remove the `mediaType` arg)
     prependNewContent: (model, mediaType) ->
       if model instanceof Backbone.Model
         # If the model is already in the book then do not add it again
@@ -350,10 +438,10 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         ContentType = MEDIA_TYPES.get(mediaType).constructor
         model = new ContentType config
         # Mark it as sync'd so we don't try to fetch a non-existent file
+        # **FIXME:** Have `Deferred.loaded()` use `Model.isNew()` to decide if the Model is fully loaded.
         model.loaded(true)
 
         @manifest.add model
-        # HACK: Since it is new content there is nothing to load but we already set an `id`
         console.warn 'FIXME: Hack for new content'
 
       else
@@ -378,7 +466,11 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     return 0
 
-  # Add the 2 basic Media Types already defined above
+  # Add the 2 basic Media Types already defined above.
+  #
+  # **FIXME:** Move these into the `controller` file instead of here.
+  #
+  # **FIXME:** Move the `application/xhtml+xml` into the `epub/` code.
   MEDIA_TYPES.add 'application/vnd.org.cnx.module',
     constructor: BaseContent
 
@@ -397,6 +489,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
   exports.ALL_CONTENT = ALL_CONTENT
+  # **FIXME:** Remove the next line
   exports.MEDIA_TYPES = MEDIA_TYPES
   exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR
   # Other implementations can override this
