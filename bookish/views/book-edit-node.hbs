@@ -1,6 +1,7 @@
+<div class="editor-drop-zone editor-drop-zone-before"></div>
 {{! Renders a single node in the book editor tree}}
 {{! Includes drop zones and supports nodes that point to content (with ids) and containers (chapter/unit)}}
-<div class="editor-drop-zone editor-drop-zone-before"></div>
+{{! The div above MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
 {{#if children}}
   {{#if expanded}}
