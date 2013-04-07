@@ -16,10 +16,19 @@
     MEDIA_TYPES = new MediaTypes();
     return {
       add: function(mediaType, config) {
-        var prev;
+        var func, mt, prev, _ref;
         prev = MEDIA_TYPES.get(mediaType);
         if (!config.constructor && !prev) {
           throw 'BUG: You must at least specify a constructor!';
+        }
+        _ref = config.accepts || {};
+        for (mt in _ref) {
+          func = _ref[mt];
+          config.accepts[mt] = function(me, droppedContent) {
+            return me.loaded().done(function() {
+              return func(me, droppedContent);
+            });
+          };
         }
         return MEDIA_TYPES.add(_.extend(config, {
           id: mediaType

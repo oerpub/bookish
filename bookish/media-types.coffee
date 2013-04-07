@@ -34,6 +34,14 @@ define ['backbone'], (Backbone) ->
     add: (mediaType, config) ->
       prev = MEDIA_TYPES.get(mediaType)
       throw 'BUG: You must at least specify a constructor!' if not config.constructor and not prev
+
+      # Before calling the accept method make sure the long-form of the content
+      # is loaded. (`mt` is `mediaType`)
+      for mt, func of config.accepts or {}
+        config.accepts[mt] = (me, droppedContent) ->
+          me.loaded().done ->
+            func(me, droppedContent)
+
       MEDIA_TYPES.add _.extend(config, {id: mediaType}), {merge:true}
 
     get: (mediaType) ->
