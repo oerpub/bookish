@@ -1,3 +1,8 @@
+# Authoring Tools
+# =======
+# This file attaches all the sync hooks necessary to make the `bookish` editor
+# read/write to the Connexions repository.
+#
 define [
   'underscore'
   'backbone'
@@ -11,6 +16,7 @@ define [
   'css!bookish'
 ], (_, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
+  # **FIXME:** This variable is no longer used
   DEBUG = true
 
 
@@ -34,9 +40,14 @@ define [
 
     # When the body of the collection changes, update the `navTreeRoot`
     @on 'change:body', (model, body) =>
+      # Older implementations of the server returned the `body`
+      # as an array of characters instead of a string.
+      # If that happens, concat them into a string.
       if body instanceof Array
         return model.set 'body', body.join('')
       $body = jQuery(body)
+      # Pull out the `<nav>` element (which contains a `<ol>`)
+      # representing the structure of a book.
       if $body.is 'nav'
         $root = $body
       else
@@ -52,10 +63,11 @@ define [
 
 
   # HACK: to always get an authenticated user
-  # Originally from `Backbone.sync`.
-  # Added the request header
+  # by adding a request header
   Backbone.ajax = (config) ->
-    config = _.extend config, {headers: {'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'}}
+    config = _.extend config,
+      headers:
+        'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'
     Backbone.$.ajax.apply(Backbone.$, [config])
 
 
@@ -81,7 +93,8 @@ define [
 
   MEDIA_TYPES.add 'application/vnd.org.cnx.folder',
     constructor: Folder
-    # ### Show Folder
+    # Show Folder
+    # -------
     # Shows a single folder in the workspace
     editAction: (model) ->
       # Always scroll to the top of the page
@@ -102,7 +115,7 @@ define [
       view = new Views.SearchResultsView {collection: workspace}
       mainArea.show view
 
-      # Update the URL
+      # Update the URL once the Folder is fully loaded
       model.loaded().done =>
         # Update the URL
         Backbone.history.navigate "content/#{model.get 'id'}"
@@ -112,16 +125,18 @@ define [
   AtcWorkspace = Models.DeferrableCollection.extend
     url: WORKSPACE_URL
     # Workspace comes in with the following format:
+    #
     #     [
     #       {mediaType: 'application/vnd.org.cnx.folder', id: 'cnxfolder:123', title: 'Some Title', ...} ...],
     #       {mediaType: 'application/vnd.org.cnx.module', id: 'cnxmodule:123', title: 'Some Title', ...} ...],
     #       {mediaType: 'application/vnd.org.cnx.collection', id: 'cnxcollection:123', title: 'Some Title', ...} ...],
     #     ]
     #
-    # Convert that to something sane.
+    # Convert that to models (if they are not already loaded).
     parse: (results) ->
       # Rewrite the `mediaType` so it matches what the bookish editor expects.
       results = for item in results
+        # **FIXME:** Only instantiate the Model if it does not already exist in `Models.ALL_CONTENT`
         ContentType = MEDIA_TYPES.get(item.mediaType).constructor
         model = new ContentType(item)
         model
@@ -130,17 +145,19 @@ define [
 
     # If new content is created/loaded, add it to the workspace
     initialize: ->
+      # If the workspace is updated make sure `Models.ALL_CONTENT` has the new content
       @on 'add', (model) => Models.ALL_CONTENT.add model
       @on 'reset', (collection) => Models.ALL_CONTENT.add @models
 
+      # If a model is added to `Models.ALL_CONTENT` ensure it shows up in the workspace
       @listenTo Models.ALL_CONTENT, 'add', (model) =>
         @add model
 
-
+  # Replace the default workspace (`Models.ALL_CONTENT`) with this workspace.
   Models.WORKSPACE = new AtcWorkspace()
 
   resetDesktop = ->
-    # Clear out all the content and reset `EPUB_CONTAINER` so it is always fetched
+    # Clear out all the content and refetch the workspace
     Models.ALL_CONTENT.reset()
     Models.WORKSPACE.fetch()
 
@@ -151,7 +168,7 @@ define [
     Backbone.history.navigate('workspace')
 
 
-  # Clear everything and refetch when the
+  # Refetch the workspace when the user Signs In/Out.
   STORED_KEYS = ['username', 'password']
   Auth.on 'change', () =>
     if not _.isEmpty(_.pick Auth.changed, STORED_KEYS)
