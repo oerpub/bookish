@@ -2,11 +2,11 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  define(['exports', 'underscore', 'backbone', 'bookish/media-types', 'bookish/controller', 'bookish/models', 'hbs!./opf-file', 'hbs!./container-file', 'hbs!./nav-serialize'], function(exports, _, Backbone, MEDIA_TYPES, Controller, AtcModels, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) {
+  define(['exports', 'underscore', 'backbone', 'bookish/media-types', 'bookish/controller', 'bookish/models', 'bookish/views', 'hbs!./opf-file', 'hbs!./container-file', 'hbs!./nav-serialize'], function(exports, _, Backbone, MEDIA_TYPES, Controller, Models, Views, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) {
     var BaseBook, BaseCollection, BaseContent, EPUBContainer, HTMLFile, PackageFile, PackageFileMixin, TemplatedFileMixin, mixin, resolvePath;
-    BaseCollection = AtcModels.DeferrableCollection;
-    BaseContent = AtcModels.BaseContent;
-    BaseBook = AtcModels.BaseBook;
+    BaseCollection = Models.DeferrableCollection;
+    BaseContent = Models.BaseContent;
+    BaseBook = Models.BaseBook;
     resolvePath = function(context, relPath) {
       if (context.search('/') < 0) {
         return relPath;
@@ -116,7 +116,7 @@
                 node = nodes[_i];
                 if (node.id && node.id.search('#') < 0) {
                   path = resolvePath(_this.navModel.id, node.id);
-                  model = AtcModels.ALL_CONTENT.get(path);
+                  model = Models.ALL_CONTENT.get(path);
                   model.set({
                     title: node.title
                   });
@@ -175,7 +175,7 @@
           if (!(__indexOf.call(MEDIA_TYPES.list(), mediaType) >= 0)) {
             model.mediaType = mediaType;
           }
-          AtcModels.ALL_CONTENT.add(model);
+          Models.ALL_CONTENT.add(model);
           _this.manifest.add(model);
           if ('nav' === $item.attr('properties')) {
             return _this.navModel = model;
@@ -191,7 +191,7 @@
         json = BaseBook.prototype.toJSON.apply(this, arguments);
         json.manifest = (_ref = this.manifest) != null ? _ref.toJSON() : void 0;
         _.each(json.manifest, function(item) {
-          return item.mediaType = AtcModels.ALL_CONTENT.get(item.id).mediaType;
+          return item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType;
         });
         return json;
       }
@@ -235,6 +235,16 @@
       constructor: HTMLFile,
       editAction: Controller.editContent
     });
+    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
+      constructor: PackageFile,
+      editAction: Controller.editBook,
+      accepts: {
+        'application/xhtml+xml': function(book, model) {
+          return book.prependNewContent(model);
+        }
+      }
+    });
+    Views.BookEditView.prototype.contentMediaType = 'application/xhtml+xml';
     exports.EPUB_CONTAINER = new EPUBContainer();
     return exports;
   });

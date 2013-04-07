@@ -215,9 +215,17 @@ define [
 
   # Attach mediaType edit views
   # -------
-  # **FIXME:** Move the `MEDIA_TYPES.add` code from `models` into here.
-  MEDIA_TYPES.add 'application/vnd.org.cnx.module',     {editAction: (model) -> mainController.editContent model}
-  MEDIA_TYPES.add 'application/vnd.org.cnx.collection', {editAction: (model) -> mainController.editBook model}
+  # Add the 2 basic Media Types already defined in `Models`.
+  MEDIA_TYPES.add 'application/vnd.org.cnx.module',
+    constructor: Models.BaseContent
+    editAction: (model) -> mainController.editContent model
+
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
+    constructor: Models.BaseBook
+    editAction: (model) -> mainController.editBook model
+    accepts:
+      'application/vnd.org.cnx.module': (book, model) ->
+        book.prependNewContent model
 
 
   # Start listening to URL changes

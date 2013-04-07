@@ -174,13 +174,20 @@
       }
     });
     MEDIA_TYPES.add('application/vnd.org.cnx.module', {
+      constructor: Models.BaseContent,
       editAction: function(model) {
         return mainController.editContent(model);
       }
     });
     MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
+      constructor: Models.BaseBook,
       editAction: function(model) {
         return mainController.editBook(model);
+      },
+      accepts: {
+        'application/vnd.org.cnx.module': function(book, model) {
+          return book.prependNewContent(model);
+        }
       }
     });
     new ContentRouter();

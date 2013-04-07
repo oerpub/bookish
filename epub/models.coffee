@@ -5,14 +5,15 @@ define [
   'bookish/media-types'
   'bookish/controller'
   'bookish/models'
+  'bookish/views'
   'hbs!./opf-file'
   'hbs!./container-file'
   'hbs!./nav-serialize'
-], (exports, _, Backbone, MEDIA_TYPES, Controller, AtcModels, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
+], (exports, _, Backbone, MEDIA_TYPES, Controller, Models, Views, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
 
-  BaseCollection = AtcModels.DeferrableCollection
-  BaseContent = AtcModels.BaseContent
-  BaseBook = AtcModels.BaseBook
+  BaseCollection = Models.DeferrableCollection
+  BaseContent = Models.BaseContent
+  BaseBook = Models.BaseBook
 
 
   # Links in a navigation document are relative to where the nav document resides.
@@ -124,7 +125,7 @@ define [
             for node in nodes
               if node.id and node.id.search('#') < 0
                 path = resolvePath(@navModel.id, node.id)
-                model = AtcModels.ALL_CONTENT.get path
+                model = Models.ALL_CONTENT.get path
                 model.set {title: node.title}
                 # Do not mark the object as 'dirty' (for saving)
                 delete model.changed
@@ -188,7 +189,7 @@ define [
         # we do not lose that information when saving out the OPF file.
         model.mediaType = mediaType if !(mediaType in MEDIA_TYPES.list())
 
-        AtcModels.ALL_CONTENT.add model
+        Models.ALL_CONTENT.add model
         @manifest.add model
 
         # If we stumbled upon the special navigation document
@@ -206,7 +207,7 @@ define [
 
       # Loop through everything in the manifest and add a `mediaType`
       _.each json.manifest, (item) ->
-        item.mediaType = AtcModels.ALL_CONTENT.get(item.id).mediaType
+        item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType
 
       json
 
@@ -232,7 +233,20 @@ define [
       return ret
 
 
-  MEDIA_TYPES.add 'application/xhtml+xml', {constructor: HTMLFile, editAction: Controller.editContent}
+  # Add the `HTMLFile` and `PackageFile` to the media types registry.
+  MEDIA_TYPES.add 'application/xhtml+xml',
+    constructor: HTMLFile
+    editAction: Controller.editContent
+
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
+    constructor: PackageFile
+    editAction: Controller.editBook
+    accepts:
+      'application/xhtml+xml': (book, model) ->
+        book.prependNewContent model
+
+  # Override the default `mediaType` for new content in the Book edit view.
+  Views.BookEditView::contentMediaType = 'application/xhtml+xml'
 
   exports.EPUB_CONTAINER = new EPUBContainer()
 
