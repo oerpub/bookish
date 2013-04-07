@@ -78,21 +78,36 @@
         return obj;
       },
       initialize: function(obj) {
-        var Type, item, model, _i, _len, _ref, _results;
+        var Type, item, model, _i, _len, _ref,
+          _this = this;
         this.collection = new Backbone.Collection();
         _ref = obj.body || [];
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           item = _ref[_i];
           Type = MEDIA_TYPES.get(item.mediaType).constructor;
           model = new Type(item);
-          _results.push(this.collection.add(model));
+          this.collection.add(model);
         }
-        return _results;
+        return this.collection.on('all', function() {
+          var args;
+          args = _.toArray(arguments);
+          return _this.trigger.apply(_this, ['change', _this].concat(args.slice(3)));
+        });
+      },
+      prependContent: function(content) {
+        return this.collection.add(content);
       }
     });
     MEDIA_TYPES.add('application/vnd.org.cnx.folder', {
       constructor: Folder,
+      accepts: {
+        'application/vnd.org.cnx.module': function(folder, content) {
+          return folder.prependContent(content);
+        },
+        'application/vnd.org.cnx.collection': function(folder, content) {
+          return folder.prependContent(content);
+        }
+      },
       editAction: function(model) {
         var mainArea, mainSidebar, mainToolbar, view, workspace,
           _this = this;

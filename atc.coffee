@@ -86,13 +86,27 @@ define [
       obj
     initialize: (obj) ->
       @collection = new Backbone.Collection()
+
       for item in obj.body or []
         Type = MEDIA_TYPES.get(item.mediaType).constructor
         model = new Type(item)
         @collection.add model
 
+      # Events on the collection "bubble up" as a change event so
+      # "Save" knows this item is "dirty"
+      @collection.on 'all', =>
+        args = _.toArray arguments
+        @trigger.apply @, ['change', @].concat args.slice 3
+
+    # Add a piece of content to the folder.
+    # If the item is already in the folder then it will not be added twice.
+    prependContent: (content) -> @collection.add content
+
   MEDIA_TYPES.add 'application/vnd.org.cnx.folder',
     constructor: Folder
+    accepts:
+      'application/vnd.org.cnx.module':     (folder, content) -> folder.prependContent content
+      'application/vnd.org.cnx.collection': (folder, content) -> folder.prependContent content
     # Show Folder
     # -------
     # Shows a single folder in the workspace
