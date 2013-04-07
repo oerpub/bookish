@@ -747,6 +747,7 @@
       template: BOOK_EDIT,
       itemView: BookEditNodeView,
       itemViewContainer: '> nav > ol',
+      contentMediaType: 'application/vnd.org.cnx.module',
       events: {
         'click #nav-close': 'closeView',
         'click #add-section': 'prependSection',
@@ -763,7 +764,7 @@
       prependContent: function() {
         return this.model.prependNewContent({
           title: 'Untitled Content'
-        }, 'application/vnd.org.cnx.module');
+        }, this.contentMediaType);
       },
       closeView: function() {
         return Controller.hideSidebar();
