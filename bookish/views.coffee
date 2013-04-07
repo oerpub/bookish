@@ -1,11 +1,11 @@
-# # Backbone Views
+# Backbone Views
+# =======
 # Most views have the following properties:
 #
 # 1. Load a Handlebar template using the `hbs` plugin (see `define` below)
 # 2. Attach listeners to the corresponding model (see `initialize` method and `events:`)
 # 3. Attach jQuery listeners to the rendered template (see `onRender` methods)
 # 4. Navigate to a different "page" (see `Controller.*` in the `jQuery.on` handlers)
-#
 
 #
 define [
@@ -68,7 +68,7 @@ define [
       $el.draggable
         addClasses: false
         revert: 'invalid'
-        # Ensure the handle is on top and not bound visually
+        # Ensure the handle is on top (zindex) and not bound to be constrained inside a div visually
         appendTo: 'body'
         # Place the little handle right next to the mouse
         cursorAt:
@@ -78,6 +78,7 @@ define [
           title = $el.data 'content-title'
           shortTitle = title
           shortTitle = title.substring(0, 20) + '...' if title.length > 20
+          # Generate the handle div using a template
           $handle = jQuery DND_HANDLE
             id: $el.data 'content-id'
             mediaType: $el.data 'media-type'
@@ -133,7 +134,8 @@ define [
     LANGUAGES.push(value)
 
 
-  # ## Search Result Views (workspace)
+  # Search Result Views (workspace)
+  # -------
   #
   # A list of search results (stubs of models only containing an icon, url, title)
   # need a generic view for an item.
@@ -174,12 +176,6 @@ define [
               activeClass: 'editor-drop-zone-active'
               hoverClass: 'editor-drop-zone-hover'
               drop: (evt, ui) =>
-                # Possible drop cases:
-                #
-                # - On the node
-                # - Before the node
-                # - After the node
-
                 $drag = ui.draggable
                 $drop = jQuery(evt.target)
 
@@ -187,8 +183,6 @@ define [
                 model = Models.ALL_CONTENT.get $drag.data 'content-id'
                 drop = Models.ALL_CONTENT.get $drop.data 'content-id'
                 mediaType.accepts[model.mediaType](drop, model)
-
-
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
@@ -241,7 +235,7 @@ define [
 
     initialize: ->
 
-      # Update the view when the content is done loading
+      # Update the view when the content is done loading (remove progress bar)
       @listenTo @model, 'change:_done', (model, value, options) => @render()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
@@ -287,7 +281,8 @@ define [
 
 
 
-  # ## Edit Content Body
+  # Edit Content Body
+  # -------
   exports.ContentEditView = exports.AlohaEditView.extend
     # **NOTE:** This template is not wrapped in an element
     template: CONTENT_EDIT
@@ -311,7 +306,8 @@ define [
       Aloha.ready =>
         @$el.removeClass('disabled')
 
-  # ### Content Metadata
+  # Content Metadata
+  # -------
 
   exports.MetadataEditView = Marionette.ItemView.extend
     template: EDIT_METADATA
@@ -469,7 +465,8 @@ define [
 
 
 
-  # ## DialogWrapper
+  # Dialog Wrapper
+  # -------
   # This class wraps a view in a div and only causes changes when
   # the 'Save' button is clicked.
   #
@@ -501,7 +498,8 @@ define [
             alert('Something went wrong when saving: ' + res)
 
 
-  # ## Auth View
+  # Default Auth View
+  # -------
   # The top-right of each page should have either:
   #
   # 1. a Sign-up/Login link if not logged in
@@ -629,7 +627,10 @@ define [
 
 
 
-  # ## Book Editing
+  # Book Editing
+  # -------
+  # The book editor has a tree of node views (nested `Marionette.ContainerView`)
+  # with Drag and Drop handling restricted by `mediaType`.
 
   BookEditNodeView = Marionette.CompositeView.extend
     template: BOOK_EDIT_NODE
@@ -682,6 +683,9 @@ define [
         content = Models.ALL_CONTENT.get @model.contentId()
         # Provide the original module title to view templates
         # if the title has not been overridden
+
+        # **FIXME:** Just make the whole Content model available via `.content`
+        # instead of picking out the `title` and `mediaType`
         return {
           _contentTitle: content.get 'title'
           _contentMediaType: content.mediaType
@@ -780,6 +784,8 @@ define [
     initialize: ->
       @collection = @model.navTreeRoot.children
 
+    # **FIXME:** Make the mediaType for new content a property of the view
+    # (so the EPUB book editor can override it) or use `media-types` to look it up.
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
     prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
 
