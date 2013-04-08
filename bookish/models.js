@@ -221,10 +221,7 @@
           delete child.parent;
           return _this.trigger('remove:treeNode', child, _this, options);
         });
-        this.children.add(children);
-        return this.children.each(function(child) {
-          return child.parent = _this;
-        });
+        return this.children.add(children);
       }
     });
     BookTocNodeCollection = Backbone.Collection.extend({
@@ -256,8 +253,11 @@
           _this.descendants.remove(node);
           return _this.trigger('remove:treeNode', node);
         });
-        return this.descendants.on('change:treeNode', function(node) {
-          return _this.trigger('change:treeNode', node);
+        this.on('add:treeNode', function(node) {
+          return _this.descendants.add(node);
+        });
+        return this.on('remove:treeNode', function(node) {
+          return _this.descendants.remove(node);
         });
       },
       reset: function(nodes) {

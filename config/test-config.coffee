@@ -14,7 +14,7 @@ require.config
 
 
 
-require ['underscore', 'bookish/models'], (_, Models) ->
+require ['underscore', 'bookish/models', 'bookish/controller'], (_, Models, Controller) ->
 
   book = new Models.BaseBook
     id: 'col1'

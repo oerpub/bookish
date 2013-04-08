@@ -260,7 +260,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         @trigger 'remove:treeNode', child, @, options
 
       @children.add children
-      @children.each (child) => child.parent = @
 
 
   BookTocNodeCollection = Backbone.Collection.extend
@@ -301,8 +300,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         @descendants.remove node
         @trigger 'remove:treeNode', node
 
-      @descendants.on 'change:treeNode', (node) =>
-        @trigger 'change:treeNode', node
+      @on 'add:treeNode',    (node) => @descendants.add node
+      @on 'remove:treeNode', (node) => @descendants.remove node
 
     # When the whole tree needs to be reset call this.
     reset: (nodes) ->
