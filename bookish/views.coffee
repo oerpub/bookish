@@ -667,8 +667,8 @@ define [
       # of this parent node
       @collection = @model.children
 
-      @model.on 'all', => @render()
-      @collection.on 'all', => @render()
+      @listenTo @model,      'all', => @render()
+      @listenTo @collection, 'all', => @render()
 
       # If the content title changes and we have not overridden the title
       # rerender the node
@@ -745,7 +745,8 @@ define [
                 return if (drag.cid == testNode.cid) or (testNode.id and drag.id == testNode.id)
                 testNode = testNode.parent
 
-              drag.collection.remove drag if drag.collection
+              # Remove the item if it is a `BookTocNode`
+              drag.parent.children.remove(drag) if drag.parent
 
               if $drop.hasClass 'editor-drop-zone-before'
                 col = @model.parent.children
@@ -775,6 +776,8 @@ define [
     template: BOOK_EDIT
     itemView: BookEditNodeView
     itemViewContainer: '> nav > ol'
+    # Default media type for new Content
+    contentMediaType: 'application/vnd.org.cnx.module'
 
     events:
       'click #nav-close': 'closeView'
@@ -787,7 +790,7 @@ define [
     # **FIXME:** Make the mediaType for new content a property of the view
     # (so the EPUB book editor can override it) or use `media-types` to look it up.
     prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, 'application/vnd.org.cnx.module'
+    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, @contentMediaType
 
     closeView: -> Controller.hideSidebar()
 

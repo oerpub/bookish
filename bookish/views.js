@@ -654,10 +654,10 @@
         var contentModel,
           _this = this;
         this.collection = this.model.children;
-        this.model.on('all', function() {
+        this.listenTo(this.model, 'all', function() {
           return _this.render();
         });
-        this.collection.on('all', function() {
+        this.listenTo(this.collection, 'all', function() {
           return _this.render();
         });
         if (this.model.contentId()) {
@@ -713,8 +713,8 @@
                   }
                   testNode = testNode.parent;
                 }
-                if (drag.collection) {
-                  drag.collection.remove(drag);
+                if (drag.parent) {
+                  drag.parent.children.remove(drag);
                 }
                 if ($drop.hasClass('editor-drop-zone-before')) {
                   col = _this.model.parent.children;
@@ -747,6 +747,7 @@
       template: BOOK_EDIT,
       itemView: BookEditNodeView,
       itemViewContainer: '> nav > ol',
+      contentMediaType: 'application/vnd.org.cnx.module',
       events: {
         'click #nav-close': 'closeView',
         'click #add-section': 'prependSection',
@@ -763,7 +764,7 @@
       prependContent: function() {
         return this.model.prependNewContent({
           title: 'Untitled Content'
-        }, 'application/vnd.org.cnx.module');
+        }, this.contentMediaType);
       },
       closeView: function() {
         return Controller.hideSidebar();

@@ -4,7 +4,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
 
   # Custom Models defined above are mixed in using `BaseContent.initialize`
-  BaseContent = Backbone.Model.extend
+  BaseModel = Backbone.Model.extend
     # New content is given an id before it is saved so it can be added to a book.
     # A book can refer to a new piece of content in its Table of Contents
     # (which could be stored in a HTML `<a href="[id]"/>` tag) so it needs some `id`.
@@ -15,7 +15,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
-      @id = "_NEW:#{@cid}" if not @id
+      @set {id: "_NEW:#{@cid}"} if not @id
 
   # ALL_CONTENT
   # =======
@@ -38,7 +38,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   #
   # Once the model is loaded (fetched) call the callbacks.
 
-  Deferrable = Backbone.Model.extend
+  Deferrable = BaseModel.extend
     # Returns a promise that the piece of content will be fully populated from
     # the server.
     # Initially the content is partially populated from a Search result, folder
@@ -141,9 +141,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # waits for the server to respond.
   #
   # This Collection takes another Collection and maintains an active filter on it.
-  #
-  # **FIXME:** Move the `exports.` part down to the bottom of this file.
-  exports.FilteredCollection = Backbone.Collection.extend
+  FilteredCollection = Backbone.Collection.extend
     defaults:
       collection: null
 
@@ -262,7 +260,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         @trigger 'remove:treeNode', child, @, options
 
       @children.add children
-      @children.each (child) => child.parent = @
 
 
   BookTocNodeCollection = Backbone.Collection.extend
@@ -303,8 +300,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         @descendants.remove node
         @trigger 'remove:treeNode', node
 
-      @descendants.on 'change:treeNode', (node) =>
-        @trigger 'change:treeNode', node
+      @on 'add:treeNode',    (node) => @descendants.add node
+      @on 'remove:treeNode', (node) => @descendants.remove node
 
     # When the whole tree needs to be reset call this.
     reset: (nodes) ->
@@ -437,19 +434,20 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         # Create the model from a config and add it to the manifest
         ContentType = MEDIA_TYPES.get(mediaType).constructor
         model = new ContentType config
+        ALL_CONTENT.add model
         # Mark it as sync'd so we don't try to fetch a non-existent file
         # **FIXME:** Have `Deferred.loaded()` use `Model.isNew()` to decide if the Model is fully loaded.
         model.loaded(true)
 
-        @manifest.add model
+        #@manifest.add model
         console.warn 'FIXME: Hack for new content'
+
+        # Prepend to the navTree
+        @navTreeRoot.children.add {id: model.get('id')}, {at: 0}
 
       else
         # Otherwise, just add a container
-        model = new Backbone.Model model
-
-      # Prepend to the navTree
-      @navTreeRoot.children.add {id: model.get('id')}, {at: 0}
+        @navTreeRoot.children.add {title: model.title}, {at: 0}
 
 
   # Compare by `mediaType` (Collections/Books 1st), then by title/URL
@@ -466,23 +464,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     return 0
 
-  # Add the 2 basic Media Types already defined above.
-  #
-  # **FIXME:** Move these into the `controller` file instead of here.
-  #
-  # **FIXME:** Move the `application/xhtml+xml` into the `epub/` code.
-  MEDIA_TYPES.add 'application/vnd.org.cnx.module',
-    constructor: BaseContent
-
-  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
-    constructor: BaseBook
-    accepts:
-      'application/xhtml+xml': (book, model) ->
-        book.prependNewContent model
-      'application/vnd.org.cnx.module': (book, model) ->
-        book.prependNewContent model
-
   # Finally, export only the pieces needed
+  exports.FilteredCollection = FilteredCollection
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
   exports.BookTocTree = BookTocTree

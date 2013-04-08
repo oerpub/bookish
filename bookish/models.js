@@ -2,8 +2,8 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection;
-    BaseContent = Backbone.Model.extend({
+    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection;
+    BaseModel = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
       },
@@ -15,12 +15,14 @@
           throw 'BUG: No mediaType not registered';
         }
         if (!this.id) {
-          return this.id = "_NEW:" + this.cid;
+          return this.set({
+            id: "_NEW:" + this.cid
+          });
         }
       }
     });
     ALL_CONTENT = null;
-    Deferrable = Backbone.Model.extend({
+    Deferrable = BaseModel.extend({
       loaded: function(flag) {
         var deferred,
           _this = this;
@@ -114,7 +116,7 @@
       }
     });
     ALL_CONTENT = new AllContent();
-    exports.FilteredCollection = Backbone.Collection.extend({
+    FilteredCollection = Backbone.Collection.extend({
       defaults: {
         collection: null
       },
@@ -219,10 +221,7 @@
           delete child.parent;
           return _this.trigger('remove:treeNode', child, _this, options);
         });
-        this.children.add(children);
-        return this.children.each(function(child) {
-          return child.parent = _this;
-        });
+        return this.children.add(children);
       }
     });
     BookTocNodeCollection = Backbone.Collection.extend({
@@ -254,8 +253,11 @@
           _this.descendants.remove(node);
           return _this.trigger('remove:treeNode', node);
         });
-        return this.descendants.on('change:treeNode', function(node) {
-          return _this.trigger('change:treeNode', node);
+        this.on('add:treeNode', function(node) {
+          return _this.descendants.add(node);
+        });
+        return this.on('remove:treeNode', function(node) {
+          return _this.descendants.remove(node);
         });
       },
       reset: function(nodes) {
@@ -355,7 +357,7 @@
           if (this.manifest.get(model.id)) {
             return;
           }
-          this.manifest.add(model);
+          return this.manifest.add(model);
         } else if (mediaType) {
           config = model;
           if (!MEDIA_TYPES.get(mediaType)) {
@@ -363,17 +365,21 @@
           }
           ContentType = MEDIA_TYPES.get(mediaType).constructor;
           model = new ContentType(config);
+          ALL_CONTENT.add(model);
           model.loaded(true);
-          this.manifest.add(model);
           console.warn('FIXME: Hack for new content');
+          return this.navTreeRoot.children.add({
+            id: model.get('id')
+          }, {
+            at: 0
+          });
         } else {
-          model = new Backbone.Model(model);
+          return this.navTreeRoot.children.add({
+            title: model.title
+          }, {
+            at: 0
+          });
         }
-        return this.navTreeRoot.children.add({
-          id: model.get('id')
-        }, {
-          at: 0
-        });
       }
     });
     CONTENT_COMPARATOR = function(a, b) {
@@ -396,20 +402,7 @@
       }
       return 0;
     };
-    MEDIA_TYPES.add('application/vnd.org.cnx.module', {
-      constructor: BaseContent
-    });
-    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
-      constructor: BaseBook,
-      accepts: {
-        'application/xhtml+xml': function(book, model) {
-          return book.prependNewContent(model);
-        },
-        'application/vnd.org.cnx.module': function(book, model) {
-          return book.prependNewContent(model);
-        }
-      }
-    });
+    exports.FilteredCollection = FilteredCollection;
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
     exports.BookTocTree = BookTocTree;
