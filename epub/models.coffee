@@ -5,14 +5,15 @@ define [
   'bookish/media-types'
   'bookish/controller'
   'bookish/models'
+  'bookish/views'
   'hbs!./opf-file'
   'hbs!./container-file'
   'hbs!./nav-serialize'
-], (exports, _, Backbone, MEDIA_TYPES, Controller, AtcModels, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
+], (exports, _, Backbone, MEDIA_TYPES, Controller, Models, Views, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
 
-  BaseCollection = AtcModels.DeferrableCollection
-  BaseContent = AtcModels.BaseContent
-  BaseBook = AtcModels.BaseBook
+  BaseCollection = Models.DeferrableCollection
+  BaseContent = Models.BaseContent
+  BaseBook = Models.BaseBook
 
 
   # Links in a navigation document are relative to where the nav document resides.
@@ -99,7 +100,10 @@ define [
             $body = $wrap
           # TODO: Add `<html><head>...</head>` tags around the `$body`
           bodyStr = $body[0].innerHTML
-        @navModel.set 'body', bodyStr
+
+        # Set a `doNotReparse` option so when `change:body` is fired we do not
+        # need to reparse the body and reset the ToC.
+        @navModel.set 'body', bodyStr, {doNotReparse:true}
 
 
       # Once the OPF is populated load the navigation HTML file.
@@ -113,10 +117,10 @@ define [
           # Finally, we have the Navigation HTML!
 
           # If its contents changes then so does the navTree
-          @navModel.on 'change:body', (model, xmlStr) =>
+          @navModel.on 'change:body', (model, xmlStr, options) =>
             # Re-parse the tree and set it as the navTree
             # `parseNavTree` is defined in `AppModels.Book`
-            @_updateNavTreeFromXML xmlStr
+            @_updateNavTreeFromXML xmlStr if !options.doNotReparse
 
           # Give the HTML files in the manifest some titles from navigation.html
           navTree = @_updateNavTreeFromXML(@navModel.get('body'), {silent:true})
@@ -124,7 +128,7 @@ define [
             for node in nodes
               if node.id and node.id.search('#') < 0
                 path = resolvePath(@navModel.id, node.id)
-                model = AtcModels.ALL_CONTENT.get path
+                model = Models.ALL_CONTENT.get path
                 model.set {title: node.title}
                 # Do not mark the object as 'dirty' (for saving)
                 delete model.changed
@@ -184,7 +188,11 @@ define [
           id: resolvePath(@id, path)
           properties: $item.attr 'properties'
 
-        AtcModels.ALL_CONTENT.add model
+        # if We could not find a suitable editor for the `mediaType` make sure
+        # we do not lose that information when saving out the OPF file.
+        model.mediaType = mediaType if !(mediaType in MEDIA_TYPES.list())
+
+        Models.ALL_CONTENT.add model
         @manifest.add model
 
         # If we stumbled upon the special navigation document
@@ -199,6 +207,11 @@ define [
     toJSON: ->
       json = BaseBook.prototype.toJSON.apply(@, arguments)
       json.manifest = @manifest?.toJSON()
+
+      # Loop through everything in the manifest and add a `mediaType`
+      _.each json.manifest, (item) ->
+        item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType
+
       json
 
   PackageFile = BaseBook.extend PackageFileMixin
@@ -223,7 +236,20 @@ define [
       return ret
 
 
-  MEDIA_TYPES.add 'application/xhtml+xml', {constructor: HTMLFile, editAction: Controller.editContent}
+  # Add the `HTMLFile` and `PackageFile` to the media types registry.
+  MEDIA_TYPES.add 'application/xhtml+xml',
+    constructor: HTMLFile
+    editAction: Controller.editContent
+
+  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
+    constructor: PackageFile
+    editAction: Controller.editBook
+    accepts:
+      'application/xhtml+xml': (book, model) ->
+        book.prependNewContent model
+
+  # Override the default `mediaType` for new content in the Book edit view.
+  Views.BookEditView::contentMediaType = 'application/xhtml+xml'
 
   exports.EPUB_CONTAINER = new EPUBContainer()
 
