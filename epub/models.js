@@ -95,13 +95,17 @@
             }
             bodyStr = $body[0].innerHTML;
           }
-          return _this.navModel.set('body', bodyStr);
+          return _this.navModel.set('body', bodyStr, {
+            doNotReparse: true
+          });
         });
         return this._promise = this.loaded().then(function() {
           return _this.navModel.loaded().then(function() {
             var navTree, recSetTitles;
-            _this.navModel.on('change:body', function(model, xmlStr) {
-              return _this._updateNavTreeFromXML(xmlStr);
+            _this.navModel.on('change:body', function(model, xmlStr, options) {
+              if (!options.doNotReparse) {
+                return _this._updateNavTreeFromXML(xmlStr);
+              }
             });
             navTree = _this._updateNavTreeFromXML(_this.navModel.get('body'), {
               silent: true

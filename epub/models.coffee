@@ -100,7 +100,10 @@ define [
             $body = $wrap
           # TODO: Add `<html><head>...</head>` tags around the `$body`
           bodyStr = $body[0].innerHTML
-        @navModel.set 'body', bodyStr
+
+        # Set a `doNotReparse` option so when `change:body` is fired we do not
+        # need to reparse the body and reset the ToC.
+        @navModel.set 'body', bodyStr, {doNotReparse:true}
 
 
       # Once the OPF is populated load the navigation HTML file.
@@ -114,10 +117,10 @@ define [
           # Finally, we have the Navigation HTML!
 
           # If its contents changes then so does the navTree
-          @navModel.on 'change:body', (model, xmlStr) =>
+          @navModel.on 'change:body', (model, xmlStr, options) =>
             # Re-parse the tree and set it as the navTree
             # `parseNavTree` is defined in `AppModels.Book`
-            @_updateNavTreeFromXML xmlStr
+            @_updateNavTreeFromXML xmlStr if !options.doNotReparse
 
           # Give the HTML files in the manifest some titles from navigation.html
           navTree = @_updateNavTreeFromXML(@navModel.get('body'), {silent:true})
