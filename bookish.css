@@ -4,6 +4,41 @@
    @import url('lib/bootstrap/css/bootstrap.css');
  */
 
+
+/* Aloha Style Overrides */
+
+.aloha-block-draghandle {
+  position: relative;
+  left: 0;
+  top: -13px;
+  width: 24px;
+  height: 12px;
+  overflow: hidden;
+  display: block;
+  background: url(lib/Aloha-Editor/src/plugins/common/block/img/toolbar-draghandle.gif);
+  border-top: 1px solid #CCC;
+  border-left: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.aloha-editable-active .aloha-block:hover,
+.aloha-block.aloha-block-highlighted:hover {
+  background-color: #efefef;
+}
+
+.aloha-editable-active, .aloha-editable-active[contenteditable=true]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.note {
+  margin: 1em;
+  border: 1px solid black;
+}
+
+
 /* Used for hiding the sidebar. `HidingRegion` uses this class */
 .hidden { }
 
