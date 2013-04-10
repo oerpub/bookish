@@ -44,10 +44,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # Initially the content is partially populated from a Search result, folder
     # listing, or some other method that allowed the user to 'click' on to begin
     # viewing/editing the full piece of content.
-    #
-    # **FIXME:** If `@isNew()` then the Model should always be fully loaded.
     loaded: (flag=false) ->
-      if flag # or @isNew()
+      if flag or @isNew()
         deferred = jQuery.Deferred()
         deferred.resolve @
         @_promise = deferred.promise()

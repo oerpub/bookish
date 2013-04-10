@@ -2,7 +2,7 @@
 (function() {
 
   define(['jquery', 'backbone', 'marionette', 'bookish/media-types', 'bookish/auth', 'bookish/models', 'bookish/views', 'hbs!bookish/layouts/main', 'hbs!bookish/layouts/content', 'hbs!bookish/layouts/workspace', 'exports', 'i18n!bookish/nls/strings'], function(jQuery, Backbone, Marionette, MEDIA_TYPES, Auth, Models, Views, LAYOUT_MAIN, LAYOUT_CONTENT, LAYOUT_WORKSPACE, exports, __) {
-    var ContentLayout, ContentRouter, HidingRegion, MainLayout, contentLayout, mainArea, mainController, mainLayout, mainRegion, mainSidebar, mainToolbar;
+    var ContentLayout, ContentRouter, HidingRegion, MainLayout, contentLayout, mainAdd, mainArea, mainController, mainLayout, mainRegion, mainSidebar, mainToolbar;
     mainRegion = new Marionette.Region({
       el: '#main'
     });
@@ -19,6 +19,7 @@
       template: LAYOUT_MAIN,
       regions: {
         home: '#layout-main-home',
+        add: '#layout-main-add',
         toolbar: '#layout-main-toolbar',
         auth: '#layout-main-auth',
         sidebar: {
@@ -32,6 +33,7 @@
       }
     });
     mainLayout = new MainLayout();
+    mainAdd = mainLayout.add;
     mainToolbar = mainLayout.toolbar;
     mainSidebar = mainLayout.sidebar;
     mainArea = mainLayout.area;
@@ -86,6 +88,9 @@
           collection: workspace
         });
         mainArea.show(view);
+        mainAdd.show(new Views.AddView({
+          collection: MEDIA_TYPES.asCollection()
+        }));
         return Models.WORKSPACE.loaded().done(function() {
           return Backbone.history.navigate('workspace');
         });

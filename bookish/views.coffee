@@ -31,6 +31,8 @@ define [
   'hbs!bookish/views/language-variants'
   'hbs!bookish/views/aloha-toolbar'
   'hbs!bookish/views/sign-in-out'
+  'hbs!bookish/views/add'
+  'hbs!bookish/views/add-item'
   'hbs!bookish/views/book-edit'
   'hbs!bookish/views/book-edit-node'
   # Load internationalized strings
@@ -41,7 +43,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
 
 
   # Drag and Drop Behavior
@@ -624,7 +626,24 @@ define [
           $saving.addClass('hide')
       , 5000)
 
+  AddItemView = Marionette.ItemView.extend
+    template: ADD_ITEM_VIEW
+    tagName: 'li'
+    events:
+      'click button': 'addItem'
 
+    addItem: ->
+      ContentType = @model.get('constructor')
+      content = new ContentType()
+      content.loaded(true)
+      Models.WORKSPACE.add content
+      @model.get('editAction') (content)
+
+  exports.AddView = Marionette.CompositeView.extend
+    template: ADD_VIEW
+    itemView: AddItemView
+    itemViewContainer: '.btn-group > ul'
+    tagName: 'span'
 
 
   # Book Editing
@@ -776,8 +795,6 @@ define [
     template: BOOK_EDIT
     itemView: BookEditNodeView
     itemViewContainer: '> nav > ol'
-    # Default media type for new Content
-    contentMediaType: 'application/vnd.org.cnx.module'
 
     events:
       'click #nav-close': 'closeView'
@@ -786,11 +803,6 @@ define [
 
     initialize: ->
       @collection = @model.navTreeRoot.children
-
-    # **FIXME:** Make the mediaType for new content a property of the view
-    # (so the EPUB book editor can override it) or use `media-types` to look it up.
-    prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, @contentMediaType
 
     closeView: -> Controller.hideSidebar()
 

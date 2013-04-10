@@ -29,7 +29,7 @@
         if (flag == null) {
           flag = false;
         }
-        if (flag) {
+        if (flag || this.isNew()) {
           deferred = jQuery.Deferred();
           deferred.resolve(this);
           this._promise = deferred.promise();

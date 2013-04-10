@@ -39,6 +39,7 @@ define [
     template: LAYOUT_MAIN
     regions:
       home:         '#layout-main-home'
+      add:          '#layout-main-add'
       toolbar:      '#layout-main-toolbar'
       auth:         '#layout-main-auth'
       # The sidebar and main area will get a 'hidden' class when hiding
@@ -47,6 +48,7 @@ define [
       area:         {selector: '#layout-main-area', regionType: HidingRegion}
   mainLayout = new MainLayout()
   # Keep the regions so views can just update the regions they need
+  mainAdd = mainLayout.add
   mainToolbar = mainLayout.toolbar
   mainSidebar = mainLayout.sidebar
   mainArea = mainLayout.area
@@ -119,6 +121,9 @@ define [
 
       view = new Views.SearchResultsView {collection: workspace}
       mainArea.show view
+
+      # Add the "Add" button
+      mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
 
       # Update the URL when the workspace is fetched and loaded
       Models.WORKSPACE.loaded().done =>
