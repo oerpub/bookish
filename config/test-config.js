@@ -1079,14 +1079,14 @@
     ]);
     workspace = [];
     recAdd = function(nodes) {
-      return nodes.each(function(node) {
+      return nodes != null ? nodes.each(function(node) {
         if (node.id) {
           workspace.push(new Models.BaseContent(_.omit(node.toJSON(), 'children')));
         }
-        return recAdd(node.children);
-      });
+        return recAdd(node.children());
+      }) : void 0;
     };
-    recAdd(book.navTreeRoot.children);
+    recAdd(book.children());
     book.manifest.add(workspace);
     workspace.unshift(book);
     Models.ALL_CONTENT.add(workspace);

@@ -113,15 +113,12 @@
         return Aloha.ready(function() {
           _EnableContentDragging($content);
           return $content.each(function(i, el) {
-            var $el, acceptsType, mediaType, validSelectors, _i, _len, _ref1;
+            var $el, ModelType, validSelectors;
             $el = jQuery(el);
-            validSelectors = [];
-            mediaType = MEDIA_TYPES.get(_this.model.mediaType);
-            _ref1 = _.keys((mediaType != null ? mediaType.accepts : void 0) || {});
-            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-              acceptsType = _ref1[_i];
-              validSelectors.push("*[data-media-type=\"" + acceptsType + "\"]");
-            }
+            ModelType = MEDIA_TYPES.get(_this.model.mediaType);
+            validSelectors = _.map(ModelType.prototype.accepts(), function(mediaType) {
+              return "*[data-media-type=\"" + mediaType + "\"]";
+            });
             validSelectors = validSelectors.join(',');
             if (validSelectors) {
               return $el.droppable({
@@ -136,7 +133,10 @@
                   $drop = jQuery(evt.target);
                   model = Models.ALL_CONTENT.get($drag.data('content-id'));
                   drop = Models.ALL_CONTENT.get($drop.data('content-id'));
-                  return mediaType.accepts[model.mediaType](drop, model);
+                  if (drop.accepts().indexOf(model.mediaType) < 0) {
+                    throw 'INVALID_DROP_MEDIA_TYPE';
+                  }
+                  return drop.addChild(model);
                 }
               });
             }
@@ -628,11 +628,11 @@
       },
       addItem: function() {
         var ContentType, content;
-        ContentType = this.model.get('constructor');
+        ContentType = this.model.get('modelType');
         content = new ContentType();
         content.loaded(true);
         Models.WORKSPACE.add(content);
-        return this.model.get('editAction')(content);
+        return content.editAction();
       }
     });
     exports.AddView = Marionette.CompositeView.extend({
@@ -653,12 +653,12 @@
         return Controller.editModelId(this.model.contentId());
       },
       editSettings: function() {
-        var contentModel, newTitle, originalTitle;
+        var contentModel, newTitle, originalTitle, _ref1, _ref2;
         contentModel = Models.ALL_CONTENT.get(this.model.contentId());
         originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
         newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
         if ('-' === newTitle) {
-          return this.model.parent.children.remove(this.model);
+          return (_ref1 = this.model.parent) != null ? (_ref2 = _ref1.children()) != null ? _ref2.remove(this.model) : void 0 : void 0;
         } else if (newTitle === (contentModel != null ? contentModel.get('title') : void 0)) {
           return this.model.unset('title');
         } else if (newTitle) {
@@ -672,16 +672,18 @@
         return this.render();
       },
       initialize: function() {
-        var contentModel,
+        var contentModel, _base,
           _this = this;
-        this.collection = this.model.children;
+        this.collection = this.model.children();
         this.listenTo(this.model, 'all', function() {
           return _this.render();
         });
-        this.listenTo(this.collection, 'all', function() {
-          return _this.render();
-        });
-        if (this.model.contentId()) {
+        if (this.collection) {
+          this.listenTo(this.collection, 'all', function() {
+            return _this.render();
+          });
+        }
+        if (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) {
           contentModel = Models.ALL_CONTENT.get(this.model.contentId());
           return this.listenTo(contentModel, 'change:title', function(newTitle, model, options) {
             if (!_this.model.get('title')) {
@@ -691,14 +693,11 @@
         }
       },
       templateHelpers: function() {
-        var content;
-        if (this.model.contentId()) {
-          content = Models.ALL_CONTENT.get(this.model.contentId());
-          return {
-            _contentTitle: content.get('title'),
-            _contentMediaType: content.mediaType
-          };
-        }
+        var _base, _ref1;
+        return {
+          children: (_ref1 = this.collection) != null ? _ref1.length : void 0,
+          content: (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) ? Models.ALL_CONTENT.get(this.model.contentId()).toJSON() : void 0
+        };
       },
       _renderChildren: function() {
         if (this.isRendered && this.model.get('expanded')) {
@@ -710,12 +709,18 @@
         var _this = this;
         this.$el.children('.organization-node,*[data-media-type]').data('content-tree-node', this.model);
         return Aloha.ready(function() {
+          var validSelectors;
           _EnableContentDragging(_this.$el.children('.organization-node,*[data-media-type]'));
+          validSelectors = _.map(_this.model.accepts(), function(mediaType) {
+            return "*[data-media-type=\"" + mediaType + "\"]";
+          });
+          validSelectors.push('.organization-node');
+          validSelectors = validSelectors.join(',');
           _this.$el.addClass('editor-drop-zone editor-drop-zone-in');
           return _this.$el.add(_this.$el.children('.editor-drop-zone')).droppable({
             greedy: true,
             addClasses: false,
-            accept: '.organization-node,*[data-media-type]',
+            accept: validSelectors,
             activeClass: 'editor-drop-zone-active',
             hoverClass: 'editor-drop-zone-hover',
             drop: function(evt, ui) {
@@ -723,7 +728,7 @@
               $drag = ui.draggable;
               $drop = jQuery(evt.target);
               delay = function() {
-                var col, drag, index, testNode;
+                var col, drag, index, testNode, _ref1;
                 drag = $drag.data('content-tree-node') || {
                   id: $drag.data('content-id')
                 };
@@ -734,23 +739,19 @@
                   }
                   testNode = testNode.parent;
                 }
-                if (drag.parent) {
-                  drag.parent.children.remove(drag);
+                if ((_ref1 = drag.parent) != null) {
+                  _ref1.children().remove(drag);
                 }
                 if ($drop.hasClass('editor-drop-zone-before')) {
-                  col = _this.model.parent.children;
+                  col = _this.model.parent.children();
                   index = col.indexOf(_this.model);
-                  return col.add(drag, {
-                    at: index
-                  });
+                  return _this.model.parent.addChild(drag, index);
                 } else if ($drop.hasClass('editor-drop-zone-after')) {
-                  col = _this.model.parent.children;
+                  col = _this.model.parent.children();
                   index = col.indexOf(_this.model);
-                  return col.add(drag, {
-                    at: index + 1
-                  });
+                  return _this.model.parent.addChild(drag, index + 1);
                 } else if ($drop.hasClass('editor-drop-zone-in')) {
-                  return _this.model.children.add(drag);
+                  return _this.model.addChild(drag);
                 } else {
                   throw 'BUG. UNKNOWN DROP CLASS';
                 }
@@ -768,16 +769,8 @@
       template: BOOK_EDIT,
       itemView: BookEditNodeView,
       itemViewContainer: '> nav > ol',
-      events: {
-        'click #nav-close': 'closeView',
-        'click #add-section': 'prependSection',
-        'click #add-content': 'prependContent'
-      },
       initialize: function() {
-        return this.collection = this.model.navTreeRoot.children;
-      },
-      closeView: function() {
-        return Controller.hideSidebar();
+        return this.collection = this.model.children();
       },
       appendHtml: function(cv, iv, index) {
         var $container, $prevChild;

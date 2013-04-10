@@ -163,11 +163,9 @@ define [
         # Figure out which mediaTypes can be dropped onto each element
         $content.each (i, el) =>
           $el = jQuery(el)
-          validSelectors = []
-          mediaType = MEDIA_TYPES.get @model.mediaType
-          for acceptsType in _.keys mediaType?.accepts or {}
-            validSelectors.push "*[data-media-type=\"#{acceptsType}\"]"
 
+          ModelType = MEDIA_TYPES.get @model.mediaType
+          validSelectors = _.map ModelType::accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
           validSelectors = validSelectors.join ','
 
           if validSelectors
@@ -184,7 +182,9 @@ define [
                 # Find the model representing the id that was dragged
                 model = Models.ALL_CONTENT.get $drag.data 'content-id'
                 drop = Models.ALL_CONTENT.get $drop.data 'content-id'
-                mediaType.accepts[model.mediaType](drop, model)
+                # Sanity-check before dropping:
+                throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
+                drop.addChild model
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
@@ -633,11 +633,11 @@ define [
       'click button': 'addItem'
 
     addItem: ->
-      ContentType = @model.get('constructor')
+      ContentType = @model.get('modelType')
       content = new ContentType()
       content.loaded(true)
       Models.WORKSPACE.add content
-      @model.get('editAction') (content)
+      content.editAction()
 
   exports.AddView = Marionette.CompositeView.extend
     template: ADD_VIEW
@@ -666,7 +666,7 @@ define [
       originalTitle = contentModel?.get('title') or @model.get 'title'
       newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
       if '-' == newTitle
-        @model.parent.children.remove @model
+        @model.parent?.children()?.remove @model
       else if newTitle == contentModel?.get('title')
         @model.unset 'title'
       else if newTitle
@@ -684,31 +684,26 @@ define [
       # grab the child collection from the parent model
       # so that we can render the collection as children
       # of this parent node
-      @collection = @model.children
+      @collection = @model.children()
 
       @listenTo @model,      'all', => @render()
-      @listenTo @collection, 'all', => @render()
+      if @collection
+        @listenTo @collection, 'all', => @render()
 
       # If the content title changes and we have not overridden the title
       # rerender the node
-      if @model.contentId()
+      if @model.contentId?()
         contentModel = Models.ALL_CONTENT.get @model.contentId()
         @listenTo contentModel, 'change:title', (newTitle, model, options) =>
           @render() if !@model.get 'title'
 
 
     templateHelpers: ->
-      if @model.contentId()
-        content = Models.ALL_CONTENT.get @model.contentId()
-        # Provide the original module title to view templates
-        # if the title has not been overridden
-
-        # **FIXME:** Just make the whole Content model available via `.content`
-        # instead of picking out the `title` and `mediaType`
-        return {
-          _contentTitle: content.get 'title'
-          _contentMediaType: content.mediaType
-        }
+      return {
+        children: @collection?.length
+        # Some rendered nodes are pointers to pieces of content. include the content.
+        content: Models.ALL_CONTENT.get(@model.contentId()).toJSON() if @model.contentId?()
+      }
 
 
     # From `Marionette.CompositeView`.
@@ -728,11 +723,15 @@ define [
       Aloha.ready =>
         _EnableContentDragging(@$el.children '.organization-node,*[data-media-type]')
 
+        validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
+        validSelectors.push '.organization-node'
+        validSelectors = validSelectors.join ','
+
         @$el.addClass 'editor-drop-zone editor-drop-zone-in'
         @$el.add(@$el.children('.editor-drop-zone')).droppable
           greedy: true
           addClasses: false
-          accept: '.organization-node,*[data-media-type]'
+          accept: validSelectors
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
           drop: (evt, ui) =>
@@ -765,18 +764,18 @@ define [
                 testNode = testNode.parent
 
               # Remove the item if it is a `BookTocNode`
-              drag.parent.children.remove(drag) if drag.parent
+              drag.parent?.children().remove(drag)
 
               if $drop.hasClass 'editor-drop-zone-before'
-                col = @model.parent.children
+                col = @model.parent.children()
                 index = col.indexOf(@model)
-                col.add drag, {at: index}
+                @model.parent.addChild drag, index
               else if $drop.hasClass 'editor-drop-zone-after'
-                col = @model.parent.children
+                col = @model.parent.children()
                 index = col.indexOf(@model)
-                col.add drag, {at: index + 1}
+                @model.parent.addChild drag, index + 1
               else if $drop.hasClass 'editor-drop-zone-in'
-                @model.children.add drag
+                @model.addChild drag
               else
                 throw 'BUG. UNKNOWN DROP CLASS'
 
@@ -796,15 +795,8 @@ define [
     itemView: BookEditNodeView
     itemViewContainer: '> nav > ol'
 
-    events:
-      'click #nav-close': 'closeView'
-      'click #add-section': 'prependSection'
-      'click #add-content': 'prependContent'
-
     initialize: ->
-      @collection = @model.navTreeRoot.children
-
-    closeView: -> Controller.hideSidebar()
+      @collection = @model.children()
 
     appendHtml: (cv, iv, index)->
       $container = @getItemViewContainer(cv)

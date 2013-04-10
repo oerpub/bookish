@@ -339,10 +339,10 @@ require ['underscore', 'bookish/models', 'bookish/controller'], (_, Models, Cont
 
   workspace = []
   recAdd = (nodes) ->
-    nodes.each (node) ->
+    nodes?.each (node) ->
       workspace.push new Models.BaseContent _.omit(node.toJSON(), 'children') if node.id
-      recAdd(node.children)
-  recAdd book.navTreeRoot.children
+      recAdd(node.children())
+  recAdd book.children()
   book.manifest.add workspace
   workspace.unshift book
 

@@ -44,7 +44,7 @@ define [
       auth:         '#layout-main-auth'
       # The sidebar and main area will get a 'hidden' class when hiding
       # so CSS transitions can be applied.
-      sidebar:      {selector: '#layout-main-sidebar', regionType: HidingRegion}
+      sidebar:      '#layout-main-sidebar'
       area:         {selector: '#layout-main-area', regionType: HidingRegion}
   mainLayout = new MainLayout()
   # Keep the regions so views can just update the regions they need
@@ -89,7 +89,6 @@ define [
 
 
       # Hide the regions if they are not being used
-      mainSidebar.onClose()
       mainArea.onClose()
       # Start URL Routing if it has not already started
       Backbone.history.start() if not Backbone.History.started
@@ -101,8 +100,6 @@ define [
     # Give others access to the main layout so they can change pieces of it
     mainLayout: mainLayout
 
-    hideSidebar: -> mainSidebar.close()
-
     # Show Workspace
     # -------
     # Shows the workspace listing and updates the URL
@@ -110,7 +107,6 @@ define [
       # Always scroll to the top of the page
       window.scrollTo(0, 0)
 
-      mainSidebar.close()
       mainToolbar.close()
       # List the workspace.
       workspace = new Models.FilteredCollection null, {collection: Models.WORKSPACE}
@@ -124,6 +120,18 @@ define [
 
       # Add the "Add" button
       mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
+
+      WorkspaceRoot = Backbone.Model.extend
+        defaults:
+          title: 'My Workspace'
+        initialize: ->
+          @workspace = new Models.FilteredCollection null,
+            collection: Models.WORKSPACE
+            mediaTypes: [ Models.BaseBook::mediaType ]
+        children: -> @workspace
+
+      view = new Views.BookEditView {model: new WorkspaceRoot()}
+      mainSidebar.show view
 
       # Update the URL when the workspace is fetched and loaded
       Models.WORKSPACE.loaded().done =>
@@ -147,9 +155,7 @@ define [
     # Dispatches based on the contents' `mediaType`
     editModel: (model) ->
       throw 'BUG: model.mediaType does not exist' if not model.mediaType
-      editAction = MEDIA_TYPES.get(model.mediaType).editAction
-      throw 'BUG: no way to edit this model' if not editAction
-      editAction(model)
+      model.editAction()
 
     # Edit a book in the main area
     editBook: (model) ->
@@ -157,9 +163,6 @@ define [
       window.scrollTo(0, 0)
 
       mainToolbar.close()
-
-      view = new Views.BookEditView {model: model}
-      mainSidebar.show view
 
     # Edit a piece of HTML content
     editContent: (content) ->
@@ -221,16 +224,11 @@ define [
   # Attach mediaType edit views
   # -------
   # Add the 2 basic Media Types already defined in `Models`.
-  MEDIA_TYPES.add 'application/vnd.org.cnx.module',
-    constructor: Models.BaseContent
-    editAction: (model) -> mainController.editContent model
+  Models.BaseContent::editAction = -> mainController.editContent @
+  Models.BaseBook::editAction = -> mainController.editBook @
 
-  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
-    constructor: Models.BaseBook
-    editAction: (model) -> mainController.editBook model
-    accepts:
-      'application/vnd.org.cnx.module': (book, model) ->
-        book.prependNewContent model
+  MEDIA_TYPES.add Models.BaseContent
+  MEDIA_TYPES.add Models.BaseBook
 
 
   # Start listening to URL changes
