@@ -18,7 +18,7 @@ require ['underscore', 'bookish/models', 'bookish/controller'], (_, Models, Cont
     id: 'col1'
     title: 'Physics: Volume 1'
 
-  book.navTreeRoot.reset [{class:'preface', id:"m42955", title:"Preface"
+  TREE = [{class:'preface', id:"m42955", title:"Preface"
      },{class:'chapter', title:"Introduction: The Nature of Science and Physics","children":[
       {id:"m42119", title:"Introduction to Science and the Realm of Physics, Physical Quantities, and Units"},
 
@@ -339,15 +339,14 @@ require ['underscore', 'bookish/models', 'bookish/controller'], (_, Models, Cont
 
   workspace = []
   recAdd = (nodes) ->
-    nodes?.each (node) ->
-      workspace.push new Models.BaseContent _.omit(node.toJSON(), 'children') if node.id
-      recAdd(node.children())
-  recAdd book.children()
-  book.manifest.add workspace
-  workspace.unshift book
+    _.each nodes, (node) ->
+      Models.ALL_CONTENT.add new Models.BaseContent _.omit(node, 'children') if node.id
+      recAdd(node.children)
+  recAdd TREE
 
-  Models.ALL_CONTENT.add workspace
+  Models.ALL_CONTENT.add book
 
+  book.navTreeRoot.reset TREE
 
   # Clear out the book titles so they all inherit from the module title
   book.navTreeRoot.descendants.each (node) ->

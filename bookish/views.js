@@ -17,7 +17,7 @@
           },
           helper: function(evt) {
             var $handle, shortTitle, title;
-            title = $el.data('content-title');
+            title = $el.data('content-title') || '';
             shortTitle = title;
             if (title.length > 20) {
               shortTitle = title.substring(0, 20) + '...';
@@ -630,9 +630,8 @@
         var ContentType, content;
         ContentType = this.model.get('modelType');
         content = new ContentType();
-        content.loaded(true);
         Models.WORKSPACE.add(content);
-        return content.editAction();
+        return typeof content.editAction === "function" ? content.editAction() : void 0;
       }
     });
     exports.AddView = Marionette.CompositeView.extend({
@@ -645,24 +644,32 @@
       template: BOOK_EDIT_NODE,
       tagName: 'li',
       events: {
-        'click > .edit-content': 'editContent',
-        'click > .edit-settings': 'editSettings',
-        'click > .editor-expand-collapse': 'toggleExpanded'
+        'click > .editor-node-body > .edit-action': 'editAction',
+        'click > .editor-node-body > .edit-settings': 'editSettings',
+        'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
       },
-      editContent: function() {
-        return Controller.editModelId(this.model.contentId());
+      editAction: function() {
+        return this.model.editAction();
       },
       editSettings: function() {
         var contentModel, newTitle, originalTitle, _ref1, _ref2;
-        contentModel = Models.ALL_CONTENT.get(this.model.contentId());
-        originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
-        newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
-        if ('-' === newTitle) {
-          return (_ref1 = this.model.parent) != null ? (_ref2 = _ref1.children()) != null ? _ref2.remove(this.model) : void 0 : void 0;
-        } else if (newTitle === (contentModel != null ? contentModel.get('title') : void 0)) {
-          return this.model.unset('title');
-        } else if (newTitle) {
-          return this.model.set('title', newTitle);
+        if (this.model.contentId) {
+          contentModel = Models.ALL_CONTENT.get(this.model.contentId());
+          originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
+          newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
+          if ('-' === newTitle) {
+            return (_ref1 = this.model.parent) != null ? (_ref2 = _ref1.children()) != null ? _ref2.remove(this.model) : void 0 : void 0;
+          } else if (newTitle === (contentModel != null ? contentModel.get('title') : void 0)) {
+            return this.model.unset('title');
+          } else if (newTitle) {
+            return this.model.set('title', newTitle);
+          }
+        } else {
+          originalTitle = this.model.get('title');
+          newTitle = prompt('Edit Title.', originalTitle);
+          if (newTitle) {
+            return this.model.set('title', newTitle);
+          }
         }
       },
       toggleExpanded: function() {
@@ -696,7 +703,9 @@
         var _base, _ref1;
         return {
           children: (_ref1 = this.collection) != null ? _ref1.length : void 0,
-          content: (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) ? Models.ALL_CONTENT.get(this.model.contentId()).toJSON() : void 0
+          content: (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) ? Models.ALL_CONTENT.get(this.model.contentId()).toJSON() : void 0,
+          editAction: !!this.model.editAction,
+          parent: !!this.model.parent
         };
       },
       _renderChildren: function() {
@@ -706,18 +715,21 @@
         }
       },
       onRender: function() {
-        var _this = this;
-        this.$el.children('.organization-node,*[data-media-type]').data('content-tree-node', this.model);
+        var $body,
+          _this = this;
+        this.$el.attr('data-media-type', this.model.mediaType);
+        $body = this.$el.children('.editor-node-body');
+        $body.children('.organization-node,*[data-media-type]').data('content-tree-node', this.model);
         return Aloha.ready(function() {
           var validSelectors;
-          _EnableContentDragging(_this.$el.children('.organization-node,*[data-media-type]'));
+          _EnableContentDragging($body.find('.organization-node,*[data-media-type]'));
           validSelectors = _.map(_this.model.accepts(), function(mediaType) {
             return "*[data-media-type=\"" + mediaType + "\"]";
           });
           validSelectors.push('.organization-node');
           validSelectors = validSelectors.join(',');
-          _this.$el.addClass('editor-drop-zone editor-drop-zone-in');
-          return _this.$el.add(_this.$el.children('.editor-drop-zone')).droppable({
+          $body.addClass('editor-drop-zone editor-drop-zone-in');
+          return $body.add($body.children('.editor-drop-zone')).droppable({
             greedy: true,
             addClasses: false,
             accept: validSelectors,
@@ -728,19 +740,14 @@
               $drag = ui.draggable;
               $drop = jQuery(evt.target);
               delay = function() {
-                var col, drag, index, testNode, _ref1;
-                drag = $drag.data('content-tree-node') || {
-                  id: $drag.data('content-id')
-                };
+                var col, drag, index, testNode;
+                drag = $drag.data('content-tree-node') || Models.ALL_CONTENT.get($drag.data('content-id'));
                 testNode = _this.model;
                 while (testNode) {
                   if ((drag.cid === testNode.cid) || (testNode.id && drag.id === testNode.id)) {
                     return;
                   }
                   testNode = testNode.parent;
-                }
-                if ((_ref1 = drag.parent) != null) {
-                  _ref1.children().remove(drag);
                 }
                 if ($drop.hasClass('editor-drop-zone-before')) {
                   col = _this.model.parent.children();

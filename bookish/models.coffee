@@ -17,6 +17,12 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
       @set {id: "_NEW:#{@cid}"} if not @id
 
+    # Add the `mediaType` to the JSON
+    toJSON: ->
+      json = Backbone.Model::toJSON.apply(@, arguments)
+      json.mediaType = @mediaType
+      return json
+
     # List of mediaTypes that are allowed to be children of this type.
     # Used by the Drag-and-Drop to decide which types can be dropped and
     # by `AddView` to decide which child mediaTypes can be added.
@@ -25,7 +31,12 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # Used by the TreeView to render the children of this node.
     children: -> null
     # Adds a child assuming it's mediaType is in `.accepts()`
-    addChild: (model, at) -> throw 'BUG_CHILD_NOT_ALLOWED'
+    addChild: (model, at=null) ->
+      options = {}
+      options.at = at if at >= 0
+      # By default unwrap pointers
+      model = ALL_CONTENT.get model.contentId() if model.contentId
+      @children().add model, options
 
     # `Controller` action to edit this model or `null` if it cannot be edited directly
     editAction: null
@@ -90,11 +101,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       return @_promise
 
-    # Add the `mediaType` to the JSON
-    toJSON: ->
-      json = Backbone.Model.prototype.toJSON.apply(@, arguments)
-      json.mediaType = @mediaType
-      return json
 
   # Collection analog of `Deferrable`
   DeferrableCollection = Backbone.Collection.extend
@@ -227,6 +233,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # Used below to create JSON representation of model
   Backbone_Model_toJSON = Backbone.Model::toJSON
 
+
   # Book ToC Tree Model
   # =======
   # The Book editor contains a tree (`BookTocTree`) of nested models `BookTocNode`
@@ -277,9 +284,27 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       @_children.add children
 
+      # If this node "points to" a piece of content then provide an `editAction`
+      if @id
+        model = ALL_CONTENT.get(@id)
+        @editAction = model.editAction.bind(model)
+
     accepts: -> [ BaseContent::mediaType, BookTocNode::mediaType ]
     children: -> @_children
-    addChild: (model, at=0) -> @_children.add model, {at:at}
+    addChild: (model, at=0) ->
+      # If the model is not already a `BookTocNode` then wrap it in one
+      if BookTocNode::mediaType != model.mediaType
+        model = new BookTocNode {id: model.id}
+
+      # Move up to the root and see if it's already in the tree
+      root = @parent or @
+      root = root.parent while root.parent
+
+      shortcut = root.descendants.get(model.id)
+      if shortcut
+        shortcut.parent.children().remove(shortcut)
+        model = shortcut
+      @_children.add model, {at:at}
 
 
   BookTocNodeCollection = Backbone.Collection.extend
@@ -347,13 +372,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # Subclasses can provide a better Collection for storing Content items in a book
     # so the book can listen to changes.
     manifestType: Backbone.Collection
-
-    # **FIXME:** Adding the `navTreeRoot` should probably be removed since the views are recursive
-    # and never need the entire JSON
-    toJSON: ->
-      json = Deferrable.prototype.toJSON.apply(@, arguments)
-      json.navTree = @navTreeRoot.toJSON()
-      return json
 
     # Takes an element representing a `<nav epub:type="toc"/>` element
     # and returns a JSON tree with the following structure:
@@ -439,15 +457,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     accepts: -> [ BookTocNode::mediaType, BaseContent::mediaType ]
     # Used by the TreeView to render the children of this book
     children: -> @navTreeRoot.children()
-    addChild: (model, at=0) ->
-      # If the model is already in the book then do not add it again
-      return if @manifest.get model.id
-      # If the model is not already a BookPointer then wrap it in one
-      if BookTocNode::mediaType != model.mediaType
-        @manifest.add model
-        model = new BookTocNode {id: model.id}
-
-      @navTreeRoot.children().add model, {at:at}
+    addChild: (model, at=0) -> @navTreeRoot.addChild(model, at)
 
   # Compare by `mediaType` (Collections/Books 1st), then by title/URL
   CONTENT_COMPARATOR = (a, b) ->
@@ -463,6 +473,33 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     return 0
 
+  # Folder
+  # =======
+  Folder = Deferrable.extend
+    defaults:
+      title: 'Untitled Folder'
+    mediaType: 'application/vnd.org.cnx.folder'
+    initialize: ->
+      Deferrable::initialize.apply(@, arguments)
+      @contents = new Backbone.Collection()
+    accepts: -> [ BaseBook::mediaType, BaseContent::mediaType ]
+    children: -> @contents
+
+
+  # Sidebar Workspace Tree
+  # =======
+  # This object filters the workspace so only Books and Folders appear in the sidebar
+  # (no module content).
+  WorkspaceTree = Backbone.Model.extend
+    defaults:
+      title: 'My Workspace'
+    mediaTypes: [ BaseBook::mediaType, Folder::mediaType ]
+    initialize: ->
+      @workspace = new FilteredCollection null,
+        collection: exports.WORKSPACE
+        mediaTypes: @mediaTypes
+    children: -> @workspace
+
   # Finally, export only the pieces needed
   exports.FilteredCollection = FilteredCollection
   exports.BaseContent = BaseContent
@@ -470,6 +507,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   exports.BookTocTree = BookTocTree
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
+  exports.WorkspaceTree = WorkspaceTree
+  exports.Folder = Folder
   exports.ALL_CONTENT = ALL_CONTENT
   exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR
   # Other implementations can override this

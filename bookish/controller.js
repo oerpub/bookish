@@ -65,7 +65,7 @@
       },
       mainLayout: mainLayout,
       workspace: function() {
-        var WorkspaceRoot, view, workspace,
+        var view, workspace,
           _this = this;
         window.scrollTo(0, 0);
         mainToolbar.close();
@@ -83,22 +83,8 @@
         mainAdd.show(new Views.AddView({
           collection: MEDIA_TYPES.asCollection()
         }));
-        WorkspaceRoot = Backbone.Model.extend({
-          defaults: {
-            title: 'My Workspace'
-          },
-          initialize: function() {
-            return this.workspace = new Models.FilteredCollection(null, {
-              collection: Models.WORKSPACE,
-              mediaTypes: [Models.BaseBook.prototype.mediaType]
-            });
-          },
-          children: function() {
-            return this.workspace;
-          }
-        });
         view = new Views.BookEditView({
-          model: new WorkspaceRoot()
+          model: new Models.WorkspaceTree()
         });
         mainSidebar.show(view);
         return Models.WORKSPACE.loaded().done(function() {
@@ -186,6 +172,7 @@
     };
     MEDIA_TYPES.add(Models.BaseContent);
     MEDIA_TYPES.add(Models.BaseBook);
+    MEDIA_TYPES.add(Models.Folder);
     new ContentRouter();
     return jQuery.extend(exports, mainController);
   });

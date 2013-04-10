@@ -15,12 +15,12 @@
   });
 
   require(['underscore', 'bookish/models', 'bookish/controller'], function(_, Models, Controller) {
-    var book, recAdd, workspace;
+    var TREE, book, recAdd, workspace;
     book = new Models.BaseBook({
       id: 'col1',
       title: 'Physics: Volume 1'
     });
-    book.navTreeRoot.reset([
+    TREE = [
       {
         "class": 'preface',
         id: "m42955",
@@ -1076,20 +1076,19 @@
         id: "m42709",
         title: "Glossary of Key Symbols and Notation"
       }
-    ]);
+    ];
     workspace = [];
     recAdd = function(nodes) {
-      return nodes != null ? nodes.each(function(node) {
+      return _.each(nodes, function(node) {
         if (node.id) {
-          workspace.push(new Models.BaseContent(_.omit(node.toJSON(), 'children')));
+          Models.ALL_CONTENT.add(new Models.BaseContent(_.omit(node, 'children')));
         }
-        return recAdd(node.children());
-      }) : void 0;
+        return recAdd(node.children);
+      });
     };
-    recAdd(book.children());
-    book.manifest.add(workspace);
-    workspace.unshift(book);
-    Models.ALL_CONTENT.add(workspace);
+    recAdd(TREE);
+    Models.ALL_CONTENT.add(book);
+    book.navTreeRoot.reset(TREE);
     book.navTreeRoot.descendants.each(function(node) {
       if (node.id) {
         return node.unset('title');

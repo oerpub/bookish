@@ -77,7 +77,7 @@ define [
           top: 0
           left: 0
         helper: (evt) ->
-          title = $el.data 'content-title'
+          title = $el.data('content-title') or ''
           shortTitle = title
           shortTitle = title.substring(0, 20) + '...' if title.length > 20
           # Generate the handle div using a template
@@ -635,9 +635,10 @@ define [
     addItem: ->
       ContentType = @model.get('modelType')
       content = new ContentType()
-      content.loaded(true)
       Models.WORKSPACE.add content
-      content.editAction()
+      # Begin editing an item as soon as it is added.
+      # Some content (like Books and Folders) do not have an `editAction`
+      content.editAction?()
 
   exports.AddView = Marionette.CompositeView.extend
     template: ADD_VIEW
@@ -655,22 +656,31 @@ define [
     template: BOOK_EDIT_NODE
     tagName: 'li'
     events:
-      'click > .edit-content': 'editContent'
-      'click > .edit-settings': 'editSettings'
-      'click > .editor-expand-collapse': 'toggleExpanded'
+      # The `.editor-node-body` is needed because `li` elements render differently
+      # when there is a space between `<li>` and the first child.
+      # `.editor-node-body` ensures there is never a space.
+      'click > .editor-node-body > .edit-action': 'editAction'
+      'click > .editor-node-body > .edit-settings': 'editSettings'
+      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
 
-    editContent: -> Controller.editModelId @model.contentId()
+    editAction: -> @model.editAction()
 
     editSettings: ->
-      contentModel = Models.ALL_CONTENT.get @model.contentId()
-      originalTitle = contentModel?.get('title') or @model.get 'title'
-      newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
-      if '-' == newTitle
-        @model.parent?.children()?.remove @model
-      else if newTitle == contentModel?.get('title')
-        @model.unset 'title'
-      else if newTitle
-        @model.set 'title', newTitle
+      if @model.contentId
+        contentModel = Models.ALL_CONTENT.get @model.contentId()
+        originalTitle = contentModel?.get('title') or @model.get 'title'
+        newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
+        if '-' == newTitle
+          @model.parent?.children()?.remove @model
+        else if newTitle == contentModel?.get('title')
+          @model.unset 'title'
+        else if newTitle
+          @model.set 'title', newTitle
+      else
+        originalTitle = @model.get 'title'
+        newTitle = prompt 'Edit Title.', originalTitle
+        @model.set 'title', newTitle if newTitle
+
 
 
     toggleExpanded: ->
@@ -703,6 +713,8 @@ define [
         children: @collection?.length
         # Some rendered nodes are pointers to pieces of content. include the content.
         content: Models.ALL_CONTENT.get(@model.contentId()).toJSON() if @model.contentId?()
+        editAction: !!@model.editAction
+        parent: !!@model.parent
       }
 
 
@@ -716,19 +728,21 @@ define [
 
     onRender: ->
 
-      @$el.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
+      @$el.attr 'data-media-type', @model.mediaType
+      $body = @$el.children '.editor-node-body'
+      $body.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
 
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        _EnableContentDragging(@$el.children '.organization-node,*[data-media-type]')
+        _EnableContentDragging($body.find '.organization-node,*[data-media-type]')
 
         validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
         validSelectors.push '.organization-node'
         validSelectors = validSelectors.join ','
 
-        @$el.addClass 'editor-drop-zone editor-drop-zone-in'
-        @$el.add(@$el.children('.editor-drop-zone')).droppable
+        $body.addClass 'editor-drop-zone editor-drop-zone-in'
+        $body.add($body.children('.editor-drop-zone')).droppable
           greedy: true
           addClasses: false
           accept: validSelectors
@@ -750,21 +764,13 @@ define [
               # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
               # and should be converted to a link inside an `li`
 
-              drag = $drag.data('content-tree-node') or {
-                id: $drag.data 'content-id'
-                # The title and mediaType should inherit from the actual piece of content
-                #    title: $drag.data 'content-title'
-                #    mediaType: $drag.data 'media-type'
-              }
+              drag = $drag.data('content-tree-node') or Models.ALL_CONTENT.get($drag.data 'content-id')
 
               # Ignore if you drop on yourself or your children
               testNode = @model
               while testNode
                 return if (drag.cid == testNode.cid) or (testNode.id and drag.id == testNode.id)
                 testNode = testNode.parent
-
-              # Remove the item if it is a `BookTocNode`
-              drag.parent?.children().remove(drag)
 
               if $drop.hasClass 'editor-drop-zone-before'
                 col = @model.parent.children()

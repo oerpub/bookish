@@ -121,16 +121,7 @@ define [
       # Add the "Add" button
       mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
 
-      WorkspaceRoot = Backbone.Model.extend
-        defaults:
-          title: 'My Workspace'
-        initialize: ->
-          @workspace = new Models.FilteredCollection null,
-            collection: Models.WORKSPACE
-            mediaTypes: [ Models.BaseBook::mediaType ]
-        children: -> @workspace
-
-      view = new Views.BookEditView {model: new WorkspaceRoot()}
+      view = new Views.BookEditView {model: new Models.WorkspaceTree()}
       mainSidebar.show view
 
       # Update the URL when the workspace is fetched and loaded
@@ -229,6 +220,7 @@ define [
 
   MEDIA_TYPES.add Models.BaseContent
   MEDIA_TYPES.add Models.BaseBook
+  MEDIA_TYPES.add Models.Folder
 
 
   # Start listening to URL changes

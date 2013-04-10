@@ -2,7 +2,7 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection;
+    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection, Folder, WorkspaceTree;
     BaseModel = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
@@ -20,6 +20,12 @@
           });
         }
       },
+      toJSON: function() {
+        var json;
+        json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+        json.mediaType = this.mediaType;
+        return json;
+      },
       accepts: function() {
         return [];
       },
@@ -27,7 +33,18 @@
         return null;
       },
       addChild: function(model, at) {
-        throw 'BUG_CHILD_NOT_ALLOWED';
+        var options;
+        if (at == null) {
+          at = null;
+        }
+        options = {};
+        if (at >= 0) {
+          options.at = at;
+        }
+        if (model.contentId) {
+          model = ALL_CONTENT.get(model.contentId());
+        }
+        return this.children().add(model, options);
       },
       editAction: null
     });
@@ -70,12 +87,6 @@
           });
         }
         return this._promise;
-      },
-      toJSON: function() {
-        var json;
-        json = Backbone.Model.prototype.toJSON.apply(this, arguments);
-        json.mediaType = this.mediaType;
-        return json;
       }
     });
     DeferrableCollection = Backbone.Collection.extend({
@@ -222,7 +233,7 @@
         return this.id;
       },
       initialize: function() {
-        var children,
+        var children, model,
           _this = this;
         this.on('change', function() {
           return _this.trigger('change:treeNode');
@@ -240,7 +251,11 @@
           delete child.parent;
           return _this.trigger('remove:treeNode', child, _this, options);
         });
-        return this._children.add(children);
+        this._children.add(children);
+        if (this.id) {
+          model = ALL_CONTENT.get(this.id);
+          return this.editAction = model.editAction.bind(model);
+        }
       },
       accepts: function() {
         return [BaseContent.prototype.mediaType, BookTocNode.prototype.mediaType];
@@ -249,8 +264,23 @@
         return this._children;
       },
       addChild: function(model, at) {
+        var root, shortcut;
         if (at == null) {
           at = 0;
+        }
+        if (BookTocNode.prototype.mediaType !== model.mediaType) {
+          model = new BookTocNode({
+            id: model.id
+          });
+        }
+        root = this.parent || this;
+        while (root.parent) {
+          root = root.parent;
+        }
+        shortcut = root.descendants.get(model.id);
+        if (shortcut) {
+          shortcut.parent.children().remove(shortcut);
+          model = shortcut;
         }
         return this._children.add(model, {
           at: at
@@ -317,12 +347,6 @@
         title: 'Untitled Book'
       },
       manifestType: Backbone.Collection,
-      toJSON: function() {
-        var json;
-        json = Deferrable.prototype.toJSON.apply(this, arguments);
-        json.navTree = this.navTreeRoot.toJSON();
-        return json;
-      },
       parseNavTree: function(li) {
         var $a, $li, $ol, obj;
         $li = jQuery(li);
@@ -395,18 +419,7 @@
         if (at == null) {
           at = 0;
         }
-        if (this.manifest.get(model.id)) {
-          return;
-        }
-        if (BookTocNode.prototype.mediaType !== model.mediaType) {
-          this.manifest.add(model);
-          model = new BookTocNode({
-            id: model.id
-          });
-        }
-        return this.navTreeRoot.children().add(model, {
-          at: at
-        });
+        return this.navTreeRoot.addChild(model, at);
       }
     });
     CONTENT_COMPARATOR = function(a, b) {
@@ -429,12 +442,45 @@
       }
       return 0;
     };
+    Folder = Deferrable.extend({
+      defaults: {
+        title: 'Untitled Folder'
+      },
+      mediaType: 'application/vnd.org.cnx.folder',
+      initialize: function() {
+        Deferrable.prototype.initialize.apply(this, arguments);
+        return this.contents = new Backbone.Collection();
+      },
+      accepts: function() {
+        return [BaseBook.prototype.mediaType, BaseContent.prototype.mediaType];
+      },
+      children: function() {
+        return this.contents;
+      }
+    });
+    WorkspaceTree = Backbone.Model.extend({
+      defaults: {
+        title: 'My Workspace'
+      },
+      mediaTypes: [BaseBook.prototype.mediaType, Folder.prototype.mediaType],
+      initialize: function() {
+        return this.workspace = new FilteredCollection(null, {
+          collection: exports.WORKSPACE,
+          mediaTypes: this.mediaTypes
+        });
+      },
+      children: function() {
+        return this.workspace;
+      }
+    });
     exports.FilteredCollection = FilteredCollection;
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
     exports.BookTocTree = BookTocTree;
     exports.Deferrable = Deferrable;
     exports.DeferrableCollection = DeferrableCollection;
+    exports.WorkspaceTree = WorkspaceTree;
+    exports.Folder = Folder;
     exports.ALL_CONTENT = ALL_CONTENT;
     exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR;
     exports.WORKSPACE = ALL_CONTENT;
