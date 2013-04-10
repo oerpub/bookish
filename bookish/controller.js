@@ -65,7 +65,7 @@
       },
       mainLayout: mainLayout,
       workspace: function() {
-        var view, workspace,
+        var view, workspace, workspaceTree,
           _this = this;
         window.scrollTo(0, 0);
         mainToolbar.close();
@@ -83,12 +83,15 @@
         mainAdd.show(new Views.AddView({
           collection: MEDIA_TYPES.asCollection()
         }));
+        workspaceTree = new Models.WorkspaceTree();
         view = new Views.BookEditView({
-          model: new Models.WorkspaceTree()
+          model: workspaceTree
         });
         mainSidebar.show(view);
         return Models.WORKSPACE.loaded().done(function() {
-          return Backbone.history.navigate('workspace');
+          return workspaceTree.loaded().done(function() {
+            return Backbone.history.navigate('workspace');
+          });
         });
       },
       editModelId: function(id) {

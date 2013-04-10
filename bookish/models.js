@@ -458,7 +458,7 @@
         return this.contents;
       }
     });
-    WorkspaceTree = Backbone.Model.extend({
+    WorkspaceTree = Deferrable.extend({
       defaults: {
         title: 'My Workspace'
       },
@@ -471,6 +471,16 @@
       },
       children: function() {
         return this.workspace;
+      },
+      loaded: function(flag) {
+        var promise;
+        promise = Deferrable.prototype.loaded.apply(this, arguments);
+        this.workspace.each(function(content) {
+          return promise = content.loaded().then(function() {
+            return promise;
+          });
+        });
+        return promise;
       }
     });
     exports.FilteredCollection = FilteredCollection;

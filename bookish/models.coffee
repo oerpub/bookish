@@ -490,7 +490,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   # =======
   # This object filters the workspace so only Books and Folders appear in the sidebar
   # (no module content).
-  WorkspaceTree = Backbone.Model.extend
+  WorkspaceTree = Deferrable.extend
     defaults:
       title: 'My Workspace'
     mediaTypes: [ BaseBook::mediaType, Folder::mediaType ]
@@ -499,6 +499,11 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         collection: exports.WORKSPACE
         mediaTypes: @mediaTypes
     children: -> @workspace
+    loaded: (flag) ->
+      promise = Deferrable::loaded.apply(@, arguments)
+      @workspace.each (content) ->
+        promise = content.loaded().then -> promise
+      return promise
 
   # Finally, export only the pieces needed
   exports.FilteredCollection = FilteredCollection

@@ -121,13 +121,15 @@ define [
       # Add the "Add" button
       mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
 
-      view = new Views.BookEditView {model: new Models.WorkspaceTree()}
+      workspaceTree = new Models.WorkspaceTree()
+      view = new Views.BookEditView {model: workspaceTree}
       mainSidebar.show view
 
       # Update the URL when the workspace is fetched and loaded
       Models.WORKSPACE.loaded().done =>
-        # Update the URL
-        Backbone.history.navigate 'workspace'
+        workspaceTree.loaded().done =>
+          # Update the URL
+          Backbone.history.navigate 'workspace'
 
     # Edit existing content
     # -------
