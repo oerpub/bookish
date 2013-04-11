@@ -142,7 +142,8 @@
 
 #layout-main-sidebar .ui-draggable { cursor: move; }
 
-.editor-drop-zone {
+.editor-node-before,
+.editor-node-after {
   min-height: 3px;
 }
 

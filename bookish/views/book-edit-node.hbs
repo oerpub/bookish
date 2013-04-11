@@ -4,7 +4,9 @@
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
 {{#if parent}}
-  <div class="editor-drop-zone editor-drop-zone-before"></div>
+  <div class="editor-drop-zone editor-drop-zone-before editor-node-before"></div>
+{{else}}
+  <div class="editor-drop-zone-before editor-node-before"></div>
 {{/if}}
 
 {{#if children}}
@@ -40,7 +42,9 @@
 {{/if}}
 
 {{#if parent}}
-  <div class="editor-drop-zone editor-drop-zone-after"></div>
+  <div class="editor-drop-zone editor-drop-zone-after editor-node-after"></div>
+{{else}}
+  <div class="editor-node-after"></div>
 {{/if}}
 
 {{#if children}}
