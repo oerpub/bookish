@@ -24,7 +24,7 @@
   height: 100%;
   -webkit-box-sizing: border-box;
   position: relative;
-  width: 20em;
+  min-width: 20em;
 
   background-color: #f0f0f0;
   padding: 1em;
@@ -35,6 +35,10 @@
 }
 #layout-main-sidebar.hidden {
   margin-left: -20em;
+}
+
+#layout-main-sidebar nav li {
+  white-space: nowrap;
 }
 
 #layout-main-toolbar { display: inline-block; }
@@ -65,13 +69,22 @@
  *
  * Show the document icon by default.
  */
-*[data-media-type]                          .icon-content { margin-right: 0.5em; }
-*[data-media-type='application/xhtml+xml']  .icon-content:before,
-*[data-media-type='application/vnd.org.cnx.module']          .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
-*[data-media-type='application/vnd.org.cnx.collection']      .icon-content:before { content:"\f02d"; /* icon-book */ }
+*[data-media-type]                         > .icon-content { margin-right: 0.5em; }
+*[data-media-type='application/xhtml+xml'] > .icon-content:before,
+*[data-media-type='application/vnd.org.cnx.module']         > .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
+*[data-media-type='application/vnd.org.cnx.collection']     > .icon-content:before { content:"\f02d"; /* icon-book */ }
+*[data-media-type='application/vnd.org.cnx.folder']         > .icon-content:before { content:"\f07c"; /* icon-folder-open */ }
 
 .search-results > tbody > tr { cursor: pointer; }
 
+#layout-main-sidebar li {
+  list-style-type: none;
+}
+#layout-main-sidebar li[data-media-type='application/vnd.org.cnx.collection'] li {
+  list-style-type: decimal;
+}
+
+#layout-main-sidebar .editor-expand-collapse:hover { background-color: #999; }
 
 
 .dnd-content-handle {
@@ -94,7 +107,8 @@
 
 #layout-main-sidebar .ui-draggable { cursor: move; }
 
-.editor-drop-zone {
+.editor-node-before,
+.editor-node-after {
   min-height: 3px;
 }
 
@@ -106,7 +120,7 @@
   background-color: #ccc;
 }
 
-li.editor-drop-zone-hover {
+li > .editor-drop-zone-hover {
   background-color: inherit;
 }
 

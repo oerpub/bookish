@@ -2,7 +2,7 @@
 (function() {
 
   define(['jquery', 'backbone', 'marionette', 'bookish/media-types', 'bookish/auth', 'bookish/models', 'bookish/views', 'hbs!bookish/layouts/main', 'hbs!bookish/layouts/content', 'hbs!bookish/layouts/workspace', 'exports', 'i18n!bookish/nls/strings'], function(jQuery, Backbone, Marionette, MEDIA_TYPES, Auth, Models, Views, LAYOUT_MAIN, LAYOUT_CONTENT, LAYOUT_WORKSPACE, exports, __) {
-    var ContentLayout, ContentRouter, HidingRegion, MainLayout, contentLayout, mainArea, mainController, mainLayout, mainRegion, mainSidebar, mainToolbar;
+    var ContentLayout, ContentRouter, HidingRegion, MainLayout, contentLayout, mainAdd, mainArea, mainController, mainLayout, mainRegion, mainSidebar, mainToolbar;
     mainRegion = new Marionette.Region({
       el: '#main'
     });
@@ -19,12 +19,10 @@
       template: LAYOUT_MAIN,
       regions: {
         home: '#layout-main-home',
+        add: '#layout-main-add',
         toolbar: '#layout-main-toolbar',
         auth: '#layout-main-auth',
-        sidebar: {
-          selector: '#layout-main-sidebar',
-          regionType: HidingRegion
-        },
+        sidebar: '#layout-main-sidebar',
         area: {
           selector: '#layout-main-area',
           regionType: HidingRegion
@@ -32,6 +30,7 @@
       }
     });
     mainLayout = new MainLayout();
+    mainAdd = mainLayout.add;
     mainToolbar = mainLayout.toolbar;
     mainSidebar = mainLayout.sidebar;
     mainArea = mainLayout.area;
@@ -56,7 +55,6 @@
         mainLayout.home.$el.on('click', function() {
           return _this.workspace();
         });
-        mainSidebar.onClose();
         mainArea.onClose();
         if (!Backbone.History.started) {
           return Backbone.history.start();
@@ -66,14 +64,10 @@
         return mainRegion;
       },
       mainLayout: mainLayout,
-      hideSidebar: function() {
-        return mainSidebar.close();
-      },
       workspace: function() {
-        var view, workspace,
+        var view, workspace, workspaceTree,
           _this = this;
         window.scrollTo(0, 0);
-        mainSidebar.close();
         mainToolbar.close();
         workspace = new Models.FilteredCollection(null, {
           collection: Models.WORKSPACE
@@ -86,8 +80,18 @@
           collection: workspace
         });
         mainArea.show(view);
+        mainAdd.show(new Views.AddView({
+          collection: MEDIA_TYPES.asCollection()
+        }));
+        workspaceTree = new Models.WorkspaceTree();
+        view = new Views.BookEditView({
+          model: workspaceTree
+        });
+        mainSidebar.show(view);
         return Models.WORKSPACE.loaded().done(function() {
-          return Backbone.history.navigate('workspace');
+          return workspaceTree.loaded().done(function() {
+            return Backbone.history.navigate('workspace');
+          });
         });
       },
       editModelId: function(id) {
@@ -99,24 +103,14 @@
         return this.editModel(model);
       },
       editModel: function(model) {
-        var editAction;
         if (!model.mediaType) {
           throw 'BUG: model.mediaType does not exist';
         }
-        editAction = MEDIA_TYPES.get(model.mediaType).editAction;
-        if (!editAction) {
-          throw 'BUG: no way to edit this model';
-        }
-        return editAction(model);
+        return model.editAction();
       },
       editBook: function(model) {
-        var view;
         window.scrollTo(0, 0);
-        mainToolbar.close();
-        view = new Views.BookEditView({
-          model: model
-        });
-        return mainSidebar.show(view);
+        return mainToolbar.close();
       },
       editContent: function(content) {
         var configAccordionDialog, view,
@@ -173,23 +167,15 @@
         'content/:id': 'editModelId'
       }
     });
-    MEDIA_TYPES.add('application/vnd.org.cnx.module', {
-      constructor: Models.BaseContent,
-      editAction: function(model) {
-        return mainController.editContent(model);
-      }
-    });
-    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
-      constructor: Models.BaseBook,
-      editAction: function(model) {
-        return mainController.editBook(model);
-      },
-      accepts: {
-        'application/vnd.org.cnx.module': function(book, model) {
-          return book.prependNewContent(model);
-        }
-      }
-    });
+    Models.BaseContent.prototype.editAction = function() {
+      return mainController.editContent(this);
+    };
+    Models.BaseBook.prototype.editAction = function() {
+      return mainController.editBook(this);
+    };
+    MEDIA_TYPES.add(Models.BaseContent);
+    MEDIA_TYPES.add(Models.BaseBook);
+    MEDIA_TYPES.add(Models.Folder);
     new ContentRouter();
     return jQuery.extend(exports, mainController);
   });
