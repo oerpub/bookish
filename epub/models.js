@@ -198,6 +198,9 @@
           return item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType;
         });
         return json;
+      },
+      accepts: function() {
+        return [HTMLFile.prototype.mediaType];
       }
     });
     PackageFile = BaseBook.extend(PackageFileMixin);
@@ -235,20 +238,14 @@
         return ret;
       }
     });
-    MEDIA_TYPES.add('application/xhtml+xml', {
-      constructor: HTMLFile,
-      editAction: Controller.editContent
-    });
-    MEDIA_TYPES.add('application/vnd.org.cnx.collection', {
-      constructor: PackageFile,
-      editAction: Controller.editBook,
-      accepts: {
-        'application/xhtml+xml': function(book, model) {
-          return book.prependNewContent(model);
-        }
-      }
-    });
-    Views.BookEditView.prototype.contentMediaType = 'application/xhtml+xml';
+    HTMLFile.prototype.editAction = function() {
+      return Controllder.editContent(this);
+    };
+    PackageFile.prototype.editAction = function() {
+      return Controller.editBook(this);
+    };
+    MEDIA_TYPES.add(HTMLFile);
+    MEDIA_TYPES.add(PackageFile);
     exports.EPUB_CONTAINER = new EPUBContainer();
     return exports;
   });
