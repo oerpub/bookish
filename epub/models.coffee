@@ -214,6 +214,9 @@ define [
 
       json
 
+    accepts: -> [ HTMLFile::mediaType ]
+
+
   PackageFile = BaseBook.extend PackageFileMixin
 
 
@@ -237,19 +240,11 @@ define [
 
 
   # Add the `HTMLFile` and `PackageFile` to the media types registry.
-  MEDIA_TYPES.add 'application/xhtml+xml',
-    constructor: HTMLFile
-    editAction: Controller.editContent
+  HTMLFile::editAction = -> Controllder.editContent @
+  PackageFile::editAction = -> Controller.editBook @
 
-  MEDIA_TYPES.add 'application/vnd.org.cnx.collection',
-    constructor: PackageFile
-    editAction: Controller.editBook
-    accepts:
-      'application/xhtml+xml': (book, model) ->
-        book.prependNewContent model
-
-  # Override the default `mediaType` for new content in the Book edit view.
-  Views.BookEditView::contentMediaType = 'application/xhtml+xml'
+  MEDIA_TYPES.add HTMLFile
+  MEDIA_TYPES.add PackageFile
 
   exports.EPUB_CONTAINER = new EPUBContainer()
 

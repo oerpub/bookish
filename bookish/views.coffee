@@ -31,6 +31,8 @@ define [
   'hbs!bookish/views/language-variants'
   'hbs!bookish/views/aloha-toolbar'
   'hbs!bookish/views/sign-in-out'
+  'hbs!bookish/views/add'
+  'hbs!bookish/views/add-item'
   'hbs!bookish/views/book-edit'
   'hbs!bookish/views/book-edit-node'
   # Load internationalized strings
@@ -41,7 +43,7 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
 
 
   # Drag and Drop Behavior
@@ -75,7 +77,7 @@ define [
           top: 0
           left: 0
         helper: (evt) ->
-          title = $el.data 'content-title'
+          title = $el.data('content-title') or ''
           shortTitle = title
           shortTitle = title.substring(0, 20) + '...' if title.length > 20
           # Generate the handle div using a template
@@ -161,11 +163,9 @@ define [
         # Figure out which mediaTypes can be dropped onto each element
         $content.each (i, el) =>
           $el = jQuery(el)
-          validSelectors = []
-          mediaType = MEDIA_TYPES.get @model.mediaType
-          for acceptsType in _.keys mediaType?.accepts or {}
-            validSelectors.push "*[data-media-type=\"#{acceptsType}\"]"
 
+          ModelType = MEDIA_TYPES.get @model.mediaType
+          validSelectors = _.map ModelType::accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
           validSelectors = validSelectors.join ','
 
           if validSelectors
@@ -182,7 +182,9 @@ define [
                 # Find the model representing the id that was dragged
                 model = Models.ALL_CONTENT.get $drag.data 'content-id'
                 drop = Models.ALL_CONTENT.get $drop.data 'content-id'
-                mediaType.accepts[model.mediaType](drop, model)
+                # Sanity-check before dropping:
+                throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
+                drop.addChild model
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
@@ -624,7 +626,25 @@ define [
           $saving.addClass('hide')
       , 5000)
 
+  AddItemView = Marionette.ItemView.extend
+    template: ADD_ITEM_VIEW
+    tagName: 'li'
+    events:
+      'click button': 'addItem'
 
+    addItem: ->
+      ContentType = @model.get('modelType')
+      content = new ContentType()
+      Models.WORKSPACE.add content
+      # Begin editing an item as soon as it is added.
+      # Some content (like Books and Folders) do not have an `editAction`
+      content.editAction?()
+
+  exports.AddView = Marionette.CompositeView.extend
+    template: ADD_VIEW
+    itemView: AddItemView
+    itemViewContainer: '.btn-group > ul'
+    tagName: 'span'
 
 
   # Book Editing
@@ -636,22 +656,31 @@ define [
     template: BOOK_EDIT_NODE
     tagName: 'li'
     events:
-      'click > .edit-content': 'editContent'
-      'click > .edit-settings': 'editSettings'
-      'click > .editor-expand-collapse': 'toggleExpanded'
+      # The `.editor-node-body` is needed because `li` elements render differently
+      # when there is a space between `<li>` and the first child.
+      # `.editor-node-body` ensures there is never a space.
+      'click > .editor-node-body > .edit-action': 'editAction'
+      'click > .editor-node-body > .edit-settings': 'editSettings'
+      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
 
-    editContent: -> Controller.editModelId @model.contentId()
+    editAction: -> @model.editAction()
 
     editSettings: ->
-      contentModel = Models.ALL_CONTENT.get @model.contentId()
-      originalTitle = contentModel?.get('title') or @model.get 'title'
-      newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
-      if '-' == newTitle
-        @model.parent.children.remove @model
-      else if newTitle == contentModel?.get('title')
-        @model.unset 'title'
-      else if newTitle
-        @model.set 'title', newTitle
+      if @model.contentId
+        contentModel = Models.ALL_CONTENT.get @model.contentId()
+        originalTitle = contentModel?.get('title') or @model.get 'title'
+        newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
+        if '-' == newTitle
+          @model.parent?.children()?.remove @model
+        else if newTitle == contentModel?.get('title')
+          @model.unset 'title'
+        else if newTitle
+          @model.set 'title', newTitle
+      else
+        originalTitle = @model.get 'title'
+        newTitle = prompt 'Edit Title.', originalTitle
+        @model.set 'title', newTitle if newTitle
+
 
 
     toggleExpanded: ->
@@ -665,31 +694,28 @@ define [
       # grab the child collection from the parent model
       # so that we can render the collection as children
       # of this parent node
-      @collection = @model.children
+      @collection = @model.children()
 
       @listenTo @model,      'all', => @render()
-      @listenTo @collection, 'all', => @render()
+      if @collection
+        @listenTo @collection, 'all', => @render()
 
       # If the content title changes and we have not overridden the title
       # rerender the node
-      if @model.contentId()
+      if @model.contentId?()
         contentModel = Models.ALL_CONTENT.get @model.contentId()
         @listenTo contentModel, 'change:title', (newTitle, model, options) =>
           @render() if !@model.get 'title'
 
 
     templateHelpers: ->
-      if @model.contentId()
-        content = Models.ALL_CONTENT.get @model.contentId()
-        # Provide the original module title to view templates
-        # if the title has not been overridden
-
-        # **FIXME:** Just make the whole Content model available via `.content`
-        # instead of picking out the `title` and `mediaType`
-        return {
-          _contentTitle: content.get 'title'
-          _contentMediaType: content.mediaType
-        }
+      return {
+        children: @collection?.length
+        # Some rendered nodes are pointers to pieces of content. include the content.
+        content: Models.ALL_CONTENT.get(@model.contentId()).toJSON() if @model.contentId?()
+        editAction: !!@model.editAction
+        parent: !!@model.parent
+      }
 
 
     # From `Marionette.CompositeView`.
@@ -702,18 +728,24 @@ define [
 
     onRender: ->
 
-      @$el.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
+      @$el.attr 'data-media-type', @model.mediaType
+      $body = @$el.children '.editor-node-body'
+      $body.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
 
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        _EnableContentDragging(@$el.children '.organization-node,*[data-media-type]')
+        _EnableContentDragging($body.find '.organization-node,*[data-media-type]')
 
-        @$el.addClass 'editor-drop-zone editor-drop-zone-in'
-        @$el.add(@$el.children('.editor-drop-zone')).droppable
+        validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
+        validSelectors.push '.organization-node'
+        validSelectors = validSelectors.join ','
+
+        $body.addClass 'editor-drop-zone editor-drop-zone-in'
+        $body.add($body.children('.editor-drop-zone')).droppable
           greedy: true
           addClasses: false
-          accept: '.organization-node,*[data-media-type]'
+          accept: validSelectors
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
           drop: (evt, ui) =>
@@ -732,12 +764,7 @@ define [
               # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
               # and should be converted to a link inside an `li`
 
-              drag = $drag.data('content-tree-node') or {
-                id: $drag.data 'content-id'
-                # The title and mediaType should inherit from the actual piece of content
-                #    title: $drag.data 'content-title'
-                #    mediaType: $drag.data 'media-type'
-              }
+              drag = $drag.data('content-tree-node') or Models.ALL_CONTENT.get($drag.data 'content-id')
 
               # Ignore if you drop on yourself or your children
               testNode = @model
@@ -745,19 +772,16 @@ define [
                 return if (drag.cid == testNode.cid) or (testNode.id and drag.id == testNode.id)
                 testNode = testNode.parent
 
-              # Remove the item if it is a `BookTocNode`
-              drag.parent.children.remove(drag) if drag.parent
-
               if $drop.hasClass 'editor-drop-zone-before'
-                col = @model.parent.children
+                col = @model.parent.children()
                 index = col.indexOf(@model)
-                col.add drag, {at: index}
+                @model.parent.addChild drag, index
               else if $drop.hasClass 'editor-drop-zone-after'
-                col = @model.parent.children
+                col = @model.parent.children()
                 index = col.indexOf(@model)
-                col.add drag, {at: index + 1}
+                @model.parent.addChild drag, index + 1
               else if $drop.hasClass 'editor-drop-zone-in'
-                @model.children.add drag
+                @model.addChild drag
               else
                 throw 'BUG. UNKNOWN DROP CLASS'
 
@@ -776,23 +800,9 @@ define [
     template: BOOK_EDIT
     itemView: BookEditNodeView
     itemViewContainer: '> nav > ol'
-    # Default media type for new Content
-    contentMediaType: 'application/vnd.org.cnx.module'
-
-    events:
-      'click #nav-close': 'closeView'
-      'click #add-section': 'prependSection'
-      'click #add-content': 'prependContent'
 
     initialize: ->
-      @collection = @model.navTreeRoot.children
-
-    # **FIXME:** Make the mediaType for new content a property of the view
-    # (so the EPUB book editor can override it) or use `media-types` to look it up.
-    prependSection: -> @model.prependNewContent {title: 'Untitled Section'}
-    prependContent: -> @model.prependNewContent {title: 'Untitled Content'}, @contentMediaType
-
-    closeView: -> Controller.hideSidebar()
+      @collection = @model.children()
 
     appendHtml: (cv, iv, index)->
       $container = @getItemViewContainer(cv)

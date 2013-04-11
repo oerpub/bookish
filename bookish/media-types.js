@@ -15,35 +15,24 @@
     });
     MEDIA_TYPES = new MediaTypes();
     return {
-      add: function(mediaType, config) {
-        var func, mt, prev, _ref;
-        prev = MEDIA_TYPES.get(mediaType);
-        if (!config.constructor && !prev) {
-          throw 'BUG: You must at least specify a constructor!';
-        }
-        _ref = config.accepts || {};
-        for (mt in _ref) {
-          func = _ref[mt];
-          config.accepts[mt] = function(me, droppedContent) {
-            return me.loaded().done(function() {
-              return func(me, droppedContent);
-            });
-          };
-        }
-        return MEDIA_TYPES.add(_.extend(config, {
-          id: mediaType
-        }), {
+      add: function(modelType) {
+        var mediaType;
+        mediaType = modelType.prototype.mediaType;
+        return MEDIA_TYPES.add({
+          id: mediaType,
+          modelType: modelType
+        }, {
           merge: true
         });
       },
       get: function(mediaType) {
-        var type;
-        type = MEDIA_TYPES.get(mediaType);
-        if (!type) {
+        var modelType;
+        modelType = MEDIA_TYPES.get(mediaType);
+        if (!modelType) {
           console.error("ERROR: No editor for media type '" + mediaType + "'. Help out by writing one!");
           return MEDIA_TYPES.models[0];
         }
-        return _.omit(type.toJSON(), 'id');
+        return modelType.get('modelType');
       },
       list: function() {
         var type;

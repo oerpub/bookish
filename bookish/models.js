@@ -2,7 +2,7 @@
 (function() {
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection;
+    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection, Folder, WorkspaceTree;
     BaseModel = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
@@ -19,7 +19,34 @@
             id: "_NEW:" + this.cid
           });
         }
-      }
+      },
+      toJSON: function() {
+        var json;
+        json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+        json.mediaType = this.mediaType;
+        return json;
+      },
+      accepts: function() {
+        return [];
+      },
+      children: function() {
+        return null;
+      },
+      addChild: function(model, at) {
+        var options;
+        if (at == null) {
+          at = null;
+        }
+        options = {};
+        if (at >= 0) {
+          options.at = at;
+        }
+        if (model.contentId) {
+          model = ALL_CONTENT.get(model.contentId());
+        }
+        return this.children().add(model, options);
+      },
+      editAction: null
     });
     ALL_CONTENT = null;
     Deferrable = BaseModel.extend({
@@ -29,7 +56,7 @@
         if (flag == null) {
           flag = false;
         }
-        if (flag) {
+        if (flag || this.isNew()) {
           deferred = jQuery.Deferred();
           deferred.resolve(this);
           this._promise = deferred.promise();
@@ -60,12 +87,6 @@
           });
         }
         return this._promise;
-      },
-      toJSON: function() {
-        var json;
-        json = Backbone.Model.prototype.toJSON.apply(this, arguments);
-        json.mediaType = this.mediaType;
-        return json;
       }
     });
     DeferrableCollection = Backbone.Collection.extend({
@@ -120,13 +141,17 @@
       defaults: {
         collection: null
       },
-      setFilter: function(str) {
+      setFilter: function(str, mediaTypes) {
         var models,
           _this = this;
+        if (mediaTypes == null) {
+          mediaTypes = [];
+        }
         if (this.filterStr === str) {
           return;
         }
         this.filterStr = str;
+        this.filterMediaTypes = mediaTypes;
         models = this.collection.filter(function(model) {
           return _this.isMatch(model);
         });
@@ -134,6 +159,9 @@
       },
       isMatch: function(model) {
         var body, bodyText, found, title;
+        if (this.filterMediaTypes.length && this.filterMediaTypes.indexOf(model.mediaType) < 0) {
+          return false;
+        }
         if (!this.filterStr) {
           return true;
         }
@@ -148,6 +176,7 @@
       initialize: function(models, options) {
         var _this = this;
         this.filterStr = options.filterStr || '';
+        this.filterMediaTypes = options.mediaTypes || [];
         this.collection = options.collection;
         if (!this.collection) {
           throw 'BUG: Cannot filter on a non-existent collection';
@@ -190,12 +219,13 @@
       }
     });
     Backbone_Model_toJSON = Backbone.Model.prototype.toJSON;
-    BookTocNode = Backbone.Model.extend({
+    BookTocNode = BaseModel.extend({
+      mediaType: 'application/vnd.org.cnx.container',
       toJSON: function() {
         var json;
         json = Backbone_Model_toJSON.apply(this);
-        if (this.children.length) {
-          json.children = this.children.toJSON();
+        if (this._children.length) {
+          json.children = this._children.toJSON();
         }
         return json;
       },
@@ -203,7 +233,7 @@
         return this.id;
       },
       initialize: function() {
-        var children,
+        var children, model,
           _this = this;
         this.on('change', function() {
           return _this.trigger('change:treeNode');
@@ -212,16 +242,49 @@
         this.unset('children', {
           silent: true
         });
-        this.children = new BookTocNodeCollection();
-        this.children.on('add', function(child, collection, options) {
+        this._children = new BookTocNodeCollection();
+        this._children.on('add', function(child, collection, options) {
           child.parent = _this;
           return _this.trigger('add:treeNode', child, _this, options);
         });
-        this.children.on('remove', function(child, collection, options) {
+        this._children.on('remove', function(child, collection, options) {
           delete child.parent;
           return _this.trigger('remove:treeNode', child, _this, options);
         });
-        return this.children.add(children);
+        this._children.add(children);
+        if (this.id) {
+          model = ALL_CONTENT.get(this.id);
+          return this.editAction = model.editAction.bind(model);
+        }
+      },
+      accepts: function() {
+        return [BaseContent.prototype.mediaType, BookTocNode.prototype.mediaType];
+      },
+      children: function() {
+        return this._children;
+      },
+      addChild: function(model, at) {
+        var root, shortcut;
+        if (at == null) {
+          at = 0;
+        }
+        if (BookTocNode.prototype.mediaType !== model.mediaType) {
+          model = new BookTocNode({
+            id: model.id
+          });
+        }
+        root = this.parent || this;
+        while (root.parent) {
+          root = root.parent;
+        }
+        shortcut = root.descendants.get(model.id);
+        if (shortcut) {
+          shortcut.parent.children().remove(shortcut);
+          model = shortcut;
+        }
+        return this._children.add(model, {
+          at: at
+        });
       }
     });
     BookTocNodeCollection = Backbone.Collection.extend({
@@ -229,7 +292,7 @@
     });
     BookTocTree = BookTocNode.extend({
       toJSON: function() {
-        return this.children.toJSON();
+        return this.children().toJSON();
       },
       initialize: function() {
         var recDescendants,
@@ -238,11 +301,11 @@
         this.descendants = new BookTocNodeCollection();
         recDescendants = function(node) {
           _this.descendants.add(node);
-          return node.children.each(function(child) {
+          return typeof node.children === "function" ? node.children().each(function(child) {
             return recDescendants(child);
-          });
+          }) : void 0;
         };
-        this.children.each(function(child) {
+        this.children().each(function(child) {
           return recDescendants(child);
         });
         this.descendants.on('add:treeNode', function(node) {
@@ -264,14 +327,14 @@
         var recAddDescendants,
           _this = this;
         this.descendants.reset();
-        this.children.reset(nodes);
+        this.children().reset(nodes);
         recAddDescendants = function(node) {
           _this.descendants.add(node);
-          return node.children.each(function(child) {
+          return typeof node.children === "function" ? node.children().each(function(child) {
             return recAddDescendants(child);
-          });
+          }) : void 0;
         };
-        return this.children.each(function(child) {
+        return this.children().each(function(child) {
           child.parent = _this;
           return recAddDescendants(child);
         });
@@ -280,15 +343,10 @@
     BaseBook = Deferrable.extend({
       mediaType: 'application/vnd.org.cnx.collection',
       defaults: {
-        manifest: null
+        manifest: null,
+        title: 'Untitled Book'
       },
       manifestType: Backbone.Collection,
-      toJSON: function() {
-        var json;
-        json = Deferrable.prototype.toJSON.apply(this, arguments);
-        json.navTree = this.navTreeRoot.toJSON();
-        return json;
-      },
       parseNavTree: function(li) {
         var $a, $li, $ol, obj;
         $li = jQuery(li);
@@ -351,35 +409,17 @@
         });
         return ALL_CONTENT.add(this);
       },
-      prependNewContent: function(model, mediaType) {
-        var ContentType, config;
-        if (model instanceof Backbone.Model) {
-          if (this.manifest.get(model.id)) {
-            return;
-          }
-          return this.manifest.add(model);
-        } else if (mediaType) {
-          config = model;
-          if (!MEDIA_TYPES.get(mediaType)) {
-            throw 'BUG: Media type not registered';
-          }
-          ContentType = MEDIA_TYPES.get(mediaType).constructor;
-          model = new ContentType(config);
-          ALL_CONTENT.add(model);
-          model.loaded(true);
-          console.warn('FIXME: Hack for new content');
-          return this.navTreeRoot.children.add({
-            id: model.get('id')
-          }, {
-            at: 0
-          });
-        } else {
-          return this.navTreeRoot.children.add({
-            title: model.title
-          }, {
-            at: 0
-          });
+      accepts: function() {
+        return [BookTocNode.prototype.mediaType, BaseContent.prototype.mediaType];
+      },
+      children: function() {
+        return this.navTreeRoot.children();
+      },
+      addChild: function(model, at) {
+        if (at == null) {
+          at = 0;
         }
+        return this.navTreeRoot.addChild(model, at);
       }
     });
     CONTENT_COMPARATOR = function(a, b) {
@@ -402,14 +442,56 @@
       }
       return 0;
     };
+    Folder = Deferrable.extend({
+      defaults: {
+        title: 'Untitled Folder'
+      },
+      mediaType: 'application/vnd.org.cnx.folder',
+      initialize: function() {
+        Deferrable.prototype.initialize.apply(this, arguments);
+        return this.contents = new Backbone.Collection();
+      },
+      accepts: function() {
+        return [BaseBook.prototype.mediaType, BaseContent.prototype.mediaType];
+      },
+      children: function() {
+        return this.contents;
+      }
+    });
+    WorkspaceTree = Deferrable.extend({
+      defaults: {
+        title: 'My Workspace'
+      },
+      mediaTypes: [BaseBook.prototype.mediaType, Folder.prototype.mediaType],
+      initialize: function() {
+        return this.workspace = new FilteredCollection(null, {
+          collection: exports.WORKSPACE,
+          mediaTypes: this.mediaTypes
+        });
+      },
+      children: function() {
+        return this.workspace;
+      },
+      loaded: function(flag) {
+        var promise;
+        promise = Deferrable.prototype.loaded.apply(this, arguments);
+        this.workspace.each(function(content) {
+          return promise = content.loaded().then(function() {
+            return promise;
+          });
+        });
+        return promise;
+      }
+    });
     exports.FilteredCollection = FilteredCollection;
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
     exports.BookTocTree = BookTocTree;
     exports.Deferrable = Deferrable;
     exports.DeferrableCollection = DeferrableCollection;
+    exports.WorkspaceTree = WorkspaceTree;
+    exports.Folder = Folder;
     exports.ALL_CONTENT = ALL_CONTENT;
-    exports.MEDIA_TYPES = MEDIA_TYPES;
     exports.CONTENT_COMPARATOR = CONTENT_COMPARATOR;
     exports.WORKSPACE = ALL_CONTENT;
     return exports;
