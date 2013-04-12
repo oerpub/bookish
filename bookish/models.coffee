@@ -289,23 +289,31 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         model = ALL_CONTENT.get(@id)
         @editAction = model.editAction.bind(model)
 
-    accepts: -> [ BaseContent::mediaType, BookTocNode::mediaType ]
+    accepts: -> [ BaseContent::mediaType, BookTocNode::mediaType, Folder::mediaType ]
     children: -> @_children
     addChild: (model, at=0) ->
+      # If the model is a Folder create a `BookTocNode` and add all the valid children to it
+      if Folder::mediaType == model.mediaType
+        folder = model
+        model = new BookTocNode {title: folder.get 'title'}
+        folder.children().each (child) ->
+          model.addChild child if child.mediaType in model.accepts()
+
       # If the model is not already a `BookTocNode` then wrap it in one
       if BookTocNode::mediaType != model.mediaType
         model = new BookTocNode {id: model.id}
 
       # Move up to the root and see if it's already in the tree
-      root = @parent or @
+      root = @
       root = root.parent while root.parent
 
       # Model can be a node that points to a piece of content (has `id`) or an
       # internal node (chapter) that is just a container (has `cid`)
-      shortcut = root.descendants.get(model.id) or root.descendants.get(model.cid)
-      if shortcut
-        shortcut.parent.children().remove(shortcut)
-        model = shortcut
+      if root.descendants
+        shortcut = root.descendants.get(model.id) or root.descendants.get(model.cid)
+        if shortcut
+          shortcut.parent.children().remove(shortcut)
+          model = shortcut
       @_children.add model, {at:at}
 
 
@@ -456,7 +464,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
     # Used by the Drag-and-Drop to decide which types can be dropped and
     # by `AddView` to decide which child mediaTypes can be added
-    accepts: -> [ BookTocNode::mediaType, BaseContent::mediaType ]
+    accepts: -> [ BookTocNode::mediaType, BaseContent::mediaType, Folder::mediaType ]
     # Used by the TreeView to render the children of this book
     children: -> @navTreeRoot.children()
     addChild: (model, at=0) -> @navTreeRoot.addChild(model, at)
