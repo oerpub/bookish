@@ -152,9 +152,7 @@
         return "<html>\n  <head>\n    " + $head[0].innerHTML + "\n  </head>\n  <body>\n    " + $body[0].innerHTML + "\n  </body>\n</html>";
       }
     });
-    MEDIA_TYPES.add(XhtmlModel.prototype.mediaType, {
-      constructor: XhtmlModel
-    });
+    MEDIA_TYPES.add(XhtmlModel);
     STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password'];
     Auth.on('change', function() {
       var key, value, _ref, _ref1, _results;

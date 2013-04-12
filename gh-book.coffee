@@ -167,7 +167,7 @@ define [
         </html>
         """
 
-  MEDIA_TYPES.add XhtmlModel::mediaType, {constructor: XhtmlModel}
+  MEDIA_TYPES.add XhtmlModel
 
   # Clear everything and refetch when the
   STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']
