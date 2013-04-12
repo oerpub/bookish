@@ -277,7 +277,7 @@
         while (root.parent) {
           root = root.parent;
         }
-        shortcut = root.descendants.get(model.id);
+        shortcut = root.descendants.get(model.id) || root.descendants.get(model.cid);
         if (shortcut) {
           shortcut.parent.children().remove(shortcut);
           model = shortcut;
@@ -486,6 +486,7 @@
     exports.FilteredCollection = FilteredCollection;
     exports.BaseContent = BaseContent;
     exports.BaseBook = BaseBook;
+    exports.BookTocNode = BookTocNode;
     exports.BookTocTree = BookTocTree;
     exports.Deferrable = Deferrable;
     exports.DeferrableCollection = DeferrableCollection;
