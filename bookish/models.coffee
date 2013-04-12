@@ -300,7 +300,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       root = @parent or @
       root = root.parent while root.parent
 
-      shortcut = root.descendants.get(model.id)
+      # Model can be a node that points to a piece of content (has `id`) or an
+      # internal node (chapter) that is just a container (has `cid`)
+      shortcut = root.descendants.get(model.id) or root.descendants.get(model.cid)
       if shortcut
         shortcut.parent.children().remove(shortcut)
         model = shortcut
@@ -509,6 +511,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   exports.FilteredCollection = FilteredCollection
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
+  exports.BookTocNode = BookTocNode
   exports.BookTocTree = BookTocTree
   exports.Deferrable = Deferrable
   exports.DeferrableCollection = DeferrableCollection
