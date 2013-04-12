@@ -169,6 +169,9 @@ define [
 
   MEDIA_TYPES.add XhtmlModel
 
+  AtcModels_Folder_accepts = AtcModels.Folder::accepts()
+  AtcModels_Folder_accepts.push XhtmlModel::mediaType
+  AtcModels.Folder::accepts = -> AtcModels_Folder_accepts
   # Clear everything and refetch when the
   STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']
   Auth.on 'change', () =>
