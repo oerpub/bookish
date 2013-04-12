@@ -39,7 +39,7 @@ define ['backbone'], (Backbone) ->
       modelType = MEDIA_TYPES.get mediaType
       if not modelType
         console.error "ERROR: No editor for media type '#{mediaType}'. Help out by writing one!"
-        return MEDIA_TYPES.models[0]
+        modelType = MEDIA_TYPES.models[0]
         #     throw 'BUG: mediaType not found'
       return modelType.get('modelType')
 

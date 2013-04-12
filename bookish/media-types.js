@@ -30,7 +30,7 @@
         modelType = MEDIA_TYPES.get(mediaType);
         if (!modelType) {
           console.error("ERROR: No editor for media type '" + mediaType + "'. Help out by writing one!");
-          return MEDIA_TYPES.models[0];
+          modelType = MEDIA_TYPES.models[0];
         }
         return modelType.get('modelType');
       },
