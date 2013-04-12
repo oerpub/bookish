@@ -200,7 +200,7 @@
         return json;
       },
       accepts: function() {
-        return [HTMLFile.prototype.mediaType];
+        return [HTMLFile.prototype.mediaType, Models.Folder.prototype.mediaType];
       }
     });
     PackageFile = BaseBook.extend(PackageFileMixin);

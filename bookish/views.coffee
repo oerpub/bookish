@@ -64,29 +64,34 @@ define [
   #
   # Additionally, each draggable element should not contain any text children
   # so CSS can hide children and properly style the cloned element that is being dragged.
-  _EnableContentDragging = ($els) ->
-    $els.each (i, el) ->
-      $el = jQuery(el)
-      $el.draggable
-        addClasses: false
-        revert: 'invalid'
-        # Ensure the handle is on top (zindex) and not bound to be constrained inside a div visually
-        appendTo: 'body'
-        # Place the little handle right next to the mouse
-        cursorAt:
-          top: 0
-          left: 0
-        helper: (evt) ->
-          title = $el.data('content-title') or ''
-          shortTitle = title
-          shortTitle = title.substring(0, 20) + '...' if title.length > 20
-          # Generate the handle div using a template
-          $handle = jQuery DND_HANDLE
-            id: $el.data 'content-id'
-            mediaType: $el.data 'media-type'
-            title: title
-            shortTitle: shortTitle
-          return $handle
+  _EnableContentDragging = (model, $el) ->
+    $el.data 'editor-model', model
+    $el.draggable
+      addClasses: false
+      revert: 'invalid'
+      # Ensure the handle is on top (zindex) and not bound to be constrained inside a div visually
+      appendTo: 'body'
+      # Place the little handle right next to the mouse
+      cursorAt:
+        top: 0
+        left: 0
+      helper: (evt) ->
+        title = model.get('title') or ''
+        shortTitle = title
+        shortTitle = title.substring(0, 20) + '...' if title.length > 20
+
+        # If the content is a pointer to a piece of content (`BookTocNode`)
+        # then use the actual content's mediaType
+        mediaType = model.mediaType
+        mediaType = Models.ALL_CONTENT.get(model.contentId()).mediaType if model.contentId?()
+
+        # Generate the handle div using a template
+        $handle = jQuery DND_HANDLE
+          id: model.id
+          mediaType: mediaType
+          title: title
+          shortTitle: shortTitle
+        return $handle
 
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
@@ -158,7 +163,7 @@ define [
       # delay until Aloha is finished loading
       Aloha.ready =>
 
-        _EnableContentDragging($content)
+        _EnableContentDragging(@model, $content)
 
         # Figure out which mediaTypes can be dropped onto each element
         $content.each (i, el) =>
@@ -180,8 +185,8 @@ define [
                 $drop = jQuery(evt.target)
 
                 # Find the model representing the id that was dragged
-                model = Models.ALL_CONTENT.get $drag.data 'content-id'
-                drop = Models.ALL_CONTENT.get $drop.data 'content-id'
+                model = $drag.data 'editor-model'
+                drop = $drop.data 'editor-model'
                 # Sanity-check before dropping:
                 throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
                 drop.addChild model
@@ -730,12 +735,11 @@ define [
 
       @$el.attr 'data-media-type', @model.mediaType
       $body = @$el.children '.editor-node-body'
-      $body.children('.organization-node,*[data-media-type]').data 'content-tree-node', @model
 
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        _EnableContentDragging($body.find '.organization-node,*[data-media-type]')
+        _EnableContentDragging(@model, $body.children '.organization-node,*[data-media-type]')
 
         validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
         validSelectors.push '.organization-node'
@@ -764,7 +768,7 @@ define [
               # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
               # and should be converted to a link inside an `li`
 
-              drag = $drag.data('content-tree-node') or Models.ALL_CONTENT.get($drag.data 'content-id')
+              drag = $drag.data('editor-model')
 
               # Ignore if you drop on yourself or your children
               testNode = @model
