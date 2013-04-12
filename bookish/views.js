@@ -3,34 +3,35 @@
 
   define(['exports', 'underscore', 'backbone', 'marionette', 'jquery', 'aloha', 'bookish/controller', 'bookish/models', 'bookish/media-types', './languages', 'hbs!bookish/views/content-edit', 'hbs!bookish/views/search-box', 'hbs!bookish/views/search-results', 'hbs!bookish/views/search-results-item', 'hbs!bookish/views/dnd-handle', 'hbs!bookish/views/modal-wrapper', 'hbs!bookish/views/edit-metadata', 'hbs!bookish/views/edit-roles', 'hbs!bookish/views/language-variants', 'hbs!bookish/views/aloha-toolbar', 'hbs!bookish/views/sign-in-out', 'hbs!bookish/views/add', 'hbs!bookish/views/add-item', 'hbs!bookish/views/book-edit', 'hbs!bookish/views/book-edit-node', 'i18n!bookish/nls/strings', 'bootstrap', 'select2', 'css!font-awesome'], function(exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) {
     var AddItemView, BookEditNodeView, DELAY_BEFORE_SAVING, LANGUAGES, METADATA_SUBJECTS, SELECT2_AJAX_HANDLER, SELECT2_MAKE_SORTABLE, languageCode, value, _EnableContentDragging, _ref;
-    _EnableContentDragging = function($els) {
-      return $els.each(function(i, el) {
-        var $el;
-        $el = jQuery(el);
-        return $el.draggable({
-          addClasses: false,
-          revert: 'invalid',
-          appendTo: 'body',
-          cursorAt: {
-            top: 0,
-            left: 0
-          },
-          helper: function(evt) {
-            var $handle, shortTitle, title;
-            title = $el.data('content-title') || '';
-            shortTitle = title;
-            if (title.length > 20) {
-              shortTitle = title.substring(0, 20) + '...';
-            }
-            $handle = jQuery(DND_HANDLE({
-              id: $el.data('content-id'),
-              mediaType: $el.data('media-type'),
-              title: title,
-              shortTitle: shortTitle
-            }));
-            return $handle;
+    _EnableContentDragging = function(model, $el) {
+      $el.data('editor-model', model);
+      return $el.draggable({
+        addClasses: false,
+        revert: 'invalid',
+        appendTo: 'body',
+        cursorAt: {
+          top: 0,
+          left: 0
+        },
+        helper: function(evt) {
+          var $handle, mediaType, shortTitle, title;
+          title = model.get('title') || '';
+          shortTitle = title;
+          if (title.length > 20) {
+            shortTitle = title.substring(0, 20) + '...';
           }
-        });
+          mediaType = model.mediaType;
+          if (typeof model.contentId === "function" ? model.contentId() : void 0) {
+            mediaType = Models.ALL_CONTENT.get(model.contentId()).mediaType;
+          }
+          $handle = jQuery(DND_HANDLE({
+            id: model.id,
+            mediaType: mediaType,
+            title: title,
+            shortTitle: shortTitle
+          }));
+          return $handle;
+        }
       });
     };
     DELAY_BEFORE_SAVING = 3000;
@@ -111,7 +112,7 @@
         });
         $content = this.$el.children('*[data-media-type]');
         return Aloha.ready(function() {
-          _EnableContentDragging($content);
+          _EnableContentDragging(_this.model, $content);
           return $content.each(function(i, el) {
             var $el, ModelType, validSelectors;
             $el = jQuery(el);
@@ -131,8 +132,8 @@
                   var $drag, $drop, drop, model;
                   $drag = ui.draggable;
                   $drop = jQuery(evt.target);
-                  model = Models.ALL_CONTENT.get($drag.data('content-id'));
-                  drop = Models.ALL_CONTENT.get($drop.data('content-id'));
+                  model = $drag.data('editor-model');
+                  drop = $drop.data('editor-model');
                   if (drop.accepts().indexOf(model.mediaType) < 0) {
                     throw 'INVALID_DROP_MEDIA_TYPE';
                   }
@@ -719,10 +720,9 @@
           _this = this;
         this.$el.attr('data-media-type', this.model.mediaType);
         $body = this.$el.children('.editor-node-body');
-        $body.children('.organization-node,*[data-media-type]').data('content-tree-node', this.model);
         return Aloha.ready(function() {
           var validSelectors;
-          _EnableContentDragging($body.find('.organization-node,*[data-media-type]'));
+          _EnableContentDragging(_this.model, $body.children('.organization-node,*[data-media-type]'));
           validSelectors = _.map(_this.model.accepts(), function(mediaType) {
             return "*[data-media-type=\"" + mediaType + "\"]";
           });
@@ -741,7 +741,7 @@
               $drop = jQuery(evt.target);
               delay = function() {
                 var col, drag, index, testNode;
-                drag = $drag.data('content-tree-node') || Models.ALL_CONTENT.get($drag.data('content-id'));
+                drag = $drag.data('editor-model');
                 testNode = _this.model;
                 while (testNode) {
                   if ((drag.cid === testNode.cid) || (testNode.id && drag.id === testNode.id)) {
