@@ -214,7 +214,7 @@ define [
 
       json
 
-    accepts: -> [ HTMLFile::mediaType ]
+    accepts: -> [ HTMLFile::mediaType, Models.Folder::mediaType ]
 
 
   PackageFile = BaseBook.extend PackageFileMixin
