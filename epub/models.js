@@ -171,7 +171,7 @@
           $item = jQuery(item);
           mediaType = $item.attr('media-type');
           path = $item.attr('href');
-          ContentType = MEDIA_TYPES.get(mediaType).constructor;
+          ContentType = MEDIA_TYPES.get(mediaType);
           model = new ContentType({
             id: resolvePath(_this.id, path),
             properties: $item.attr('properties')
@@ -239,10 +239,13 @@
       }
     });
     HTMLFile.prototype.editAction = function() {
-      return Controllder.editContent(this);
+      return Controller.editContent(this);
     };
     PackageFile.prototype.editAction = function() {
       return Controller.editBook(this);
+    };
+    Models.BookTocNode.prototype.accepts = function() {
+      return [Models.BookTocNode.prototype.mediaType, HTMLFile.prototype.mediaType];
     };
     MEDIA_TYPES.add(HTMLFile);
     MEDIA_TYPES.add(PackageFile);

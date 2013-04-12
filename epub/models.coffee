@@ -182,7 +182,7 @@ define [
         # Add it to the set of all content and construct the correct model based on the mimetype
         mediaType = $item.attr 'media-type'
         path = $item.attr 'href'
-        ContentType = MEDIA_TYPES.get(mediaType).constructor
+        ContentType = MEDIA_TYPES.get(mediaType)
         model = new ContentType
           # Set the path to the file to be relative to the OPF file
           id: resolvePath(@id, path)
@@ -240,8 +240,9 @@ define [
 
 
   # Add the `HTMLFile` and `PackageFile` to the media types registry.
-  HTMLFile::editAction = -> Controllder.editContent @
+  HTMLFile::editAction = -> Controller.editContent @
   PackageFile::editAction = -> Controller.editBook @
+  Models.BookTocNode::accepts = -> [ Models.BookTocNode::mediaType, HTMLFile::mediaType ]
 
   MEDIA_TYPES.add HTMLFile
   MEDIA_TYPES.add PackageFile
