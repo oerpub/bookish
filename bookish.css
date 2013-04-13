@@ -109,12 +109,15 @@
  */
 *[data-media-type]                         > .icon-content { margin-right: 0.5em; }
 *[data-media-type='application/xhtml+xml'] > .icon-content:before,
-*[data-media-type='application/vnd.org.cnx.module']         > .icon-content:before { content:"\f0f6"; /* icon-file-alt */ }
-*[data-media-type='application/vnd.org.cnx.collection']     > .icon-content:before { content:"\f02d"; /* icon-book */ }
-*[data-media-type='application/vnd.org.cnx.folder']         > .icon-content:before { content:"\f07c"; /* icon-folder-open */ }
+*[data-media-type='application/vnd.org.cnx.module']         > .icon-content:before { color: #00c; content:"\f0f6"; /* icon-file-alt */ }
+*[data-media-type='application/vnd.org.cnx.collection']     > .icon-content:before { color: #c00; content:"\f02d"; /* icon-book */ }
+*[data-media-type='application/vnd.org.cnx.folder']         > .icon-content:before { color: #999; content:"\f07c"; /* icon-folder-open */ }
 
 .search-results > tbody > tr { cursor: pointer; }
+.search-results a { color: black; }
+.search-results a:hover { color: blue; }
 
+#layout-main-sidebar nav > ol { margin: 0; }
 #layout-main-sidebar li {
   list-style-type: none;
 }
@@ -141,9 +144,6 @@
   box-shadow: 2px 2px 2px #888;
 }
 .dnd-content-handle > .title-content { font-weight: bold; }
-
-/* Style TOC sections different from content */
-.organization-node { font-weight: bold; }
 
 /* Reduce the vertical whitespace */
 /* #layout-main-sidebar nav li { line-height: 14px;} */
