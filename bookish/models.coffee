@@ -35,8 +35,13 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       options = {}
       options.at = at if at >= 0
       # By default unwrap pointers
-      model = ALL_CONTENT.get model.contentId() if model.contentId
+      model = model.dereference()
       @children().add model, options
+
+    # Some models are pointers to other models (ie `BookTocNode`).
+    # Dereference them.
+    # By default, return this.
+    dereference: -> @
 
     # `Controller` action to edit this model or `null` if it cannot be edited directly
     editAction: null
@@ -260,7 +265,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # Return the `id` of the corresponding Content Model represented by this node.
     # This is used to "look up" the original title of content if it has not been
     # Overridden in the book.
-    contentId: -> @id
+    #
+    # If it is an `organization` node (no `id`) then just return itself.
+    dereference: -> ALL_CONTENT.get(@id) or @
 
     initialize: ->
       @on 'change', => @trigger 'change:treeNode'
@@ -446,8 +453,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       # If a piece of content is linked to in the navigation document
       # always include it in the manifest
-      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add ALL_CONTENT.get(navNode.contentId())
-      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove ALL_CONTENT.get(navNode.contentId())
+      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add navNode.dereference()
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove navNode.dereference()
 
       # Trigger a change so `save` works
       @listenTo @navTreeRoot, 'add:treeNode',    (navNode) => @trigger 'add:treeNode', @
