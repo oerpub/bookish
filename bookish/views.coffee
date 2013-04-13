@@ -190,8 +190,14 @@ define [
                 model = $drag.data 'editor-model'
                 drop = $drop.data 'editor-model'
                 # Sanity-check before dropping:
+                # Dereference if this is a pointer
+                if drop.accepts().indexOf(model.mediaType) < 0
+                  model = Models.ALL_CONTENT.get(model.contentId())
                 throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
-                drop.addChild model
+
+                # Delay the call so jQuery.droppable has time to clean up before the DOM changes
+                delay = => drop.addChild model
+                setTimeout delay, 10
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk

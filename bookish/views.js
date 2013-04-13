@@ -129,15 +129,21 @@
                 activeClass: 'editor-drop-zone-active',
                 hoverClass: 'editor-drop-zone-hover',
                 drop: function(evt, ui) {
-                  var $drag, $drop, drop, model;
+                  var $drag, $drop, delay, drop, model;
                   $drag = ui.draggable;
                   $drop = jQuery(evt.target);
                   model = $drag.data('editor-model');
                   drop = $drop.data('editor-model');
                   if (drop.accepts().indexOf(model.mediaType) < 0) {
+                    model = Models.ALL_CONTENT.get(model.contentId());
+                  }
+                  if (drop.accepts().indexOf(model.mediaType) < 0) {
                     throw 'INVALID_DROP_MEDIA_TYPE';
                   }
-                  return drop.addChild(model);
+                  delay = function() {
+                    return drop.addChild(model);
+                  };
+                  return setTimeout(delay, 10);
                 }
               });
             }
