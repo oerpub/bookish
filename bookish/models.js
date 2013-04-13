@@ -42,10 +42,11 @@
         if (at >= 0) {
           options.at = at;
         }
-        if (model.contentId) {
-          model = ALL_CONTENT.get(model.contentId());
-        }
+        model = model.dereference();
         return this.children().add(model, options);
+      },
+      dereference: function() {
+        return this;
       },
       editAction: null
     });
@@ -229,8 +230,8 @@
         }
         return json;
       },
-      contentId: function() {
-        return this.id;
+      dereference: function() {
+        return ALL_CONTENT.get(this.id) || this;
       },
       initialize: function() {
         var children, model,
@@ -257,6 +258,14 @@
           return this.editAction = model.editAction.bind(model);
         }
       },
+      root: function() {
+        var root;
+        root = this;
+        while (root.parent) {
+          root = root.parent;
+        }
+        return root;
+      },
       accepts: function() {
         return [BaseContent.prototype.mediaType, BookTocNode.prototype.mediaType, Folder.prototype.mediaType];
       },
@@ -264,30 +273,21 @@
         return this._children;
       },
       addChild: function(model, at) {
-        var folder, root, shortcut;
+        var children, root, shortcut;
         if (at == null) {
           at = 0;
         }
+        root = this.root();
+        children = model.children();
         if (Folder.prototype.mediaType === model.mediaType) {
-          folder = model;
           model = new BookTocNode({
-            title: folder.get('title')
-          });
-          folder.children().each(function(child) {
-            var _ref;
-            if (_ref = child.mediaType, __indexOf.call(model.accepts(), _ref) >= 0) {
-              return model.addChild(child);
-            }
+            title: model.get('title')
           });
         }
         if (BookTocNode.prototype.mediaType !== model.mediaType) {
           model = new BookTocNode({
             id: model.id
           });
-        }
-        root = this;
-        while (root.parent) {
-          root = root.parent;
         }
         if (root.descendants) {
           shortcut = root.descendants.get(model.id) || root.descendants.get(model.cid);
@@ -296,9 +296,17 @@
             model = shortcut;
           }
         }
-        return this._children.add(model, {
+        this._children.add(model, {
           at: at
         });
+        if (children) {
+          return children.each(function(child) {
+            var _ref;
+            if (_ref = child.mediaType, __indexOf.call(model.accepts(), _ref) >= 0) {
+              return model.addChild(child);
+            }
+          });
+        }
       }
     });
     BookTocNodeCollection = Backbone.Collection.extend({
@@ -406,10 +414,10 @@
           return node.set('id', newValue);
         });
         this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
-          return _this.manifest.add(ALL_CONTENT.get(navNode.contentId()));
+          return _this.manifest.add(navNode.dereference());
         });
         this.listenTo(this.navTreeRoot, 'remove:treeNode', function(navNode) {
-          return _this.manifest.remove(ALL_CONTENT.get(navNode.contentId()));
+          return _this.manifest.remove(navNode.dereference());
         });
         this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
           return _this.trigger('add:treeNode', _this);

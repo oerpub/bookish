@@ -78,14 +78,13 @@ define [
         top: 0
         left: 0
       helper: (evt) ->
-        title = model.get('title') or ''
+        title = model.get('title') or model.dereference().get('title') or ''
         shortTitle = title
         shortTitle = title.substring(0, 20) + '...' if title.length > 20
 
         # If the content is a pointer to a piece of content (`BookTocNode`)
         # then use the actual content's mediaType
-        mediaType = model.mediaType
-        mediaType = Models.ALL_CONTENT.get(model.contentId()).mediaType if model.contentId?()
+        mediaType = model.dereference().mediaType
 
         # Generate the handle div using a template
         $handle = jQuery DND_HANDLE
@@ -190,8 +189,14 @@ define [
                 model = $drag.data 'editor-model'
                 drop = $drop.data 'editor-model'
                 # Sanity-check before dropping:
+                # Dereference if this is a pointer
+                if drop.accepts().indexOf(model.mediaType) < 0
+                  model = model.dereference()
                 throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
-                drop.addChild model
+
+                # Delay the call so jQuery.droppable has time to clean up before the DOM changes
+                delay = => drop.addChild model
+                setTimeout delay, 10
 
 
     # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
@@ -673,8 +678,8 @@ define [
     editAction: -> @model.editAction()
 
     editSettings: ->
-      if @model.contentId
-        contentModel = Models.ALL_CONTENT.get @model.contentId()
+      if @model != @model.dereference()
+        contentModel = @model.dereference()
         originalTitle = contentModel?.get('title') or @model.get 'title'
         newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
         if '-' == newTitle
@@ -709,8 +714,8 @@ define [
 
       # If the content title changes and we have not overridden the title
       # rerender the node
-      if @model.contentId?()
-        contentModel = Models.ALL_CONTENT.get @model.contentId()
+      if @model != @model.dereference()
+        contentModel = @model.dereference()
         @listenTo contentModel, 'change:title', (newTitle, model, options) =>
           @render() if !@model.get 'title'
 
@@ -719,7 +724,7 @@ define [
       return {
         children: @collection?.length
         # Some rendered nodes are pointers to pieces of content. include the content.
-        content: Models.ALL_CONTENT.get(@model.contentId()).toJSON() if @model.contentId?()
+        content: @model.dereference().toJSON() if @model != @model.dereference()
         editAction: !!@model.editAction
         parent: !!@model.parent
       }

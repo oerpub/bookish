@@ -35,8 +35,13 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       options = {}
       options.at = at if at >= 0
       # By default unwrap pointers
-      model = ALL_CONTENT.get model.contentId() if model.contentId
+      model = model.dereference()
       @children().add model, options
+
+    # Some models are pointers to other models (ie `BookTocNode`).
+    # Dereference them.
+    # By default, return this.
+    dereference: -> @
 
     # `Controller` action to edit this model or `null` if it cannot be edited directly
     editAction: null
@@ -260,7 +265,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     # Return the `id` of the corresponding Content Model represented by this node.
     # This is used to "look up" the original title of content if it has not been
     # Overridden in the book.
-    contentId: -> @id
+    #
+    # If it is an `organization` node (no `id`) then just return itself.
+    dereference: -> ALL_CONTENT.get(@id) or @
 
     initialize: ->
       @on 'change', => @trigger 'change:treeNode'
@@ -286,23 +293,27 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         model = ALL_CONTENT.get(@id)
         @editAction = model.editAction.bind(model)
 
+    # Returns the root of this tree node
+    root: ->
+      root = @
+      root = root.parent while root.parent
+      root
+
     accepts: -> [ BaseContent::mediaType, BookTocNode::mediaType, Folder::mediaType ]
     children: -> @_children
     addChild: (model, at=0) ->
+      # Move up to the root and see if it's already in the tree
+      root = @root()
+      children = model.children()
+
       # If the model is a Folder create a `BookTocNode` and add all the valid children to it
       if Folder::mediaType == model.mediaType
-        folder = model
-        model = new BookTocNode {title: folder.get 'title'}
-        folder.children().each (child) ->
-          model.addChild child if child.mediaType in model.accepts()
+        model = new BookTocNode {title: model.get 'title'}
 
       # If the model is not already a `BookTocNode` then wrap it in one
       if BookTocNode::mediaType != model.mediaType
         model = new BookTocNode {id: model.id}
 
-      # Move up to the root and see if it's already in the tree
-      root = @
-      root = root.parent while root.parent
 
       # Model can be a node that points to a piece of content (has `id`) or an
       # internal node (chapter) that is just a container (has `cid`)
@@ -312,6 +323,10 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
           shortcut.parent.children().remove(shortcut)
           model = shortcut
       @_children.add model, {at:at}
+
+      # Finally, add the children (so the descendants list is populated)
+      if children
+        children.each (child) -> model.addChild child if child.mediaType in model.accepts()
 
 
   BookTocNodeCollection = Backbone.Collection.extend
@@ -446,8 +461,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
 
       # If a piece of content is linked to in the navigation document
       # always include it in the manifest
-      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add ALL_CONTENT.get(navNode.contentId())
-      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove ALL_CONTENT.get(navNode.contentId())
+      @listenTo @navTreeRoot, 'add:treeNode', (navNode) => @manifest.add navNode.dereference()
+      @listenTo @navTreeRoot, 'remove:treeNode', (navNode) => @manifest.remove navNode.dereference()
 
       # Trigger a change so `save` works
       @listenTo @navTreeRoot, 'add:treeNode',    (navNode) => @trigger 'add:treeNode', @
