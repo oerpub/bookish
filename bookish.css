@@ -53,6 +53,9 @@
 
 #layout-main-sidebar .edit { float: right; }
 
+#layout-main-sidebar nav .editor-node-body > .edit-settings { visibility: hidden; }
+#layout-main-sidebar nav .editor-node-body:hover > .edit-settings { visibility: visible; }
+
 /* Enable scrolling inside the side bar */
 #layout-main-sidebar nav {
   height: 100%;
