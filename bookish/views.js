@@ -728,8 +728,7 @@
           });
           validSelectors.push('.organization-node');
           validSelectors = validSelectors.join(',');
-          $body.addClass('editor-drop-zone editor-drop-zone-in');
-          return $body.add($body.children('.editor-drop-zone')).droppable({
+          return $body.children('.editor-drop-zone').add(_this.$el.children('.editor-drop-zone')).droppable({
             greedy: true,
             addClasses: false,
             accept: validSelectors,
