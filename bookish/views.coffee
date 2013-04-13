@@ -745,8 +745,7 @@ define [
         validSelectors.push '.organization-node'
         validSelectors = validSelectors.join ','
 
-        $body.addClass 'editor-drop-zone editor-drop-zone-in'
-        $body.add($body.children('.editor-drop-zone')).droppable
+        $body.children('.editor-drop-zone').add(@$el.children('.editor-drop-zone')).droppable
           greedy: true
           addClasses: false
           accept: validSelectors
