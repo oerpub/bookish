@@ -15,15 +15,12 @@
         },
         helper: function(evt) {
           var $handle, mediaType, shortTitle, title;
-          title = model.get('title') || '';
+          title = model.get('title') || model.dereference().get('title') || '';
           shortTitle = title;
           if (title.length > 20) {
             shortTitle = title.substring(0, 20) + '...';
           }
-          mediaType = model.mediaType;
-          if (typeof model.contentId === "function" ? model.contentId() : void 0) {
-            mediaType = Models.ALL_CONTENT.get(model.contentId()).mediaType;
-          }
+          mediaType = model.dereference().mediaType;
           $handle = jQuery(DND_HANDLE({
             id: model.id,
             mediaType: mediaType,
@@ -135,7 +132,7 @@
                   model = $drag.data('editor-model');
                   drop = $drop.data('editor-model');
                   if (drop.accepts().indexOf(model.mediaType) < 0) {
-                    model = Models.ALL_CONTENT.get(model.contentId());
+                    model = model.dereference();
                   }
                   if (drop.accepts().indexOf(model.mediaType) < 0) {
                     throw 'INVALID_DROP_MEDIA_TYPE';
@@ -660,8 +657,8 @@
       },
       editSettings: function() {
         var contentModel, newTitle, originalTitle, _ref1, _ref2;
-        if (this.model.contentId) {
-          contentModel = Models.ALL_CONTENT.get(this.model.contentId());
+        if (this.model !== this.model.dereference()) {
+          contentModel = this.model.dereference();
           originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
           newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
           if ('-' === newTitle) {
@@ -686,7 +683,7 @@
         return this.render();
       },
       initialize: function() {
-        var contentModel, _base,
+        var contentModel,
           _this = this;
         this.collection = this.model.children();
         this.listenTo(this.model, 'all', function() {
@@ -697,8 +694,8 @@
             return _this.render();
           });
         }
-        if (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) {
-          contentModel = Models.ALL_CONTENT.get(this.model.contentId());
+        if (this.model !== this.model.dereference()) {
+          contentModel = this.model.dereference();
           return this.listenTo(contentModel, 'change:title', function(newTitle, model, options) {
             if (!_this.model.get('title')) {
               return _this.render();
@@ -707,10 +704,10 @@
         }
       },
       templateHelpers: function() {
-        var _base, _ref1;
+        var _ref1;
         return {
           children: (_ref1 = this.collection) != null ? _ref1.length : void 0,
-          content: (typeof (_base = this.model).contentId === "function" ? _base.contentId() : void 0) ? Models.ALL_CONTENT.get(this.model.contentId()).toJSON() : void 0,
+          content: this.model !== this.model.dereference() ? this.model.dereference().toJSON() : void 0,
           editAction: !!this.model.editAction,
           parent: !!this.model.parent
         };
