@@ -1,4 +1,4 @@
-define 'epub-local', [ 'jquery', 'backbone', 'bookish/controller', 'bookish/models', 'epub/models', 'css!bookish' ], (jQuery, Backbone, BookishController, BookishModels, Models) ->
+define 'epub-local', [ 'jquery', 'backbone', 'bookish/controller', 'bookish/models', 'epub/models' ], (jQuery, Backbone, BookishController, BookishModels, Models) ->
 
   # # Application Code
 

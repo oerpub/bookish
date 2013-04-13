@@ -7,7 +7,6 @@ define [
   'epub/models'
   'bookish/auth'
   'gh-book/views'
-  'css!bookish'
 ], (_, Backbone, MEDIA_TYPES, Controller, AtcModels, EpubModels, Auth, Views) ->
 
   DEBUG = true

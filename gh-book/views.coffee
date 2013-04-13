@@ -9,7 +9,6 @@ define [
   'bookish/views'
   'hbs!gh-book/sign-in-out'
   'hbs!gh-book/fork-book-item'
-  'css!bookish'
 ], (_, Backbone, Marionette, Controller, AtcModels, EpubModels, Auth, Views, SIGN_IN_OUT, FORK_BOOK_ITEM) ->
 
 
