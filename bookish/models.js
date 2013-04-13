@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], function(exports, jQuery, Backbone, MEDIA_TYPES, __) {
-    var ALL_CONTENT, AllContent, Backbone_Model_toJSON, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection, Folder, WorkspaceTree;
+    var ALL_CONTENT, AllContent, BaseBook, BaseContent, BaseModel, BookTocNode, BookTocNodeCollection, BookTocTree, CONTENT_COMPARATOR, Deferrable, DeferrableCollection, FilteredCollection, Folder, WorkspaceTree;
     BaseModel = Backbone.Model.extend({
       isNew: function() {
         return !this.id || this.id.match(/^_NEW:/);
@@ -219,12 +219,11 @@
         language: ((typeof navigator !== "undefined" && navigator !== null ? navigator.userLanguage : void 0) || (typeof navigator !== "undefined" && navigator !== null ? navigator.language : void 0) || 'en').toLowerCase()
       }
     });
-    Backbone_Model_toJSON = Backbone.Model.prototype.toJSON;
     BookTocNode = BaseModel.extend({
       mediaType: 'application/vnd.org.cnx.container',
       toJSON: function() {
         var json;
-        json = Backbone_Model_toJSON.apply(this);
+        json = BaseModel.prototype.toJSON.apply(this);
         if (this._children.length) {
           json.children = this._children.toJSON();
         }

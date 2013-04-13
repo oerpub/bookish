@@ -721,13 +721,19 @@
         this.$el.attr('data-media-type', this.model.mediaType);
         $body = this.$el.children('.editor-node-body');
         return Aloha.ready(function() {
-          var validSelectors;
-          _EnableContentDragging(_this.model, $body.children('.organization-node,*[data-media-type]'));
+          var expandNode, expandTimeout, validSelectors;
+          _EnableContentDragging(_this.model, $body.children('*[data-media-type]'));
           validSelectors = _.map(_this.model.accepts(), function(mediaType) {
             return "*[data-media-type=\"" + mediaType + "\"]";
           });
-          validSelectors.push('.organization-node');
           validSelectors = validSelectors.join(',');
+          expandTimeout = null;
+          expandNode = function() {
+            var _ref1;
+            if (((_ref1 = _this.collection) != null ? _ref1.length : void 0) > 0) {
+              return _this.toggleExpanded(true);
+            }
+          };
           return $body.children('.editor-drop-zone').add(_this.$el.children('.editor-drop-zone')).droppable({
             greedy: true,
             addClasses: false,

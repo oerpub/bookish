@@ -230,9 +230,6 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # Default language for new content is the browser's language
       language: (navigator?.userLanguage or navigator?.language or 'en').toLowerCase()
 
-  # Used below to create JSON representation of model
-  Backbone_Model_toJSON = Backbone.Model::toJSON
-
 
   # Book ToC Tree Model
   # =======
@@ -256,7 +253,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     mediaType: 'application/vnd.org.cnx.container'
     # Recursively include child nodes in the returned JSON
     toJSON: ->
-      json = Backbone_Model_toJSON.apply(@)
+      json = BaseModel::toJSON.apply(@)
       json.children = @_children.toJSON() if @_children.length
       json
 
