@@ -43,6 +43,8 @@ define [
   'select2'
   # Include CSS icons used by the toolbar
   'css!font-awesome'
+  # Include the main CSS file
+  'less!bookish'
 ], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
 
 

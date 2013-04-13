@@ -18,7 +18,6 @@ define [
   'aloha'
   'bookish/auth'
   'bookish/controller'
-  'css!bookish'
 ], (jQuery, _, Backbone, Marionette, Aloha, Auth, Controller) ->
 
   # Application Code
