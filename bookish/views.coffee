@@ -739,11 +739,13 @@ define [
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        _EnableContentDragging(@model, $body.children '.organization-node,*[data-media-type]')
+        _EnableContentDragging(@model, $body.children '*[data-media-type]')
 
         validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
-        validSelectors.push '.organization-node'
         validSelectors = validSelectors.join ','
+
+        expandTimeout = null
+        expandNode = => @toggleExpanded(true) if @collection?.length > 0
 
         $body.children('.editor-drop-zone').add(@$el.children('.editor-drop-zone')).droppable
           greedy: true
@@ -751,6 +753,11 @@ define [
           accept: validSelectors
           activeClass: 'editor-drop-zone-active'
           hoverClass: 'editor-drop-zone-hover'
+          # If hovering over a node that has children but is not expanded
+          # Expand after a period of time.
+          # over: => expandTimeout = setTimeout(expandNode, DELAY_BEFORE_SAVING)
+          # out: => clearTimeout expandTimeout
+
           drop: (evt, ui) =>
             # Possible drop cases:
             #
@@ -763,9 +770,6 @@ define [
 
             # Perform all of these DOM cleanup events once jQueryUI is finished with its events
             delay = =>
-
-              # If $drag is not a `li.organization-node` then it has a `*[data-media-type]`
-              # and should be converted to a link inside an `li`
 
               drag = $drag.data('editor-model')
 
