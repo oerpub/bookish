@@ -94,7 +94,7 @@ define [
     obj
 
   Models_Folder_initialize = Models.Folder::initialize
-  Models.Folder::initialize = (obj) ->
+  Models.Folder::initialize = (obj={}) ->
     Models_Folder_initialize.apply(@, arguments)
 
     for item in obj.body or []

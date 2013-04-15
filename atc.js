@@ -93,6 +93,9 @@
     Models.Folder.prototype.initialize = function(obj) {
       var Type, item, model, _i, _len, _ref,
         _this = this;
+      if (obj == null) {
+        obj = {};
+      }
       Models_Folder_initialize.apply(this, arguments);
       _ref = obj.body || [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
