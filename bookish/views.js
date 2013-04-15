@@ -647,13 +647,37 @@
     BookEditNodeView = Marionette.CompositeView.extend({
       template: BOOK_EDIT_NODE,
       tagName: 'li',
+      itemViewContainer: '> ol',
       events: {
+        'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded',
+        'click > .editor-node-body > .no-edit-action': 'toggleExpanded',
         'click > .editor-node-body > .edit-action': 'editAction',
-        'click > .editor-node-body > .edit-settings': 'editSettings',
-        'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
+        'click > .editor-node-body > .edit-settings': 'editSettings'
+      },
+      isExpanded: false,
+      hasRendered: false,
+      toggleExpanded: function() {
+        return this.expand(!this.isExpanded);
+      },
+      expand: function(isExpanded) {
+        this.isExpanded = isExpanded;
+        this.$el.toggleClass('editor-node-expanded', this.isExpanded);
+        if (this.isExpanded && !this.hasRendered) {
+          return this.render();
+        }
+      },
+      _renderChildren: function() {
+        if (this.isRendered) {
+          if (this.isExpanded) {
+            Marionette.CollectionView.prototype._renderChildren.call(this);
+            this.triggerMethod('composite:collection:rendered');
+          }
+          return this.hasRendered = this.isExpanded;
+        }
       },
       editAction: function() {
-        return this.model.editAction();
+        this.model.editAction();
+        return this.expand(true);
       },
       editSettings: function() {
         var contentModel, newTitle, originalTitle, _ref1, _ref2;
@@ -676,22 +700,54 @@
           }
         }
       },
-      toggleExpanded: function() {
-        this.model.set('expanded', !this.model.get('expanded'), {
-          silent: true
-        });
-        return this.render();
-      },
       initialize: function() {
         var contentModel,
           _this = this;
         this.collection = this.model.children();
-        this.listenTo(this.model, 'all', function() {
-          return _this.render();
+        this.listenTo(this.model, 'all', function(name, model, collection, options) {
+          if (model !== _this.model) {
+            return;
+          }
+          switch (name) {
+            case 'change':
+              break;
+            case 'change:title':
+              return _this.render();
+            case 'change:treeNode':
+              break;
+          }
         });
         if (this.collection) {
-          this.listenTo(this.collection, 'all', function() {
+          this.listenTo(this.collection, 'add', function() {
+            if (_this.collection.length === 1) {
+              _this.render();
+              return _this.expand(true);
+            }
+          });
+          this.listenTo(this.collection, 'remove', function() {
+            if (_this.collection.length === 0) {
+              return _this.render();
+            }
+          });
+          this.listenTo(this.collection, 'reset', function() {
             return _this.render();
+          });
+          this.listenTo(this.collection, 'all', function(name, model, collection, options) {
+            if (options == null) {
+              options = collection;
+            }
+            switch (name) {
+              case 'change':
+                break;
+              case 'change:title':
+                break;
+              case 'change:treeNode':
+                break;
+              default:
+                if (_this.model === options.parent) {
+                  return _this.render();
+                }
+            }
           });
         }
         if (this.model !== this.model.dereference()) {
@@ -711,12 +767,6 @@
           editAction: !!this.model.editAction,
           parent: !!this.model.parent
         };
-      },
-      _renderChildren: function() {
-        if (this.isRendered && this.model.get('expanded')) {
-          Marionette.CollectionView.prototype._renderChildren.call(this);
-          return this.triggerMethod('composite:collection:rendered');
-        }
       },
       onRender: function() {
         var $body,
@@ -776,8 +826,15 @@
           });
         });
       },
-      appendHtml: function(cv, iv) {
-        return cv.$('ol:first').append(iv.el);
+      appendHtml: function(cv, iv, index) {
+        var $container, $prevChild;
+        $container = this.getItemViewContainer(cv);
+        $prevChild = $container.children().eq(index);
+        if ($prevChild[0]) {
+          return iv.$el.insertBefore($prevChild);
+        } else {
+          return $container.append(iv.el);
+        }
       }
     });
     exports.BookEditView = Marionette.CompositeView.extend({

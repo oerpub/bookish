@@ -4,11 +4,7 @@
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
 {{#if children}}
-  {{#if expanded}}
-    <span class="editor-expand-collapse" title="Click to collapse"><i class="icon-caret-down"></i></span>
-  {{else}}
-    <span class="editor-expand-collapse" title="Click to expand"><i class="icon-caret-right"></i></span>
-  {{/if}}
+  <span class="editor-expand-collapse" title="Click to expand/collapse"><i class="icon-content"></i></span>
 {{/if}}
 
 <button class="btn btn-mini pull-right edit-settings" title="Advanced Settings"><i class="icon-pencil"></i></button>
@@ -26,7 +22,7 @@
     {{/if}}
   </span>
 {{else}}
-  <span data-media-type="{{mediaType}}" data-content-title="{{title}}" class="editor-expand-collapse editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
+  <span data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
     <span class="editor-node-title">{{title}}</span>
   </span>
 {{/if}}
@@ -42,10 +38,8 @@
   <div class="editor-node-after"></div>
 {{/if}}
 
-{{#if children}}
-  <ol>
-  </ol>
-{{/if}}
+{{! Always include the list because a node _may_ get children later}}
+<ol></ol>
 
 {{#if parent}}
   {{#if children}}

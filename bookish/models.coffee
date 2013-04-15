@@ -2,7 +2,6 @@
 # This module contains backbone models used throughout the application
 define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
 
-
   # Custom Models defined above are mixed in using `BaseContent.initialize`
   BaseModel = Backbone.Model.extend
     # New content is given an id before it is saved so it can be added to a book.
@@ -32,7 +31,9 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     children: -> null
     # Adds a child assuming it's mediaType is in `.accepts()`
     addChild: (model, at=null) ->
-      options = {}
+      # Set the `parent` in the options so we can rerender the parent in the view
+      # (for lazy redrawing)
+      options = {parent: @}
       options.at = at if at >= 0
       # By default unwrap pointers
       model = model.dereference()
@@ -320,9 +321,26 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       if root.descendants
         shortcut = root.descendants.get(model.id) or root.descendants.get(model.cid)
         if shortcut
+          # If `model` is already in `parent.children()` then we are reordering.
+          # By removing the model, we need to adjust the index where it will be
+          # added.
+          if @ == shortcut.parent
+            if @children().indexOf(shortcut) < at
+              at = at - 1
           shortcut.parent.children().remove(shortcut)
           model = shortcut
-      @_children.add model, {at:at}
+        else
+          # The model belongs to a different book/folder so clone it.
+          # Since children will be added later, don't use the full `.toJSON()`.
+          json = model.toJSON()
+          delete json.children
+
+          model = new BookTocNode json
+      # Set the `parent` in the options so we can rerender the parent in the view
+      # (for lazy redrawing)
+      options = {parent: @}
+      options.at = at if at >= 0
+      @_children.add model, options
 
       # Finally, add the children (so the descendants list is populated)
       if children
