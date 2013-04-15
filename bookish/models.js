@@ -38,7 +38,9 @@
         if (at == null) {
           at = null;
         }
-        options = {};
+        options = {
+          parent: this
+        };
         if (at >= 0) {
           options.at = at;
         }
@@ -273,7 +275,7 @@
         return this._children;
       },
       addChild: function(model, at) {
-        var children, root, shortcut;
+        var children, json, options, root, shortcut;
         if (at == null) {
           at = 0;
         }
@@ -292,13 +294,26 @@
         if (root.descendants) {
           shortcut = root.descendants.get(model.id) || root.descendants.get(model.cid);
           if (shortcut) {
+            if (this === shortcut.parent) {
+              if (this.children().indexOf(shortcut) < at) {
+                at = at - 1;
+              }
+            }
             shortcut.parent.children().remove(shortcut);
             model = shortcut;
+          } else {
+            json = model.toJSON();
+            delete json.children;
+            model = new BookTocNode(json);
           }
         }
-        this._children.add(model, {
-          at: at
-        });
+        options = {
+          parent: this
+        };
+        if (at >= 0) {
+          options.at = at;
+        }
+        this._children.add(model, options);
         if (children) {
           return children.each(function(child) {
             var _ref;

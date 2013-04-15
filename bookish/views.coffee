@@ -667,15 +667,74 @@ define [
   BookEditNodeView = Marionette.CompositeView.extend
     template: BOOK_EDIT_NODE
     tagName: 'li'
+    itemViewContainer: '> ol'
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
+      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
+      'click > .editor-node-body > .no-edit-action': 'toggleExpanded'
       'click > .editor-node-body > .edit-action': 'editAction'
       'click > .editor-node-body > .edit-settings': 'editSettings'
-      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
 
-    editAction: -> @model.editAction()
+    # Toggle expanded/collapsed in the View
+    # -------
+    #
+    # The first time a node is rendered it is collapsed so we lazily load the
+    # `ItemView` children.
+    #
+    # Initially, the node is collapsed and the following occurs:
+    #
+    # 1. `@render()` calls `@_renderChildren()`
+    # 2. Since `@isExpanded == false` the children are not rendered
+    #
+    # When the node is expanded:
+    #
+    # 1. `@isExpanded` is set to `true`
+    # 2. `@render()` is called and calls `@_renderChildren()`
+    # 3. Since `@isExpanded == true` the children are rendered and attached to the DOM
+    # 4. `@hasRendered` is set to `true` so we know not to generate the children again
+    #
+    #
+    # When an expanded node is collapsed:
+    #
+    # 1. `@isExpanded` is set to `false`
+    # 2. A CSS class is set on the `<li>` item to hide children
+    # 3. CSS rules hide the children and change the expand/collapse icon
+    #
+    # When a node that was expanded and collapsed is re-expanded:
+    #
+    # 1. `@isExpanded` is set to `true`
+    # 2. Since `@hasRendered == true` there is no need to call `@render()`
+    # 3. The CSS class is removed to show the children again
+
+    isExpanded: false
+    hasRendered: false
+
+    # Called from UI when user clicks the collapse/expando buttons
+    toggleExpanded: -> @expand !@isExpanded
+
+    # Pass in `false` to collapse
+    expand: (@isExpanded) ->
+      @$el.toggleClass 'editor-node-expanded', @isExpanded
+      # (re)render the model and children if the node is expanded
+      # and has not been rendered yet.
+      if @isExpanded and !@hasRendered
+        @render()
+
+    # From `Marionette.CompositeView`.
+    # Added check to only render when the model `@isExpanded`
+    _renderChildren: ->
+      if @isRendered
+        if @isExpanded
+          Marionette.CollectionView.prototype._renderChildren.call(@)
+          this.triggerMethod('composite:collection:rendered')
+        # Remember that the children have been rendered already
+        @hasRendered = @isExpanded
+
+
+    # Perform the edit action and then expand the node to show children.
+    editAction: -> @model.editAction(); @expand(true)
 
     editSettings: ->
       if @model != @model.dereference()
@@ -694,23 +753,43 @@ define [
         @model.set 'title', newTitle if newTitle
 
 
-
-    toggleExpanded: ->
-      # Set the expanded state silently so we don't regenerate the `navTreeStr`
-      # (since the model changed)
-      @model.set 'expanded', !@model.get('expanded'), {silent:true}
-      @render()
-
-
     initialize: ->
       # grab the child collection from the parent model
       # so that we can render the collection as children
       # of this parent node
       @collection = @model.children()
 
-      @listenTo @model,      'all', => @render()
+      @listenTo @model, 'all', (name, model, collection, options) =>
+        return if model != @model
+        # Reduce the number of re-renderings that occur by filtering on the
+        # type of event.
+        # **FIXME:** Just listen to the relevant events
+        switch name
+          when 'change' then return
+          when 'change:title' then @render()
+          when 'change:treeNode' then return
+          else return
+
       if @collection
-        @listenTo @collection, 'all', => @render()
+        # If the children drop to/from 0 rerender so the (+)/(-) expandos are visible
+        @listenTo @collection, 'add',    =>
+          if @collection.length == 1
+            @render()
+            @expand(true)
+        @listenTo @collection, 'remove', =>
+          if @collection.length == 0
+            @render()
+        @listenTo @collection, 'reset',  => @render()
+
+        @listenTo @collection, 'all', (name, model, collection, options=collection) =>
+          # Reduce the number of re-renderings that occur by filtering on the
+          # type of event.
+          # **FIXME:** Just listen to the relevant events
+          switch name
+            when 'change' then return
+            when 'change:title' then return
+            when 'change:treeNode' then return
+            else @render() if @model == options.parent
 
       # If the content title changes and we have not overridden the title
       # rerender the node
@@ -728,14 +807,6 @@ define [
         editAction: !!@model.editAction
         parent: !!@model.parent
       }
-
-
-    # From `Marionette.CompositeView`.
-    # Added check to only render when model is `expanded`
-    _renderChildren: ->
-      if @isRendered and @model.get('expanded')
-        Marionette.CollectionView.prototype._renderChildren.call(@)
-        this.triggerMethod('composite:collection:rendered')
 
 
     onRender: ->
@@ -801,7 +872,13 @@ define [
 
             setTimeout delay, 100
 
-    appendHtml: (cv, iv) -> cv.$('ol:first').append(iv.el)
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
 
 
   # Use this to generate HTML with extra divs for Drag-and-Drop zones.
