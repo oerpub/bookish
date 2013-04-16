@@ -219,11 +219,6 @@ define [
     itemViewContainer: 'tbody'
     itemView: exports.SearchResultsItemView
 
-    initialize: ->
-      @listenTo @collection, 'reset',   => @render()
-      @listenTo @collection, 'add',     => @render()
-      @listenTo @collection, 'remove',  => @render()
-
   # The search box. Changing the text will cause the underlying collection to filter
   # and fire off `add/remove` events.
   exports.SearchBoxView = Marionette.ItemView.extend
@@ -774,7 +769,6 @@ define [
         # If the children drop to/from 0 rerender so the (+)/(-) expandos are visible
         @listenTo @collection, 'add',    =>
           if @collection.length == 1
-            @render()
             @expand(true)
         @listenTo @collection, 'remove', =>
           if @collection.length == 0

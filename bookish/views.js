@@ -163,19 +163,7 @@
     exports.SearchResultsView = Marionette.CompositeView.extend({
       template: SEARCH_RESULT,
       itemViewContainer: 'tbody',
-      itemView: exports.SearchResultsItemView,
-      initialize: function() {
-        var _this = this;
-        this.listenTo(this.collection, 'reset', function() {
-          return _this.render();
-        });
-        this.listenTo(this.collection, 'add', function() {
-          return _this.render();
-        });
-        return this.listenTo(this.collection, 'remove', function() {
-          return _this.render();
-        });
-      }
+      itemView: exports.SearchResultsItemView
     });
     exports.SearchBoxView = Marionette.ItemView.extend({
       template: SEARCH_BOX,
@@ -720,7 +708,6 @@
         if (this.collection) {
           this.listenTo(this.collection, 'add', function() {
             if (_this.collection.length === 1) {
-              _this.render();
               return _this.expand(true);
             }
           });
