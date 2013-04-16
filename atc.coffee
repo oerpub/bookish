@@ -39,7 +39,8 @@ define [
     oldBaseBook_initialize.apply(@, arguments)
 
     # When the body of the collection changes, update the `navTreeRoot`
-    @on 'change:body', (model, body) =>
+    @on 'change:body', (model, body, options) =>
+      return if options?.doNotReparse
       # Older implementations of the server returned the `body`
       # as an array of characters instead of a string.
       # If that happens, concat them into a string.
@@ -58,8 +59,8 @@ define [
 
     # When the `navTreeRoot` is changed on the package,
     # Change it in the book body
-    @on 'change:treeNode add:treeNode remove:treeNode', =>
-      @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}
+    @navTreeRoot.on 'all', => @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}, {doNotReparse:true}
+    @navTreeRoot.descendants.on 'all', => @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}, {doNotReparse:true}
 
 
   # HACK: to always get an authenticated user

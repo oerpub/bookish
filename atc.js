@@ -24,8 +24,11 @@
     Models.BaseBook.prototype.initialize = function() {
       var _this = this;
       oldBaseBook_initialize.apply(this, arguments);
-      this.on('change:body', function(model, body) {
+      this.on('change:body', function(model, body, options) {
         var $body, $root, navTree;
+        if (options != null ? options.doNotReparse : void 0) {
+          return;
+        }
         if (body instanceof Array) {
           return model.set('body', body.join(''));
         }
@@ -40,9 +43,18 @@
           return _this.navTreeRoot.reset(navTree.children);
         }
       });
-      return this.on('change:treeNode add:treeNode remove:treeNode', function() {
+      this.navTreeRoot.on('all', function() {
         return _this.set({
           body: NAV_SERIALIZE(_this.navTreeRoot.toJSON())
+        }, {
+          doNotReparse: true
+        });
+      });
+      return this.navTreeRoot.descendants.on('all', function() {
+        return _this.set({
+          body: NAV_SERIALIZE(_this.navTreeRoot.toJSON())
+        }, {
+          doNotReparse: true
         });
       });
     };
