@@ -1,4 +1,5 @@
-# # Page Controllers
+# Page Controllers
+# =======
 #
 # This module sets up page regions (ie header, footer, sidebar, etc),
 # route listeners, and updates the URL and DOM with the correct views
@@ -31,19 +32,23 @@ define [
     onShow: ->  @$el.removeClass 'hidden'
     onClose: -> @ensureEl(); @$el.addClass 'hidden'
 
-  # ## Layouts
+  # Layouts
+  # =======
   # The `MainLayout` contains all areas of the page that do not change
   MainLayout = Marionette.Layout.extend
     template: LAYOUT_MAIN
-    regionType: HidingRegion
     regions:
       home:         '#layout-main-home'
+      add:          '#layout-main-add'
       toolbar:      '#layout-main-toolbar'
       auth:         '#layout-main-auth'
+      # The sidebar and main area will get a 'hidden' class when hiding
+      # so CSS transitions can be applied.
       sidebar:      '#layout-main-sidebar'
-      area:         '#layout-main-area'
+      area:         {selector: '#layout-main-area', regionType: HidingRegion}
   mainLayout = new MainLayout()
   # Keep the regions so views can just update the regions they need
+  mainAdd = mainLayout.add
   mainToolbar = mainLayout.toolbar
   mainSidebar = mainLayout.sidebar
   mainArea = mainLayout.area
@@ -61,7 +66,8 @@ define [
   contentLayout = new ContentLayout()
 
 
-  # ## Main Controller
+  # Main Controller
+  # =======
   # Changes all the regions on the page to begin editing a new/existing
   # piece of content.
   #
@@ -83,7 +89,6 @@ define [
 
 
       # Hide the regions if they are not being used
-      mainSidebar.onClose()
       mainArea.onClose()
       # Start URL Routing if it has not already started
       Backbone.history.start() if not Backbone.History.started
@@ -95,31 +100,39 @@ define [
     # Give others access to the main layout so they can change pieces of it
     mainLayout: mainLayout
 
-    hideSidebar: -> mainSidebar.close()
-
-    # ### Show Workspace
+    # Show Workspace
+    # -------
     # Shows the workspace listing and updates the URL
     workspace: ->
       # Always scroll to the top of the page
       window.scrollTo(0, 0)
 
-      mainSidebar.close()
       mainToolbar.close()
-      # List the workspace
+      # List the workspace.
       workspace = new Models.FilteredCollection null, {collection: Models.WORKSPACE}
 
+      # Allow filtering the workspace by searching in the `SearchBoxView`
       view = new Views.SearchBoxView {model: workspace}
       mainToolbar.show view
 
       view = new Views.SearchResultsView {collection: workspace}
       mainArea.show view
 
-      # Update the URL
-      Models.WORKSPACE.loaded().done =>
-        # Update the URL
-        Backbone.history.navigate 'workspace'
+      # Add the "Add" button
+      mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
 
-    # ### Edit existing content
+      workspaceTree = new Models.WorkspaceTree()
+      view = new Views.BookEditView {model: workspaceTree}
+      mainSidebar.show view
+
+      # Update the URL when the workspace is fetched and loaded
+      Models.WORKSPACE.loaded().done =>
+        workspaceTree.loaded().done =>
+          # Update the URL
+          Backbone.history.navigate 'workspace'
+
+    # Edit existing content
+    # -------
     # Calling this method directly will start editing an existing piece of content
     # and will update the URL.
     editModelId: (id) ->
@@ -135,9 +148,7 @@ define [
     # Dispatches based on the contents' `mediaType`
     editModel: (model) ->
       throw 'BUG: model.mediaType does not exist' if not model.mediaType
-      editAction = MEDIA_TYPES.get(model.mediaType).editAction
-      throw 'BUG: no way to edit this model' if not editAction
-      editAction(model)
+      model.editAction()
 
     # Edit a book in the main area
     editBook: (model) ->
@@ -146,17 +157,13 @@ define [
 
       mainToolbar.close()
 
-      view = new Views.BookEditView {model: model}
-
-      # Wait until the book is loaded
-      model.loaded().done => mainSidebar.show view
-
     # Edit a piece of HTML content
     editContent: (content) ->
       # Always scroll to the top of the page
       window.scrollTo(0, 0)
 
-      # ## Bind Metadata Dialogs
+      # Bind Metadata Dialogs
+      # -------
       mainArea.show contentLayout
 
       # Load the various views:
@@ -198,7 +205,8 @@ define [
         # Update the URL
         Backbone.history.navigate "content/#{content.get 'id'}"
 
-  # ## Bind Routes
+  # Bind Routes
+  # =======
   ContentRouter = Marionette.AppRouter.extend
     controller: mainController
     appRoutes:
@@ -206,9 +214,15 @@ define [
       'workspace':    'workspace'
       'content/:id':  'editModelId' # Edit an existing piece of content
 
-  # ## Attach mediaType edit views
-  MEDIA_TYPES.add 'application/vnd.org.cnx.module',     {editAction: (model) -> mainController.editContent model}
-  MEDIA_TYPES.add 'application/vnd.org.cnx.collection', {editAction: (model) -> mainController.editBook model}
+  # Attach mediaType edit views
+  # -------
+  # Add the 2 basic Media Types already defined in `Models`.
+  Models.BaseContent::editAction = -> mainController.editContent @
+  Models.BaseBook::editAction = -> mainController.editBook @
+
+  MEDIA_TYPES.add Models.BaseContent
+  MEDIA_TYPES.add Models.BaseBook
+  MEDIA_TYPES.add Models.Folder
 
 
   # Start listening to URL changes

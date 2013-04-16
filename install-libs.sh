@@ -59,5 +59,8 @@ if [ -d "bootstrap" ]; then
 else
   echo "---- Downloading bootstrap"
   curl --location -o ${TEMP} http://twitter.github.com/bootstrap/assets/bootstrap.zip && unzip ${TEMP} && rm ${TEMP}
+  # Remove the glyphicons since we are using FontAwesome icons
+  rm bootstrap/img/glyphicons-halflings-white.png
+  rm bootstrap/img/glyphicons-halflings.png
 fi
 

@@ -1,3 +1,8 @@
+# Authoring Tools
+# =======
+# This file attaches all the sync hooks necessary to make the `bookish` editor
+# read/write to the Connexions repository.
+#
 define [
   'underscore'
   'backbone'
@@ -11,6 +16,7 @@ define [
   'css!bookish'
 ], (_, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
+  # **FIXME:** This variable is no longer used
   DEBUG = true
 
 
@@ -27,97 +33,100 @@ define [
   Models.BaseBook::url = -> "#{ROOT_URL}/collection/#{@id}"
 
 
-  # When the `navTreeStr` changes, update the body with HTML
+  # When the `navTreeRoot` changes, update the body with HTML
   oldBaseBook_initialize = Models.BaseBook::initialize
   Models.BaseBook::initialize = ->
     oldBaseBook_initialize.apply(@, arguments)
 
-    # When the body of the collection changes, update the `navTreeStr`
+    # When the body of the collection changes, update the `navTreeRoot`
     @on 'change:body', (model, body) =>
+      # Older implementations of the server returned the `body`
+      # as an array of characters instead of a string.
+      # If that happens, concat them into a string.
+      if body instanceof Array
+        return model.set 'body', body.join('')
       $body = jQuery(body)
-      $root = $body.find('ul').first()
+      # Pull out the `<nav>` element (which contains a `<ol>`)
+      # representing the structure of a book.
+      if $body.is 'nav'
+        $root = $body
+      else
+        $root = $body.find('nav').first()
       if $root[0]
         navTree = @parseNavTree($root)
-        @set 'navTreeStr', JSON.stringify navTree
+        @navTreeRoot.reset navTree.children
 
-    # When the `navTreeStr` is changed on the package,
+    # When the `navTreeRoot` is changed on the package,
     # Change it in the book body
-    @on 'change:navTreeStr', (model, navTreeStr) =>
-      @set {body: NAV_SERIALIZE JSON.parse navTreeStr}
+    @on 'change:treeNode add:treeNode remove:treeNode', =>
+      @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}
 
 
   # HACK: to always get an authenticated user
-  # Originally from `Backbone.sync`.
-  # Added the request header
+  # by adding a request header
   Backbone.ajax = (config) ->
-    config = _.extend config, {headers: {'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'}}
+    config = _.extend config,
+      headers:
+        'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'
     Backbone.$.ajax.apply(Backbone.$, [config])
 
 
   # A folder contains a title and a collection of items in the folder
-  Folder = Models.Deferrable.extend
-    mediaType: 'application/vnd.org.cnx.folder'
-    url: -> "#{ROOT_URL}/folder/#{@id}"
-    parse: (obj) ->
-      models = for item in obj.body or []
-        Type = MEDIA_TYPES.get(item.mediaType).constructor
-        model = new Type(item)
-        model
-      @collection.reset(models)
+  Models.Folder::url = -> "#{ROOT_URL}/folder/#{@id}"
+  Models.Folder::parse = (obj) ->
+    models = []
+    _.each obj.body, (item) ->
+      # **FIXME:** This is a HACK. Folder.body should contain an array
+      # of `{id: , mediaType: , title: }` at the very least
+      if 'string' == typeof item
+        hackType = item.split(':')[0]
+        mediaType = switch hackType
+          when 'cnxmodule' then 'application/vnd.org.cnx.module'
+          when 'cnxcollection' then 'application/vnd.org.cnx.collection'
+          else throw 'BUG:TYPE_NOT_FOUND'
+        item = {id: item, mediaType: mediaType, title: 'FOLDER_HACK_TITLE'}
 
-      delete obj.body
-      obj
-    initialize: (obj) ->
-      @collection = new Backbone.Collection()
-      for item in obj.body or []
-        Type = MEDIA_TYPES.get(item.mediaType).constructor
-        model = new Type(item)
-        @collection.add model
+      model = Models.ALL_CONTENT.get item.id
+      models.push model if model
+    @contents.reset(models)
 
-  MEDIA_TYPES.add 'application/vnd.org.cnx.folder',
-    constructor: Folder
-    # ### Show Folder
-    # Shows a single folder in the workspace
-    editAction: (model) ->
-      # Always scroll to the top of the page
-      window.scrollTo(0, 0)
+    delete obj.body
+    obj
 
-      mainSidebar = Controller.mainLayout.sidebar
-      mainToolbar = Controller.mainLayout.toolbar
-      mainArea = Controller.mainLayout.area
+  Models_Folder_initialize = Models.Folder::initialize
+  Models.Folder::initialize = (obj) ->
+    Models_Folder_initialize.apply(@, arguments)
 
-      mainSidebar.close()
-      mainToolbar.close()
-      # List the workspace
-      workspace = new Models.FilteredCollection null, {collection: model.collection}
+    for item in obj.body or []
+      Type = MEDIA_TYPES.get(item.mediaType)
+      model = new Type(item)
+      @contents.add model
 
-      view = new Views.SearchBoxView {model: workspace}
-      mainToolbar.show view
-
-      view = new Views.SearchResultsView {collection: workspace}
-      mainArea.show view
-
-      # Update the URL
-      model.loaded().done =>
-        # Update the URL
-        Backbone.history.navigate "content/#{model.get 'id'}"
-
+    # Events on the collection "bubble up" as a change event so
+    # "Save" knows this item is "dirty"
+    @contents.on 'all', =>
+      args = _.toArray arguments
+      json = []
+      @contents.each (item) -> json.push item.id
+      @set 'body', json
 
 
   AtcWorkspace = Models.DeferrableCollection.extend
     url: WORKSPACE_URL
     # Workspace comes in with the following format:
+    #
     #     [
     #       {mediaType: 'application/vnd.org.cnx.folder', id: 'cnxfolder:123', title: 'Some Title', ...} ...],
     #       {mediaType: 'application/vnd.org.cnx.module', id: 'cnxmodule:123', title: 'Some Title', ...} ...],
     #       {mediaType: 'application/vnd.org.cnx.collection', id: 'cnxcollection:123', title: 'Some Title', ...} ...],
     #     ]
     #
-    # Convert that to something sane.
+    # Convert that to models (if they are not already loaded).
     parse: (results) ->
       # Rewrite the `mediaType` so it matches what the bookish editor expects.
       results = for item in results
-        ContentType = MEDIA_TYPES.get(item.mediaType).constructor
+        # **FIXME:** Only instantiate the Model if it does not already exist in `Models.ALL_CONTENT`
+        ContentType = MEDIA_TYPES.get(item.mediaType)
         model = new ContentType(item)
         model
 
@@ -125,17 +134,19 @@ define [
 
     # If new content is created/loaded, add it to the workspace
     initialize: ->
+      # If the workspace is updated make sure `Models.ALL_CONTENT` has the new content
       @on 'add', (model) => Models.ALL_CONTENT.add model
       @on 'reset', (collection) => Models.ALL_CONTENT.add @models
 
+      # If a model is added to `Models.ALL_CONTENT` ensure it shows up in the workspace
       @listenTo Models.ALL_CONTENT, 'add', (model) =>
         @add model
 
-
+  # Replace the default workspace (`Models.ALL_CONTENT`) with this workspace.
   Models.WORKSPACE = new AtcWorkspace()
 
   resetDesktop = ->
-    # Clear out all the content and reset `EPUB_CONTAINER` so it is always fetched
+    # Clear out all the content and refetch the workspace
     Models.ALL_CONTENT.reset()
     Models.WORKSPACE.fetch()
 
@@ -146,7 +157,7 @@ define [
     Backbone.history.navigate('workspace')
 
 
-  # Clear everything and refetch when the
+  # Refetch the workspace when the user Signs In/Out.
   STORED_KEYS = ['username', 'password']
   Auth.on 'change', () =>
     if not _.isEmpty(_.pick Auth.changed, STORED_KEYS)

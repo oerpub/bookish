@@ -2,7 +2,7 @@
 (function() {
 
   define(['underscore', 'backbone', 'jquery', 'bookish/controller', 'bookish/models', 'bookish/views', 'bookish/media-types', 'bookish/auth', 'hbs!atc-nav-serialize', 'css!bookish'], function(_, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) {
-    var AtcWorkspace, DEBUG, Folder, ROOT_URL, STORED_KEYS, WORKSPACE_URL, oldBaseBook_initialize, resetDesktop,
+    var AtcWorkspace, DEBUG, Models_Folder_initialize, ROOT_URL, STORED_KEYS, WORKSPACE_URL, oldBaseBook_initialize, resetDesktop,
       _this = this;
     DEBUG = true;
     ROOT_URL = '';
@@ -26,16 +26,23 @@
       oldBaseBook_initialize.apply(this, arguments);
       this.on('change:body', function(model, body) {
         var $body, $root, navTree;
+        if (body instanceof Array) {
+          return model.set('body', body.join(''));
+        }
         $body = jQuery(body);
-        $root = $body.find('ul').first();
+        if ($body.is('nav')) {
+          $root = $body;
+        } else {
+          $root = $body.find('nav').first();
+        }
         if ($root[0]) {
           navTree = _this.parseNavTree($root);
-          return _this.set('navTreeStr', JSON.stringify(navTree));
+          return _this.navTreeRoot.reset(navTree.children);
         }
       });
-      return this.on('change:navTreeStr', function(model, navTreeStr) {
+      return this.on('change:treeNode add:treeNode remove:treeNode', function() {
         return _this.set({
-          body: NAV_SERIALIZE(JSON.parse(navTreeStr))
+          body: NAV_SERIALIZE(_this.navTreeRoot.toJSON())
         });
       });
     };
@@ -47,70 +54,63 @@
       });
       return Backbone.$.ajax.apply(Backbone.$, [config]);
     };
-    Folder = Models.Deferrable.extend({
-      mediaType: 'application/vnd.org.cnx.folder',
-      url: function() {
-        return "" + ROOT_URL + "/folder/" + this.id;
-      },
-      parse: function(obj) {
-        var Type, item, model, models;
-        models = (function() {
-          var _i, _len, _ref, _results;
-          _ref = obj.body || [];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
-            Type = MEDIA_TYPES.get(item.mediaType).constructor;
-            model = new Type(item);
-            _results.push(model);
-          }
-          return _results;
-        })();
-        this.collection.reset(models);
-        delete obj.body;
-        return obj;
-      },
-      initialize: function(obj) {
-        var Type, item, model, _i, _len, _ref, _results;
-        this.collection = new Backbone.Collection();
-        _ref = obj.body || [];
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          item = _ref[_i];
-          Type = MEDIA_TYPES.get(item.mediaType).constructor;
-          model = new Type(item);
-          _results.push(this.collection.add(model));
+    Models.Folder.prototype.url = function() {
+      return "" + ROOT_URL + "/folder/" + this.id;
+    };
+    Models.Folder.prototype.parse = function(obj) {
+      var models;
+      models = [];
+      _.each(obj.body, function(item) {
+        var hackType, mediaType, model;
+        if ('string' === typeof item) {
+          hackType = item.split(':')[0];
+          mediaType = (function() {
+            switch (hackType) {
+              case 'cnxmodule':
+                return 'application/vnd.org.cnx.module';
+              case 'cnxcollection':
+                return 'application/vnd.org.cnx.collection';
+              default:
+                throw 'BUG:TYPE_NOT_FOUND';
+            }
+          })();
+          item = {
+            id: item,
+            mediaType: mediaType,
+            title: 'FOLDER_HACK_TITLE'
+          };
         }
-        return _results;
+        model = Models.ALL_CONTENT.get(item.id);
+        if (model) {
+          return models.push(model);
+        }
+      });
+      this.contents.reset(models);
+      delete obj.body;
+      return obj;
+    };
+    Models_Folder_initialize = Models.Folder.prototype.initialize;
+    Models.Folder.prototype.initialize = function(obj) {
+      var Type, item, model, _i, _len, _ref,
+        _this = this;
+      Models_Folder_initialize.apply(this, arguments);
+      _ref = obj.body || [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
+        Type = MEDIA_TYPES.get(item.mediaType);
+        model = new Type(item);
+        this.contents.add(model);
       }
-    });
-    MEDIA_TYPES.add('application/vnd.org.cnx.folder', {
-      constructor: Folder,
-      editAction: function(model) {
-        var mainArea, mainSidebar, mainToolbar, view, workspace,
-          _this = this;
-        window.scrollTo(0, 0);
-        mainSidebar = Controller.mainLayout.sidebar;
-        mainToolbar = Controller.mainLayout.toolbar;
-        mainArea = Controller.mainLayout.area;
-        mainSidebar.close();
-        mainToolbar.close();
-        workspace = new Models.FilteredCollection(null, {
-          collection: model.collection
+      return this.contents.on('all', function() {
+        var args, json;
+        args = _.toArray(arguments);
+        json = [];
+        _this.contents.each(function(item) {
+          return json.push(item.id);
         });
-        view = new Views.SearchBoxView({
-          model: workspace
-        });
-        mainToolbar.show(view);
-        view = new Views.SearchResultsView({
-          collection: workspace
-        });
-        mainArea.show(view);
-        return model.loaded().done(function() {
-          return Backbone.history.navigate("content/" + (model.get('id')));
-        });
-      }
-    });
+        return _this.set('body', json);
+      });
+    };
     AtcWorkspace = Models.DeferrableCollection.extend({
       url: WORKSPACE_URL,
       parse: function(results) {
@@ -120,7 +120,7 @@
           _results = [];
           for (_i = 0, _len = results.length; _i < _len; _i++) {
             item = results[_i];
-            ContentType = MEDIA_TYPES.get(item.mediaType).constructor;
+            ContentType = MEDIA_TYPES.get(item.mediaType);
             model = new ContentType(item);
             _results.push(model);
           }
