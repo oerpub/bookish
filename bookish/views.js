@@ -146,18 +146,6 @@
             }
           });
         });
-      },
-      templateHelpers: function() {
-        var attribute, changes;
-        changes = this.model.changedAttributes() || {};
-        for (attribute in changes) {
-          if (!this.model.previous(attribute)) {
-            delete changes[attribute];
-          }
-        }
-        return {
-          hasChanged: _.keys(changes).length
-        };
       }
     });
     exports.SearchResultsView = Marionette.CompositeView.extend({
@@ -497,8 +485,10 @@
         'click #save-content': 'saveContent'
       },
       initialize: function() {
-        var beforeUnload, disableSave,
+        var beforeUnload,
           _this = this;
+        this.dirtyModels = new Backbone.Collection();
+        this.dirtyModels.comparator = 'id';
         beforeUnload = function() {
           if (_this.hasChanged) {
             return 'You have unsaved changes. Are you sure you want to leave this page?';
@@ -511,38 +501,36 @@
         this.listenTo(this.model, 'change:userid', function() {
           return _this.render();
         });
-        this.listenTo(Models.ALL_CONTENT, 'change', function(model, b, c) {
-          var $save, checkIfContentActuallyChanged;
-          $save = _this.$el.find('#save-content');
-          checkIfContentActuallyChanged = function() {
-            if (model.hasChanged()) {
-              _this.hasChanged = true;
-              $save.removeClass('disabled');
-              return $save.addClass('btn-primary');
-            }
-          };
-          return setTimeout((function() {
-            return checkIfContentActuallyChanged();
-          }), 100);
+        this.listenTo(Models.ALL_CONTENT, 'change:_isDirty', function(model, b, c) {
+          if (model.get('_isDirty')) {
+            return _this.dirtyModels.add(model);
+          } else {
+            return _this.dirtyModels.remove(model);
+          }
         });
         this.listenTo(Models.ALL_CONTENT, 'change:treeNode add:treeNode remove:treeNode', function(model, b, c) {
+          return _this.dirtyModels.add(model);
+        });
+        this.listenTo(Models.ALL_CONTENT, 'add', function(model) {
+          if (model.get('_isDirty')) {
+            return _this.dirtyModels.add(model);
+          }
+        });
+        this.listenTo(this.dirtyModels, 'add reset', function(model, b, c) {
           var $save;
           _this.hasChanged = true;
           $save = _this.$el.find('#save-content');
           $save.removeClass('disabled');
           return $save.addClass('btn-primary');
         });
-        disableSave = function() {
+        return this.listenTo(this.dirtyModels, 'remove', function(model, b, c) {
           var $save;
-          _this.hasChanged = false;
-          $save = _this.$el.find('#save-content');
-          $save.addClass('disabled');
-          return $save.removeClass('btn-primary');
-        };
-        this.listenTo(Models.ALL_CONTENT, 'sync', disableSave);
-        this.listenTo(Models.ALL_CONTENT, 'reset', disableSave);
-        return this.listenTo(this.model, 'change', function() {
-          return _this.render();
+          if (_this.dirtyModels.length === 0) {
+            _this.hasChanged = false;
+            $save = _this.$el.find('#save-content');
+            $save.addClass('disabled');
+            return $save.removeClass('btn-primary');
+          }
         });
       },
       onRender: function() {
@@ -553,7 +541,8 @@
         return this.model.signOut();
       },
       saveContent: function() {
-        var $alertError, $errorBar, $label, $save, $saving, $successBar, allContent, errorCount, finished, recSave, total;
+        var $alertError, $errorBar, $label, $save, $saving, $successBar, errorCount, finished, recSave, total,
+          _this = this;
         if (!this.model.get('id')) {
           return alert('You need to Sign In (and make sure you can edit) before you can save changes');
         }
@@ -563,32 +552,30 @@
         $successBar = $save.find('.progress > .bar.success');
         $errorBar = $save.find('.progress > .bar.error');
         $label = $save.find('.label');
-        allContent = Models.ALL_CONTENT.filter(function(model) {
-          return model.hasChanged();
-        });
-        total = allContent.length;
+        total = this.dirtyModels.length;
         errorCount = 0;
         finished = false;
         recSave = function() {
           var model, saving;
-          $successBar.width(((total - allContent.length - errorCount) * 100 / total) + '%');
+          $successBar.width(((total - _this.dirtyModels.length - errorCount) * 100 / total) + '%');
           $errorBar.width((errorCount * 100 / total) + '%');
-          if (allContent.length === 0) {
+          if (_this.dirtyModels.length === 0) {
             if (errorCount === 0) {
               finished = true;
-              Models.ALL_CONTENT.trigger('sync');
-              Models.ALL_CONTENT.each(function(model) {
-                return delete model.changed;
-              });
               return $save.modal('hide');
             } else {
               return $alertError.removeClass('hide');
             }
           } else {
-            model = allContent.shift();
+            model = _this.dirtyModels.first();
             $label.text(model.get('title'));
             saving = model.save(null, {
-              success: recSave,
+              success: function() {
+                model.set({
+                  _isDirty: false
+                });
+                return recSave();
+              },
               error: function() {
                 return errorCount += 1;
               }
@@ -609,7 +596,7 @@
             $alertError.removeClass('hide');
             return $saving.addClass('hide');
           }
-        }, 5000);
+        }, 2000);
       }
     });
     AddItemView = Marionette.ItemView.extend({
@@ -668,7 +655,7 @@
         return this.expand(true);
       },
       editSettings: function() {
-        var contentModel, newTitle, originalTitle, _ref1, _ref2;
+        var contentModel, newTitle, originalTitle, _ref1, _ref2, _ref3, _ref4;
         if (this.model !== this.model.dereference()) {
           contentModel = this.model.dereference();
           originalTitle = (contentModel != null ? contentModel.get('title') : void 0) || this.model.get('title');
@@ -682,9 +669,13 @@
           }
         } else {
           originalTitle = this.model.get('title');
-          newTitle = prompt('Edit Title.', originalTitle);
-          if (newTitle) {
-            return this.model.set('title', newTitle);
+          newTitle = prompt('Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle);
+          if ('-' === newTitle) {
+            return (_ref3 = this.model.parent) != null ? (_ref4 = _ref3.children()) != null ? _ref4.remove(this.model) : void 0 : void 0;
+          } else {
+            if (newTitle) {
+              return this.model.set('title', newTitle);
+            }
           }
         }
       },
@@ -731,7 +722,7 @@
               case 'change:treeNode':
                 break;
               default:
-                if (_this.model === options.parent) {
+                if (_this.model === (options != null ? options.parent : void 0)) {
                   return _this.render();
                 }
             }
