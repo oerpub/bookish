@@ -49,7 +49,7 @@
     Backbone.ajax = function(config) {
       config = _.extend(config, {
         headers: {
-          'X-REMOTE_AUTHID': 'https://paulbrian.myopenid.com'
+          'X-REMOTEAUTHID': 'https://paulbrian.myopenid.com'
         }
       });
       return Backbone.$.ajax.apply(Backbone.$, [config]);
