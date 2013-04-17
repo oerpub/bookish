@@ -45,7 +45,7 @@
     <button id="fork-book" class="btn btn-success" title="Derive a copy of this book and save it into your account!" data-placement="bottom"><i class="icon-github-alt"></i> Copy this Book!</button>
   {{/if}}
 
-  <button type="button" id="sign-out" class="btn btn-link" title="Sign {{username}} Out" data-placement="bottom">Sign Out</button>
+  <button type="button" id="sign-out" class="btn btn-link" title="Sign {{id}} Out" data-placement="bottom">Sign Out</button>
 
 
 {{else}}
@@ -66,7 +66,7 @@
 
       <p>If you refresh this page you may need to re-enter this information.</p>
       <div class="form-inline">
-        <input id="github-username" class="input-small" type="text" required="true" placeholder="Username" value="{{username}}"/>
+        <input id="github-id" class="input-small" type="text" required="true" placeholder="Username" value="{{id}}"/>
         <input id="github-password" type="password" required="true" class="input-small" placeholder="Password"/>
         <button id="sign-in" type="submit" class="btn btn-primary" data-dismiss="modal">Sign In</button>
       </div>

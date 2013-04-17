@@ -14,14 +14,17 @@ require.config
 
 
 
-require ['underscore', 'bookish/models'], (_, Models) ->
+require ['underscore', 'bookish/models', 'bookish/controller'], (_, Models, Controller) ->
 
   book = new Models.BaseBook
     id: 'col1'
     title: 'Physics: Volume 1'
-    navTreeStr: JSON.stringify [{class:'preface', id:"m42955", title:"Preface"
+
+  TREE = [{class:'preface', id:"m42955", title:"Preface"
      },{class:'chapter', title:"Introduction: The Nature of Science and Physics","children":[
       {id:"m42119", title:"Introduction to Science and the Realm of Physics, Physical Quantities, and Units"},
+
+  #    ]}]
       {id:"m42092", title:"Physics: An Introduction"},
       {id:"m42091", title:"Physical Quantities and Units"},
       {id:"m42120", title:"Accuracy, Precision, and Significant Figures"},
@@ -336,17 +339,20 @@ require ['underscore', 'bookish/models'], (_, Models) ->
       {id:"m42720", title:"Useful Information"},
       {id:"m42709", title:"Glossary of Key Symbols and Notation"}]
 
-
   workspace = []
   recAdd = (nodes) ->
     _.each nodes, (node) ->
-      workspace.push new Models.BaseContent _.omit(node, 'children') if node.id
+      Models.ALL_CONTENT.add new Models.BaseContent _.omit(node, 'children') if node.id
       recAdd(node.children)
-  recAdd JSON.parse book.get 'navTreeStr'
-  book.manifest.add workspace
-  workspace.unshift book
+  recAdd TREE
 
-  Models.ALL_CONTENT.add workspace
+  Models.ALL_CONTENT.add book
+
+  book.navTreeRoot.reset TREE
+
+  # Clear out the book titles so they all inherit from the module title
+  book.navTreeRoot.descendants.each (node) ->
+    node.unset 'title' if node.id
 
   # Mark all the content as loaded so we do not try to fetch
   Models.ALL_CONTENT.each (model) -> model.loaded(true)

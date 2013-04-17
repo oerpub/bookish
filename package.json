@@ -13,7 +13,7 @@
   "dependencies": {
     "underscore": ">=1.4.3",
     "backbone": ">=0.9.9",
-    "github-js": "*"
+    "github-client": "*"
   },
   "devDependencies": {
     "docco": "~0.4.0",

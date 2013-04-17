@@ -5,14 +5,15 @@ define [
   'bookish/media-types'
   'bookish/controller'
   'bookish/models'
+  'bookish/views'
   'hbs!./opf-file'
   'hbs!./container-file'
   'hbs!./nav-serialize'
-], (exports, _, Backbone, MEDIA_TYPES, Controller, AtcModels, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
+], (exports, _, Backbone, MEDIA_TYPES, Controller, Models, Views, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) ->
 
-  BaseCollection = AtcModels.DeferrableCollection
-  BaseContent = AtcModels.BaseContent
-  BaseBook = AtcModels.BaseBook
+  BaseCollection = Models.DeferrableCollection
+  BaseContent = Models.BaseContent
+  BaseBook = Models.BaseBook
 
 
   # Links in a navigation document are relative to where the nav document resides.
@@ -71,11 +72,11 @@ define [
 
       # When the `navTreeStr` is changed on the package,
       # CHange it on the navigation.html file
-      @on 'change:navTreeStr', (model, navTreeStr) =>
+      @listenTo @navTreeRoot, 'change:treeNode add:treeNode remove:treeNode', =>
 
         $newTree = jQuery(@navModel.get 'body')
 
-        newTree = NAV_SERIALIZE JSON.parse navTreeStr
+        newTree = NAV_SERIALIZE @navTreeRoot.toJSON()
         $newTree = jQuery(newTree)
 
         $bodyNodes = jQuery(@navModel.get 'body')
@@ -99,7 +100,10 @@ define [
             $body = $wrap
           # TODO: Add `<html><head>...</head>` tags around the `$body`
           bodyStr = $body[0].innerHTML
-        @navModel.set 'body', bodyStr, {silent:true}
+
+        # Set a `doNotReparse` option so when `change:body` is fired we do not
+        # need to reparse the body and reset the ToC.
+        @navModel.set 'body', bodyStr, {doNotReparse:true}
 
 
       # Once the OPF is populated load the navigation HTML file.
@@ -113,10 +117,10 @@ define [
           # Finally, we have the Navigation HTML!
 
           # If its contents changes then so does the navTree
-          @navModel.on 'change:body', (model, xmlStr) =>
+          @navModel.on 'change:body', (model, xmlStr, options) =>
             # Re-parse the tree and set it as the navTree
             # `parseNavTree` is defined in `AppModels.Book`
-            @_updateNavTreeFromXML xmlStr
+            @_updateNavTreeFromXML xmlStr if !options.doNotReparse
 
           # Give the HTML files in the manifest some titles from navigation.html
           navTree = @_updateNavTreeFromXML(@navModel.get('body'), {silent:true})
@@ -124,7 +128,7 @@ define [
             for node in nodes
               if node.id and node.id.search('#') < 0
                 path = resolvePath(@navModel.id, node.id)
-                model = AtcModels.ALL_CONTENT.get path
+                model = Models.ALL_CONTENT.get path
                 model.set {title: node.title}
                 # Do not mark the object as 'dirty' (for saving)
                 delete model.changed
@@ -152,7 +156,7 @@ define [
       $nav = $nav.first()
 
       navTree = @parseNavTree($nav).children
-      @set 'navTreeStr', JSON.stringify(navTree), options
+      @navTreeRoot.reset navTree
       return navTree
 
     parse: (xmlStr) ->
@@ -178,13 +182,17 @@ define [
         # Add it to the set of all content and construct the correct model based on the mimetype
         mediaType = $item.attr 'media-type'
         path = $item.attr 'href'
-        ContentType = MEDIA_TYPES.get(mediaType).constructor
+        ContentType = MEDIA_TYPES.get(mediaType)
         model = new ContentType
           # Set the path to the file to be relative to the OPF file
           id: resolvePath(@id, path)
           properties: $item.attr 'properties'
 
-        AtcModels.ALL_CONTENT.add model
+        # if We could not find a suitable editor for the `mediaType` make sure
+        # we do not lose that information when saving out the OPF file.
+        model.mediaType = mediaType if !(mediaType in MEDIA_TYPES.list())
+
+        Models.ALL_CONTENT.add model
         @manifest.add model
 
         # If we stumbled upon the special navigation document
@@ -199,7 +207,15 @@ define [
     toJSON: ->
       json = BaseBook.prototype.toJSON.apply(@, arguments)
       json.manifest = @manifest?.toJSON()
+
+      # Loop through everything in the manifest and add a `mediaType`
+      _.each json.manifest, (item) ->
+        item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType
+
       json
+
+    accepts: -> [ HTMLFile::mediaType, Models.Folder::mediaType ]
+
 
   PackageFile = BaseBook.extend PackageFileMixin
 
@@ -223,7 +239,13 @@ define [
       return ret
 
 
-  MEDIA_TYPES.add 'application/xhtml+xml', {constructor: HTMLFile, editAction: Controller.editContent}
+  # Add the `HTMLFile` and `PackageFile` to the media types registry.
+  HTMLFile::editAction = -> Controller.editContent @
+  PackageFile::editAction = -> Controller.editBook @
+  Models.BookTocNode::accepts = -> [ Models.BookTocNode::mediaType, HTMLFile::mediaType ]
+
+  MEDIA_TYPES.add HTMLFile
+  MEDIA_TYPES.add PackageFile
 
   exports.EPUB_CONTAINER = new EPUBContainer()
 

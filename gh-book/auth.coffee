@@ -7,7 +7,7 @@ define ['github', 'backbone'], (Github, Backbone) ->
   # For the UI, provide a backbone "interface" to the auth piece
   AuthModel = Backbone.Model.extend
     defaults:
-      username: ''
+      id: '' # Set `username` to `id` so Save view knows when to alert the user to log in
       password: ''
       auth: 'basic'
 
@@ -21,7 +21,7 @@ define ['github', 'backbone'], (Github, Backbone) ->
     # Updates the singleton variables `github` and `repo`
     _update: ->
       credentials =
-        username: @get 'username'
+        username: @get 'id'
         password: @get 'password'
         token:    @get 'token'
         auth:     @get 'auth'
@@ -41,7 +41,7 @@ define ['github', 'backbone'], (Github, Backbone) ->
     initialize: ->
       @_update()
 
-      @on 'change:username', @_update
+      @on 'change:id',       @_update
       @on 'change:password', @_update
       @on 'change:token',    @_update
       @on 'change:auth',     @_update
@@ -59,7 +59,7 @@ define ['github', 'backbone'], (Github, Backbone) ->
       github = null
       repo = null
       @set {
-        username: 'philschatz'
+        id: ''
         password: ''
       }
 
