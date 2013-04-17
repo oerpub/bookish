@@ -67,7 +67,7 @@ define [
   Backbone.ajax = (config) ->
     config = _.extend config,
       headers:
-        'REMOTE_USERURI': 'cnxuser:75e06194-baee-4395-8e1a-566b656f6920'
+        'X-REMOTE_AUTHID': 'https://paulbrian.myopenid.com'
     Backbone.$.ajax.apply(Backbone.$, [config])
 
 
