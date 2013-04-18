@@ -39,16 +39,23 @@ define [
   Auth.fetch()
 
 
-  Models.BaseContent::url = ->
-    return "#{ROOT_URL}/module/" if @isNew()
-    "#{ROOT_URL}/module/#{@id}"
-  Models.BaseBook::url = -> "#{ROOT_URL}/collection/#{@id}"
+  Models.BaseContent::urlPrefix = "#{ROOT_URL}/module"
+  Models.BaseBook::urlPrefix    = "#{ROOT_URL}/collection"
+  Models.Folder::urlPrefix      = "#{ROOT_URL}/folder"
 
+  # All the content types extend `Models.Deferrable`
+  # so override the URL here.
+  # Since the webserver redirects when a URL does not end in a `/`, override
+  # the default URL-generation logic in `Backbone` to append a `/` when POSTing
+  # a new piece of content.
+  Models.Deferrable::url = ->
+    return "#{@urlPrefix}/" if @isNew()
+    "#{@urlPrefix}/#{@id}"
 
   # When the `navTreeRoot` changes, update the body with HTML
-  oldBaseBook_initialize = Models.BaseBook::initialize
+  Models_BaseBook_initialize = Models.BaseBook::initialize
   Models.BaseBook::initialize = ->
-    oldBaseBook_initialize.apply(@, arguments)
+    Models_BaseBook_initialize.apply(@, arguments)
 
     # When the body of the collection changes, update the `navTreeRoot`
     @on 'change:body', (model, body, options) =>
@@ -76,7 +83,6 @@ define [
 
 
   # A folder contains a title and a collection of items in the folder
-  Models.Folder::url = -> "#{ROOT_URL}/folder/#{@id}"
   Models.Folder::parse = (obj) ->
     models = []
     _.each obj.body, (item) ->

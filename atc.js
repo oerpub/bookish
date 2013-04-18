@@ -2,7 +2,7 @@
 (function() {
 
   define(['module', 'underscore', 'backbone', 'jquery', 'bookish/controller', 'bookish/models', 'bookish/views', 'bookish/media-types', 'bookish/auth', 'hbs!atc-nav-serialize', 'css!bookish'], function(module, _, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) {
-    var AtcWorkspace, DEBUG_USER, Models_Folder_initialize, ROOT_URL, STORED_KEYS, WORKSPACE_URL, oldBaseBook_initialize, resetDesktop,
+    var AtcWorkspace, DEBUG_USER, Models_BaseBook_initialize, Models_Folder_initialize, ROOT_URL, STORED_KEYS, WORKSPACE_URL, resetDesktop,
       _this = this;
     DEBUG_USER = module.config().debugUser;
     ROOT_URL = module.config().rootUrl || '';
@@ -21,19 +21,19 @@
       return "" + ROOT_URL + "/me/";
     };
     Auth.fetch();
-    Models.BaseContent.prototype.url = function() {
+    Models.BaseContent.prototype.urlPrefix = "" + ROOT_URL + "/module";
+    Models.BaseBook.prototype.urlPrefix = "" + ROOT_URL + "/collection";
+    Models.Folder.prototype.urlPrefix = "" + ROOT_URL + "/folder";
+    Models.Deferrable.prototype.url = function() {
       if (this.isNew()) {
-        return "" + ROOT_URL + "/module/";
+        return "" + this.urlPrefix + "/";
       }
-      return "" + ROOT_URL + "/module/" + this.id;
+      return "" + this.urlPrefix + "/" + this.id;
     };
-    Models.BaseBook.prototype.url = function() {
-      return "" + ROOT_URL + "/collection/" + this.id;
-    };
-    oldBaseBook_initialize = Models.BaseBook.prototype.initialize;
+    Models_BaseBook_initialize = Models.BaseBook.prototype.initialize;
     Models.BaseBook.prototype.initialize = function() {
       var _this = this;
-      oldBaseBook_initialize.apply(this, arguments);
+      Models_BaseBook_initialize.apply(this, arguments);
       this.on('change:body', function(model, body, options) {
         var $body, $root, navTree;
         if (options != null ? options.doNotReparse : void 0) {
@@ -67,9 +67,6 @@
           doNotReparse: true
         });
       });
-    };
-    Models.Folder.prototype.url = function() {
-      return "" + ROOT_URL + "/folder/" + this.id;
     };
     Models.Folder.prototype.parse = function(obj) {
       var models;
