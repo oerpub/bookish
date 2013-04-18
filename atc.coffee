@@ -4,6 +4,7 @@
 # read/write to the Connexions repository.
 #
 define [
+  'module' # Obtain the requirejs module config
   'underscore'
   'backbone'
   'jquery'
@@ -14,13 +15,13 @@ define [
   'bookish/auth'
   'hbs!atc-nav-serialize'
   'css!bookish'
-], (_, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
+], (module, _, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
-  # **FIXME:** This variable is no longer used
-  DEBUG = true
+  # Load debug options from the module config
+  DEBUG_USER = module.config().debugUser
+  ROOT_URL = module.config().rootUrl or ''
 
 
-  ROOT_URL = ''
   WORKSPACE_URL = "#{ROOT_URL}/workspace/"
 
   # Find out who the current user is logged in as
@@ -64,11 +65,12 @@ define [
 
   # HACK: to always get an authenticated user
   # by adding a request header
-  Backbone.ajax = (config) ->
-    config = _.extend config,
-      headers:
-        'X-REMOTEAUTHID': 'https://paulbrian.myopenid.com'
-    Backbone.$.ajax.apply(Backbone.$, [config])
+  if DEBUG_USER
+    Backbone.ajax = (config) ->
+      config = _.extend config,
+        headers:
+          'X-REMOTEAUTHID': DEBUG_USER
+      Backbone.$.ajax.apply(Backbone.$, [config])
 
 
   # A folder contains a title and a collection of items in the folder
