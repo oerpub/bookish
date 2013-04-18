@@ -14,7 +14,6 @@ define [
   'bookish/media-types'
   'bookish/auth'
   'hbs!atc-nav-serialize'
-  'css!bookish'
 ], (module, _, Backbone, jQuery, Controller, Models, Views, MEDIA_TYPES, Auth, NAV_SERIALIZE) ->
 
   # Load debug options from the module config
