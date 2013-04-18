@@ -199,30 +199,11 @@ define [
                 setTimeout delay, 10
 
 
-    # Add the hasChanged bit to the resulting JSON so the template can render an asterisk
-    # if this piece of content has unsaved changes
-    templateHelpers: ->
-      # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
-      # or if the attributes did actually change
-
-      # Delete any properties that were null before
-      changes = @model.changedAttributes() or {}
-      (delete changes[attribute] if not @model.previous(attribute)) for attribute of changes
-
-      # If there was anything that was actually changed (not null before) then mark the save button.
-      return {hasChanged: _.keys(changes).length}
-
-
   # This can also be thought of as the Workspace view
   exports.SearchResultsView = Marionette.CompositeView.extend
     template: SEARCH_RESULT
     itemViewContainer: 'tbody'
     itemView: exports.SearchResultsItemView
-
-    initialize: ->
-      @listenTo @collection, 'reset',   => @render()
-      @listenTo @collection, 'add',     => @render()
-      @listenTo @collection, 'remove',  => @render()
 
   # The search box. Changing the text will cause the underlying collection to filter
   # and fire off `add/remove` events.
@@ -528,6 +509,12 @@ define [
       'click #save-content':  'saveContent'
 
     initialize: ->
+      @dirtyModels = new Backbone.Collection()
+      # Sort by `id` so new models are saved first.
+      # This way their id's change and their references (in books and Folders)
+      # will be updated before the Book/Folder is saved.
+      @dirtyModels.comparator = 'id'
+
       # Bind a function to the window if the user tries to navigate away from this page
       beforeUnload = =>
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
@@ -537,38 +524,31 @@ define [
       @listenTo @model, 'change:userid', => @render()
 
       # Listen to all changes made on Content so we can update the save button
-      @listenTo Models.ALL_CONTENT, 'change', (model, b,c) =>
+      @listenTo Models.ALL_CONTENT, 'change:_isDirty', (model, b,c) =>
         # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
         # or if the attributes did actually change
-
-        $save = @$el.find '#save-content'
-        checkIfContentActuallyChanged = =>
-          if model.hasChanged()
-            @hasChanged = true
-            $save.removeClass('disabled')
-            $save.addClass('btn-primary')
-
-        setTimeout (=> checkIfContentActuallyChanged()), 100
+        if model.get('_isDirty')
+          @dirtyModels.add model
+        else
+          @dirtyModels.remove model
 
       @listenTo Models.ALL_CONTENT, 'change:treeNode add:treeNode remove:treeNode', (model, b,c) =>
+        @dirtyModels.add model
+
+      @listenTo Models.ALL_CONTENT, 'add', (model) => @dirtyModels.add model if model.get('_isDirty')
+
+      @listenTo @dirtyModels, 'add reset', (model, b,c) =>
         @hasChanged = true
         $save = @$el.find '#save-content'
         $save.removeClass('disabled')
         $save.addClass('btn-primary')
 
-
-      # If the repo changes and all of the content is reset, update the button
-      disableSave = =>
-        @hasChanged = false
-        $save = @$el.find '#save-content'
-        $save.addClass('disabled')
-        $save.removeClass('btn-primary')
-
-      @listenTo Models.ALL_CONTENT, 'sync', disableSave
-      @listenTo Models.ALL_CONTENT, 'reset', disableSave
-
-      # Listen to model changes
-      @listenTo @model, 'change', => @render()
+      @listenTo @dirtyModels, 'remove', (model, b,c) =>
+        if @dirtyModels.length == 0
+          @hasChanged = false
+          $save = @$el.find '#save-content'
+          $save.addClass('disabled')
+          $save.removeClass('btn-primary')
 
     onRender: ->
       # Enable tooltips
@@ -592,34 +572,33 @@ define [
       $errorBar   = $save.find('.progress > .bar.error')
       $label = $save.find('.label')
 
-      allContent = Models.ALL_CONTENT.filter (model) -> model.hasChanged()
-      total = allContent.length
+      total = @dirtyModels.length
       errorCount = 0
       finished = false
 
-      recSave = ->
-        $successBar.width(((total - allContent.length - errorCount) * 100 / total) + '%')
-        $errorBar.width((  errorCount                               * 100 / total) + '%')
+      recSave = =>
+        $successBar.width(((total - @dirtyModels.length - errorCount) * 100 / total) + '%')
+        $errorBar.width((  errorCount                                 * 100 / total) + '%')
 
-        if allContent.length == 0
+        if @dirtyModels.length == 0
           if errorCount == 0
             finished = true
-            Models.ALL_CONTENT.trigger 'sync'
-            # Clear the dirty flag
-            Models.ALL_CONTENT.each (model) -> delete model.changed
             $save.modal('hide')
           else
             $alertError.removeClass 'hide'
 
         else
-          model = allContent.shift()
+          model = @dirtyModels.first()
           $label.text(model.get('title'))
 
           # Clear the changed bit since it is saved.
           #     delete model.changed
           #     saving = true; recSave()
           saving = model.save null,
-              success: recSave
+              success: =>
+                # Clear the dirty bit for the model
+                model.set {_isDirty:false}
+                recSave()
               error: -> errorCount += 1
           if not saving
             console.log "Skipping #{model.id} because it is not valid"
@@ -636,7 +615,7 @@ define [
           $save.modal('show')
           $alertError.removeClass('hide')
           $saving.addClass('hide')
-      , 5000)
+      , 2000)
 
   AddItemView = Marionette.ItemView.extend
     template: ADD_ITEM_VIEW
@@ -667,15 +646,74 @@ define [
   BookEditNodeView = Marionette.CompositeView.extend
     template: BOOK_EDIT_NODE
     tagName: 'li'
+    itemViewContainer: '> ol'
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
+      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
+      'click > .editor-node-body > .no-edit-action': 'toggleExpanded'
       'click > .editor-node-body > .edit-action': 'editAction'
       'click > .editor-node-body > .edit-settings': 'editSettings'
-      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
 
-    editAction: -> @model.editAction()
+    # Toggle expanded/collapsed in the View
+    # -------
+    #
+    # The first time a node is rendered it is collapsed so we lazily load the
+    # `ItemView` children.
+    #
+    # Initially, the node is collapsed and the following occurs:
+    #
+    # 1. `@render()` calls `@_renderChildren()`
+    # 2. Since `@isExpanded == false` the children are not rendered
+    #
+    # When the node is expanded:
+    #
+    # 1. `@isExpanded` is set to `true`
+    # 2. `@render()` is called and calls `@_renderChildren()`
+    # 3. Since `@isExpanded == true` the children are rendered and attached to the DOM
+    # 4. `@hasRendered` is set to `true` so we know not to generate the children again
+    #
+    #
+    # When an expanded node is collapsed:
+    #
+    # 1. `@isExpanded` is set to `false`
+    # 2. A CSS class is set on the `<li>` item to hide children
+    # 3. CSS rules hide the children and change the expand/collapse icon
+    #
+    # When a node that was expanded and collapsed is re-expanded:
+    #
+    # 1. `@isExpanded` is set to `true`
+    # 2. Since `@hasRendered == true` there is no need to call `@render()`
+    # 3. The CSS class is removed to show the children again
+
+    isExpanded: false
+    hasRendered: false
+
+    # Called from UI when user clicks the collapse/expando buttons
+    toggleExpanded: -> @expand !@isExpanded
+
+    # Pass in `false` to collapse
+    expand: (@isExpanded) ->
+      @$el.toggleClass 'editor-node-expanded', @isExpanded
+      # (re)render the model and children if the node is expanded
+      # and has not been rendered yet.
+      if @isExpanded and !@hasRendered
+        @render()
+
+    # From `Marionette.CompositeView`.
+    # Added check to only render when the model `@isExpanded`
+    _renderChildren: ->
+      if @isRendered
+        if @isExpanded
+          Marionette.CollectionView.prototype._renderChildren.call(@)
+          this.triggerMethod('composite:collection:rendered')
+        # Remember that the children have been rendered already
+        @hasRendered = @isExpanded
+
+
+    # Perform the edit action and then expand the node to show children.
+    editAction: -> @model.editAction(); @expand(true)
 
     editSettings: ->
       if @model != @model.dereference()
@@ -690,16 +728,11 @@ define [
           @model.set 'title', newTitle
       else
         originalTitle = @model.get 'title'
-        newTitle = prompt 'Edit Title.', originalTitle
-        @model.set 'title', newTitle if newTitle
-
-
-
-    toggleExpanded: ->
-      # Set the expanded state silently so we don't regenerate the `navTreeStr`
-      # (since the model changed)
-      @model.set 'expanded', !@model.get('expanded'), {silent:true}
-      @render()
+        newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
+        if '-' == newTitle
+          @model.parent?.children()?.remove @model
+        else
+          @model.set 'title', newTitle if newTitle
 
 
     initialize: ->
@@ -708,9 +741,36 @@ define [
       # of this parent node
       @collection = @model.children()
 
-      @listenTo @model,      'all', => @render()
+      @listenTo @model, 'all', (name, model, collection, options) =>
+        return if model != @model
+        # Reduce the number of re-renderings that occur by filtering on the
+        # type of event.
+        # **FIXME:** Just listen to the relevant events
+        switch name
+          when 'change' then return
+          when 'change:title' then @render()
+          when 'change:treeNode' then return
+          else return
+
       if @collection
-        @listenTo @collection, 'all', => @render()
+        # If the children drop to/from 0 rerender so the (+)/(-) expandos are visible
+        @listenTo @collection, 'add',    =>
+          if @collection.length == 1
+            @expand(true)
+        @listenTo @collection, 'remove', =>
+          if @collection.length == 0
+            @render()
+        @listenTo @collection, 'reset',  => @render()
+
+        @listenTo @collection, 'all', (name, model, collection, options=collection) =>
+          # Reduce the number of re-renderings that occur by filtering on the
+          # type of event.
+          # **FIXME:** Just listen to the relevant events
+          switch name
+            when 'change' then return
+            when 'change:title' then return
+            when 'change:treeNode' then return
+            else @render() if @model == options?.parent
 
       # If the content title changes and we have not overridden the title
       # rerender the node
@@ -728,14 +788,6 @@ define [
         editAction: !!@model.editAction
         parent: !!@model.parent
       }
-
-
-    # From `Marionette.CompositeView`.
-    # Added check to only render when model is `expanded`
-    _renderChildren: ->
-      if @isRendered and @model.get('expanded')
-        Marionette.CollectionView.prototype._renderChildren.call(@)
-        this.triggerMethod('composite:collection:rendered')
 
 
     onRender: ->
@@ -801,7 +853,13 @@ define [
 
             setTimeout delay, 100
 
-    appendHtml: (cv, iv) -> cv.$('ol:first').append(iv.el)
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
 
 
   # Use this to generate HTML with extra divs for Drag-and-Drop zones.

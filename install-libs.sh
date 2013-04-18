@@ -54,13 +54,14 @@ fromGithub "https://github.com/wysiwhat/Aloha-Editor" "dev"
 
 ##fromGithub "https://github.com/twitter/bootstrap"
 TEMP="bootstrap.zip"
-if [ -d "bootstrap" ]; then
+if [ -d "bootstrap-2.2.2" ]; then
   echo "---- Skipping bootstrap"
 else
   echo "---- Downloading bootstrap"
-  curl --location -o ${TEMP} http://twitter.github.com/bootstrap/assets/bootstrap.zip && unzip ${TEMP} && rm ${TEMP}
+  # curl --location -o ${TEMP} http://twitter.github.com/bootstrap/assets/bootstrap.zip && unzip ${TEMP} && rm ${TEMP}
+  curl --location -o ${TEMP} https://github.com/twitter/bootstrap/archive/v2.2.2.zip && unzip ${TEMP} && rm ${TEMP}
   # Remove the glyphicons since we are using FontAwesome icons
-  rm bootstrap/img/glyphicons-halflings-white.png
-  rm bootstrap/img/glyphicons-halflings.png
+  rm bootstrap-2.2.2/img/glyphicons-halflings-white.png
+  rm bootstrap-2.2.2/img/glyphicons-halflings.png
 fi
 

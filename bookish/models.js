@@ -9,6 +9,7 @@
         return !this.id || this.id.match(/^_NEW:/);
       },
       initialize: function() {
+        var _this = this;
         if (!this.mediaType) {
           throw 'BUG: No mediaType set';
         }
@@ -16,10 +17,27 @@
           throw 'BUG: No mediaType not registered';
         }
         if (!this.id) {
-          return this.set({
-            id: "_NEW:" + this.cid
+          this.set({
+            id: "_NEW:" + this.cid,
+            _isDirty: true
           });
         }
+        return this.on('change', function() {
+          var attrs, key, _i, _len, _ref;
+          attrs = _this.changedAttributes();
+          _ref = _.keys(attrs);
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            key = _ref[_i];
+            if (/^_/.test(key)) {
+              delete attrs[key];
+            }
+          }
+          if (_.keys(attrs).length) {
+            return _this.set({
+              _isDirty: true
+            });
+          }
+        });
       },
       toJSON: function() {
         var json;
@@ -38,7 +56,9 @@
         if (at == null) {
           at = null;
         }
-        options = {};
+        options = {
+          parent: this
+        };
         if (at >= 0) {
           options.at = at;
         }
@@ -71,6 +91,11 @@
             _loading: true
           });
           this._promise = this.fetch({
+            success: function() {
+              return _this.set({
+                _isDirty: false
+              });
+            },
             error: function(model, message, options) {
               return _this.trigger('error', model, message, options);
             }
@@ -255,7 +280,9 @@
         this._children.add(children);
         if (this.id) {
           model = ALL_CONTENT.get(this.id);
-          return this.editAction = model.editAction.bind(model);
+          if (model) {
+            return this.editAction = model.editAction.bind(model);
+          }
         }
       },
       root: function() {
@@ -273,7 +300,7 @@
         return this._children;
       },
       addChild: function(model, at) {
-        var children, root, shortcut;
+        var children, json, options, root, shortcut;
         if (at == null) {
           at = 0;
         }
@@ -292,12 +319,28 @@
         if (root.descendants) {
           shortcut = root.descendants.get(model.id) || root.descendants.get(model.cid);
           if (shortcut) {
+            if (this === shortcut.parent) {
+              if (this.children().indexOf(shortcut) < at) {
+                at = at - 1;
+              }
+            }
             shortcut.parent.children().remove(shortcut);
             model = shortcut;
+          } else {
+            json = model.toJSON();
+            delete json.children;
+            model = new BookTocNode(json);
           }
         }
-        this._children.add(model, {
-          at: at
+        options = {
+          parent: this
+        };
+        if (at >= 0) {
+          options.at = at;
+        }
+        this._children.add(model, options);
+        root.descendants.add(model, {
+          parent: this
         });
         if (children) {
           return children.each(function(child) {
@@ -397,21 +440,17 @@
       },
       initialize: function() {
         var _this = this;
+        Deferrable.prototype.initialize.apply(this, arguments);
         this.manifest = new this.manifestType();
         this.navTreeRoot = new BookTocTree();
-        this.listenTo(this.manifest, 'add', function(model, collection) {
-          return ALL_CONTENT.add(model);
-        });
-        this.listenTo(this.manifest, 'reset', function(model, collection) {
-          return ALL_CONTENT.add(model);
-        });
-        this.listenTo(this.manifest, 'change:id', function(model, newValue, oldValue) {
-          var node;
-          node = _this.navTreeRoot.descendants.get(oldValue);
+        this.listenTo(this.manifest, 'change:id', function(model, newId, options) {
+          var node, oldId;
+          oldId = model.previousAttributes().id;
+          node = _this.navTreeRoot.descendants.get(oldId);
           if (!node) {
             return console.error('BUG: There is an entry in the tree but no corresponding model in the manifest');
           }
-          return node.set('id', newValue);
+          return node.set('id', newId);
         });
         this.listenTo(this.navTreeRoot, 'add:treeNode', function(navNode) {
           return _this.manifest.add(navNode.dereference());
