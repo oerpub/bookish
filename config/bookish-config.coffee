@@ -77,7 +77,7 @@ require.config
     # Load all the dev versions of bootstrap files (some of which we may not use)
     bootstrap:
       deps: ['jquery'
-        'less!lib/bootstrap/less/bootstrap'
+        'less!bootstrap-path/../less/bootstrap'
         'bootstrap-path/bootstrap-affix'
         'bootstrap-path/bootstrap-alert'
         'bootstrap-path/bootstrap-button'
