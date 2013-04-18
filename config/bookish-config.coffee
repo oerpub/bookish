@@ -75,8 +75,9 @@ require.config
     # ## UI Libraries
 
     # Load all the dev versions of bootstrap files (some of which we may not use)
+    'bootstrap-path': ['jquery']
     bootstrap:
-      deps: ['jquery'
+      deps: [
         'less!bootstrap-path/../less/bootstrap'
         'bootstrap-path/bootstrap-affix'
         'bootstrap-path/bootstrap-alert'
@@ -92,6 +93,21 @@ require.config
         'bootstrap-path/bootstrap-typeahead'
       ]
       exports: 'jQuery'
+
+    # Ensure jQuery is loaded before any of the bootstrap files are loaded
+    'bootstrap-path/bootstrap-affix'      : ['jquery']
+    'bootstrap-path/bootstrap-alert'      : ['jquery']
+    'bootstrap-path/bootstrap-button'     : ['jquery']
+    'bootstrap-path/bootstrap-carousel'   : ['jquery']
+    'bootstrap-path/bootstrap-collapse'   : ['jquery']
+    'bootstrap-path/bootstrap-dropdown'   : ['jquery']
+    'bootstrap-path/bootstrap-modal'      : ['jquery']
+    'bootstrap-path/bootstrap-scrollspy'  : ['jquery']
+    'bootstrap-path/bootstrap-tab'        : ['jquery']
+    'bootstrap-path/bootstrap-tooltip'    : ['jquery']
+    'bootstrap-path/bootstrap-transition' : ['jquery']
+    'bootstrap-path/bootstrap-typeahead'  : ['jquery']
+
 
     select2:
       deps: ['jquery', 'css!./select2']
