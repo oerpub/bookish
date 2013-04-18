@@ -6,6 +6,16 @@
       _this = this;
     DEBUG_USER = module.config().debugUser;
     ROOT_URL = module.config().rootUrl || '';
+    if (DEBUG_USER) {
+      Backbone.ajax = function(config) {
+        config = _.extend(config, {
+          headers: {
+            'X-REMOTEAUTHID': DEBUG_USER
+          }
+        });
+        return Backbone.$.ajax.apply(Backbone.$, [config]);
+      };
+    }
     WORKSPACE_URL = "" + ROOT_URL + "/workspace/";
     Auth.url = function() {
       return "" + ROOT_URL + "/me/";
@@ -46,16 +56,6 @@
         });
       });
     };
-    if (DEBUG_USER) {
-      Backbone.ajax = function(config) {
-        config = _.extend(config, {
-          headers: {
-            'X-REMOTEAUTHID': DEBUG_USER
-          }
-        });
-        return Backbone.$.ajax.apply(Backbone.$, [config]);
-      };
-    }
     Models.Folder.prototype.url = function() {
       return "" + ROOT_URL + "/folder/" + this.id;
     };

@@ -22,11 +22,22 @@ define [
   ROOT_URL = module.config().rootUrl or ''
 
 
+  # HACK: to always get an authenticated user
+  # by adding a request header
+  if DEBUG_USER
+    Backbone.ajax = (config) ->
+      config = _.extend config,
+        headers:
+          'X-REMOTEAUTHID': DEBUG_USER
+      Backbone.$.ajax.apply(Backbone.$, [config])
+
+
   WORKSPACE_URL = "#{ROOT_URL}/workspace/"
 
   # Find out who the current user is logged in as
   Auth.url = -> "#{ROOT_URL}/me/"
   Auth.fetch()
+
 
   Models.BaseContent::url = ->
     return "#{ROOT_URL}/module/" if @isNew()
@@ -61,16 +72,6 @@ define [
     # Change it in the book body
     @on 'change:treeNode add:treeNode remove:treeNode', =>
       @set {body: NAV_SERIALIZE @navTreeRoot.toJSON()}
-
-
-  # HACK: to always get an authenticated user
-  # by adding a request header
-  if DEBUG_USER
-    Backbone.ajax = (config) ->
-      config = _.extend config,
-        headers:
-          'X-REMOTEAUTHID': DEBUG_USER
-      Backbone.$.ajax.apply(Backbone.$, [config])
 
 
   # A folder contains a title and a collection of items in the folder
