@@ -245,7 +245,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   BaseContent = Deferrable.extend
     mediaType: 'application/vnd.org.cnx.module'
     defaults:
-      title: null
+      title: 'Untitled'
       subjects: []
       keywords: []
       authors: []

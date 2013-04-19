@@ -237,7 +237,7 @@
     BaseContent = Deferrable.extend({
       mediaType: 'application/vnd.org.cnx.module',
       defaults: {
-        title: null,
+        title: 'Untitled',
         subjects: [],
         keywords: [],
         authors: [],
