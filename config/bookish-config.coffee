@@ -75,7 +75,6 @@ require.config
     # ## UI Libraries
 
     # Load all the dev versions of bootstrap files (some of which we may not use)
-    'bootstrap-path': ['jquery']
     bootstrap:
       deps: [
         'less!bootstrap-path/../less/bootstrap'
@@ -101,7 +100,7 @@ require.config
     'bootstrap-path/bootstrap-carousel'   : ['jquery']
     'bootstrap-path/bootstrap-collapse'   : ['jquery']
     'bootstrap-path/bootstrap-dropdown'   : ['jquery']
-    'bootstrap-path/bootstrap-modal'      : ['jquery']
+    'bootstrap-path/bootstrap-modal'      : ['jquery', 'bootstrap-path/bootstrap-transition']
     'bootstrap-path/bootstrap-scrollspy'  : ['jquery']
     'bootstrap-path/bootstrap-tab'        : ['jquery']
     'bootstrap-path/bootstrap-tooltip'    : ['jquery']

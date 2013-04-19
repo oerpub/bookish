@@ -45,7 +45,6 @@
           return ret;
         }
       },
-      'bootstrap-path': ['jquery'],
       bootstrap: {
         deps: ['less!bootstrap-path/../less/bootstrap', 'bootstrap-path/bootstrap-affix', 'bootstrap-path/bootstrap-alert', 'bootstrap-path/bootstrap-button', 'bootstrap-path/bootstrap-carousel', 'bootstrap-path/bootstrap-collapse', 'bootstrap-path/bootstrap-dropdown', 'bootstrap-path/bootstrap-modal', 'bootstrap-path/bootstrap-scrollspy', 'bootstrap-path/bootstrap-tab', 'bootstrap-path/bootstrap-tooltip', 'bootstrap-path/bootstrap-transition', 'bootstrap-path/bootstrap-typeahead'],
         exports: 'jQuery'
@@ -56,7 +55,7 @@
       'bootstrap-path/bootstrap-carousel': ['jquery'],
       'bootstrap-path/bootstrap-collapse': ['jquery'],
       'bootstrap-path/bootstrap-dropdown': ['jquery'],
-      'bootstrap-path/bootstrap-modal': ['jquery'],
+      'bootstrap-path/bootstrap-modal': ['jquery', 'bootstrap-path/bootstrap-transition'],
       'bootstrap-path/bootstrap-scrollspy': ['jquery'],
       'bootstrap-path/bootstrap-tab': ['jquery'],
       'bootstrap-path/bootstrap-tooltip': ['jquery'],
