@@ -627,6 +627,8 @@ define [
       ContentType = @model.get('modelType')
       content = new ContentType()
       Models.WORKSPACE.add content
+      @options.addToContext?(content)
+
       # Begin editing an item as soon as it is added.
       # Some content (like Books and Folders) do not have an `editAction`
       content.editAction?()
@@ -873,8 +875,19 @@ define [
     itemView: BookEditNodeView
     itemViewContainer: '> nav > ol'
 
+    events:
+      'click .editor-content-title': 'changeTitle'
+      'click .editor-go-workspace': 'goWorkspace'
+
+    changeTitle: ->
+      title = prompt 'Enter a new Title', @model.get('title')
+      @model.set 'title', title if title
+    goWorkspace: -> Controller.workspace()
+
     initialize: ->
       @collection = @model.children()
+
+      @listenTo @model, 'change:title', => @render()
 
     appendHtml: (cv, iv, index)->
       $container = @getItemViewContainer(cv)

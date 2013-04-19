@@ -606,10 +606,13 @@
         'click button': 'addItem'
       },
       addItem: function() {
-        var ContentType, content;
+        var ContentType, content, _base;
         ContentType = this.model.get('modelType');
         content = new ContentType();
         Models.WORKSPACE.add(content);
+        if (typeof (_base = this.options).addToContext === "function") {
+          _base.addToContext(content);
+        }
         return typeof content.editAction === "function" ? content.editAction() : void 0;
       }
     });
@@ -819,8 +822,26 @@
       template: BOOK_EDIT,
       itemView: BookEditNodeView,
       itemViewContainer: '> nav > ol',
+      events: {
+        'click .editor-content-title': 'changeTitle',
+        'click .editor-go-workspace': 'goWorkspace'
+      },
+      changeTitle: function() {
+        var title;
+        title = prompt('Enter a new Title', this.model.get('title'));
+        if (title) {
+          return this.model.set('title', title);
+        }
+      },
+      goWorkspace: function() {
+        return Controller.workspace();
+      },
       initialize: function() {
-        return this.collection = this.model.children();
+        var _this = this;
+        this.collection = this.model.children();
+        return this.listenTo(this.model, 'change:title', function() {
+          return _this.render();
+        });
       },
       appendHtml: function(cv, iv, index) {
         var $container, $prevChild;
