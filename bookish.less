@@ -173,9 +173,24 @@
 .progress { margin-bottom: 0 !important; }
 
 
-#layout-main-toolbar { display: inline-block; }
+#layout-main-add, #layout-main-toolbar {
+  .btn-group {
+    margin: 0;
+  }
+}
+
+#layout-main-toolbar {
+  display: inline-block;
+  .input-append {
+    margin-bottom: 0;
+  }
+}
 
 
+#layout-main-auth {
+  display: inline-block;
+  margin: 4px 10px 0 0;
+}
 
 #layout-main-area {
   height: 100%;
