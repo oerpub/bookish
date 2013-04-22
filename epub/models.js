@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['exports', 'underscore', 'backbone', 'bookish/media-types', 'bookish/controller', 'bookish/models', 'bookish/views', 'hbs!./opf-file', 'hbs!./container-file', 'hbs!./nav-serialize'], function(exports, _, Backbone, MEDIA_TYPES, Controller, Models, Views, OPF_TEMPLATE, CONTAINER_TEMPLATE, NAV_SERIALIZE) {
-    var BaseBook, BaseCollection, BaseContent, EPUBContainer, HTMLFile, PackageFile, PackageFileMixin, TemplatedFileMixin, mixin, resolvePath;
+    var BaseBook, BaseCollection, BaseContent, EPUBContainer, PackageFile, PackageFileMixin, TemplatedFileMixin, mixin, resolvePath;
     BaseCollection = Models.DeferrableCollection;
     BaseContent = Models.BaseContent;
     BaseBook = Models.BaseBook;
@@ -37,13 +37,6 @@
         return this.template(this.toJSON());
       }
     };
-    HTMLFile = BaseContent.extend(_.extend({}, TemplatedFileMixin, {
-      mediaType: 'application/xhtml+xml',
-      getterField: 'body',
-      serialize: function() {
-        return this.get(this.getterField);
-      }
-    }));
     PackageFileMixin = mixin(TemplatedFileMixin, {
       defaults: _.defaults(BaseBook.prototype.defaults, {
         language: 'en',
@@ -111,7 +104,7 @@
               silent: true
             });
             recSetTitles = function(nodes) {
-              var model, node, path, _i, _len, _results;
+              var isDirty, model, node, path, _i, _len, _results;
               if (nodes == null) {
                 nodes = [];
               }
@@ -121,10 +114,13 @@
                 if (node.id && node.id.search('#') < 0) {
                   path = resolvePath(_this.navModel.id, node.id);
                   model = Models.ALL_CONTENT.get(path);
+                  isDirty = model.get('_isDirty');
                   model.set({
                     title: node.title
                   });
-                  delete model.changed;
+                  model.set({
+                    _isDirty: isDirty
+                  });
                 }
                 _results.push(recSetTitles(node.children));
               }
@@ -200,7 +196,7 @@
         return json;
       },
       accepts: function() {
-        return [HTMLFile.prototype.mediaType, Models.Folder.prototype.mediaType];
+        return [Models.Folder.prototype.mediaType];
       }
     });
     PackageFile = BaseBook.extend(PackageFileMixin);
@@ -238,16 +234,12 @@
         return ret;
       }
     });
-    HTMLFile.prototype.editAction = function() {
-      return Controller.editContent(this);
-    };
     PackageFile.prototype.editAction = function() {
       return Controller.editBook(this);
     };
     Models.BookTocNode.prototype.accepts = function() {
-      return [Models.BookTocNode.prototype.mediaType, HTMLFile.prototype.mediaType];
+      return [Models.BookTocNode.prototype.mediaType];
     };
-    MEDIA_TYPES.add(HTMLFile);
     MEDIA_TYPES.add(PackageFile);
     exports.EPUB_CONTAINER = new EPUBContainer();
     return exports;
