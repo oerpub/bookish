@@ -41,6 +41,7 @@ define [
   # so they are 'defined' _after_ everything else
   'bootstrap'
   'select2'
+  'humane-dates' # jQuery().humaneDates()
   # Include CSS icons used by the toolbar
   'css!font-awesome'
   # Include the main CSS file
@@ -156,6 +157,9 @@ define [
     initialize: ->
       @listenTo @model, 'change', => @render()
     onRender: ->
+      # Render the modified time in a relative format
+      @$el.find('time[datetime]').humaneDates()
+
       @$el.on 'click', => Controller.editModel(@model)
       # Add DnD options to content
       $content = @$el.children('*[data-media-type]')

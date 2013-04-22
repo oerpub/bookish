@@ -26,6 +26,7 @@ require.config
     'bootstrap-path': 'lib/bootstrap-2.2.2/js'
 
     select2: 'lib/select2/select2'
+    'humane-dates': 'lib/Humane-Dates/humane'
 
     'font-awesome': 'lib/Font-Awesome/css/font-awesome'
 
