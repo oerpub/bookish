@@ -72,6 +72,10 @@
           return ret;
         }
       },
+      'humane-dates': {
+        deps: ['jquery'],
+        exports: 'jQuery.fn.humaneDates'
+      },
       aloha: {
         deps: ['bootstrap', 'config/aloha-config'],
         exports: 'Aloha'
