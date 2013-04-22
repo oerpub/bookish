@@ -65,7 +65,7 @@
       initialize: function() {
         var _this = this;
         BaseBook.prototype.initialize.apply(this, arguments);
-        this.listenTo(this.navTreeRoot, 'change:treeNode add:treeNode remove:treeNode', function() {
+        this.listenTo(this.navTreeRoot.descendants, 'change change:treeNode add:treeNode remove:treeNode', function() {
           var $body, $bodyNodes, $nav, $newTree, $wrap, bodyStr, newTree;
           $newTree = jQuery(_this.navModel.get('body'));
           newTree = NAV_SERIALIZE(_this.navTreeRoot.toJSON());
@@ -242,6 +242,7 @@
     };
     MEDIA_TYPES.add(PackageFile);
     exports.EPUB_CONTAINER = new EPUBContainer();
+    exports.PackageFile = PackageFile;
     return exports;
   });
 

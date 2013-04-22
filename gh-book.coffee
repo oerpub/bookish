@@ -174,6 +174,10 @@ define [
   AtcModels_Folder_accepts = AtcModels.Folder::accepts()
   AtcModels_Folder_accepts.push XhtmlModel::mediaType
   AtcModels.Folder::accepts = -> AtcModels_Folder_accepts
+
+  AtcModels.BookTocNode::accepts  = -> [ XhtmlModel::mediaType, AtcModels.Folder::mediaType, AtcModels.BookTocNode::mediaType ]
+  EpubModels.PackageFile::accepts = -> [ XhtmlModel::mediaType, AtcModels.Folder::mediaType, AtcModels.BookTocNode::mediaType ]
+
   # Clear everything and refetch when the
   STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']
   Auth.on 'change', () =>

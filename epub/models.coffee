@@ -66,7 +66,7 @@ define [
 
       # When the `navTreeStr` is changed on the package,
       # CHange it on the navigation.html file
-      @listenTo @navTreeRoot, 'change:treeNode add:treeNode remove:treeNode', =>
+      @listenTo @navTreeRoot.descendants, 'change change:treeNode add:treeNode remove:treeNode', =>
 
         $newTree = jQuery(@navModel.get 'body')
 
@@ -241,5 +241,6 @@ define [
   MEDIA_TYPES.add PackageFile
 
   exports.EPUB_CONTAINER = new EPUBContainer()
+  exports.PackageFile = PackageFile
 
   return exports

@@ -161,6 +161,12 @@
     AtcModels.Folder.prototype.accepts = function() {
       return AtcModels_Folder_accepts;
     };
+    AtcModels.BookTocNode.prototype.accepts = function() {
+      return [XhtmlModel.prototype.mediaType, AtcModels.Folder.prototype.mediaType, AtcModels.BookTocNode.prototype.mediaType];
+    };
+    EpubModels.PackageFile.prototype.accepts = function() {
+      return [XhtmlModel.prototype.mediaType, AtcModels.Folder.prototype.mediaType, AtcModels.BookTocNode.prototype.mediaType];
+    };
     STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password'];
     Auth.on('change', function() {
       var key, value, _ref, _ref1, _results;
