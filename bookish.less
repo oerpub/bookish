@@ -11,9 +11,10 @@
  *
  * Show the document icon by default.
  */
-.x-media-type-icon(@media-type; @color; @char) {
+.x-media-type-icon(@media-type; @add-title; @color; @char) {
   @mt-selector: ~"[data-media-type='@{media-type}']";
   @{mt-selector} > .icon-content::before { color: @color; content: @char; }
+  @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
 }
 
 [data-media-type] {
@@ -21,11 +22,11 @@
   > .icon-content { margin-right: 0.25em; }
 }
 
-.x-media-type-icon('application/xhtml+xml';              #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.module';     #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.collection'; #c00; "\f02d"); /* icon-book */
-.x-media-type-icon('application/vnd.org.cnx.folder';     #999; "\f07c"); /* icon-folder-open */
-.x-media-type-icon('application/vnd.org.cnx.container';  #999; "\f114"); /* icon-folder-close-alt */
+.x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.module';     "Module";    #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.collection'; "Book";      #c00; "\f02d"); /* icon-book */
+.x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
+.x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
 
 //Used to style parts of the sidebar differently for different media-types
 @mt-book: ~"[data-media-type='application/vnd.org.cnx.collection']";
@@ -172,9 +173,24 @@
 .progress { margin-bottom: 0 !important; }
 
 
-#layout-main-toolbar { display: inline-block; }
+#layout-main-add, #layout-main-toolbar {
+  .btn-group {
+    margin: 0;
+  }
+}
+
+#layout-main-toolbar {
+  display: inline-block;
+  .input-append {
+    margin-bottom: 0;
+  }
+}
 
 
+#layout-main-auth {
+  display: inline-block;
+  margin: 4px 10px 0 0;
+}
 
 #layout-main-area {
   height: 100%;
