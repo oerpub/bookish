@@ -75,6 +75,9 @@
       });
     };
     XhtmlModel = AtcModels.BaseContent.extend({
+      defaults: {
+        title: null
+      },
       mediaType: 'application/xhtml+xml',
       parse: function(html) {
         var $body, $head, $html, $images, counter, _ref, _ref1,

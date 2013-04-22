@@ -76,6 +76,9 @@ define [
 
 
   XhtmlModel = AtcModels.BaseContent.extend
+    defaults:
+      # Set the default title to null so the path shows up instead of "Untitled"
+      title: null
     mediaType: 'application/xhtml+xml'
 
     parse: (html) ->
