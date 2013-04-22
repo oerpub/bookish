@@ -114,6 +114,10 @@ require.config
       exports: 'Select2'
       init: -> ret = @Select2; delete @Select2; ret
 
+    'humane-dates':
+      deps: ['jquery']
+      exports: 'jQuery.fn.humaneDates'
+
     # Some of the Aloha plugins depend on bootstrap being initialized on jQuery
     # (like the popover plugin).
     #
