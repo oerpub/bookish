@@ -26,6 +26,7 @@ require.config
     'bootstrap-path': 'lib/bootstrap-2.2.2/js'
 
     select2: 'lib/select2/select2'
+    'humane-dates': 'lib/Humane-Dates/humane'
 
     'font-awesome': 'lib/Font-Awesome/css/font-awesome'
 
@@ -112,6 +113,10 @@ require.config
       deps: ['jquery', 'css!./select2']
       exports: 'Select2'
       init: -> ret = @Select2; delete @Select2; ret
+
+    'humane-dates':
+      deps: ['jquery']
+      exports: 'jQuery.fn.humaneDates'
 
     # Some of the Aloha plugins depend on bootstrap being initialized on jQuery
     # (like the popover plugin).
