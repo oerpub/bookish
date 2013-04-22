@@ -15,6 +15,7 @@ define [
   'marionette'
   'jquery'
   'aloha'
+  'moment' # For generating relative times
   'bookish/controller'
   'bookish/models'
   'bookish/media-types'
@@ -41,12 +42,11 @@ define [
   # so they are 'defined' _after_ everything else
   'bootstrap'
   'select2'
-  'humane-dates' # jQuery().humaneDates()
   # Include CSS icons used by the toolbar
   'css!font-awesome'
   # Include the main CSS file
   'less!bookish'
-], (exports, _, Backbone, Marionette, jQuery, Aloha, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
+], (exports, _, Backbone, Marionette, jQuery, Aloha, Moment, Controller, Models, MEDIA_TYPES, Languages, CONTENT_EDIT, SEARCH_BOX, SEARCH_RESULT, SEARCH_RESULT_ITEM, DND_HANDLE, DIALOG_WRAPPER, EDIT_METADATA, EDIT_ROLES, LANGUAGE_VARIANTS, ALOHA_TOOLBAR, SIGN_IN_OUT, ADD_VIEW, ADD_ITEM_VIEW, BOOK_EDIT, BOOK_EDIT_NODE, __) ->
 
 
   # Drag and Drop Behavior
@@ -98,6 +98,35 @@ define [
 
   # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
   DELAY_BEFORE_SAVING = 3000
+
+  # Updates the relative time for a set of elements periodically
+  updateTimes = ($times) ->
+    $times.each (i, el) =>
+      $el = jQuery(el)
+      updateTime = =>
+        # If the element is detached from the DOM don't continue updating it
+        if $el.parents('html')[0]
+          # Generate a relative time and set it as the text of the `time` element
+          utc = $el.attr 'datetime'
+          if utc
+            utcTime = Moment.utc(utc)
+            now = Moment()
+            diff = now.diff(utcTime) / 1000 # Put it in Seconds instead of milliseconds
+            # If the update was in the future then change it to be `a few seconds ago`
+            utcTime = now if diff < 0
+
+            # Set the human-readable text for the time
+            $el.text utcTime.fromNow() # Passing `true` would drop the suffix
+            nextUpdate = 10
+            if diff < 60
+              nextUpdate = 5       # update in 5 seconds
+            else if diff < 60 * 60
+              nextUpdate = 30      # update in 30 seconds
+            else
+              nextUpdate = 60 * 2  # update in 2 minutes
+            setTimeout updateTime, (nextUpdate * 1000)
+      updateTime()
+
 
   # Select2 is a multiselect UI library.
   # It queries the webserver to provide search results as you type
@@ -157,8 +186,9 @@ define [
     initialize: ->
       @listenTo @model, 'change', => @render()
     onRender: ->
-      # Render the modified time in a relative format
-      @$el.find('time[datetime]').humaneDates()
+      # Render the modified time in a relative format and update it periodically
+      $times = @$el.find('time[datetime]')
+      updateTimes $times
 
       @$el.on 'click', => Controller.editModel(@model)
       # Add DnD options to content
