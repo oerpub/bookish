@@ -20,7 +20,11 @@ require.config
 
     # ## UI libraries
     aloha: 'lib/Aloha-Editor/src/lib/aloha'
-    bootstrap: 'lib/bootstrap/js/bootstrap'
+    # Link to the Tooltip just so something is requested and loaded.
+    # Bootstrap attaches itself to jQuery anyway.
+    bootstrap: 'lib/bootstrap-2.2.2/js/bootstrap-popover'
+    'bootstrap-path': 'lib/bootstrap-2.2.2/js'
+
     select2: 'lib/select2/select2'
 
     'font-awesome': 'lib/Font-Awesome/css/font-awesome'
@@ -69,9 +73,40 @@ require.config
       init: -> ret = @Backbone.Marionette; delete @Backbone.Marionette; delete @Backbone; ret
 
     # ## UI Libraries
+
+    # Load all the dev versions of bootstrap files (some of which we may not use)
     bootstrap:
-      deps: ['jquery', 'css!lib/bootstrap/css/bootstrap']
+      deps: [
+        'less!bootstrap-path/../less/bootstrap'
+        'bootstrap-path/bootstrap-affix'
+        'bootstrap-path/bootstrap-alert'
+        'bootstrap-path/bootstrap-button'
+        'bootstrap-path/bootstrap-carousel'
+        'bootstrap-path/bootstrap-collapse'
+        'bootstrap-path/bootstrap-dropdown'
+        'bootstrap-path/bootstrap-modal'
+        'bootstrap-path/bootstrap-scrollspy'
+        'bootstrap-path/bootstrap-tab'
+        'bootstrap-path/bootstrap-tooltip' # `bootstrap-popover` depends on this one
+        'bootstrap-path/bootstrap-transition'
+        'bootstrap-path/bootstrap-typeahead'
+      ]
       exports: 'jQuery'
+
+    # Ensure jQuery is loaded before any of the bootstrap files are loaded
+    'bootstrap-path/bootstrap-affix'      : ['jquery']
+    'bootstrap-path/bootstrap-alert'      : ['jquery']
+    'bootstrap-path/bootstrap-button'     : ['jquery']
+    'bootstrap-path/bootstrap-carousel'   : ['jquery']
+    'bootstrap-path/bootstrap-collapse'   : ['jquery']
+    'bootstrap-path/bootstrap-dropdown'   : ['jquery']
+    'bootstrap-path/bootstrap-modal'      : ['jquery', 'bootstrap-path/bootstrap-transition']
+    'bootstrap-path/bootstrap-scrollspy'  : ['jquery']
+    'bootstrap-path/bootstrap-tab'        : ['jquery']
+    'bootstrap-path/bootstrap-tooltip'    : ['jquery']
+    'bootstrap-path/bootstrap-transition' : ['jquery']
+    'bootstrap-path/bootstrap-typeahead'  : ['jquery']
+
 
     select2:
       deps: ['jquery', 'css!./select2']
@@ -83,7 +118,7 @@ require.config
     #
     # Also, configure Aloha for the application using the `aloha-config` module.
     aloha:
-      deps: ['bootstrap', 'config/aloha-config', 'css!lib/Aloha-Editor/src/css/aloha']
+      deps: ['bootstrap', 'config/aloha-config']
       exports: 'Aloha'
 
   # Maps prefixes (like `less!path/to/less-file`) to use the LESS CSS plugin

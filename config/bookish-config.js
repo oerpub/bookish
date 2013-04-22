@@ -13,7 +13,8 @@
       backbone: 'node_modules/backbone/backbone',
       marionette: 'lib/backbone.marionette',
       aloha: 'lib/Aloha-Editor/src/lib/aloha',
-      bootstrap: 'lib/bootstrap/js/bootstrap',
+      bootstrap: 'lib/bootstrap-2.2.2/js/bootstrap-popover',
+      'bootstrap-path': 'lib/bootstrap-2.2.2/js',
       select2: 'lib/select2/select2',
       'font-awesome': 'lib/Font-Awesome/css/font-awesome',
       handlebars: 'lib/require-handlebars-plugin/Handlebars',
@@ -45,9 +46,21 @@
         }
       },
       bootstrap: {
-        deps: ['jquery', 'css!lib/bootstrap/css/bootstrap'],
+        deps: ['less!bootstrap-path/../less/bootstrap', 'bootstrap-path/bootstrap-affix', 'bootstrap-path/bootstrap-alert', 'bootstrap-path/bootstrap-button', 'bootstrap-path/bootstrap-carousel', 'bootstrap-path/bootstrap-collapse', 'bootstrap-path/bootstrap-dropdown', 'bootstrap-path/bootstrap-modal', 'bootstrap-path/bootstrap-scrollspy', 'bootstrap-path/bootstrap-tab', 'bootstrap-path/bootstrap-tooltip', 'bootstrap-path/bootstrap-transition', 'bootstrap-path/bootstrap-typeahead'],
         exports: 'jQuery'
       },
+      'bootstrap-path/bootstrap-affix': ['jquery'],
+      'bootstrap-path/bootstrap-alert': ['jquery'],
+      'bootstrap-path/bootstrap-button': ['jquery'],
+      'bootstrap-path/bootstrap-carousel': ['jquery'],
+      'bootstrap-path/bootstrap-collapse': ['jquery'],
+      'bootstrap-path/bootstrap-dropdown': ['jquery'],
+      'bootstrap-path/bootstrap-modal': ['jquery', 'bootstrap-path/bootstrap-transition'],
+      'bootstrap-path/bootstrap-scrollspy': ['jquery'],
+      'bootstrap-path/bootstrap-tab': ['jquery'],
+      'bootstrap-path/bootstrap-tooltip': ['jquery'],
+      'bootstrap-path/bootstrap-transition': ['jquery'],
+      'bootstrap-path/bootstrap-typeahead': ['jquery'],
       select2: {
         deps: ['jquery', 'css!./select2'],
         exports: 'Select2',
@@ -59,7 +72,7 @@
         }
       },
       aloha: {
-        deps: ['bootstrap', 'config/aloha-config', 'css!lib/Aloha-Editor/src/css/aloha'],
+        deps: ['bootstrap', 'config/aloha-config'],
         exports: 'Aloha'
       }
     },

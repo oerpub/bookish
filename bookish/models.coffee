@@ -14,7 +14,23 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     initialize: ->
       throw 'BUG: No mediaType set' if not @mediaType
       throw 'BUG: No mediaType not registered' if not MEDIA_TYPES.get @mediaType
-      @set {id: "_NEW:#{@cid}"} if not @id
+      @set {id:"_NEW:#{@cid}", _isDirty:true} if not @id
+
+      # If anything but one of the *meta* attributes changes then set the dirty bit.
+      #
+      # Some meta attributes:
+      #
+      # * `_isDirty`
+      # * `_loading`
+      # * `_loaded`
+      @on 'change', =>
+        attrs = @changedAttributes()
+        # Remove all keys starting with `_`.
+        # Then set the dirty bit if anything else changed
+        for key in _.keys(attrs)
+          delete attrs[key] if /^_/.test key
+
+        @set {_isDirty:true} if _.keys(attrs).length
 
     # Add the `mediaType` to the JSON
     toJSON: ->
@@ -91,7 +107,8 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         # **TODO:** Set `silent:true` during the fetch (So save doesn't trigger)
         # but make sure all the views listen to `change:_done` so they always update
         # instead of relying on `change:*`.
-        @_promise = @fetch # {silent:true}
+        @_promise = @fetch
+          success: => @set {_isDirty:false}
           error: (model, message, options) =>
             @trigger 'error', model, message, options
         @_promise
@@ -228,7 +245,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
   BaseContent = Deferrable.extend
     mediaType: 'application/vnd.org.cnx.module'
     defaults:
-      title: null
+      title: 'Untitled'
       subjects: []
       keywords: []
       authors: []
@@ -292,7 +309,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       # If this node "points to" a piece of content then provide an `editAction`
       if @id
         model = ALL_CONTENT.get(@id)
-        @editAction = model.editAction.bind(model)
+        @editAction = model.editAction.bind(model) if model
 
     # Returns the root of this tree node
     root: ->
@@ -342,6 +359,7 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
       options.at = at if at >= 0
       @_children.add model, options
 
+      root.descendants.add model, {parent:@}
       # Finally, add the children (so the descendants list is populated)
       if children
         children.each (child) -> model.addChild child if child.mediaType in model.accepts()
@@ -464,18 +482,18 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
     #
     # Similarly, an update to the navigation tree will create new models.
     initialize: ->
+      # Call the super `initialize()`
+      Deferrable::initialize.apply(@, arguments)
 
       @manifest = new @manifestType()
       @navTreeRoot = new BookTocTree()
 
-      @listenTo @manifest, 'add',   (model, collection) -> ALL_CONTENT.add model
-      @listenTo @manifest, 'reset', (model, collection) -> ALL_CONTENT.add model
-
       # If a model's id changes then update the `navTree` (it was a new model that got saved)
-      @listenTo @manifest, 'change:id', (model, newValue, oldValue) =>
-        node = @navTreeRoot.descendants.get oldValue
+      @listenTo @manifest, 'change:id', (model, newId, options) =>
+        oldId = model.previousAttributes().id
+        node = @navTreeRoot.descendants.get oldId
         return console.error 'BUG: There is an entry in the tree but no corresponding model in the manifest' if not node
-        node.set('id', newValue)
+        node.set('id', newId)
 
       # If a piece of content is linked to in the navigation document
       # always include it in the manifest
