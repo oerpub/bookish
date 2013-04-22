@@ -43,6 +43,7 @@ fromGithub "https://github.com/millermedeiros/requirejs-plugins"
 fromGithub "https://github.com/FortAwesome/Font-Awesome"
 
 fromGithub "https://github.com/ivaynberg/select2"
+fromGithub "https://github.com/zachleat/Humane-Dates"
 fromGithub "https://github.com/pivotal/jasmine"
 fromGithub "https://github.com/appendto/jquery-mockjax"
 

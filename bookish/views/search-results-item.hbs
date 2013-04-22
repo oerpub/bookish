@@ -21,4 +21,11 @@
 {{/if}}
 </td>
 
-<td><!-- modified --></td>
+{{!Last Modified}}
+<td>
+  {{#if dateLastModifiedUTC}}
+    <time datetime="{{dateLastModifiedUTC}}"></time>
+  {{else}}
+    <time datetime="{{dateCreatedUTC}}"></time>
+  {{/if}}
+</td>
