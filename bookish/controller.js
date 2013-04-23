@@ -108,9 +108,63 @@
         }
         return model.editAction();
       },
-      editBook: function(model) {
+      editBook: function(book) {
+        var view, workspace,
+          _this = this;
         window.scrollTo(0, 0);
-        return mainToolbar.close();
+        workspace = new Models.FilteredCollection(null, {
+          collection: book.manifest
+        });
+        view = new Views.SearchBoxView({
+          model: workspace
+        });
+        mainToolbar.show(view);
+        view = new Views.SearchResultsView({
+          collection: workspace
+        });
+        mainArea.show(view);
+        mainAdd.show(new Views.AddView({
+          collection: MEDIA_TYPES.asCollection(),
+          itemViewOptions: {
+            addToContext: function(content) {
+              return book.addChild(content);
+            }
+          }
+        }));
+        view = new Views.BookEditView({
+          model: book
+        });
+        mainSidebar.show(view);
+        return book.loaded().done(function() {
+          return Backbone.history.navigate("content/" + book.id);
+        });
+      },
+      editFolder: function(folder) {
+        var view, workspace,
+          _this = this;
+        window.scrollTo(0, 0);
+        workspace = new Models.FilteredCollection(null, {
+          collection: folder.children()
+        });
+        view = new Views.SearchBoxView({
+          model: workspace
+        });
+        mainToolbar.show(view);
+        view = new Views.SearchResultsView({
+          collection: workspace
+        });
+        mainArea.show(view);
+        mainAdd.show(new Views.AddView({
+          collection: MEDIA_TYPES.asCollection(),
+          itemViewOptions: {
+            addToContext: function(content) {
+              return folder.addChild(content);
+            }
+          }
+        }));
+        return folder.loaded().done(function() {
+          return Backbone.history.navigate("content/" + folder.id);
+        });
       },
       editContent: function(content) {
         var configAccordionDialog, view,
@@ -172,6 +226,9 @@
     };
     Models.BaseBook.prototype.editAction = function() {
       return mainController.editBook(this);
+    };
+    Models.Folder.prototype.editAction = function() {
+      return mainController.editFolder(this);
     };
     MEDIA_TYPES.add(Models.BaseContent);
     MEDIA_TYPES.add(Models.BaseBook);

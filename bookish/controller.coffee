@@ -119,7 +119,8 @@ define [
       mainArea.show view
 
       # Add the "Add" button
-      mainAdd.show new Views.AddView {collection: MEDIA_TYPES.asCollection()}
+      mainAdd.show new Views.AddView
+        collection: MEDIA_TYPES.asCollection()
 
       workspaceTree = new Models.WorkspaceTree()
       view = new Views.BookEditView {model: workspaceTree}
@@ -151,11 +152,62 @@ define [
       model.editAction()
 
     # Edit a book in the main area
-    editBook: (model) ->
+    editBook: (book) ->
       # Always scroll to the top of the page
       window.scrollTo(0, 0)
 
-      mainToolbar.close()
+      # List the contents of the book.
+      workspace = new Models.FilteredCollection null, {collection: book.manifest}
+
+      # Allow filtering the workspace by searching in the `SearchBoxView`
+      view = new Views.SearchBoxView {model: workspace}
+      mainToolbar.show view
+
+      view = new Views.SearchResultsView {collection: workspace}
+      mainArea.show view
+
+      # Add the "Add" button
+      mainAdd.show new Views.AddView
+        collection: MEDIA_TYPES.asCollection()
+        itemViewOptions:
+          addToContext: (content) -> book.addChild(content)
+
+      view = new Views.BookEditView {model: book}
+      mainSidebar.show view
+
+      # Update the URL when the workspace is fetched and loaded
+      book.loaded().done =>
+        # Update the URL
+        Backbone.history.navigate "content/#{book.id}"
+
+    # Edit a folder in the sidebar
+    editFolder: (folder) ->
+      # Always scroll to the top of the page
+      window.scrollTo(0, 0)
+
+      # List the contents of the folder.
+      workspace = new Models.FilteredCollection null, {collection: folder.children()}
+
+      # Allow filtering the workspace by searching in the `SearchBoxView`
+      view = new Views.SearchBoxView {model: workspace}
+      mainToolbar.show view
+
+      view = new Views.SearchResultsView {collection: workspace}
+      mainArea.show view
+
+      # Add the "Add" button
+      mainAdd.show new Views.AddView
+        collection: MEDIA_TYPES.asCollection()
+        # Define what happens when one of the Add Items is clicked
+        itemViewOptions:
+          addToContext: (content) -> folder.addChild content
+
+      # Do not change the `mainSidebar`
+
+      # Update the URL when the workspace is fetched and loaded
+      folder.loaded().done =>
+        # Update the URL
+        Backbone.history.navigate "content/#{folder.id}"
 
     # Edit a piece of HTML content
     editContent: (content) ->
@@ -218,7 +270,8 @@ define [
   # -------
   # Add the 2 basic Media Types already defined in `Models`.
   Models.BaseContent::editAction = -> mainController.editContent @
-  Models.BaseBook::editAction = -> mainController.editBook @
+  Models.BaseBook::editAction =    -> mainController.editBook @
+  Models.Folder::editAction =      -> mainController.editFolder @
 
   MEDIA_TYPES.add Models.BaseContent
   MEDIA_TYPES.add Models.BaseBook
