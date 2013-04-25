@@ -71,7 +71,13 @@ require.config
       # so we never always include `marionette` and never assume Marionette is already loaded as a dependency.
       #
       #      init: -> ret = @Backbone.Marionette; delete @Backbone.Marionette; delete @Backbone; delete @_; ret
-      init: -> ret = @Backbone.Marionette; delete @Backbone.Marionette; delete @Backbone; ret
+      init: (_, Backbone) -> 
+        trigger = Marionette.Controller.prototype.trigger 
+        Marionette.Controller.prototype.trigger = ->
+          console.log arguments
+          trigger.apply(@,arguments)
+
+        ret = @Backbone.Marionette; delete @Backbone.Marionette; delete @Backbone; ret
 
     # ## UI Libraries
 
