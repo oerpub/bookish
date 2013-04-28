@@ -102,6 +102,8 @@ define [
       html = html.replace(/body>/g, "prefix-body>")
 
       html = html.replace(/<html/g, "<prefix-html")
+      # Search for the exact element `<head>` since otherwise it could be
+      # confused with `<header>`.
       html = html.replace(/<head>/g, "<prefix-head>")
       html = html.replace(/<body/g, "<prefix-body")
 
