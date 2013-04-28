@@ -11,9 +11,10 @@
     "install": "mkdir -p ./lib && cd ./lib && bash ../install-libs.sh && cd ../"
   },
   "dependencies": {
+    "github-client": "*",
     "underscore": ">=1.4.3",
     "backbone": ">=0.9.9",
-    "github-client": "*"
+    "moment": ">=2.0.0"
   },
   "devDependencies": {
     "docco": "~0.4.0"

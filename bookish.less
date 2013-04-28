@@ -11,9 +11,10 @@
  *
  * Show the document icon by default.
  */
-.x-media-type-icon(@media-type; @color; @char) {
+.x-media-type-icon(@media-type; @add-title; @color; @char) {
   @mt-selector: ~"[data-media-type='@{media-type}']";
   @{mt-selector} > .icon-content::before { color: @color; content: @char; }
+  @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
 }
 
 [data-media-type] {
@@ -21,15 +22,29 @@
   > .icon-content { margin-right: 0.25em; }
 }
 
-.x-media-type-icon('application/xhtml+xml';              #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.module';     #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.collection'; #c00; "\f02d"); /* icon-book */
-.x-media-type-icon('application/vnd.org.cnx.folder';     #999; "\f07c"); /* icon-folder-open */
-.x-media-type-icon('application/vnd.org.cnx.container';  #999; "\f114"); /* icon-folder-close-alt */
+.x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.module';     "Module";    #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.collection'; "Book";      #c00; "\f02d"); /* icon-book */
+.x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
+.x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
 
 //Used to style parts of the sidebar differently for different media-types
 @mt-book: ~"[data-media-type='application/vnd.org.cnx.collection']";
 
+
+.below-toolbar {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: flex;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  box-orient: horizontal;
+}
 
 /* ******************************************************
  * Left sidebar (tree explorer)
@@ -37,16 +52,19 @@
  */
 
 #layout-main-sidebar {
-  height: 100%;
-  -webkit-box-sizing: border-box;
-  position: relative;
-  min-width: 20em;
+  -webkit-flex: 0 1 20em;
+  -moz-flex: 0 1 20em;
+  flex: 0 1 20em;
 
   padding: 1em;
   border-right: 1px solid #ccc;
 
   /* Slide the sidebar off screen when hiding it */
   -webkit-transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  transition: 0.5s ease-in-out;
+
+  .editor-go-workspace { cursor: pointer; }
 
   nav {
     /* Enable scrolling inside the side bar */
@@ -117,6 +135,29 @@
   }
 }
 
+#layout-main-area {
+  overflow-y: scroll;
+  -webkit-flex: 1 0 auto;
+  -moz-flex: 1 0 auto;
+  flex: 1 0 auto;
+
+  /* Add some space because the toolbar floats */
+  background-color: #ebebeb;
+  padding: 2em;
+
+  // Make the main editing area white so it looks like a sheet of paper
+  > * {
+    padding: 1em;
+    background-color: white;
+    border: 1px solid black;
+  }
+
+  #accordion-metadata .accordion-toggle {
+    width: 100%;
+    text-align: left;
+  }
+}
+
 
 /* ******************************************************
  * Search Results (Workspace) table
@@ -142,9 +183,6 @@
   padding-bottom: 10px;
   max-width: 300px;
   max-height: 1em;
-
-  -moz-box-shadow: 2px 2px 2px #888;
-  -webkit-box-shadow: 2px 2px 2px #888;
   box-shadow: 2px 2px 2px #888;
 }
 .dnd-content-handle > .title-content { font-weight: bold; }
@@ -154,47 +192,31 @@
   background-color: #ccc;
 }
 
-.below-toolbar {
-  height: 100%;
-  -webkit-box-flex: 1;
-  -webkit-box-sizing: border-box;
-  -webkit-box-orient: horizontal;
-  -moz-box-flex: 1;
-  -moz-box-sizing: border-box;
-  -moz-box-orient: horizontal;
-  display: -webkit-box;
-  display: -moz-box;
-}
-
 .has-changed { color: #cc0; }
 
 /* Bootstrap progress bars have a margin-bottom: 20px. Remove it */
 .progress { margin-bottom: 0 !important; }
 
 
-#layout-main-toolbar { display: inline-block; }
-
-
-
-#layout-main-area {
-  height: 100%;
-  -webkit-box-flex: 1;
-  -webkit-box-sizing: border-box;
-  /* -moz-box-flex: 1;  better w/o until we get the right column width sorted out*/
-  -moz-box-sizing: border-box;
-  position: relative;
-
-  /* Add some space because the toolbar floats */
-  background-color: #ebebeb;
-  padding: 2em;
-
-  // Make the main editing area white so it looks like a sheet of paper
-  > * {
-    padding: 1em;
-    background-color: white;
-    border: 1px solid black;
+#layout-main-add, #layout-main-toolbar {
+  .btn-group {
+    margin: 0;
   }
+}
 
+#layout-main-toolbar {
+  display: inline-block;
+  vertical-align: middle;
+
+  .input-append {
+    margin-bottom: 0;
+  }
+}
+
+
+#layout-main-auth {
+  display: inline-block;
+  margin: 4px 10px 0 0;
 }
 
 
