@@ -11,7 +11,6 @@ define [
   'hbs!gh-book/fork-book-item'
 ], (_, Backbone, Marionette, Controller, AtcModels, EpubModels, Auth, Views, SIGN_IN_OUT, FORK_BOOK_ITEM) ->
 
-
   # ## Auth View
   # The top-right of each page should have either:
   #
@@ -46,16 +45,24 @@ define [
       # Show an alert if the user is not logged in
       return alert 'Please log in to fork or just go to the github page and fork the book!' if not @model.get 'id'
 
+      # The view will refresh when anything on it changes (including the github `rateLimitRemaining`).
+      # This causes a problem when the "Copy this Book" modal pops up.
+      # Getting the list of organizations updates the `rateLimitRemaining` causing the modal to pop open
+      # and then immediately close (because the view with the modal is refreshed).
+      # So, move the modal to the body and find it there if it has been opened before
+      # (hence the `jQuery('body')` instead of `@$el.find(...)`)
+      #
       # Populate the fork modal before showing it
-      $fork = @$el.find '#fork-book-modal'
+      $fork = jQuery('body').find '#fork-book-modal'
 
 
       forkHandler = (org) -> () ->
-        Auth.getRepo().fork (err, resp) ->
+        Auth.getRepo().fork(org)
+        .fail (err) ->
+          alert "Problem forking: #{err}"
+        .done (resp) ->
           # Close the modal dialog
           $fork.modal('hide')
-
-          throw "Problem forking: #{err}" if err
 
           setTimeout(->
             Auth.set 'repoUser', (org or Auth.get('id'))
@@ -64,15 +71,16 @@ define [
           alert 'Thanks for copying!\nThe current repository (in settings) will be updated to point to your copy of the book. \nThe next time you click Save the changes will be saved to your copied book.\nIf not, refresh the page and change the Repo User in Settings.'
 
 
-      Auth.getUser().orgs (err, orgs) ->
+      Auth.getUser().orgs()
+      .done (orgs) ->
         $list = $fork.find('.modal-body').empty()
 
-        $item = @$(FORK_BOOK_ITEM {login: Auth.get 'id'})
+        $item = jQuery(FORK_BOOK_ITEM {login: Auth.get 'id'})
         $item.find('button').on 'click', forkHandler(null)
         $list.append $item
 
         _.each orgs, (org) ->
-          $item = @$(FORK_BOOK_ITEM {login: "#{org.login} (Organization)"})
+          $item = jQuery(FORK_BOOK_ITEM {login: "#{org.login} (Organization)"})
           # For now disallow forking to organizations.
           #     $item.find('button').on 'click', forkHandler(org)
           $item.addClass 'disabled'
@@ -80,6 +88,9 @@ define [
           $list.append $item
 
 
+        # Move the modal to the body so it does not get reloaded when the `rateLimitRemaining` is updated
+        # (after fetching the list of orgs to fork to).
+        $fork.appendTo('body')
         # Show the modal
         $fork.modal('show')
 

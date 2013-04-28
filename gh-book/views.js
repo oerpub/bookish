@@ -28,14 +28,13 @@
         if (!this.model.get('id')) {
           return alert('Please log in to fork or just go to the github page and fork the book!');
         }
-        $fork = this.$el.find('#fork-book-modal');
+        $fork = jQuery('body').find('#fork-book-modal');
         forkHandler = function(org) {
           return function() {
-            return Auth.getRepo().fork(function(err, resp) {
+            return Auth.getRepo().fork(org).fail(function(err) {
+              return alert("Problem forking: " + err);
+            }).done(function(resp) {
               $fork.modal('hide');
-              if (err) {
-                throw "Problem forking: " + err;
-              }
               setTimeout(function() {
                 return Auth.set('repoUser', org || Auth.get('id'));
               }, 10000);
@@ -43,21 +42,22 @@
             });
           };
         };
-        return Auth.getUser().orgs(function(err, orgs) {
+        return Auth.getUser().orgs().done(function(orgs) {
           var $item, $list;
           $list = $fork.find('.modal-body').empty();
-          $item = this.$(FORK_BOOK_ITEM({
+          $item = jQuery(FORK_BOOK_ITEM({
             login: Auth.get('id')
           }));
           $item.find('button').on('click', forkHandler(null));
           $list.append($item);
           _.each(orgs, function(org) {
-            $item = this.$(FORK_BOOK_ITEM({
+            $item = jQuery(FORK_BOOK_ITEM({
               login: "" + org.login + " (Organization)"
             }));
             $item.addClass('disabled');
             return $list.append($item);
           });
+          $fork.appendTo('body');
           return $fork.modal('show');
         });
       },
