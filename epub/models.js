@@ -187,11 +187,11 @@
         };
       },
       toJSON: function() {
-        var json, _ref;
+        var json, manifest, _ref;
         json = BaseBook.prototype.toJSON.apply(this, arguments);
-        json.manifest = (_ref = this.manifest) != null ? _ref.toJSON() : void 0;
-        _.each(json.manifest, function(item) {
-          return item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType;
+        manifest = (_ref = this.manifest) != null ? _ref.toJSON() : void 0;
+        json.manifest = _.filter(manifest, function(item) {
+          return item.mediaType !== Models.BookTocNode.prototype.mediaType;
         });
         return json;
       },

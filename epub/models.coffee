@@ -201,12 +201,9 @@ define [
 
     toJSON: ->
       json = BaseBook.prototype.toJSON.apply(@, arguments)
-      json.manifest = @manifest?.toJSON()
-
-      # Loop through everything in the manifest and add a `mediaType`
-      _.each json.manifest, (item) ->
-        item.mediaType = Models.ALL_CONTENT.get(item.id).mediaType
-
+      manifest = @manifest?.toJSON()
+      # Filter out all the containers (subcollections/chapters)
+      json.manifest = _.filter manifest, (item) -> item.mediaType != Models.BookTocNode::mediaType
       json
 
     accepts: -> [ Models.Folder::mediaType ]
