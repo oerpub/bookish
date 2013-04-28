@@ -69,9 +69,12 @@
       }
       Backbone.history.navigate('workspace');
       return EpubModels.EPUB_CONTAINER.loaded().then(function() {
-        return EpubModels.EPUB_CONTAINER.each(function(book) {
+        EpubModels.EPUB_CONTAINER.each(function(book) {
           return book.loaded();
         });
+        if (1 === EpubModels.EPUB_CONTAINER.length) {
+          return Controller.editBook(EpubModels.EPUB_CONTAINER.first());
+        }
       });
     };
     XhtmlModel = AtcModels.BaseContent.extend({

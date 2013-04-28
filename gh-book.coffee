@@ -74,6 +74,10 @@ define [
       # fetch all the book contents so the workspace is populated
       EpubModels.EPUB_CONTAINER.each (book) -> book.loaded()
 
+      # If there is only 1 book then navigate to editing just that book.
+      if 1 == EpubModels.EPUB_CONTAINER.length
+        Controller.editBook EpubModels.EPUB_CONTAINER.first()
+
 
   XhtmlModel = AtcModels.BaseContent.extend
     defaults:
