@@ -96,9 +96,6 @@ define [
         return $handle
 
 
-  # **FIXME:** Move this delay into a common module so the mock AJAX code can use them too
-  DELAY_BEFORE_SAVING = 3000
-
   # Updates the relative time for a set of elements periodically
   updateTimes = ($times) ->
     $times.each (i, el) =>
@@ -157,11 +154,6 @@ define [
         containment: 'parent'
         start: ->  $el.select2 'onSortStart'
         update: -> $el.select2 'onSortEnd'
-
-
-  # **FIXME:** Move these subjects to a common module so the mock code can use them and can be used elsewhere
-  METADATA_SUBJECTS = ['Arts', 'Mathematics and Statistics', 'Business',
-    'Science and Technology', 'Humanities', 'Social Sciences']
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.
@@ -408,7 +400,7 @@ define [
 
       $subjects = @$el.find('*[name=subjects]')
       $subjects.select2
-        tags: METADATA_SUBJECTS
+        tags: Models.config.get('metadataSubjects')
         tokenSeparators: [',']
         separator: '|' # String used to delimit ids in $('input').val()
 
@@ -777,16 +769,7 @@ define [
       # of this parent node
       @collection = @model.children()
 
-      @listenTo @model, 'all', (name, model, collection, options) =>
-        return if model != @model
-        # Reduce the number of re-renderings that occur by filtering on the
-        # type of event.
-        # **FIXME:** Just listen to the relevant events
-        switch name
-          when 'change' then return
-          when 'change:title' then @render()
-          when 'change:treeNode' then return
-          else return
+      @listenTo(@model, 'change:title', @render)
 
       if @collection
         # If the children drop to/from 0 rerender so the (+)/(-) expandos are visible
@@ -850,7 +833,7 @@ define [
           hoverClass: 'editor-drop-zone-hover'
           # If hovering over a node that has children but is not expanded
           # Expand after a period of time.
-          # over: => expandTimeout = setTimeout(expandNode, DELAY_BEFORE_SAVING)
+          # over: => expandTimeout = setTimeout(expandNode, Models.config.get('delayBeforeSaving'))
           # out: => clearTimeout expandTimeout
 
           drop: (evt, ui) =>

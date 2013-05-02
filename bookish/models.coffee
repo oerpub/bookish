@@ -563,7 +563,19 @@ define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nl
         promise = content.loaded().then -> promise
       return promise
 
+
+  # Config
+  # =======
+  # This object contains default and app configurations.
+  Config = Backbone.Model.extend
+    defaults:
+      delayBeforeSaving: 3000
+      metadataSubjects: ['Arts', 'Mathematics and Statistics', 'Business',
+        'Science and Technology', 'Humanities', 'Social Sciences']
+      
+
   # Finally, export only the pieces needed
+  exports.config = new Config()
   exports.FilteredCollection = FilteredCollection
   exports.BaseContent = BaseContent
   exports.BaseBook = BaseBook
