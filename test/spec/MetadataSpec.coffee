@@ -1,3 +1,8 @@
+# Copyright (c) 2013 Rice University
+#
+# This software is subject to the provisions of the GNU AFFERO GENERAL PUBLIC LICENSE Version 3.0 (AGPL).
+# See LICENSE.txt for details.
+
 # Checks editing the Metadata and Roles popups.
 # Uses global jasmine functions like `describe`, `beforeEach`, `it`, and `expect`.
 define ['bookish/models', 'bookish/views', 'test/routes'], (Models, Views, MOCK_CONTENT) ->

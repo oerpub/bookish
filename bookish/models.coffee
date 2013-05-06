@@ -1,3 +1,8 @@
+# Copyright (c) 2013 Rice University
+#
+# This software is subject to the provisions of the GNU AFFERO GENERAL PUBLIC LICENSE Version 3.0 (AGPL).
+# See LICENSE.txt for details.
+
 # # Backbone Models
 # This module contains backbone models used throughout the application
 define ['exports', 'jquery', 'backbone', 'bookish/media-types', 'i18n!bookish/nls/strings'], (exports, jQuery, Backbone, MEDIA_TYPES, __) ->
