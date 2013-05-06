@@ -41,3 +41,8 @@ Check the `./docs` directory to read through the different modules.
     * Don't use `/` or `.`
 
 4. Use it in your module by adding it to the dependencies in `define`
+
+License
+-------
+
+This software is subject to the provisions of the GNU Affero General Public License Version 3.0 (AGPL). See license.txt for details. Copyright (c) 2013 Rice University
