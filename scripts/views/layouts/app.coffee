@@ -9,7 +9,6 @@ define [
 
   return new (Marionette.Layout.extend
     template: appTemplate
-    el: 'body'
 
     regions:
       menu: '#menu'

@@ -16,7 +16,6 @@ define [
 
   app.on 'start', (options) ->
     # Load layout
-    console.log appLayout
     app.body.show(appLayout)
 
     # Load router
