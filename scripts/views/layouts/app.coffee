@@ -13,5 +13,5 @@ define [
     regions:
       menu: '#menu'
       sidebar: '#sidebar'
-      main: '#main'
+      content: '#content'
   )()

@@ -12,11 +12,11 @@ define [
   app.root = ''
 
   app.addRegions
-    body: 'body'
+    main: '#main'
 
   app.on 'start', (options) ->
     # Load layout
-    app.body.show(appLayout)
+    app.main.show(appLayout)
 
     # Load router
     require ['cs!routers/router'], (router) ->
