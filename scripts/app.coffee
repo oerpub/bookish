@@ -3,11 +3,22 @@ define [
   'underscore'
   'backbone'
   'marionette'
-], ($, _, Backbone, Marionette) ->
+  'cs!session'
+  'cs!views/layouts/app'
+], ($, _, Backbone, Marionette, session, appLayout) ->
 
   app = new Marionette.Application()
 
+  app.root = ''
+
+  app.addRegions
+    body: 'body'
+
   app.on 'start', (options) ->
+    # Load layout
+    console.log appLayout
+    app.body.show(appLayout)
+
     # Load router
     require ['cs!routers/router'], (router) ->
       $(document).on 'click', 'a:not([data-bypass])', (e) ->
@@ -21,6 +32,8 @@ define [
         else
           router.navigate(href, {trigger: true})
 
-      Backbone.history.start({pushState: true})
+      Backbone.history.start
+        pushState: true
+        root: app.root
 
   return app
