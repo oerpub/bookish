@@ -11,7 +11,7 @@ require.config
 
     # ## Core Libraries
     jquery: 'libs/jquery/jquery'
-    underscore: 'libs/underscore'
+    underscore: 'libs/lodash'
     backbone: 'libs/backbone/backbone'
     # Layout manager for backbone
     marionette: 'libs/backbone/marionette'
