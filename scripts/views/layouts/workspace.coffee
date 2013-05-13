@@ -4,6 +4,7 @@ define [
   'backbone'
   'marionette'
   'hbs!templates/layouts/workspace'
+  'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, workspaceTemplate) ->
 
   return new (Marionette.Layout.extend
