@@ -4,7 +4,7 @@ require.config
     # ## Template and Style paths
     templates: '../templates'
     styles: '../styles'
-    
+
     # ## Requirejs plugins
     text: 'libs/require/plugins/text'
     hbs: 'libs/require/plugins/require-handlebars/hbs'
@@ -18,6 +18,7 @@ require.config
 
     # ## UI Libraries
     aloha: 'libs/aloha-editor/lib/aloha'
+    select2: 'libs/select2/select2'
     # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
@@ -65,6 +66,7 @@ require.config
       exports: 'Marionette'
 
     # ## UI Libraries
+    # Bootstrap Plugins
     bootstrapAffix: ['jquery']
     bootstrapAlert: ['jquery']
     bootstrapButton: ['jquery']
@@ -78,6 +80,11 @@ require.config
     bootstrapTooltip: ['jquery']
     bootstrapTransition: ['jquery']
     bootstrapTypeahead: ['jquery']
+
+    # Select2
+    select2:
+      deps: ['jquery', 'css!./select2']
+      exports: 'Select2'
 
 
   # Handlebars Requirejs Plugin Configuration
