@@ -13,7 +13,11 @@ define [
     # -------
     # Shows the workspace listing and updates the URL
     workspace: ->
+      # Always scroll to the top of the page
+      window.scrollTo(0, 0)
+
       app.main.show(workspaceLayout)
+      workspaceLayout.load()
 
     # Edit existing content
     # -------

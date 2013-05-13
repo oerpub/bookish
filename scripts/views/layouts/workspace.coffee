@@ -3,10 +3,10 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!views/search-results'
   'hbs!templates/layouts/workspace'
-  'aloha'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, SearchResultsView, workspaceTemplate) ->
 
   return new (Marionette.Layout.extend
     template: workspaceTemplate
@@ -15,4 +15,9 @@ define [
       menu: '#menu'
       sidebar: '#sidebar'
       content: '#content'
+    
+    load: () ->
+      #@menu.show()
+      #@sidebar.show()
+      @content.show(new SearchResultsView())
   )()
