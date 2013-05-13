@@ -1,24 +1,25 @@
 {{! The initial context is an array so the 1st thing we do is loop over each item using '#.' }}
 
-<td data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}"><i class="icon-content"></i><a href="#content/{{id}}">
-  <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
-  {{#if title}}
-    {{{title}}}
-  {{else}}
-    {{id}}
+<td data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}">
+  <i class="icon-content"></i>
+  <a href="#content/{{id}}">
+    <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
+    {{#if title}}
+      {{{title}}}
+    {{else}}
+      {{id}}
+    {{/if}}
+  </a>
+  {{#if _isDirty}}
+    <span class="has-changed" title="This has unsaved changes"><i class="icon-warning-sign"></i></span>
   {{/if}}
-</a>
-{{#if _isDirty}}
-  <span class="has-changed" title="This has unsaved changes"><i class="icon-warning-sign"></i></span>
-{{/if}}
 
-{{! Display a progress bar if the file has not loaded yet }}
-{{#if _loading}}
-{{#if _done}}
-{{else}}
-<div class="progress progress-striped active" style="display: inline-block; width: 100px;"><div class="bar" style="width: 100%;"></div></div>
-{{/if}}
-{{/if}}
+  {{! Display a progress bar if the file has not loaded yet }}
+  {{#if _loading}}
+    {{#unless _done}}
+      <div class="progress progress-striped active" style="display: inline-block; width: 100px;"><div class="bar" style="width: 100%;"></div></div>
+    {{/unless}}
+  {{/if}}
 </td>
 
 {{!Last Modified}}
