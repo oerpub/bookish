@@ -4,6 +4,7 @@ define [
   'backbone'
   'marionette'
   'hbs!templates/layouts/workspace'
+  'aloha'
   'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, workspaceTemplate) ->
 
