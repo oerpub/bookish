@@ -1,0 +1,37 @@
+#menu {
+  background: green;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 50px;
+  left: 0;
+}
+
+#container {
+  display: -webkit-flex;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-box-orient: horizontal;
+}
+
+#sidebar {
+  -webkit-flex: 0 1 20em;
+
+  padding: 1em;
+  border-right: 1px solid #ccc;
+
+  /* Slide the sidebar off screen when hiding it */
+  -webkit-transition: 0.5s ease-in-out;
+  
+  background: blue;
+}
+
+#content {
+  overflow-y: scroll;
+  -webkit-flex: 1 0 auto;
+
+  background-color: #ebebeb;
+}

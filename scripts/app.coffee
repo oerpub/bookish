@@ -4,8 +4,7 @@ define [
   'backbone'
   'marionette'
   'cs!session'
-  'cs!views/layouts/app'
-], ($, _, Backbone, Marionette, session, appLayout) ->
+], ($, _, Backbone, Marionette, session) ->
 
   app = new Marionette.Application()
 
@@ -15,9 +14,6 @@ define [
     main: '#main'
 
   app.on 'start', (options) ->
-    # Load layout
-    app.main.show(appLayout)
-
     # Load router
     require ['cs!routers/router'], (router) ->
       $(document).on 'click', 'a:not([data-bypass])', (e) ->

@@ -3,12 +3,11 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'hbs!templates/layouts/app'
-  'less!styles/main.less'
-], ($, _, Backbone, Marionette, appTemplate) ->
+  'hbs!templates/layouts/workspace'
+], ($, _, Backbone, Marionette, workspaceTemplate) ->
 
   return new (Marionette.Layout.extend
-    template: appTemplate
+    template: workspaceTemplate
 
     regions:
       menu: '#menu'
