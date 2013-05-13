@@ -3,8 +3,8 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/search-results-item'
-  'hbs!templates/search-results'
+  'cs!views/workspace/search-results-item'
+  'hbs!templates/workspace/search-results'
 ], ($, _, Backbone, Marionette, SearchResultsItemView, searchResultsTemplate) ->
 
   return Marionette.CompositeView.extend

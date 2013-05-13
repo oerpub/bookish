@@ -4,7 +4,7 @@ define [
   'backbone'
   'marionette'
   'aloha'
-  'hbs!templates/search-results-item'
+  'hbs!templates/workspace/search-results-item'
 ], ($, _, Backbone, Marionette, Aloha, searchResultsItemTemplate) ->
 
   # Search Result Views (workspace)

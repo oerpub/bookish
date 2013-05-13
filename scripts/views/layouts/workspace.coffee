@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/search-results'
+  'cs!views/workspace/search-results'
   'hbs!templates/layouts/workspace'
   'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, SearchResultsView, workspaceTemplate) ->
