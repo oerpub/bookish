@@ -1,5 +1,5 @@
 /* =============================================================
- * bootstrap-scrollspy.js v3.0.0
+ * bootstrap-scrollspy.js v2.3.1
  * http://twitter.github.com/bootstrap/javascript.html#scrollspy
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -97,7 +97,7 @@
         this.activeTarget = target
 
         $(this.selector)
-          .parents('.active')
+          .parent('.active')
           .removeClass('active')
 
         selector = this.selector
@@ -105,7 +105,7 @@
           + this.selector + '[href="' + target + '"]'
 
         active = $(selector)
-          .parents('li')
+          .parent('li')
           .addClass('active')
 
         if (active.parent('.dropdown-menu').length)  {
