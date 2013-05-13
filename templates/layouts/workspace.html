@@ -1,47 +1,12 @@
-<div id="workspace">
-  <nav id="menu">
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <ul class="nav">
-            <li><a href="/workspace"><i class="icon-home nav-home"></i></a></li>
-          </ul>
-
-          <form class="navbar-form pull-left">
-            <div class="btn-group">
-              <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
-                Add
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <!-- dropdown menu links -->
-              </ul>
-            </div>
-
-            <input type="text" class="search-query span3" placeholder="Search">
-          </form>
-        </div><!-- /.container -->
-      </div><!-- /.navbar-inner -->
-    </div><!-- /.navbar -->
-  </nav>
-
-  <section id="container">
-    <aside id="sidebar">
-      <h3>My Workspace</h3>
-    </aside>
-
-    <div id="content">
-      <table class="table table-condensed table-hover search-results">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Modified</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{! Items will be appended here as tr elements}}
-        </tbody>
-      </table>
-    </div>
-  </section>
-</div>
+{{! Items will be appended to the tbody in separate rows}}
+<table class="search-results table table-condensed table-hover">
+  <thead>
+    <tr>
+      <th class="header-title">Title</th>
+      <th class="header-modified">Modified</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{! Items will be appended here as tr elements}}
+  </tbody>
+</table>

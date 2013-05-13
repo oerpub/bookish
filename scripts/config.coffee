@@ -16,7 +16,9 @@ require.config
     # Layout manager for backbone
     marionette: 'libs/backbone/marionette'
 
-    # ## Bootstrap plugins
+    # ## UI Libraries
+    aloha: 'libs/aloha-editor/lib/aloha'
+    # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
     bootstrapButton: 'libs/bootstrap/js/bootstrap-button'
