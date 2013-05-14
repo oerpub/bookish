@@ -15,7 +15,7 @@ define [
     addItem: ->
       ContentType = @model.get('modelType')
       content = new ContentType()
-      #Models.WORKSPACE.add content
+      Models.WORKSPACE.add content
       # Begin editing an item as soon as it is added.
       # Some content (like Books and Folders) do not have an `editAction`
-      #content.editAction?()
+      content.editAction?()
