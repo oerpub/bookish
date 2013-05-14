@@ -17,7 +17,6 @@ define [
   return Marionette.ItemView.extend
     template: signInOutTemplate
     events:
-      'click #sign-in':       'signIn'
       'click #sign-out':      'signOut'
       'click #save-content':  'saveContent'
 
@@ -68,9 +67,6 @@ define [
     onRender: ->
       # Enable tooltips
       #@$el.find('*[title]').tooltip()
-
-    signIn: ->
-      # The browser will go to the login page because `#sign-in` is a link
 
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model
