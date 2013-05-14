@@ -1,0 +1,29 @@
+{
+  "name": "atc",
+  "version": "0.0.0",
+  "description": "Authoring Tools Client (Javascript Book Editor)",
+  "main": "./scripts/main.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "docco": "~0.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Connexions/atc.git"
+  },
+  "keywords": [
+    "javascript",
+    "EPUB",
+    "editor",
+    "github",
+    "readium",
+    "writium"
+  ],
+  "author": "Philip Schatz"
+}
