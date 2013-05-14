@@ -1,0 +1,66 @@
+@import "variables.less";
+
+#menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 41px;
+  left: 0;
+  overflow: hidden;
+  
+  .nav-home {
+    font-size: 1.25em;
+    vertical-align: middle;
+    color: @linkColor;
+  }
+  
+  .nav-home:hover {
+    color: @linkColorHover;
+    text-decoration: underline;
+  }
+}
+
+#container {
+  display: -webkit-flex;
+  position: absolute;
+  top: 41px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-box-orient: horizontal;
+  overflow: hidden;
+}
+
+#sidebar {
+  -webkit-flex: 0 1 20em;
+
+  padding: 1em;
+  border-right: 1px solid #ccc;
+
+  /* Slide the sidebar off screen when hiding it */
+  -webkit-transition: 0.5s ease-in-out;
+  
+  background: white;
+  
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#content {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-flex: 1 0 auto;
+
+  background-color: #ebebeb;
+  
+  padding: 2em;
+}
+
+.search-results {
+  background-color: white;
+  border: 1px solid black;
+  
+  th, tr {
+    padding: 1em;
+  }
+}
