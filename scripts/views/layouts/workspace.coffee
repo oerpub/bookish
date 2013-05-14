@@ -4,20 +4,21 @@ define [
   'backbone'
   'marionette'
   'cs!views/workspace/search-results'
+  'cs!views/workspace/auth'
   'hbs!templates/layouts/workspace'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, SearchResultsView, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, SearchResultsView, AuthView, workspaceTemplate) ->
 
   return new (Marionette.Layout.extend
     template: workspaceTemplate
 
     regions:
-      menu: '#menu'
+      auth: '#auth'
       sidebar: '#sidebar'
       content: '#content'
-    
+
     load: () ->
-      #@menu.show()
       #@sidebar.show()
+      @auth.show(new AuthView())
       @content.show(new SearchResultsView())
   )()
