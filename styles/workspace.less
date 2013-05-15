@@ -18,6 +18,23 @@
     color: @linkColorHover;
     text-decoration: underline;
   }
+  
+  .x-media-type-icon(@media-type; @add-title; @color; @char) {
+    @mt-selector: ~"[data-media-type='@{media-type}']";
+    @{mt-selector} > .icon-content::before { color: @color; content: @char; }
+    @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
+  }
+
+  [data-media-type] {
+    cursor: pointer;
+    > .icon-content { margin-right: 0.25em; }
+  }
+
+  .x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
+  .x-media-type-icon('application/vnd.org.cnx.module';     "Module";    #00c; "\f0f6"); /* icon-file-alt */
+  .x-media-type-icon('application/vnd.org.cnx.collection'; "Book";      #c00; "\f02d"); /* icon-book */
+  .x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
+  .x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
 }
 
 #container {
