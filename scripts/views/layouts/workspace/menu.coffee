@@ -7,7 +7,7 @@ define [
   'cs!views/workspace/auth'
   'cs!views/workspace/add'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, mediaTypesCollection, AuthView, AddView, menuTemplate) ->
+], ($, _, Backbone, Marionette, mediaTypes, AuthView, AddView, menuTemplate) ->
 
   return new (Marionette.Layout.extend
     template: menuTemplate
@@ -17,6 +17,6 @@ define [
       auth: '#workspace-menu-auth'
 
     load: () ->
-      @add.show(new AddView({collection: mediaTypesCollection.asCollection()}))
+      @add.show(new AddView({collection: mediaTypes}))
       @auth.show(new AuthView())
   )()

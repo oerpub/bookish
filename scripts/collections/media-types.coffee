@@ -17,38 +17,45 @@
 # - `.accepts` hash of `mediaType -> addOperation` that is used for Drag-and-Dropping onto the content in the workspace list
 #
 # Different plugins (EPUB OPF, XHTML, Markdown, ASCIIDoc, cnxml) can add themselves to this
-define ['backbone'], (Backbone) ->
+define [
+  'underscore'
+  'backbone'
+  'cs!models/base-content'
+  'cs!models/base-book'
+  'cs!models/folder'
+], (_, Backbone, BaseContentModel, BaseBookModel, FolderModel) ->
 
   # Collection used for storing the various mediaTypes.
   # When something registers a "New... mediaType" view can update
-  MediaTypes = Backbone.Collection.extend
+  return new (Backbone.Collection.extend
     # Just a glorified JSON holder (that cannot `sync`)
     model: Backbone.Model.extend
       sync: -> throw 'This model cannot be syncd'
 
-    sync: -> throw 'This collection cannot be syncd'
+    initialize: () ->
+      @add BaseContentModel
+      @add BaseBookModel
+      @add FolderModel
 
-  # Singleton collection
-  mediaTypes = new MediaTypes()
-
-  return {
-    add: (modelType) ->
+    add: (modelType, options={merge: true}) ->
       mediaType = modelType::mediaType
-      mediaTypes.add {id: mediaType, modelType: modelType}, {merge:true}
+      Backbone.Collection::add.call(@, {id: mediaType, modelType: modelType}, options)
 
+    ###
     get: (mediaType) ->
-      modelType = mediaTypes.get mediaType
+      console.log mediaType
+      console.log @
+      modelType = Backbone.Collection::get(@, mediaType)
+      console.log modelType
       if not modelType
         console.error "ERROR: No editor for media type '#{mediaType}'. Help out by writing one!"
-        modelType = mediaTypes.models[0]
-        #     throw 'BUG: mediaType not found'
+        modelType = @models[0]
+        # throw 'BUG: mediaType not found'
       return modelType.get('modelType')
+    ###
 
-    # Provides a list of all registered media types
-    list: ->
-      return (type.get 'id' for type in mediaTypes.models)
+    list: () ->
+      return (type.get 'id' for type in @models)
 
-    # So views can listen to changes
-    asCollection: ->
-      return mediaTypes
-  }
+    sync: -> throw 'This collection cannot be syncd'
+  )()

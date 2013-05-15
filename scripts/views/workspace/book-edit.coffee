@@ -26,7 +26,7 @@ define [
       title = prompt 'Enter a new Title', @model.get('title')
       @model.set 'title', title if title
 
-    goWorkspace: -> Controller.workspace()
+    #goWorkspace: -> Controller.workspace()
 
     initialize: ->
       #@collection = @model.children()
