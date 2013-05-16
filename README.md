@@ -5,10 +5,9 @@ of how the code is organized.
 
 ## Building Yourself
 
-1. Create a local branch named `gh-pages`
-2. Run `npm install .` to download the dependencies
-3. Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
-4. Add the minified Javscript file, commit, and push the changes back to github
+1. Download
+2. Configure your server to point /workspace, /login, and /logout at index.html
+3. (optional) Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
 
 ## Building Documentation
 
@@ -20,27 +19,21 @@ Check the `./docs` directory to read through the different modules.
 
 ## Directory Layout
 
-* `atc/models.coffee`    Backbone Models
-* `atc/views.coffee`     Marionette Views
-* `atc/views/*`          Handlebars Templates
-* `atc/nls/*.coffee`     i18n strings (and HTML) http://requirejs.org/docs/api.html#i18n
-* `lib/`                 3rd party libraries
-* `config/*`             Custom configuration of 3rd party libraries (Aloha Editor and MathJax)
-* `config/atc-config.coffee` Includes paths to 3rd party libs so we can minify them
-
-* `atc.coffee`   The starting point for all javascript
-* `atc.less`     Includes all other css files (including external libs) so we can minify
-
-## Adding a 3rd party library
-
-1. If a npm version of it exists, add it to `package.json`
-2. Otherwise, add it to `install-libs.sh` (which is called when you run `npm install .`)
-3. Add the lib to `config/atc-config.coffee` (both in `path` and `shim`)
-    * The name should be all lowercase
-    * Use a `-` if the library name is more than one word
-    * Don't use `/` or `.`
-
-4. Use it in your module by adding it to the dependencies in `define`
+* `scripts/collections/`   Backbone Collections
+* `scripts/controllers/`   Marionette Controllers
+* `scripts/libs/`          3rd Party Libraries
+* `scripts/models/`        Backbone Models and Marionette Modules
+* `scripts/routers/`       Marionette Routers
+* `scripts/views/`         Backbone and Marionette Views
+* `scripts/views/layouts/` Marionette Layouts
+* `scripts/app.coffee`     Marionette Application
+* `scripts/config.coffee`  Requirejs Config
+* `scripts/main.js`        Initial Requirejs Loader
+* `scripts/session.coffee` Model of Session
+* `styles/`                LESS Styling
+* `templates/`             Handlebars Templates
+* `templates/helpers/`     Handlebars Helpers
+* `index.html`             App's HTML Page
 
 License
 -------
