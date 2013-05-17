@@ -185,7 +185,7 @@ define [
             # - After the node
 
             $drag = ui.draggable
-            $drop = jQuery(evt.target)
+            $drop = $(evt.target)
 
             # Perform all of these DOM cleanup events once jQueryUI is finished with its events
             delay = =>

@@ -20,10 +20,10 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/base-content'
-  'cs!models/base-book'
-  'cs!models/folder'
-], (_, Backbone, BaseContentModel, BaseBookModel, FolderModel) ->
+  'cs!models/content/book'
+  'cs!models/content/folder'
+  'cs!models/content/module'
+], (_, Backbone, Book, Folder, Module) ->
 
   # Collection used for storing the various mediaTypes.
   # When something registers a "New... mediaType" view can update
@@ -33,26 +33,23 @@ define [
       sync: -> throw 'This model cannot be syncd'
 
     initialize: () ->
-      @add BaseContentModel
-      @add BaseBookModel
-      @add FolderModel
+      @add Module
+      @add Book
+      @add Folder
+      window.x = @
 
-    add: (modelType, options={merge: true}) ->
+    add: (modelType, options) ->
       mediaType = modelType::mediaType
       Backbone.Collection::add.call(@, {id: mediaType, modelType: modelType}, options)
 
-    ###
-    get: (mediaType) ->
-      console.log mediaType
-      console.log @
-      modelType = Backbone.Collection::get(@, mediaType)
-      console.log modelType
-      if not modelType
-        console.error "ERROR: No editor for media type '#{mediaType}'. Help out by writing one!"
-        modelType = @models[0]
-        # throw 'BUG: mediaType not found'
-      return modelType.get('modelType')
-    ###
+    type: (medium) ->
+      model = Backbone.Collection::get.call(@, medium)
+
+      if not model
+        console.error "ERROR: No editor for media type '#{medium}'. Help out by writing one!"
+        model = @models[0]
+
+      return model.get('modelType')
 
     list: () ->
       return (type.get 'id' for type in @models)

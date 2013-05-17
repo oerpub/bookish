@@ -1,8 +1,7 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/deferrable'
-], (_, Backbone, Deferrable) ->
+], (_, Backbone) ->
 
   # The `Content` model contains the following members:
   #
@@ -11,7 +10,7 @@ define [
   # * `subjects` - an array of strings (eg `['Mathematics', 'Business']`)
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
-  return Deferrable.extend
+  return Backbone.Model.extend
     mediaType: 'application/vnd.org.cnx.module'
     defaults:
       title: 'Untitled'

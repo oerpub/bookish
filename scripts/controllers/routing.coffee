@@ -17,7 +17,6 @@ define [
       window.scrollTo(0, 0)
 
       app.main.show(workspaceLayout)
-      workspaceLayout.load()
 
     # Edit existing content
     # -------

@@ -7,18 +7,18 @@
   bottom: 41px;
   left: 0;
   overflow: hidden;
-  
+
   .nav-home {
     font-size: 1.25em;
     vertical-align: middle;
     color: @linkColor;
   }
-  
+
   .nav-home:hover {
     color: @linkColorHover;
     text-decoration: underline;
   }
-  
+
   .x-media-type-icon(@media-type; @add-title; @color; @char) {
     @mt-selector: ~"[data-media-type='@{media-type}']";
     @{mt-selector} > .icon-content::before { color: @color; content: @char; }
@@ -56,9 +56,9 @@
 
   /* Slide the sidebar off screen when hiding it */
   -webkit-transition: 0.5s ease-in-out;
-  
+
   background: white;
-  
+
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -69,14 +69,14 @@
   -webkit-flex: 1 0 auto;
 
   background-color: #ebebeb;
-  
+
   padding: 2em;
 }
 
 .search-results {
   background-color: white;
   border: 1px solid black;
-  
+
   th, tr {
     padding: 1em;
   }

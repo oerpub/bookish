@@ -3,11 +3,10 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!collections/media-types'
   'cs!views/workspace/auth'
   'cs!views/workspace/add'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, mediaTypes, AuthView, AddView, menuTemplate) ->
+], ($, _, Backbone, Marionette, AuthView, AddView, menuTemplate) ->
 
   return new (Marionette.Layout.extend
     template: menuTemplate
@@ -16,7 +15,11 @@ define [
       add: '#workspace-menu-add'
       auth: '#workspace-menu-auth'
 
+    render: () ->
+      Marionette.Layout::render.apply(@, arguments)
+      @load()
+
     load: () ->
-      @add.show(new AddView({collection: mediaTypes}))
+      @add.show(new AddView())
       @auth.show(new AuthView())
   )()

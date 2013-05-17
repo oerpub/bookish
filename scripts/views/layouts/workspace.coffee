@@ -18,9 +18,13 @@ define [
       menu: '#menu'
       sidebar: '#sidebar'
 
+    render: () ->
+      Marionette.Layout::render.apply(@, arguments)
+      @load()
+
     load: () ->
       @content.show(new SearchResultsView())
       @menu.show(menuView)
-      menuView.load()
-      @sidebar.show(new BookEditView())
+      #@sidebar.show(new BookEditView({model: workspaceTree}))
+      @sidebar.show(sidebarView)
   )()
