@@ -36,7 +36,6 @@ define [
       @add Module
       @add Book
       @add Folder
-      window.x = @
 
     add: (modelType, options) ->
       mediaType = modelType::mediaType

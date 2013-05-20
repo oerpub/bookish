@@ -3,12 +3,12 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/workspace/book-edit'
   'cs!views/workspace/search-results'
   'cs!views/layouts/workspace/menu'
+  'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, BookEditView, SearchResultsView, menuView, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
   return new (Marionette.Layout.extend
     template: workspaceTemplate
@@ -24,7 +24,7 @@ define [
 
     load: () ->
       @content.show(new SearchResultsView())
-      @menu.show(menuView)
+      @menu.show(menuLayout)
       #@sidebar.show(new BookEditView({model: workspaceTree}))
-      @sidebar.show(sidebarView)
+      @sidebar.show(sidebarLayout)
   )()

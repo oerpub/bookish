@@ -10,7 +10,10 @@
 define [
   'underscore'
   'backbone'
-], (_, Backbone) ->
+  'cs!models/content/book'
+  'cs!models/content/folder'
+  'cs!models/content/module'
+], (_, Backbone, Book, Folder, Module) ->
 
   return new (Backbone.Collection.extend
     model: (attrs, options) ->
