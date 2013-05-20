@@ -9,6 +9,8 @@ define [
     defaults:
       mediaType: 'application/vnd.org.cnx.folder'
       title: 'Untitled Folder'
-      contents: new Backbone.Collection()
+
+    initialize: () ->
+      @set('contents', new Backbone.Collection())
 
     #accepts: -> [ BaseBook::mediaType, BaseContent::mediaType ]
