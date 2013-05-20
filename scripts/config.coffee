@@ -86,6 +86,10 @@ require.config
       deps: ['jquery', 'css!./select2']
       exports: 'Select2'
 
+    aloha:
+      deps: ['jquery', 'cs!configs/aloha']
+      exports: 'Aloha'
+
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).

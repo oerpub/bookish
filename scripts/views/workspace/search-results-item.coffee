@@ -18,12 +18,13 @@ define [
   return Marionette.ItemView.extend
     tagName: 'tr'
     template: searchResultsItemTemplate
+    
     initialize: ->
       @listenTo @model, 'change', => @render()
     onRender: ->
       # Render the modified time in a relative format and update it periodically
       $times = @$el.find('time[datetime]')
-      updateTimes $times
+      #updateTimes $times
 
       @$el.on 'click', => Controller.editModel(@model)
       # Add DnD options to content
