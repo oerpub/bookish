@@ -87,12 +87,8 @@ define [
     editSettings: ->
       newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', @model.get('title')
 
-      if '-' is newTitle
-        @model.parent?.children()?.remove @model
-      else if newTitle == contentModel?.get('title')
-        @model.unset 'title'
-      else if newTitle
-        @model.set 'title', newTitle
+      if newTitle
+        @model.set('title', newTitle)
 
       @render()
       ###
