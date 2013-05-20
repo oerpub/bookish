@@ -7,6 +7,7 @@ define [
     mediaType: 'application/vnd.org.cnx.folder'
     branch: true
     defaults:
+      mediaType: 'application/vnd.org.cnx.folder'
       title: 'Untitled Folder'
       contents: new Backbone.Collection()
 

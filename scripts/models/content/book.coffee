@@ -9,4 +9,7 @@ define [
     defaults:
       manifest: null
       title: 'Untitled Book'
-      contents: new Backbone.Collection()
+      mediaType: 'application/vnd.org.cnx.collection'
+
+    initialize: () ->
+      @set('contents', new Backbone.Collection())
