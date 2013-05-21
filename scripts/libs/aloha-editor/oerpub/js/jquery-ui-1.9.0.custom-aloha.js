@@ -65,15 +65,9 @@ $.fn.extend({
 
 	scrollParent: function() {
 		var scrollParent;
-		if (($.browser.msie && (/(static|relative)/).test(this.css('position'))) || (/absolute/).test(this.css('position'))) {
-			scrollParent = this.parents().filter(function() {
-				return (/(relative|absolute|fixed)/).test($.css(this,'position')) && (/(auto|scroll)/).test($.css(this,'overflow')+$.css(this,'overflow-y')+$.css(this,'overflow-x'));
-			}).eq(0);
-		} else {
-			scrollParent = this.parents().filter(function() {
-				return (/(auto|scroll)/).test($.css(this,'overflow')+$.css(this,'overflow-y')+$.css(this,'overflow-x'));
-			}).eq(0);
-		}
+		scrollParent = this.parents().filter(function() {
+			return (/(auto|scroll)/).test($.css(this,'overflow')+$.css(this,'overflow-y')+$.css(this,'overflow-x'));
+		}).eq(0);
 
 		return (/fixed/).test(this.css('position')) || !scrollParent.length ? $(document) : scrollParent;
 	},
@@ -922,10 +916,6 @@ $.widget("ui.mouse", {
 	},
 
 	_mouseMove: function(event) {
-		// IE mouseup check - mouseup happened when mouse was out of window
-		if ($.browser.msie && !(document.documentMode >= 9) && !event.button) {
-			return this._mouseUp(event);
-		}
 
 		if (this._mouseStarted) {
 			this._mouseDrag(event);
@@ -1790,8 +1780,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 			po.top += this.scrollParent.scrollTop();
 		}
 
-		if((this.offsetParent[0] == document.body) //This needs to be actually done for all browsers, since pageX/pageY includes this information
-		|| (this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() == 'html' && $.browser.msie)) //Ugly IE fix
+		if (this.offsetParent[0] == document.body) //This needs to be actually done for all browsers, since pageX/pageY includes this information
 			po = { top: 0, left: 0 };
 
 		return {
@@ -3022,7 +3011,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 			this.helper = this.helper || $('<div style="overflow:hidden;"></div>');
 
 			// fix ie6 offset TODO: This seems broken
-			var ie6 = $.browser.msie && $.browser.version < 7, ie6offset = (ie6 ? 1 : 0),
+			var ie6 = false, ie6offset = (ie6 ? 1 : 0),
 			pxyoffset = ( ie6 ? 2 : -1 );
 
 			this.helper.addClass(this._helper).css({
@@ -8965,53 +8954,11 @@ $.extend( $.ui.dialog.overlay, {
 	},
 
 	height: function() {
-		var scrollHeight,
-			offsetHeight;
-		// handle IE
-		if ( $.browser.msie ) {
-			scrollHeight = Math.max(
-				document.documentElement.scrollHeight,
-				document.body.scrollHeight
-			);
-			offsetHeight = Math.max(
-				document.documentElement.offsetHeight,
-				document.body.offsetHeight
-			);
-
-			if ( scrollHeight < offsetHeight ) {
-				return $( window ).height() + "px";
-			} else {
-				return scrollHeight + "px";
-			}
-		// handle "good" browsers
-		} else {
-			return $( document ).height() + "px";
-		}
+		return $( document ).height() + "px";
 	},
 
 	width: function() {
-		var scrollWidth,
-			offsetWidth;
-		// handle IE
-		if ( $.browser.msie ) {
-			scrollWidth = Math.max(
-				document.documentElement.scrollWidth,
-				document.body.scrollWidth
-			);
-			offsetWidth = Math.max(
-				document.documentElement.offsetWidth,
-				document.body.offsetWidth
-			);
-
-			if ( scrollWidth < offsetWidth ) {
-				return $( window ).width() + "px";
-			} else {
-				return scrollWidth + "px";
-			}
-		// handle "good" browsers
-		} else {
-			return $( document ).width() + "px";
-		}
+		return $( document ).width() + "px";
 	},
 
 	resize: function() {
