@@ -6,6 +6,7 @@ define [
   return Backbone.Model.extend
     mediaType: 'application/vnd.org.cnx.folder'
     branch: true
+    expanded: false
     defaults:
       mediaType: 'application/vnd.org.cnx.folder'
       title: 'Untitled Folder'

@@ -14,6 +14,16 @@ define [
     initialize: () ->
       @collection = @model.get('contents')
 
+    render: () ->
+      Marionette.CompositeView::render.apply(@, arguments)
+
+      if @model and @model.expanded
+        @$el.addClass('editor-node-expanded')
+        @isExpanded = true
+        @expand(true)
+      
+      return @
+
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
       # when there is a space between `<li>` and the first child.
@@ -62,6 +72,7 @@ define [
 
     # Pass in `false` to collapse
     expand: (@isExpanded) ->
+      @model.expanded = @isExpanded
       @$el.toggleClass 'editor-node-expanded', @isExpanded
       # (re)render the model and children if the node is expanded
       # and has not been rendered yet.

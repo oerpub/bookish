@@ -6,6 +6,7 @@ define [
   return Backbone.Model.extend
     mediaType: 'application/vnd.org.cnx.collection'
     branch: true
+    expanded: false
     defaults:
       manifest: null
       title: 'Untitled Book'
