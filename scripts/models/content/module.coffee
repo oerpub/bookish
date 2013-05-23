@@ -13,6 +13,7 @@ define [
   return Backbone.Model.extend
     mediaType: 'application/vnd.org.cnx.module'
     defaults:
+      mediaType: 'application/vnd.org.cnx.module'
       title: 'Untitled'
       subjects: []
       keywords: []
