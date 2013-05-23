@@ -33,7 +33,10 @@ define [
       #'click .editor-go-workspace': 'goWorkspace'
 
     changeTitle: ->
-      title = prompt 'Enter a new Title', @model.get('title')
-      @model.set 'title', title if title
+      title = prompt('Enter a new Title', @model.get('title'))
+      @model.set('title', title) if title
+
+    initialize: () ->
+      @listenTo(content, 'change', @render)
 
     #goWorkspace: -> Controller.workspace()

@@ -20,3 +20,11 @@ define [
       copyrightHolders: []
       # Default language for new content is the browser's language
       language: (navigator?.userLanguage or navigator?.language or 'en').toLowerCase()
+
+    accepts: (mediaType) ->
+      types = []
+
+      if (typeof mediaType is 'string')
+        return _.indexOf(types, mediaType) is not -1
+
+      return types

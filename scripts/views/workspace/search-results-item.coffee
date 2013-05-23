@@ -26,7 +26,7 @@ define [
   #
   # Additionally, each draggable element should not contain any text children
   # so CSS can hide children and properly style the cloned element that is being dragged.
-  _EnableContentDragging = (model, $el) ->
+  enableContentDragging = (model, $el) ->
     $el.data('editor-model', model)
     $el.draggable
       addClasses: false
@@ -82,18 +82,17 @@ define [
       # delay until Aloha is finished loading
       Aloha.ready =>
 
-        _EnableContentDragging(@model, $content)
+        enableContentDragging(@model, $content)
 
         # Figure out which mediaTypes can be dropped onto each element
         $content.each (i, el) =>
           $el = $(el)
 
           #ModelType = mediaTypes.get(@model.mediaType)
-          #validSelectors = _.map ModelType::accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
-          #validSelectors = validSelectors.join ','
+          validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
+          validSelectors = validSelectors.join ','
 
-          #if validSelectors
-          if false
+          if validSelectors
             $el.droppable
               greedy: true
               addClasses: false
@@ -109,10 +108,10 @@ define [
                 drop = $drop.data 'editor-model'
                 # Sanity-check before dropping:
                 # Dereference if this is a pointer
-                if drop.accepts().indexOf(model.mediaType) < 0
-                  model = model.dereference()
-                throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
+                #if drop.accepts().indexOf(model.mediaType) < 0
+                #  model = model.dereference()
+                #throw 'INVALID_DROP_MEDIA_TYPE' if drop.accepts().indexOf(model.mediaType) < 0
 
                 # Delay the call so $.droppable has time to clean up before the DOM changes
-                delay = => drop.addChild model
+                delay = => drop.add(model)
                 setTimeout delay, 10

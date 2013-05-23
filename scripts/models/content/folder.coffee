@@ -13,4 +13,18 @@ define [
     initialize: () ->
       @set('contents', new Backbone.Collection())
 
-    #accepts: -> [ BaseBook::mediaType, BaseContent::mediaType ]
+    add: (model) ->
+      @get('contents').add(model)
+      @trigger('change')
+      return @
+
+    accepts: (mediaType) ->
+      types = [
+        'application/vnd.org.cnx.collection', # Book
+        'application/vnd.org.cnx.module' # Module
+      ]
+
+      if (typeof mediaType is 'string')
+        return _.indexOf(types, mediaType) is not -1
+
+      return types

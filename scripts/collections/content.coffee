@@ -10,23 +10,23 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/content/book'
-  'cs!models/content/folder'
-  'cs!models/content/module'
-], (_, Backbone, Book, Folder, Module) ->
+], (_, Backbone) ->
 
   return new (Backbone.Collection.extend
     model: (attrs, options) ->
       throw 'You must pass the model in when adding to the content collection.'
-    
+
     branches: () ->
       return _.where(@models, {branch: true})
 
-    initialize: () ->
-      book = new Book()
-      book.get('contents').add(new Folder())
-      book.get('contents').add(new Folder())
-      @add book
-      @add new Folder()
-      @add new Book({title: 'A Tale of Two '})
+    add: (models, options) ->
+      if (!_.isArray(models))
+        models = if models then [models] else []
+
+      # Listen to models and trigger a change event if any of them change
+      _.each(models, (model, index, arr) =>
+        @listenTo(model, 'change', () => @trigger('change'))
+      )
+
+      Backbone.Collection::add.call(@, models, options)
   )()
