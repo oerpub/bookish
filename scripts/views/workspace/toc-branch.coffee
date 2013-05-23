@@ -41,13 +41,13 @@ define [
     #
     # Initially, the node is collapsed and the following occurs:
     #
-    # 1. `@render()` calls `@_renderChildren()`
+    # 1. `@render()` calls `@renderChildren()`
     # 2. Since `@isExpanded == false` the children are not rendered
     #
     # When the node is expanded:
     #
     # 1. `@isExpanded` is set to `true`
-    # 2. `@render()` is called and calls `@_renderChildren()`
+    # 2. `@render()` is called and calls `@renderChildren()`
     # 3. Since `@isExpanded == true` the children are rendered and attached to the DOM
     # 4. `@hasRendered` is set to `true` so we know not to generate the children again
     #
@@ -81,14 +81,13 @@ define [
 
     # From `Marionette.CompositeView`.
     # Added check to only render when the model `@isExpanded`
-    _renderChildren: ->
+    renderChildren: ->
       if @isRendered
         if @isExpanded
-          Marionette.CollectionView.prototype._renderChildren.call(@)
+          Marionette.CollectionView::renderChildren.call(@)
           this.triggerMethod('composite:collection:rendered')
         # Remember that the children have been rendered already
         @hasRendered = @isExpanded
-
 
     # Perform the edit action and then expand the node to show children.
     editAction: -> @model.editAction(); @expand(true)

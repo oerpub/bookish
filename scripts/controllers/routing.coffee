@@ -23,5 +23,6 @@ define [
     # Calling this method directly will start editing an existing piece of content
     # and will update the URL.
     editModelId: (id) ->
+      console.log id
       app.main.show(workspaceLayout)
   )()

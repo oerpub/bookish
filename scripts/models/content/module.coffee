@@ -13,7 +13,6 @@ define [
   return Backbone.Model.extend
     mediaType: 'application/vnd.org.cnx.module'
     defaults:
-      mediaType: 'application/vnd.org.cnx.module'
       title: 'Untitled'
       subjects: []
       keywords: []
@@ -29,3 +28,10 @@ define [
         return _.indexOf(types, mediaType) is not -1
 
       return types
+
+    toJSON: () ->
+      json = Backbone.Model::toJSON.apply(@, arguments)
+      json.mediaType = @mediaType
+      json.id = @cid
+
+      return json

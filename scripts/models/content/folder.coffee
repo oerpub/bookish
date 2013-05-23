@@ -8,7 +8,6 @@ define [
     branch: true
     expanded: false
     defaults:
-      mediaType: 'application/vnd.org.cnx.folder'
       title: 'Untitled Folder'
 
     initialize: () ->
@@ -29,3 +28,10 @@ define [
         return _.indexOf(types, mediaType) is not -1
 
       return types
+
+    toJSON: () ->
+      json = Backbone.Model::toJSON.apply(@, arguments)
+      json.mediaType = @mediaType
+      json.id = @cid
+
+      return json

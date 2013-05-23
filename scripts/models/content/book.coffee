@@ -10,7 +10,6 @@ define [
     defaults:
       manifest: null
       title: 'Untitled Book'
-      mediaType: 'application/vnd.org.cnx.collection'
 
     initialize: () ->
       @set('contents', new Backbone.Collection())
@@ -27,3 +26,10 @@ define [
         return _.indexOf(types, mediaType) is not -1
 
       return types
+
+    toJSON: () ->
+      json = Backbone.Model::toJSON.apply(@, arguments)
+      json.mediaType = @mediaType
+      json.id = @cid
+
+      return json

@@ -69,12 +69,13 @@ define [
 
     initialize: ->
       @listenTo @model, 'change', => @render()
+
     onRender: ->
       # Render the modified time in a relative format and update it periodically
       $times = @$el.find('time[datetime]')
       #updateTimes $times
 
-      @$el.on 'click', => Controller.editModel(@model)
+      #@$el.on 'click', => Controller.editModel(@model)
       # Add DnD options to content
       $content = @$el.children('*[data-media-type]')
 
