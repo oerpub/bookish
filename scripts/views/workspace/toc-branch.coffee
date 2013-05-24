@@ -19,8 +19,7 @@ define [
 
       if @model and @model.expanded
         @$el.addClass('editor-node-expanded')
-        @isExpanded = true
-        @expand(true)
+        @renderChildren()
       
       return @
 
@@ -64,30 +63,19 @@ define [
     # 2. Since `@hasRendered == true` there is no need to call `@render()`
     # 3. The CSS class is removed to show the children again
 
-    isExpanded: false
-    hasRendered: false
-
     # Called from UI when user clicks the collapse/expando buttons
-    toggleExpanded: -> @expand !@isExpanded
+    toggleExpanded: -> @expand !@model.expanded
 
     # Pass in `false` to collapse
-    expand: (@isExpanded) ->
-      @model.expanded = @isExpanded
-      @$el.toggleClass 'editor-node-expanded', @isExpanded
-      # (re)render the model and children if the node is expanded
-      # and has not been rendered yet.
-      if @isExpanded and !@hasRendered
-        @render()
+    expand: (expanded) ->
+      @model.expanded = expanded
+      @render()
 
     # From `Marionette.CompositeView`.
     # Added check to only render when the model `@isExpanded`
-    renderChildren: ->
-      if @isRendered
-        if @isExpanded
-          Marionette.CollectionView::renderChildren.call(@)
-          this.triggerMethod('composite:collection:rendered')
-        # Remember that the children have been rendered already
-        @hasRendered = @isExpanded
+    renderChildren: () ->
+      Marionette.CollectionView::render.call(@)
+      this.triggerMethod('composite:collection:rendered')
 
     # Perform the edit action and then expand the node to show children.
     editAction: -> @model.editAction(); @expand(true)
