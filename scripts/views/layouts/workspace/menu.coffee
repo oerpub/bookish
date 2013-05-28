@@ -5,6 +5,7 @@ define [
   'marionette'
   'cs!views/workspace/auth'
   'cs!views/workspace/add'
+  #'cs!views/workspace/toolbar'
   'hbs!templates/layouts/workspace/menu'
 ], ($, _, Backbone, Marionette, AuthView, AddView, menuTemplate) ->
 
@@ -14,8 +15,10 @@ define [
     regions:
       add: '#workspace-menu-add'
       auth: '#workspace-menu-auth'
+      toolbar: '#workspace-menu-toolbar'
 
     onRender: () ->
       @add.show(new AddView())
       @auth.show(new AuthView())
+      #@toolbar.show(new ToolbarView())
   )()

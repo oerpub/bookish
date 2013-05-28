@@ -24,14 +24,9 @@ define [
       language: navigator?.language or navigator?.userLanguage or 'en'
 
     contentView: (callback) ->
-      # return instantiated content view
-      # use require to get view and pass it in to the callback
-      callback()
+      require ['cs!views/content'], (view) ->
+        callback(view)
 
-    menuView: () ->
-      # return instantiated menu view
-      callback()
-
-    menuView: () ->
-      # return instantiated menu view
-      callback()
+    toolbarView: (callback) ->
+      require ['cs!views/aloha-toolbar'], (view) ->
+        callback(view)

@@ -20,3 +20,12 @@ define [
       @get('contents').add(model)
       @trigger('change')
       return @
+
+    contentView: (callback) ->
+      #require ['cs!views/content'], (view) ->
+      #  callback(view)
+
+    sidebarView: (callback) ->
+      require ['cs!views/workspace/toc'], (View) =>
+        view = new View({collection: @get('contents')})
+        callback(view)
