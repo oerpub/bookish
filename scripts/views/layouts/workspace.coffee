@@ -6,12 +6,12 @@ define [
   'cs!views/workspace/search-results'
   'cs!views/layouts/workspace/menu'
   'cs!views/layouts/workspace/sidebar'
-  'hbs!templates/layouts/main'
+  'hbs!templates/layouts/workspace'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, mainTemplate) ->
+], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
-  return new (Marionette.Layout.extend
-    template: mainTemplate({layout: 'workspace'})
+  return Marionette.Layout.extend
+    template: workspaceTemplate
 
     regions:
       content: '#content'
@@ -19,7 +19,18 @@ define [
       sidebar: '#sidebar'
 
     onRender: () ->
-      @content.show(new SearchResultsView())
-      @menu.show(menuLayout)
-      @sidebar.show(sidebarLayout)
-  )()
+      @load(@model)
+
+    load: (model) ->
+      @model = model
+
+      if typeof @model is 'object'
+        # load editor view
+        @model.contentView?((view) => if view then @content.show(view))
+        @model.menuView?((view) => if view then @menu.show(view))
+        @model.sidebarView?((view) => if view then @sidebar.show(view))
+      else
+        # load default view
+        @content.show(new SearchResultsView())
+        @menu.show(menuLayout)
+        @sidebar.show(sidebarLayout)

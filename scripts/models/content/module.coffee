@@ -35,3 +35,16 @@ define [
       json.id = @id or @cid
 
       return json
+
+    contentView: (callback) ->
+      # return instantiated content view
+      # use require to get view and pass it in to the callback
+      callback()
+
+    menuView: () ->
+      # return instantiated menu view
+      callback()
+
+    menuView: () ->
+      # return instantiated menu view
+      callback()
