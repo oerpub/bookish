@@ -23,10 +23,11 @@ define [
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
 
-    contentView: (callback) ->
-      require ['cs!views/content'], (view) ->
-        callback(view)
+    #contentView: (callback) ->
+    #  require ['cs!views/content'], (view) ->
+    #    callback(view)
 
     toolbarView: (callback) ->
-      require ['cs!views/aloha-toolbar'], (view) ->
+      require ['cs!views/workspace/menu/toolbar-aloha'], (View) ->
+        view = new View()
         callback(view)

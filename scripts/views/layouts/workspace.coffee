@@ -26,7 +26,7 @@ define [
       if typeof @model is 'object'
         # load editor view
         @model.contentView?((view) => if view then @content.show(view))
-        @model.toolbarView?((view) => if view then @menu.toolbar.show(view))
+        @model.toolbarView?((view) => if view then @menu.currentView.toolbar.show(view))
         @model.sidebarView?((view) => if view then @sidebar.show(view))
       else
         # load default view
