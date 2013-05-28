@@ -75,7 +75,8 @@ define [
       $times = @$el.find('time[datetime]')
       #updateTimes $times
 
-      #@$el.on 'click', => Controller.editModel(@model)
+      # @$el.on 'click', (e) => controller.edit(@model)
+
       # Add DnD options to content
       $content = @$el.children('*[data-media-type]')
 
@@ -115,4 +116,4 @@ define [
 
                 # Delay the call so $.droppable has time to clean up before the DOM changes
                 delay = => drop.add(model)
-                setTimeout delay, 10
+                setTimeout(delay, 10)

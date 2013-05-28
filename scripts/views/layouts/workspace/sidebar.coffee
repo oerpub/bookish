@@ -13,10 +13,6 @@ define [
     regions:
       toc: '#workspace-sidebar'
 
-    render: () ->
-      Marionette.Layout::render.apply(@, arguments)
-      @load()
-
-    load: () ->
+    onRender: () ->
       @toc.show(new TocView())
   )()

@@ -10,8 +10,8 @@ define [
   'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, mainTemplate) ->
 
-  return new (Marionette.Layout.extend
-    template: mainTemplate({layout: 'workspace'})
+  return Marionette.Layout.extend
+    template: mainTemplate({layout: 'editor'})
 
     regions:
       content: '#content'
@@ -22,4 +22,3 @@ define [
       @content.show(new SearchResultsView())
       @menu.show(menuLayout)
       @sidebar.show(sidebarLayout)
-  )()

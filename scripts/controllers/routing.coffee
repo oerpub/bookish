@@ -4,25 +4,30 @@ define [
   'backbone'
   'marionette'
   'cs!app'
+  'cs!collections/content'
   'cs!views/layouts/workspace'
+  'cs!views/layouts/editor'
   'less!styles/main.less'
-], ($, _, Backbone, Marionette, app, workspaceLayout) ->
+], ($, _, Backbone, Marionette, app, content, workspaceLayout, EditorLayout) ->
 
   return new (Marionette.Controller.extend
     # Show Workspace
     # -------
-    # Shows the workspace listing and updates the URL
+    # Show the workspace listing and update the URL
     workspace: ->
-      # Always scroll to the top of the page
-      window.scrollTo(0, 0)
-
       app.main.show(workspaceLayout)
 
     # Edit existing content
     # -------
-    # Calling this method directly will start editing an existing piece of content
-    # and will update the URL.
-    editModelId: (id) ->
-      console.log id
-      app.main.show(workspaceLayout)
+    # Start editing an existing piece of content and update the URL.
+    edit: (model) ->
+      if typeof model is 'string'
+        model = content.get(model)
+
+      if model
+        app.main.show(new EditorLayout(model))
+      else
+        # Redirect to workspace if model does not exist
+        require ['cs!routers/router'], (router) ->
+          router.navigate('/', {trigger: true, replace: true});
   )()

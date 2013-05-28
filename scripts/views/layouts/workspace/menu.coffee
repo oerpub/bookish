@@ -15,11 +15,7 @@ define [
       add: '#workspace-menu-add'
       auth: '#workspace-menu-auth'
 
-    render: () ->
-      Marionette.Layout::render.apply(@, arguments)
-      @load()
-
-    load: () ->
+    onRender: () ->
       @add.show(new AddView())
       @auth.show(new AuthView())
   )()

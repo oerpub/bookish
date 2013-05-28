@@ -11,5 +11,5 @@ define [
     appRoutes:
       '':             'workspace' # Show the workspace list of content
       'workspace':    'workspace'
-      'content/:id':  'editModelId' # Edit an existing piece of content
+      'content/:id':  'edit' # Edit an existing piece of content
   )()
