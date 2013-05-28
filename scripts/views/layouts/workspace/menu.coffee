@@ -8,6 +8,8 @@ define [
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
 ], ($, _, Backbone, Marionette, AuthView, AddView, ToolbarView, menuTemplate) ->
+  
+  _toolbar = null
 
   return new (Marionette.Layout.extend
     template: menuTemplate
@@ -18,7 +20,15 @@ define [
       toolbar: '#workspace-menu-toolbar'
 
     onRender: () ->
+      @load(_toolbar)
+
+    load: (view) ->
+      _toolbar = view or new ToolbarView()
+
       @add.show(new AddView())
       @auth.show(new AuthView())
-      @toolbar.show(new ToolbarView())
+      @toolbar.show(_toolbar)
+
+    showToolbar: (view) ->
+      @load(view or new ToolbarView())
   )()

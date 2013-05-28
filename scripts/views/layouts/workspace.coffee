@@ -7,7 +7,7 @@ define [
   'cs!views/layouts/workspace/menu'
   'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace'
-], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, searchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
   return Marionette.Layout.extend
     template: workspaceTemplate
@@ -23,13 +23,21 @@ define [
     load: (options) ->
       @model = options?.model
 
-      if typeof @model is 'object'
-        # load editor view
-        @model.contentView?((view) => if view then @content.show(view))
-        @model.toolbarView?((view) => if view then @menu.currentView.toolbar.show(view))
-        @model.sidebarView?((view) => if view then @sidebar.show(view))
-      else
-        # load default view
-        @content.show(new SearchResultsView())
+      # Make sure the menu is loaded
+      if not @menu.currentView
         @menu.show(menuLayout)
-        @sidebar.show(sidebarLayout)
+
+      # Load the content view
+      if @model?.contentView?
+        @model.contentView((view) => if view then @content.show(view))
+      else @content.show(searchResultsView)
+
+      # Load the menu's toolbar
+      if @model?.toolbarView?
+        @model.toolbarView((view) => if view then @menu.currentView.showToolbar(view))
+      else @menu.currentView.showToolbar()
+
+      # Load the sidebar
+      if @model?.sidebarView?
+        @model.sidebarView((view) => if view then @sidebar.show(view))
+      else @sidebar.show(sidebarLayout)

@@ -8,8 +8,9 @@ define [
   'hbs!templates/workspace/content/search-results'
 ], ($, _, Backbone, Marionette, content, SearchResultsItemView, searchResultsTemplate) ->
 
-  return Marionette.CompositeView.extend
+  return new (Marionette.CompositeView.extend
     template: searchResultsTemplate
     itemViewContainer: 'tbody'
     itemView: SearchResultsItemView
     collection: content
+  )()
