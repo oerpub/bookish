@@ -1,7 +1,8 @@
 define [
   'underscore'
   'backbone'
-], (_, Backbone) ->
+  'cs!models/content/base'
+], (_, Backbone, BaseModel) ->
 
   # The `Content` model contains the following members:
   #
@@ -10,8 +11,9 @@ define [
   # * `subjects` - an array of strings (eg `['Mathematics', 'Business']`)
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
-  return Backbone.Model.extend
+  return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.module'
+    accept: []
     defaults:
       title: 'Untitled'
       subjects: []
@@ -19,22 +21,7 @@ define [
       authors: []
       copyrightHolders: []
       # Default language for new content is the browser's language
-      language: (navigator?.userLanguage or navigator?.language or 'en').toLowerCase()
-
-    accepts: (mediaType) ->
-      types = []
-
-      if (typeof mediaType is 'string')
-        return _.indexOf(types, mediaType) is not -1
-
-      return types
-
-    toJSON: () ->
-      json = Backbone.Model::toJSON.apply(@, arguments)
-      json.mediaType = @mediaType
-      json.id = @id or @cid
-
-      return json
+      language: navigator?.language or navigator?.userLanguage or 'en'
 
     contentView: (callback) ->
       # return instantiated content view

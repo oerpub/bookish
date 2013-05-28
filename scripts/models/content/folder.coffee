@@ -1,10 +1,15 @@
 define [
   'underscore'
   'backbone'
-], (_, Backbone) ->
+  'cs!models/content/base'
+], (_, Backbone, BaseModel) ->
 
-  return Backbone.Model.extend
+  return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
+    accept: [
+      'application/vnd.org.cnx.collection', # Book
+      'application/vnd.org.cnx.module' # Module
+    ]
     branch: true
     expanded: false
     defaults:
@@ -17,21 +22,3 @@ define [
       @get('contents').add(model)
       @trigger('change')
       return @
-
-    accepts: (mediaType) ->
-      types = [
-        'application/vnd.org.cnx.collection', # Book
-        'application/vnd.org.cnx.module' # Module
-      ]
-
-      if (typeof mediaType is 'string')
-        return _.indexOf(types, mediaType) is not -1
-
-      return types
-
-    toJSON: () ->
-      json = Backbone.Model::toJSON.apply(@, arguments)
-      json.mediaType = @mediaType
-      json.id = @cid
-
-      return json
