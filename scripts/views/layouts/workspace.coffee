@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/workspace/search-results'
+  'cs!views/workspace/content/search-results'
   'cs!views/layouts/workspace/menu'
   'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace'

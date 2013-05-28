@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'hbs!templates/workspace/sign-in-out'
+  'hbs!templates/workspace/menu/sign-in-out'
 ], ($, _, Backbone, Marionette, signInOutTemplate) ->
 
   # Default Auth View

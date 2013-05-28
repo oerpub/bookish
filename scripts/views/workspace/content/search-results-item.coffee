@@ -6,7 +6,7 @@ define [
   'aloha'
   'cs!collections/media-types'
   'hbs!templates/workspace/dnd-handle'
-  'hbs!templates/workspace/search-results-item'
+  'hbs!templates/workspace/content/search-results-item'
 ], ($, _, Backbone, Marionette, Aloha, mediaTypes, dndHandleTemplate, searchResultsItemTemplate) ->
   # Drag and Drop Behavior
   # -------

@@ -4,8 +4,8 @@ define [
   'backbone'
   'marionette'
   'cs!collections/content'
-  'cs!views/workspace/toc-branch'
-  'hbs!templates/workspace/toc'
+  'cs!views/workspace/sidebar/toc-branch'
+  'hbs!templates/workspace/sidebar/toc'
 ], ($, _, Backbone, Marionette, content, TocBranchView, tocTemplate) ->
 
   return Marionette.CompositeView.extend

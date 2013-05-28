@@ -4,8 +4,8 @@ define [
   'backbone'
   'marionette'
   'cs!collections/content'
-  'cs!views/workspace/search-results-item'
-  'hbs!templates/workspace/search-results'
+  'cs!views/workspace/content/search-results-item'
+  'hbs!templates/workspace/content/search-results'
 ], ($, _, Backbone, Marionette, content, SearchResultsItemView, searchResultsTemplate) ->
 
   return Marionette.CompositeView.extend

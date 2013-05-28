@@ -26,6 +26,6 @@ define [
       #  callback(view)
 
     sidebarView: (callback) ->
-      require ['cs!views/workspace/toc'], (View) =>
+      require ['cs!views/workspace/sidebar/toc'], (View) =>
         view = new View({collection: @get('contents')})
         callback(view)

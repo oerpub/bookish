@@ -5,8 +5,8 @@ define [
   'marionette'
   'cs!collections/content'
   'cs!collections/media-types'
-  'hbs!templates/workspace/add'
-  'hbs!templates/workspace/add-item'
+  'hbs!templates/workspace/menu/add'
+  'hbs!templates/workspace/menu/add-item'
 ], ($, _, Backbone, Marionette, content, mediaTypes, addTemplate, addItemTemplate) ->
 
   AddItemView = Marionette.ItemView.extend

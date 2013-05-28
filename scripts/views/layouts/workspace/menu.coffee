@@ -3,8 +3,8 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/workspace/auth'
-  'cs!views/workspace/add'
+  'cs!views/workspace/menu/auth'
+  'cs!views/workspace/menu/add'
   #'cs!views/workspace/toolbar'
   'hbs!templates/layouts/workspace/menu'
 ], ($, _, Backbone, Marionette, AuthView, AddView, menuTemplate) ->

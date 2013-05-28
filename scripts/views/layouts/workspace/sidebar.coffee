@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!views/workspace/toc'
+  'cs!views/workspace/sidebar/toc'
   'hbs!templates/layouts/workspace/sidebar'
 ], ($, _, Backbone, Marionette, TocView, sidebarTemplate) ->
 

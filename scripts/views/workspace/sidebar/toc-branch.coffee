@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'hbs!templates/workspace/toc-branch'
+  'hbs!templates/workspace/sidebar/toc-branch'
 ], ($, _, Backbone, Marionette, tocBranchTemplate) ->
 
   return Marionette.CompositeView.extend
