@@ -5,9 +5,9 @@ define [
   'marionette'
   'cs!views/workspace/menu/auth'
   'cs!views/workspace/menu/add'
-  #'cs!views/workspace/toolbar'
+  'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, AuthView, AddView, menuTemplate) ->
+], ($, _, Backbone, Marionette, AuthView, AddView, ToolbarView, menuTemplate) ->
 
   return new (Marionette.Layout.extend
     template: menuTemplate
@@ -20,5 +20,5 @@ define [
     onRender: () ->
       @add.show(new AddView())
       @auth.show(new AuthView())
-      #@toolbar.show(new ToolbarView())
+      @toolbar.show(new ToolbarView())
   )()

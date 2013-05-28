@@ -19,11 +19,12 @@ define [
     addItem: (e) ->
       e.preventDefault()
 
-      content.add(new (@model.get('modelType'))())
+      model = new (@model.get('modelType'))()
+      content.add(model)
 
       # Begin editing an item as soon as it is added.
       # Some content (like Books and Folders) do not have an `editAction`
-      #content.editAction?()
+      #model.editAction?()
 
   return Marionette.CompositeView.extend
     collection: mediaTypes
