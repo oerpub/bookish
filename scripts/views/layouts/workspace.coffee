@@ -7,7 +7,6 @@ define [
   'cs!views/layouts/workspace/menu'
   'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace'
-  'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
   return Marionette.Layout.extend

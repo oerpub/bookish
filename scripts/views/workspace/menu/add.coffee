@@ -7,13 +7,14 @@ define [
   'cs!collections/media-types'
   'hbs!templates/workspace/menu/add'
   'hbs!templates/workspace/menu/add-item'
+  'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, content, mediaTypes, addTemplate, addItemTemplate) ->
 
   AddItemView = Marionette.ItemView.extend
     template: addItemTemplate
     tagName: 'li'
     events:
-      'click button': 'addItem'
+      'click .add-content-item': 'addItem'
 
     addItem: (e) ->
       e.preventDefault()
