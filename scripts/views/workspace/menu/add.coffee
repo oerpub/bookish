@@ -26,9 +26,10 @@ define [
       # Some content (like Books and Folders) do not have an `editAction`
       #model.editAction?()
 
-  return Marionette.CompositeView.extend
+  return new (Marionette.CompositeView.extend
     collection: mediaTypes
     template: addTemplate
     itemView: AddItemView
     itemViewContainer: '.btn-group > ul'
     tagName: 'span'
+  )()
