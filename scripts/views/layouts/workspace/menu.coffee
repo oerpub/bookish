@@ -7,7 +7,7 @@ define [
   'cs!views/workspace/menu/add'
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, AuthView, AddView, ToolbarView, menuTemplate) ->
+], ($, _, Backbone, Marionette, AuthView, AddView, toolbarView, menuTemplate) ->
   
   _toolbar = null
 
@@ -23,12 +23,12 @@ define [
       @load(_toolbar)
 
     load: (view) ->
-      _toolbar = view or new ToolbarView()
+      _toolbar = view or toolbarView
 
       @add.show(new AddView())
       @auth.show(new AuthView())
       @toolbar.show(_toolbar)
 
     showToolbar: (view) ->
-      @load(view or new ToolbarView())
+      @load(view or toolbarView)
   )()

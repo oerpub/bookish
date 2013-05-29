@@ -28,6 +28,5 @@ define [
         callback(view)
 
     toolbarView: (callback) ->
-      require ['cs!views/workspace/menu/toolbar-aloha'], (View) ->
-        view = new View()
+      require ['cs!views/workspace/menu/toolbar-aloha'], (view) ->
         callback(view)
