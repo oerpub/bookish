@@ -3,18 +3,21 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!views/workspace/content/content-edit'
+  'cs!views/workspace/content/edit-metadata'
+  'cs!views/workspace/content/edit-roles'
   'hbs!templates/workspace/content/layouts/editor'
-], ($, _, Backbone, Marionette, editorTemplate) ->
+], ($, _, Backbone, Marionette, ContentEditView, MetadataView, RolesView, editorTemplate) ->
 
   return Marionette.Layout.extend
     template: editorTemplate
 
     regions:
-      metadata: '#workspace-content-metadata'
-      roles: '#workspace-content-roles'
-      edit: '#workspace-content-toolbar'
+      metadata: '#layout-metadata'
+      roles: '#layout-roles'
+      edit: '#layout-body'
 
     onRender: () ->
-      #@metadata.show(new AddView())
-      #@roles.show(new AuthView())
-      #@edit.show(new ToolbarView())
+      @metadata.show(new MetadataView())
+      #@roles.show(new RolesView())
+      #@edit.show(new ContentEditView())
