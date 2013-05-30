@@ -133,17 +133,42 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-flex: 1 0 auto;
-
   background-color: #ebebeb;
-
   padding: 2em;
-}
+  
+  // Make the main editing area white so it looks like a sheet of paper
+  .layout-content {
+    padding: 2em;
+    background-color: white;
+    border: 1px solid black;
+  }
+  
+  .search-results {
+    background-color: white;
+    border: 1px solid black;
+    border-collapse: separate;
 
-.search-results {
-  background-color: white;
-  border: 1px solid black;
+    th, tr {
+      padding: 1em;
+    }
+  }
 
-  th, tr {
-    padding: 1em;
+  #layout-title {
+    // Hint that the user can edit the title here
+    cursor: pointer;
+
+    &:before {
+      content: "Title: ";
+      opacity: 0.5;
+    }
+
+    // Make the "tooltip" that the user can change the title small
+    + .popover { font-size: 12pt; font-weight: normal; }
+
+  }
+
+  #accordion-metadata .accordion-toggle {
+    width: 100%;
+    text-align: left;
   }
 }
