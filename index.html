@@ -2,18 +2,19 @@
 <html>
   <head>
     <title>Connexions</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/styles/loading.css" />
 
     <!-- Application source. -->
     <script data-main="/scripts/main" src="/scripts/libs/require/require.js"></script>
   </head>
-  <body style="margin: 0;">
+  <body>
     <div id="main">
-      <div style="position: absolute; top: 25%; width: 100%; text-align: center;">
-        <div style="position: absolute; left: 50%; width: 400px; margin-left: -200px;">
-          <h3 style="margin: 10px 0; font: bold 24.5px/40px 'Helvetica Neue', Helvetica, Arial, sans-serif; text-rendering: optimizelegibility;">Loading Editor...</h3>
-          <div style="line-height: 20px;">
-            <img style="vertical-align: middle;" src="/img/loader.gif" height="19" width="220"/>
+      <div class="loading-container">
+        <div class="loading">
+          <h3>Loading Editor...</h3>
+          <div class="progress progress-striped active">
+            <div class="bar" style="width: 100%"></div>
           </div>
         </div>
       </div>
