@@ -4,6 +4,7 @@ define [
   'backbone'
   'marionette'
   'hbs!templates/workspace/menu/sign-in-out'
+  'bootstrapTooltip'
 ], ($, _, Backbone, Marionette, signInOutTemplate) ->
 
   # Default Auth View
@@ -66,7 +67,7 @@ define [
 
     onRender: ->
       # Enable tooltips
-      #@$el.find('*[title]').tooltip()
+      @$el.find('*[title]').tooltip()
 
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model
