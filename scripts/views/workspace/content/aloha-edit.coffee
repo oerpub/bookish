@@ -4,7 +4,8 @@ define [
   'backbone'
   'marionette'
   'aloha'
-], ($, _, Backbone, Marionette, Aloha) ->
+  'mathjax'
+], ($, _, Backbone, Marionette, Aloha, MathJax) ->
 
   return Marionette.ItemView.extend
     # **NOTE:** This template is not wrapped in an element

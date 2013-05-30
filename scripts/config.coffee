@@ -21,6 +21,7 @@ require.config
     # ## UI Libraries
     aloha: 'libs/aloha-editor/lib/aloha'
     select2: 'libs/select2/select2'
+    'mathjax-src': '//cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
     # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
@@ -47,6 +48,7 @@ require.config
     '*':
       css: 'libs/require/plugins/require-css/css'
       less: 'libs/require/plugins/require-less/less'
+      mathjax: 'cs!configs/mathjax'
 
   # # Shims
   # Used to support libraries that were not written for AMD
@@ -91,7 +93,9 @@ require.config
     aloha:
       deps: ['jquery', 'cs!configs/aloha']
       exports: 'Aloha'
-
+    
+    'mathjax-src':
+      exports: 'MathJax'
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).
