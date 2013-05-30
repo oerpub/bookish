@@ -22,6 +22,9 @@ define [
       copyrightHolders: []
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
+      
+      #temp
+      _done: true
 
     contentView: (callback) ->
       require ['cs!views/workspace/content/layouts/editor'], (View) =>
