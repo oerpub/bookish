@@ -9,6 +9,7 @@ define [
   'hbs!templates/workspace/content/language-variants'
   'i18n!nls/strings'
   'select2'
+  'bootstrapCollapse'
 ], ($, _, Backbone, Marionette, config, languagesModel, metadataTemplate, languagesTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)

@@ -6,6 +6,7 @@ define [
   'aloha'
   'hbs!templates/workspace/content/edit-roles'
   'select2'
+  'bootstrapCollapse'
 ], ($, _, Backbone, Marionette, Aloha, rolesTemplate) ->
 
   # Select2 is a multiselect UI library.
