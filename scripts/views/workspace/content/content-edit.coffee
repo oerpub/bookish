@@ -5,6 +5,7 @@ define [
   'marionette'
   'cs!views/workspace/content/aloha-edit'
   'hbs!templates/workspace/content/content-edit'
+  'bootstrapPopover'
 ], ($, _, Backbone, Marionette, AlohaEditView, contentEditTemplate) ->
 
   # Edit Content Body
