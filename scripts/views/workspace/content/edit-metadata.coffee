@@ -6,9 +6,10 @@ define [
   'cs!configs/app'
   'cs!models/languages'
   'hbs!templates/workspace/content/edit-metadata'
+  'hbs!templates/workspace/content/language-variants'
   'i18n!nls/strings'
   'select2'
-], ($, _, Backbone, Marionette, config, languagesModel, metadataTemplate, __) ->
+], ($, _, Backbone, Marionette, config, languagesModel, metadataTemplate, languagesTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.
@@ -49,14 +50,14 @@ define [
       $variant = @$el.find('*[name=variantLanguage]')
       $label = @$el.find('*[for=variantLanguage]')
       variants = []
-      for code, value of Languages.getCombined()
+      for code, value of languagesModel.getCombined()
         if code[..1] == lang
           $.extend(value, {code: code})
           variants.push(value)
       if variants.length > 0
         # Generate the language variants dropdown.
         $variant.removeAttr('disabled')
-        $variant.html(LANGUAGE_VARIANTS('variants': variants))
+        $variant.html(languagesTemplate({'variants': variants}))
         $variant.find("option[value=#{language}]").attr('selected', true)
         $label.removeClass('hidden')
         $variant.removeClass('hidden')
