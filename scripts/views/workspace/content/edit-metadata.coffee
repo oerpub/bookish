@@ -3,11 +3,12 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!configs/app'
   'cs!models/languages'
   'hbs!templates/workspace/content/edit-metadata'
   'i18n!nls/strings'
   'select2'
-], ($, _, Backbone, Marionette, languagesModel, metadataTemplate, __) ->
+], ($, _, Backbone, Marionette, config, languagesModel, metadataTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.
@@ -87,7 +88,7 @@ define [
 
       $subjects = @$el.find('*[name=subjects]')
       $subjects.select2
-        tags: Models.config.get('metadataSubjects')
+        tags: config.get('metadataSubjects')
         tokenSeparators: [',']
         separator: '|' # String used to delimit ids in $('input').val()
 
