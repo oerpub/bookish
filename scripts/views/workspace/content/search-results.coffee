@@ -3,14 +3,11 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'cs!collections/content'
   'cs!views/workspace/content/search-results-item'
   'hbs!templates/workspace/content/search-results'
-], ($, _, Backbone, Marionette, content, SearchResultsItemView, searchResultsTemplate) ->
+], ($, _, Backbone, Marionette, SearchResultsItemView, searchResultsTemplate) ->
 
-  return new (Marionette.CompositeView.extend
+  return Marionette.CompositeView.extend
     template: searchResultsTemplate
     itemViewContainer: 'tbody'
     itemView: SearchResultsItemView
-    collection: content
-  )()

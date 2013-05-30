@@ -3,11 +3,12 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!collections/content'
   'cs!views/workspace/content/search-results'
   'cs!views/layouts/workspace/menu'
   'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace'
-], ($, _, Backbone, Marionette, searchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, content, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
   return Marionette.Layout.extend
     template: workspaceTemplate
@@ -30,7 +31,7 @@ define [
       # Load the content view
       if @model?.contentView?
         @model.contentView((view) => if view then @content.show(view))
-      else @content.show(searchResultsView)
+      else @content.show(new SearchResultsView({collection: content}))
 
       # Load the menu's toolbar
       if @model?.toolbarView?
