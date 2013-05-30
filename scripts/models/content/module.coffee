@@ -24,7 +24,8 @@ define [
       language: navigator?.language or navigator?.userLanguage or 'en'
 
     contentView: (callback) ->
-      require ['cs!views/workspace/content/editor'], (view) ->
+      require ['cs!views/workspace/content/layouts/editor'], (View) =>
+        view = new View(@)
         callback(view)
 
     toolbarView: (callback) ->
