@@ -19,5 +19,5 @@ define [
 
     onRender: () ->
       @metadata.show(new MetadataView({model: @model}))
-      #@roles.show(new RolesView())
+      @roles.show(new RolesView({model: @model}))
       #@edit.show(new ContentEditView())

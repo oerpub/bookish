@@ -3,9 +3,42 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'aloha'
   'hbs!templates/workspace/content/edit-roles'
   'select2'
-], ($, _, Backbone, Marionette, rolesTemplate) ->
+], ($, _, Backbone, Marionette, Aloha, rolesTemplate) ->
+
+  # Select2 is a multiselect UI library.
+  # It queries the webserver to provide search results as you type
+  #
+  # Given a `url` to query (like `/users` or `/keywords`) this returns a config
+  # used when binding select2 to an input.
+  ###
+  ajaxHandler = (url) ->
+    quietMillis: 500
+    url: url
+    dataType: 'json'
+    data: (term, page) ->
+      q: term # search term
+    # parse the results into the format expected by Select2
+    results: (data, page) ->
+      return {
+        results: ({id:id, text:id} for id in data)
+      }
+  ###
+
+  # Make a multiselect widget sortable using jQueryUI.
+  # Unfortunately jQueryUI is not available until Aloha finishes loading
+  # so postpone making it sortable until `Aloha.ready`
+  makeSortable = ($el) ->
+    Aloha.ready ->
+      $el.select2('container')
+      .find('ul.select2-choices')
+      .sortable
+        cursor: 'move'
+        containment: 'parent'
+        start: ->  $el.select2 'onSortStart'
+        update: -> $el.select2 'onSortEnd'
 
   return Marionette.ItemView.extend
     template: rolesTemplate
@@ -19,15 +52,15 @@ define [
         tags: @model.get('authors') or []
         tokenSeparators: [',']
         separator: '|'
-        #ajax: SELECT2_AJAX_HANDLER(URLS.USERS)
+        #ajax: ajaxHandler(URLS.USERS)
       $copyrightHolders.select2
         tags: @model.get('copyrightHolders') or []
         tokenSeparators: [',']
         separator: '|'
-        #ajax: SELECT2_AJAX_HANDLER(URLS.USERS)
+        #ajax: ajaxHandler(URLS.USERS)
 
-      SELECT2_MAKE_SORTABLE $authors
-      SELECT2_MAKE_SORTABLE $copyrightHolders
+      makeSortable($authors)
+      makeSortable($copyrightHolders)
 
       # Populate the multiselect widgets with data from the backbone model
       @_updateAuthors()
