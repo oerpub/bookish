@@ -25,7 +25,7 @@ define [
 
     contentView: (callback) ->
       require ['cs!views/workspace/content/layouts/editor'], (View) =>
-        view = new View(@)
+        view = new View({model: @})
         callback(view)
 
     toolbarView: (callback) ->

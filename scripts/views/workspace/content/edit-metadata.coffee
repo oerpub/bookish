@@ -26,6 +26,7 @@ define [
       'change *[name=language]': '_updateLanguageVariant'
 
     initialize: () ->
+      console.log @model
       #@listenTo @model, 'change:language', => @_updateLanguage()
       #@listenTo @model, 'change:subjects', => @_updateSubjects()
       #@listenTo @model, 'change:keywords', => @_updateKeywords()

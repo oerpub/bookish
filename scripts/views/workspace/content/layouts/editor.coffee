@@ -18,6 +18,6 @@ define [
       edit: '#layout-body'
 
     onRender: () ->
-      @metadata.show(new MetadataView())
+      @metadata.show(new MetadataView({model: @model}))
       #@roles.show(new RolesView())
       #@edit.show(new ContentEditView())
