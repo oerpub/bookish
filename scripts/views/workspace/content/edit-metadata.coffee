@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'models/languages'
+  'cs!models/languages'
   'hbs!templates/workspace/content/edit-metadata'
   'select2'
 ], ($, _, Backbone, Marionette, languagesModel, metadataTemplate) ->

@@ -7,6 +7,7 @@ require.config
 
     # ## Requirejs plugins
     text: 'libs/require/plugins/text'
+    json: 'libs/require/plugins/json'
     hbs: 'libs/require/plugins/require-handlebars/hbs'
 
     # ## Core Libraries
