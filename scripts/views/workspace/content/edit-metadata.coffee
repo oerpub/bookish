@@ -3,11 +3,11 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'helpers/i18n'
   'cs!models/languages'
   'hbs!templates/workspace/content/edit-metadata'
+  'i18n!nls/strings'
   'select2'
-], ($, _, Backbone, Marionette, __, languagesModel, metadataTemplate) ->
+], ($, _, Backbone, Marionette, languagesModel, metadataTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.
