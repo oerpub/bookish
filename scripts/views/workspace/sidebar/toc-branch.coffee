@@ -20,6 +20,8 @@ define [
       if @model and @model.expanded
         @$el.addClass('editor-node-expanded')
         @renderChildren()
+      else
+        @$el.removeClass('editor-node-expanded')
       
       return @
 
@@ -64,7 +66,7 @@ define [
     # 3. The CSS class is removed to show the children again
 
     # Called from UI when user clicks the collapse/expando buttons
-    toggleExpanded: -> @expand !@model.expanded
+    toggleExpanded: -> @expand(!@model.expanded)
 
     # Pass in `false` to collapse
     expand: (expanded) ->
@@ -75,7 +77,7 @@ define [
     # Added check to only render when the model `@isExpanded`
     renderChildren: () ->
       Marionette.CollectionView::render.call(@)
-      this.triggerMethod('composite:collection:rendered')
+      @triggerMethod('composite:collection:rendered')
 
     # Perform the edit action and then expand the node to show children.
     editAction: -> @model.editAction(); @expand(true)
