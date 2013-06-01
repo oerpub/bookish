@@ -30,7 +30,7 @@ Check the `./docs` directory to read through the different modules.
 * `scripts/config.coffee`  Requirejs Config
 * `scripts/main.js`        Initial Requirejs Loader
 * `scripts/session.coffee` Model of Session
-* `styles/`                LESS Styling
+* `styles/`                LESS and CSS Styling
 * `templates/`             Handlebars Templates
 * `templates/helpers/`     Handlebars Helpers
 * `index.html`             App's HTML Page
