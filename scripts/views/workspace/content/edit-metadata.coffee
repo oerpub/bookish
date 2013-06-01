@@ -103,7 +103,9 @@ define [
         #ajax: SELECT2_AJAX_HANDLER(URLS.KEYWORDS)
         initSelection: (element, callback) ->
           data = []
-          _.each element.val().split('|'), (str) -> data.push {id: str, text: str}
+          val = element.val()
+          if val
+            _.each val.split('|'), (str) -> data.push {id: str, text: str}
           callback(data)
 
       # Select the correct language (Handlebars can't do that)
