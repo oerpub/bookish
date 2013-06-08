@@ -30,6 +30,7 @@ define ['jquery'], (jQuery) ->
         'oer/toolbar'
         'common/ui'
         'common/format'
+        'common/contenthandler'
         'common/paste'
         'common/block'
         'common/list'
@@ -39,6 +40,7 @@ define ['jquery'], (jQuery) ->
         'oer/popover'
         'oer/math'
         'oer/assorted'
+        'oer/semanticblock'
         'oer/note'
       ]
 
