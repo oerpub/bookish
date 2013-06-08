@@ -28,7 +28,7 @@ require.config
     select2: 'lib/select2/select2'
     moment: 'node_modules/moment/moment'
 
-    'font-awesome': 'lib/Font-Awesome/css/font-awesome'
+    'font-awesome': 'lib/Font-Awesome/build/assets/font-awesome/css/font-awesome'
 
     # ## Handlebars Dependencies
     # The requirejs plugin to support handlebars has several dependencies
