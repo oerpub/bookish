@@ -3,9 +3,10 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'session'
   'hbs!templates/workspace/menu/sign-in-out'
   'bootstrapTooltip'
-], ($, _, Backbone, Marionette, signInOutTemplate) ->
+], ($, _, Backbone, Marionette, session, signInOutTemplate) ->
 
   # Default Auth View
   # -------
@@ -22,52 +23,17 @@ define [
       'click #save-content':  'saveContent'
 
     initialize: ->
-      @dirtyModels = new Backbone.Collection()
-      # Sort by `id` so new models are saved first.
-      # This way their id's change and their references (in books and Folders)
-      # will be updated before the Book/Folder is saved.
-      @dirtyModels.comparator = 'id'
-
       # Bind a function to the window if the user tries to navigate away from this page
-      beforeUnload = =>
+      beforeUnload = () =>
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
+
       $(window).on 'beforeunload', beforeUnload
 
-      #@listenTo @model, 'change', => @render()
-      #@listenTo @model, 'change:userid', => @render()
-
-      # Listen to all changes made on Content so we can update the save button
-      ###
-      @listenTo Models.ALL_CONTENT, 'change:_isDirty', (model, b,c) =>
-        # Figure out if the model was just fetched (all the changed attributes used to be 'undefined')
-        # or if the attributes did actually change
-        if model.get('_isDirty')
-          @dirtyModels.add model
-        else
-          @dirtyModels.remove model
-
-      @listenTo Models.ALL_CONTENT, 'change:treeNode add:treeNode remove:treeNode', (model, b,c) =>
-        @dirtyModels.add model
-
-      @listenTo Models.ALL_CONTENT, 'add', (model) => @dirtyModels.add model if model.get('_isDirty')
-      ###
-
-      @listenTo @dirtyModels, 'add reset', (model, b,c) =>
-        @hasChanged = true
-        $save = @$el.find '#save-content'
-        $save.removeClass('disabled')
-        $save.addClass('btn-primary')
-
-      @listenTo @dirtyModels, 'remove', (model, b,c) =>
-        if @dirtyModels.length == 0
-          @hasChanged = false
-          $save = @$el.find '#save-content'
-          $save.addClass('disabled')
-          $save.removeClass('btn-primary')
+      # TODO: Listen for changes to content and enable Save button
 
     onRender: ->
-      # Enable tooltips
-      @$el.find('*[title]').tooltip()
+      # Enable tooltip
+      @$el.find('#save-content').tooltip()
 
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model
