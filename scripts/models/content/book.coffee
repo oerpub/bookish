@@ -1,20 +1,18 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/content/base'
-], (_, Backbone, BaseModel) ->
+  'cs!models/content/inherits/container'
+], (_, Backbone, BaseContainerModel) ->
 
-  return BaseModel.extend
-    mediaType: 'application/vnd.org.cnx.collection'
-    accept: ['application/vnd.org.cnx.module'] # Module
-    branch: true
-    expanded: false
+  return BaseContainerModel.extend
     defaults:
       manifest: null
       title: 'Untitled Book'
 
-    initialize: () ->
-      @set('contents', new Backbone.Collection())
+    mediaType: 'application/vnd.org.cnx.collection'
+    accept: ['application/vnd.org.cnx.module'] # Module
+    branch: true
+    expanded: false
 
     add: (model) ->
       @get('contents').add(model)

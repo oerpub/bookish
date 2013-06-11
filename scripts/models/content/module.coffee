@@ -1,7 +1,7 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/content/base'
+  'cs!models/content/inherits/base'
 ], (_, Backbone, BaseModel) ->
 
   # The `Content` model contains the following members:

@@ -1,10 +1,10 @@
 define [
   'underscore'
   'backbone'
-  'cs!models/content/base'
-], (_, Backbone, BaseModel) ->
+  'cs!models/content/inherits/container'
+], (_, Backbone, BaseContainerModel) ->
 
-  return BaseModel.extend
+  return BaseContainerModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
     accept: [
       'application/vnd.org.cnx.collection', # Book

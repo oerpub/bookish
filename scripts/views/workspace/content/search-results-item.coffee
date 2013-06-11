@@ -92,7 +92,7 @@ define [
           $el = $(el)
 
           #ModelType = mediaTypes.get(@model.mediaType)
-          validSelectors = _.map @model.accepts(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
+          validSelectors = _.map @model.accepts?(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]"
           validSelectors = validSelectors.join ','
 
           if validSelectors

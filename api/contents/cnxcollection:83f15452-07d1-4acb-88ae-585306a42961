@@ -1,0 +1,34 @@
+{
+   "id_": "cnxcollection:83f15452-07d1-4acb-88ae-585306a42961",
+   "language": null,
+   "title": "Daniel's Book",
+   "dateLastModifiedUTC": "2013-05-21T18:30:00.839632",
+   "summary": null,
+   "dateCreatedUTC": "2013-05-15T00:23:24.760349",
+   "subType": null,
+   "maintainers": null,
+   "subjects": null,
+   "copyrightHolders": null,
+   "authors": null,
+   "keywords": null,
+   "mediaType": "application/vnd.org.cnx.collection",
+   "id": "cnxcollection:83f15452-07d1-4acb-88ae-585306a42961",
+   "contents": [
+      {
+         "id": "cnxmodule:5d6429a9-a8b2-40cf-990a-513222819d27",
+         "mediaType": "application/vnd.org.cnx.module"
+      },
+      {
+         "id": "cnxmodule:aaca9318-c3ba-4873-9cb7-ef2de784dde0",
+         "mediaType": "application/vnd.org.cnx.module"
+      },
+      {
+         "id": "cnxmodule:11764a46-52a4-4d3a-8358-4d908516dc44",
+         "mediaType": "application/vnd.org.cnx.module"
+      },
+      {
+         "id": "cnxmodule:3ef8355f-e74a-4ebe-9064-b05f875f1fe5",
+         "mediaType": "application/vnd.org.cnx.module"
+      }
+   ]
+}

@@ -22,7 +22,7 @@ define [
         @renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
-      
+
       return @
 
     events:
@@ -47,21 +47,21 @@ define [
     #
     # When the node is expanded:
     #
-    # 1. `@isExpanded` is set to `true`
+    # 1. `@model.expanded` is set to `true`
     # 2. `@render()` is called and calls `@renderChildren()`
-    # 3. Since `@isExpanded == true` the children are rendered and attached to the DOM
+    # 3. Since `@model.expanded == true` the children are rendered and attached to the DOM
     # 4. `@hasRendered` is set to `true` so we know not to generate the children again
     #
     #
     # When an expanded node is collapsed:
     #
-    # 1. `@isExpanded` is set to `false`
+    # 1. `@model.expanded` is set to `false`
     # 2. A CSS class is set on the `<li>` item to hide children
     # 3. CSS rules hide the children and change the expand/collapse icon
     #
     # When a node that was expanded and collapsed is re-expanded:
     #
-    # 1. `@isExpanded` is set to `true`
+    # 1. `@model.expanded` is set to `true`
     # 2. Since `@hasRendered == true` there is no need to call `@render()`
     # 3. The CSS class is removed to show the children again
 
@@ -89,22 +89,3 @@ define [
         @model.set('title', newTitle)
 
       @render()
-      ###
-      if @model != @model.dereference()
-        contentModel = @model.dereference()
-        originalTitle = contentModel?.get('title') or @model.get 'title'
-        newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
-        if '-' == newTitle
-          @model.parent?.children()?.remove @model
-        else if newTitle == contentModel?.get('title')
-          @model.unset 'title'
-        else if newTitle
-          @model.set 'title', newTitle
-      else
-        originalTitle = @model.get 'title'
-        newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', originalTitle
-        if '-' == newTitle
-          @model.parent?.children()?.remove @model
-        else
-          @model.set 'title', newTitle if newTitle
-      ###

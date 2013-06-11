@@ -4,14 +4,8 @@ define [
 ], (_, Backbone) ->
 
   return Backbone.Model.extend
+    url: () -> return "/api/contents/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
-    accept: []
-
-    accepts: (mediaType) ->
-      if (typeof mediaType is 'string')
-        return _.indexOf(@accept, mediaType) is not -1
-
-      return @accept
 
     toJSON: () ->
       json = Backbone.Model::toJSON.apply(@, arguments)
