@@ -14,13 +14,15 @@ define [
   'cs!collections/media-types'
 ], (_, Backbone, session, mediaTypes) ->
 
+  _loaded = $.Deferred()
+
   return new (Backbone.Collection.extend
     url: '/api/content'
 
     initialize: () ->
-      if session.authenticated() then @fetch()
+      if session.authenticated() then @load()
 
-      @listenTo(session, 'login', @fetch)
+      @listenTo(session, 'login', @load)
 
     model: (attrs, options) ->
       if attrs.mediaType
@@ -34,8 +36,12 @@ define [
     branches: () ->
       return _.where(@models, {branch: true})
 
+    load: () ->
+      @fetch
+        success: (model, response, options) =>
+          _loaded.resolve()
+
     add: (models, options) ->
-      console.log 'add'
       if (!_.isArray(models)) then (models = if models then [models] else [])
 
       # Listen to models and trigger a change event if any of them change
@@ -44,4 +50,7 @@ define [
       )
 
       Backbone.Collection::add.call(@, models, options)
+
+    loading: () ->
+      return _loaded.promise()
   )()

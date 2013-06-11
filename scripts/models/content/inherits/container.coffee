@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'underscore'
   'backbone'
   'cs!models/content/inherits/base'
-], (_, Backbone, BaseModel) ->
+], ($, _, Backbone, BaseModel) ->
 
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
@@ -21,7 +22,8 @@ define [
           if response?.contents
             require ['cs!collections/content'], (content) =>
               _.each response.contents, (item) =>
-                @add(content.get({id: item.id}))
+                content.loading().done () =>
+                  @add(content.get({id: item.id}))
 
         error: (model, response, options) =>
           @set('contents', new Backbone.Collection())
