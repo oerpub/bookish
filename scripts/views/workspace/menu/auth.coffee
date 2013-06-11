@@ -18,11 +18,16 @@ define [
   # This view updates when the login state changes
   return Marionette.ItemView.extend
     template: signInOutTemplate
+      authenticated: session.authenticated()
+      user: session.user()
+
     events:
       'click #sign-out':      'signOut'
       'click #save-content':  'saveContent'
 
-    initialize: ->
+    initialize: () ->
+      @listenTo(session, 'login logout', @render)
+
       # Bind a function to the window if the user tries to navigate away from this page
       beforeUnload = () =>
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
@@ -31,7 +36,8 @@ define [
 
       # TODO: Listen for changes to content and enable Save button
 
-    onRender: ->
+    onRender: () ->
+      @$el.html(@template) # FIXME: Why is marionnete not loading the template correctly
       # Enable tooltip
       @$el.find('#save-content').tooltip()
 
@@ -41,7 +47,7 @@ define [
 
     # Save each model in sequence.
     # **FIXME:** This should be done in a commit batch
-    saveContent: ->
+    saveContent: () ->
       return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'
       $save = @$el.find('#save-progress-modal')
       $saving     = $save.find('.saving')

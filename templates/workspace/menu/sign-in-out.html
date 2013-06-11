@@ -1,12 +1,12 @@
 <button id="save-content" type="button" class="btn disabled" data-placement="bottom" data-toggle="tooltip" title="Save all changes"><i class="icon-save"></i> Save</button>
 
-{{#if id}}
+{{#if authenticated}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
        and instead go to the login page directly.
     -->
   <a href="/logout" data-bypass="true" id="sign-out">Sign Out</a>
-  {{#if name}}
-    <span class="name">[{{name}}]</span>
+  {{#if user}}
+    <span class="name">[{{user.name}}]</span>
   {{/if}}
 {{else}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link

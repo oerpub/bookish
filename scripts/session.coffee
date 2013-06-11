@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
 ], ($, _, Backbone) ->
-  
+
   _authenticated = false
 
   return new (Backbone.Model.extend
@@ -18,33 +18,34 @@ define [
           if response.id
             # Logged in
 
-            @user =
+            @set('user', {
               id: response.id
               auth_identifier: response.auth_identifier
               name: response.name
               email: response.email
+            })
 
             _authenticated = true;
             @trigger('login')
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
-    
+
     login: () ->
       this.load()
-    
+
     logout: () ->
       this.reset()
       this.clear()
       this.trigger('logout')
-    
+
     reset: () ->
       _authenticated = false
-      @user = null
+      @set('user', null)
 
     authenticated: () ->
       return _authenticated
 
     user: () ->
-      return @user
+      return @get('user')
   )()
