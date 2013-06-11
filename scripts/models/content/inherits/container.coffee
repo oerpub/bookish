@@ -25,3 +25,8 @@ define [
 
         error: (model, response, options) =>
           @set('contents', new Backbone.Collection())
+
+    add: (model) ->
+      @get('contents').add(model)
+      @trigger('change')
+      return @

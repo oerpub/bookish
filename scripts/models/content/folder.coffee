@@ -14,11 +14,3 @@ define [
     expanded: false
     defaults:
       title: 'Untitled Folder'
-
-    initialize: () ->
-      @set('contents', new Backbone.Collection())
-
-    add: (model) ->
-      @get('contents').add(model)
-      @trigger('change')
-      return @

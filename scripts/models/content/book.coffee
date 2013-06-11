@@ -14,11 +14,6 @@ define [
     branch: true
     expanded: false
 
-    add: (model) ->
-      @get('contents').add(model)
-      @trigger('change')
-      return @
-
     contentView: (callback) ->
       #require ['cs!views/content'], (view) ->
       #  callback(view)
