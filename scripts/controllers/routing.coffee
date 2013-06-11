@@ -5,7 +5,7 @@ define [
   'marionette'
   'cs!app'
   'cs!collections/content'
-  'cs!views/layouts/Workspace'
+  'cs!views/layouts/workspace'
   'less!styles/main.less'
 ], ($, _, Backbone, Marionette, app, content, WorkspaceLayout) ->
 
