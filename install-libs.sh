@@ -37,7 +37,7 @@ fromGithub "https://github.com/requirejs/text" "2.0.7"
 fromGithub "https://github.com/jrburke/require-cs" "0.4.4"
 fromGithub "https://github.com/guybedford/require-css" "0.0.6"
 fromGithub "https://github.com/guybedford/require-less" "0.0.6"
-fromGithub "https://github.com/SlexAxton/require-handlebars-plugin" "master"
+fromGithub "https://github.com/SlexAxton/require-handlebars-plugin" "master" # bug in every current tagged release
 fromGithub "https://github.com/millermedeiros/requirejs-plugins" "v1.0.2" "1.0.2"
 cd "../../"
 
@@ -55,5 +55,5 @@ singleFile "https://raw.github.com/documentcloud/backbone/1.0.0/backbone.js" "ba
 singleFile "https://raw.github.com/marionettejs/backbone.marionette/v1.0.3/lib/backbone.marionette.js" "backbone.marionette.js"
 cd "../"
 
-fromGithub "https://github.com/wysiwhat/Aloha-Editor" "release-oerpub-2013-04-09" "" "aloha-editor"
+fromGithub "https://github.com/wysiwhat/Aloha-Editor" "testing" "" "aloha-editor"
 fromGithub "https://github.com/twitter/bootstrap" "v2.3.2" "2.3.2"
