@@ -8,11 +8,12 @@
 # New content models should be created by calling `ALL_CONTENT.add {}`
 
 define [
+  'jquery'
   'underscore'
   'backbone'
   'cs!session'
   'cs!collections/media-types'
-], (_, Backbone, session, mediaTypes) ->
+], ($, _, Backbone, session, mediaTypes) ->
 
   _loaded = $.Deferred()
 
