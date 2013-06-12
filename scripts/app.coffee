@@ -28,7 +28,7 @@ define [
           router.navigate(href, {trigger: true})
 
       Backbone.history.start
-        pushState: true
+        #pushState: true
         root: app.root
 
   return app
