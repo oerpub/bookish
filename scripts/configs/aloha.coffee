@@ -27,8 +27,6 @@ define ['jquery'], ($) ->
         # jquery-ui and bootstrap conflict in a few cases (buttons,
         # tooltip) our copy has those removed.
         jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
-        #contenthandler: '../plugins/common/contenthandler/lib'
-        #semanticblock: '../plugins/oer/semanticblock/lib'
 
     errorhandling: true
     plugins:
