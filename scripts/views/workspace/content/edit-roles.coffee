@@ -45,10 +45,10 @@ define [
     template: rolesTemplate
 
     onRender: ->
-      $copyrightHolders = @$el.find('*[name=copyrightHolders]')
-      $authors = @$el.find('*[name=authors]')
-      $editors = @$el.find('*[name=editors]')
-      $translators = @$el.find('*[name=translators]')
+      $copyrightHolders = @$el.find('[name=copyright-holders]')
+      $authors = @$el.find('[name=authors]')
+      $editors = @$el.find('[name=editors]')
+      $translators = @$el.find('[name=translators]')
 
       $copyrightHolders.select2
         tags: @model.get('copyrightHolders') or []

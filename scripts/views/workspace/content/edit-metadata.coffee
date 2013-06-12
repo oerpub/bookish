@@ -25,7 +25,7 @@ define [
 
     # Bind methods onto jQuery events that happen in the view
     events:
-      'change *[name=language]': '_updateLanguageVariant'
+      'change [name=language]': '_updateLanguageVariant'
 
     initialize: () ->
       @listenTo @model, 'change:language', => @_updateLanguage()
@@ -37,18 +37,18 @@ define [
     _updateLanguage: () ->
       language = @model.get('language') or ''
       [lang] = language.split('-')
-      @$el.find("*[name=language]").select2('val', lang)
+      @$el.find("[name=language]").select2('val', lang)
       @_updateLanguageVariant()
 
     _updateLanguageVariant: () ->
-      $language = @$el.find('*[name=language]')
+      $language = @$el.find('[name=language]')
       language = @model.get('language') or ''
       [lang, variant] = language.split('-')
       if $language.val() != lang
         lang = $language.val()
         variant = null
-      $variant = @$el.find('*[name=variantLanguage]')
-      $label = @$el.find('*[for=variantLanguage]')
+      $variant = @$el.find('[name=variantLanguage]')
+      $label = @$el.find('[for=variantLanguage]')
       variants = []
       for code, value of languagesModel.getCombined()
         if code[..1] == lang
@@ -68,7 +68,7 @@ define [
 
     # Helper method to populate a multiselect input
     _updateSelect2: (key) ->
-      @$el.find("*[name=#{key}]").select2('val', @model.get key)
+      @$el.find("[name=#{key}]").select2('val', @model.get key)
 
     # Update the View with new subjects selected
     _updateSubjects: -> @_updateSelect2 'subjects'
@@ -80,7 +80,7 @@ define [
     # Also, initialize the select2 widget on elements
     onRender: () ->
       # Populate the Language dropdown and Subjects checkboxes
-      $languages = @$el.find('*[name=language]')
+      $languages = @$el.find('[name=language]')
       for lang in languages
         $lang = $('<option></option>').attr('value', lang.code).text(lang.native)
         $languages.append($lang)
@@ -88,14 +88,14 @@ define [
       $languages.select2
         placeholder: __('Select a language')
 
-      $subjects = @$el.find('*[name=subjects]')
+      $subjects = @$el.find('[name=subjects]')
       $subjects.select2
         tags: config.get('metadataSubjects')
         tokenSeparators: [',']
         separator: '|' # String used to delimit ids in $('input').val()
 
       # Enable multiselect on certain elements
-      $keywords = @$el.find('*[name=keywords]')
+      $keywords = @$el.find('[name=keywords]')
       $keywords.select2
         tags: @model.get('keywords') or []
         tokenSeparators: [',']
@@ -117,14 +117,14 @@ define [
 
     # This is used by `DialogWrapper` which offers a "Save" and "Cancel" buttons
     attrsToSave: () ->
-      language = @$el.find('*[name=language]').val()
-      variant = @$el.find('*[name=variantLanguage]').val()
+      language = @$el.find('[name=language]').val()
+      variant = @$el.find('[name=variantLanguage]').val()
       language = variant or language
       # subjects could be the empty string in which case it would be set to `[""]`
-      subjects = (kw for kw in @$el.find('*[name=subjects]').val().split('|'))
+      subjects = (kw for kw in @$el.find('[name=subjects]').val().split('|'))
       subjects = [] if '' is subjects[0]
       # Keywords could be the empty string in which case it would be set to `[""]`
-      keywords = (kw for kw in @$el.find('*[name=keywords]').val().split('|'))
+      keywords = (kw for kw in @$el.find('[name=keywords]').val().split('|'))
       keywords = [] if '' is keywords[0]
 
       return {
