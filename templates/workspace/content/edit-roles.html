@@ -1,17 +1,31 @@
 <div class="form-horizontal">
   <div class="control-group">
-    <label class="control-label" for="authors">Authors</label>
-    <div class="controls">
-      <!-- Bootstrap ".input-prepend .add-on" does not work with select2 inputs so we use a new class "add-on-prepend" -->
+    <label class="control-label" for="copyrightHolders">Copyright Holders</label>
+    <div class="copyright-holders controls">
       <span class="add-on-prepend">@</span>
-      <input type="text" name="authors" placeholder="People attributed to this content">
+      <input name="copyrightHolders" type="hidden" data-placeholder="Copyright Holders" />
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="copyrightHolders">Copyright Holders</label>
-    <div class="controls">
+    <label class="control-label" for="authors">Authors</label>
+    <div class="authors controls">
+      <!-- Bootstrap ".input-prepend .add-on" does not work with select2 inputs so we use a new class "add-on-prepend" -->
       <span class="add-on-prepend">@</span>
-      <input type="text" name="copyrightHolders" placeholder="Copyright Holders">
+      <input name="authors" type="hidden" data-placeholder="People attributed to this content" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="editors">Editors</label>
+    <div class="editors controls">
+      <span class="add-on-prepend">@</span>
+      <input name="editors" type="hidden" data-placeholder="Editors" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="translators">Translators</label>
+    <div class="translators controls">
+      <span class="add-on-prepend">@</span>
+      <input name="translators" type="hidden" data-placeholder="Translators" />
     </div>
   </div>
 </div>

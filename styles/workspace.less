@@ -167,7 +167,7 @@
 
   }
 
-  #accordion-metadata .accordion-toggle {
+  #accordion-metadata .accordion-toggle, #accordion-roles .accordion-toggle {
     width: 100%;
     text-align: left;
   }
@@ -177,6 +177,12 @@
   }
 
   .subjects, .keywords {
+    input, .select2-container {
+      min-width: 36em;
+    }
+  }
+
+  .subjects, .keywords, .copyright-holders, .authors, .editors, .translators {
     input, .select2-container {
       min-width: 36em;
     }

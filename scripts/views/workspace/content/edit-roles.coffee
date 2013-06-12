@@ -45,17 +45,29 @@ define [
     template: rolesTemplate
 
     onRender: ->
-      $authors = @$el.find('*[name=authors]')
       $copyrightHolders = @$el.find('*[name=copyrightHolders]')
+      $authors = @$el.find('*[name=authors]')
+      $editors = @$el.find('*[name=editors]')
+      $translators = @$el.find('*[name=translators]')
 
+      $copyrightHolders.select2
+        tags: @model.get('copyrightHolders') or []
+        tokenSeparators: [',']
+        separator: '|'
+        #ajax: ajaxHandler(URLS.USERS)
       $authors.select2
         # **FIXME:** The authors should be looked up instead of being arbitrary text
         tags: @model.get('authors') or []
         tokenSeparators: [',']
         separator: '|'
         #ajax: ajaxHandler(URLS.USERS)
-      $copyrightHolders.select2
-        tags: @model.get('copyrightHolders') or []
+      $editors.select2
+        tags: @model.get('editors') or []
+        tokenSeparators: [',']
+        separator: '|'
+        #ajax: ajaxHandler(URLS.USERS)
+      $translators.select2
+        tags: @model.get('translators') or []
         tokenSeparators: [',']
         separator: '|'
         #ajax: ajaxHandler(URLS.USERS)
