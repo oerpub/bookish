@@ -1,4 +1,6 @@
 require.config
+  baseUrl: '/scripts/'
+
   # # Configure Library Locations
   paths:
     # ## Template and Style paths
@@ -93,7 +95,7 @@ require.config
     aloha:
       deps: ['jquery', 'cs!configs/aloha']
       exports: 'Aloha'
-    
+
     'mathjax-src':
       exports: 'MathJax'
 
