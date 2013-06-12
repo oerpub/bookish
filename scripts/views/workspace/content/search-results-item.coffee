@@ -68,10 +68,10 @@ define [
     tagName: 'tr'
     template: searchResultsItemTemplate
 
-    initialize: ->
+    initialize: () ->
       @listenTo @model, 'change', => @render()
 
-    onRender: ->
+    onRender: () ->
       # Render the modified time in a relative format and update it periodically
       $times = @$el.find('time[datetime]')
       #updateTimes $times

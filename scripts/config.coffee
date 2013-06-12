@@ -6,20 +6,20 @@ require.config
     styles: '../styles'
 
     # ## Requirejs plugins
-    text: 'libs/require/plugins/text'
-    json: 'libs/require/plugins/json'
-    i18n: 'libs/require/plugins/i18n'
-    hbs: 'libs/require/plugins/require-handlebars/hbs'
+    text: 'libs/require/plugins/text/text'
+    json: 'libs/require/plugins/requirejs-plugins/src/json'
+    i18n: 'helpers/i18n-custom'
+    hbs: 'libs/require/plugins/require-handlebars-plugin/hbs'
 
     # ## Core Libraries
-    jquery: 'libs/jquery/jquery'
+    jquery: 'libs/jquery'
     underscore: 'libs/lodash'
     backbone: 'libs/backbone/backbone'
     # Layout manager for backbone
-    marionette: 'libs/backbone/marionette'
+    marionette: 'libs/backbone/backbone.marionette'
 
     # ## UI Libraries
-    aloha: 'libs/aloha-editor/lib/aloha'
+    aloha: 'libs/aloha-editor/src/lib/aloha'
     select2: 'libs/select2/select2'
     'mathjax-src': '//cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
     # Bootstrap Plugins
@@ -38,9 +38,9 @@ require.config
     bootstrapTypeahead: 'libs/bootstrap/js/bootstrap-typeahead'
 
     # ## Handlebars Dependencies
-    Handlebars: 'libs/require/plugins/require-handlebars/Handlebars'
-    i18nprecompile: 'libs/require/plugins/require-handlebars/hbs/i18nprecompile'
-    json2: 'libs/require/plugins/require-handlebars/hbs/json2'
+    Handlebars: 'libs/require/plugins/require-handlebars-plugin/Handlebars'
+    i18nprecompile: 'libs/require/plugins/require-handlebars-plugin/hbs/i18nprecompile'
+    json2: 'libs/require/plugins/require-handlebars-plugin/hbs/json2'
 
 
   # # Map prefixes
