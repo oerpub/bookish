@@ -48,7 +48,7 @@ fromGithub "https://github.com/pivotal/jasmine" "v1.3.1" "1.3.1"
 fromGithub "https://github.com/appendto/jquery-mockjax" "v1.5.2" "1.5.2"
 
 singleFile "http://code.jquery.com/jquery-1.8.3.js" "jquery.js"
-singleFile "https://raw.github.com/bestiejs/lodash/v1.3.0/dist/lodash.js" "lodash.js"
+singleFile "https://raw.github.com/bestiejs/lodash/v1.3.1/dist/lodash.js" "lodash.js"
 
 mkdir -p "backbone" && cd "backbone"
 singleFile "https://raw.github.com/documentcloud/backbone/1.0.0/backbone.js" "backbone.js"
