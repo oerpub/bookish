@@ -5,9 +5,10 @@ of how the code is organized.
 
 ## Building Yourself
 
-1. Download
-2. Configure your server to point /workspace, /login, and /logout at index.html
-3. (optional) Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
+1. Download and extract (if necessary)
+2. Run `npm install` or `bash install-libs.sh` in the directory to download and install dependencies
+3. Configure your server to point /workspace, /login, and /logout at index.html
+4. (optional) Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
 
 ## Building Documentation
 
@@ -20,9 +21,12 @@ Check the `./docs` directory to read through the different modules.
 ## Directory Layout
 
 * `scripts/collections/`   Backbone Collections
+* `scripts/configs/`       App and 3rd party configs
 * `scripts/controllers/`   Marionette Controllers
+* `scripts/helpers/`       Miscellaneous helper functions
 * `scripts/libs/`          3rd Party Libraries
 * `scripts/models/`        Backbone Models and Marionette Modules
+* `scripts/nls/`           Internationalized strings
 * `scripts/routers/`       Marionette Routers
 * `scripts/views/`         Backbone and Marionette Views
 * `scripts/views/layouts/` Marionette Layouts
@@ -33,7 +37,9 @@ Check the `./docs` directory to read through the different modules.
 * `styles/`                LESS and CSS Styling
 * `templates/`             Handlebars Templates
 * `templates/helpers/`     Handlebars Helpers
+* `test/`                  Testable mock data and scripts
 * `index.html`             App's HTML Page
+* `install-libs.sh`        Bash script to install 3rd party libraries
 
 License
 -------
