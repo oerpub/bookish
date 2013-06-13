@@ -1,6 +1,4 @@
 require.config
-  baseUrl: 'scripts/'
-
   # # Configure Library Locations
   paths:
     # ## Template and Style paths

@@ -1,12 +1,14 @@
 require({
+  baseUrl: '../scripts/',
+
   paths: {
-    cs: '../scripts/libs/require/plugins/require-cs/cs',
-    'coffee-script': '../scripts/libs/require/plugins/require-cs/coffee-script',
-    jquery: '../scripts/libs/jquery',
-    mockjax: '../scripts/libs/jquery-mockjax/jquery.mockjax'
+    cs: 'libs/require/plugins/require-cs/cs',
+    'coffee-script': 'libs/require/plugins/require-cs/coffee-script',
+    jquery: 'libs/jquery',
+    mockjax: 'libs/jquery-mockjax/jquery.mockjax'
   },
-  
+
   shim: {
     mockjax: ['jquery']
   }
-}, ['cs!demo-mock']);
+}, ['cs!../test/demo-mock']);
