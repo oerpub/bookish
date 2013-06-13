@@ -12,8 +12,8 @@ define [
     proxy: 'data/content.json'
 
   $.mockjax (settings) ->
-    # url: '/content/<id>'
-    id = settings.url.match(/\/content\/(.*)$/);
+    # url: '/api/content/<id>'
+    id = settings.url.match(/\/api\/content\/(.*)$/);
     if id
       return {proxy: 'data/content/' + id[1] + '.json'}
 
