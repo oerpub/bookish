@@ -15,7 +15,7 @@ define [
 
     initialize: ->
       # Update the view when the content is done loading (remove progress bar)
-      @listenTo @model, 'change:_done', (model, value, options) => @render()
+      @listenTo(@model, 'loaded', @render)
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
@@ -33,7 +33,7 @@ define [
       # Wait until Aloha is started before loading MathJax.
       MathJax?.Hub.Configured()
 
-      if @model.get '_done'
+      if @model.loaded
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
         Aloha.ready =>

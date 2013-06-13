@@ -11,5 +11,6 @@ define [
       json = Backbone.Model::toJSON.apply(@, arguments)
       json.mediaType = @mediaType
       json.id = @id or @cid
+      json.loaded = @loaded
 
       return json

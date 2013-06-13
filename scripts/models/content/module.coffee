@@ -14,6 +14,7 @@ define [
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.module'
     accept: []
+    loaded: false
     defaults:
       title: 'Untitled'
       subjects: []
@@ -22,14 +23,17 @@ define [
       copyrightHolders: []
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
-      
-      #temp
-      _done: true
 
     contentView: (callback) ->
       require ['cs!views/workspace/content/layouts/editor'], (View) =>
         view = new View({model: @})
         callback(view)
+
+        if not @loaded
+          @fetch
+            success: (model, response, options) =>
+              @loaded = true
+              @trigger('loaded')
 
     toolbarView: (callback) ->
       require ['cs!views/workspace/menu/toolbar-aloha'], (view) ->
