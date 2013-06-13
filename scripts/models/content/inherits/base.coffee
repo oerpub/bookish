@@ -4,7 +4,7 @@ define [
 ], (_, Backbone) ->
 
   return Backbone.Model.extend
-    url: () -> return "/api/contents/#{ @id }"
+    url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
 
     toJSON: () ->

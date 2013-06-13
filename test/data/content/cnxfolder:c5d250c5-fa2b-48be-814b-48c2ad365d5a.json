@@ -1,0 +1,30 @@
+{
+   "id_": "cnxfolder:c5d250c5-fa2b-48be-814b-48c2ad365d5a",
+   "language": null,
+   "title": "Daniel's OLD Folder",
+   "dateLastModifiedUTC": "2013-05-16T15:35:40.528033",
+   "summary": null,
+   "dateCreatedUTC": "2013-05-16T15:30:14.798880",
+   "subType": null,
+   "maintainers": null,
+   "subjects": null,
+   "copyrightHolders": null,
+   "authors": null,
+   "keywords": null,
+   "mediaType": "application/vnd.org.cnx.folder",
+   "id": "cnxfolder:c5d250c5-fa2b-48be-814b-48c2ad365d5a",
+   "contents": [
+      {
+         "id": "cnxmodule:1735707b-aa83-4922-8ffe-96f714601327",
+         "mediaType": "application/vnd.org.cnx.module"
+      },
+      {
+         "id": "cnxmodule:11d9ddb3-3bd1-4ad5-afe8-7a2d6b988806",
+         "mediaType": "application/vnd.org.cnx.module"
+      },
+      {
+         "id": "cnxcollection:16c507f8-db65-4f2f-ab93-0fafcdce882c",
+         "mediaType": "application/vnd.org.cnx.collection"
+      }
+   ]
+}

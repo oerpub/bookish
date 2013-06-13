@@ -16,19 +16,30 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @fetch
-        success: (model, response, options) =>
-          @set('contents', new Backbone.Collection())
-          if response?.contents
-            require ['cs!collections/content'], (content) =>
-              _.each response.contents, (item) =>
-                content.loading().done () =>
-                  @add(content.get({id: item.id}))
+      @fetch()
 
-        error: (model, response, options) =>
-          @set('contents', new Backbone.Collection())
-
-    add: (model) ->
+    add: (model, options) ->
       @get('contents').add(model)
-      @trigger('change')
+      if not options.silent then @trigger('change')
       return @
+
+    set: (key, val, options) ->
+      if (key == null) then return this;
+
+      if typeof key is 'object'
+        attrs = key
+        options = val
+      else
+        (attrs = {})[key] = val
+
+      contents = attrs.contents
+      attrs.contents = @get('contents') or new Backbone.Collection()
+
+      if contents
+        require ['cs!collections/content'], (content) =>
+          content.loading().done () =>
+            _.each contents, (item) =>
+              @add(content.get({id: item.id}), {silent: true})
+            @trigger('change')
+
+      return Backbone.Model::set.call(@, attrs, options)

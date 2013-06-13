@@ -46,9 +46,8 @@ define [
       if (!_.isArray(models)) then (models = if models then [models] else [])
 
       # Listen to models and trigger a change event if any of them change
-      _.each(models, (model, index, arr) =>
+      _.each models, (model, index, arr) =>
         @listenTo(model, 'change', () => @trigger('change'))
-      )
 
       Backbone.Collection::add.call(@, models, options)
 

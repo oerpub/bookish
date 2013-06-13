@@ -18,11 +18,7 @@ define [
           if response.id
             # Logged in
 
-            @set 'user',
-              id: response.id
-              auth_identifier: response.auth_identifier
-              name: response.name
-              email: response.email
+            @set('user', response)
 
             _authenticated = true;
             @trigger('login')
