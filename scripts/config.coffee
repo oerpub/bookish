@@ -1,5 +1,5 @@
 require.config
-  baseUrl: '/scripts/'
+  baseUrl: 'scripts/'
 
   # # Configure Library Locations
   paths:
