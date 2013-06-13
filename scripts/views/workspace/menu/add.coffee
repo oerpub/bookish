@@ -20,6 +20,7 @@ define [
       e.preventDefault()
 
       model = new (@model.get('modelType'))()
+      model.loaded = true
       content.add(model)
 
       # Begin editing an item as soon as it is added.
