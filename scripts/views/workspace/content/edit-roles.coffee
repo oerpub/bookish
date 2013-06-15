@@ -45,7 +45,7 @@ define [
           update: -> $el.select2 'onSortEnd'
 
     setupSelect2: ($el, attr) ->
-      $el.val(@model.get(attr).join('|') or '')
+      $el.val(@model.get(attr).join('|'))
 
       $el.select2
         tags: @model.get(attr) or []
@@ -64,14 +64,7 @@ define [
       @setupSelect2(@$el.find('[name=editors]'), 'editors')
       @setupSelect2(@$el.find('[name=translators]'), 'translators')
 
-      # Populate the multiselect widgets with data from the backbone model
-      @_updateAuthors()
-      @_updateCopyrightHolders()
-
       @delegateEvents()
-
-    _updateAuthors: -> @$el.find('*[name=authors]').select2 'val', (@model.get('authors') or [])
-    _updateCopyrightHolders: -> @$el.find('*[name=copyrightHolders]').select2 'val', (@model.get('copyrightHolders') or [])
 
     attrsToSave: () ->
       # Grab the authors from the multiselect input element.
