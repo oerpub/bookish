@@ -19,8 +19,10 @@ define [
       title: 'Untitled'
       subjects: []
       keywords: []
-      authors: []
       copyrightHolders: []
+      authors: []
+      editors: []
+      translators: []
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
 

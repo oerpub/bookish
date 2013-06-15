@@ -28,52 +28,41 @@ define [
       }
   ###
 
-  # Make a multiselect widget sortable using jQueryUI.
-  # Unfortunately jQueryUI is not available until Aloha finishes loading
-  # so postpone making it sortable until `Aloha.ready`
-  makeSortable = ($el) ->
-    Aloha.ready ->
-      $el.select2('container')
-      .find('ul.select2-choices')
-      .sortable
-        cursor: 'move'
-        containment: 'parent'
-        start: ->  $el.select2 'onSortStart'
-        update: -> $el.select2 'onSortEnd'
-
   return Marionette.ItemView.extend
     template: rolesTemplate
 
+    # Make a multiselect widget sortable using jQueryUI.
+    # Unfortunately jQueryUI is not available until Aloha finishes loading
+    # so postpone making it sortable until `Aloha.ready`
+    makeSortable: ($el) ->
+      Aloha.ready ->
+        $el.select2('container')
+        .find('ul.select2-choices')
+        .sortable
+          cursor: 'move'
+          containment: 'parent'
+          start: ->  $el.select2 'onSortStart'
+          update: -> $el.select2 'onSortEnd'
+
+    setupSelect2: ($el, attr) ->
+      $el.val(@model.get(attr).join('|') or '')
+
+      $el.select2
+        tags: @model.get(attr) or []
+        tokenSeparators: [',']
+        separator: '|'
+        #ajax: ajaxHandler(URLS.USERS)
+
+      $el.on 'change', (e) =>
+        @model.set(attr, $el.val().split('|'), {silent: true})
+
+      @makeSortable($el)
+
     onRender: ->
-      $copyrightHolders = @$el.find('[name=copyright-holders]')
-      $authors = @$el.find('[name=authors]')
-      $editors = @$el.find('[name=editors]')
-      $translators = @$el.find('[name=translators]')
-
-      $copyrightHolders.select2
-        tags: @model.get('copyrightHolders') or []
-        tokenSeparators: [',']
-        separator: '|'
-        #ajax: ajaxHandler(URLS.USERS)
-      $authors.select2
-        # **FIXME:** The authors should be looked up instead of being arbitrary text
-        tags: @model.get('authors') or []
-        tokenSeparators: [',']
-        separator: '|'
-        #ajax: ajaxHandler(URLS.USERS)
-      $editors.select2
-        tags: @model.get('editors') or []
-        tokenSeparators: [',']
-        separator: '|'
-        #ajax: ajaxHandler(URLS.USERS)
-      $translators.select2
-        tags: @model.get('translators') or []
-        tokenSeparators: [',']
-        separator: '|'
-        #ajax: ajaxHandler(URLS.USERS)
-
-      makeSortable($authors)
-      makeSortable($copyrightHolders)
+      @setupSelect2(@$el.find('[name=copyright-holders]'), 'copyrightHolders')
+      @setupSelect2(@$el.find('[name=authors]'), 'authors')
+      @setupSelect2(@$el.find('[name=editors]'), 'editors')
+      @setupSelect2(@$el.find('[name=translators]'), 'translators')
 
       # Populate the multiselect widgets with data from the backbone model
       @_updateAuthors()
