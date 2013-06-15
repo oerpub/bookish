@@ -44,14 +44,14 @@ define [
           start: ->  $el.select2 'onSortStart'
           update: -> $el.select2 'onSortEnd'
 
-    setupSelect2: ($el, attr) ->
-      $el.val(@model.get(attr).join('|'))
-
+    setupSelect2: ($el, attr, tags) ->
       $el.select2
-        tags: @model.get(attr) or []
+        tags: tags or @model.get(attr) or []
         tokenSeparators: [',']
         separator: '|'
         #ajax: ajaxHandler(URLS.USERS)
+
+      $el.select2('val', @model.get(attr))
 
       $el.on 'change', (e) =>
         @model.set(attr, $el.val().split('|'), {silent: true})
@@ -65,14 +65,3 @@ define [
       @setupSelect2(@$el.find('[name=translators]'), 'translators')
 
       @delegateEvents()
-
-    attrsToSave: () ->
-      # Grab the authors from the multiselect input element.
-      # They are separated with a `|` character defined when select2 was configured
-      authors = (kw for kw in @$el.find('*[name=authors]').val().split('|'))
-      copyrightHolders = (kw for kw in @$el.find('*[name=copyrightHolders]').val().split('|'))
-
-      return {
-        authors: authors
-        copyrightHolders: copyrightHolders
-      }
