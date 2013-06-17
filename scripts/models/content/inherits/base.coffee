@@ -5,7 +5,6 @@ define [
 
   return Backbone.Model.extend
     url: () -> return "/api/content/#{ @id }"
-    idAttribute: "id_"
     mediaType: 'application/vnd.org.cnx.module'
 
     toJSON: () ->
