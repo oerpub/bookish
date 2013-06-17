@@ -4,10 +4,8 @@ define [
   'backbone'
   'marionette'
   'aloha'
-  'mathjax'
-  'bootstrapModal'
-  'bootstrapPopover'
-], ($, _, Backbone, Marionette, Aloha, MathJax) ->
+  #'mathjax'
+], ($, _, Backbone, Marionette, Aloha) ->
 
   return Marionette.ItemView.extend
     # **NOTE:** This template is not wrapped in an element

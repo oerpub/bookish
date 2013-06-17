@@ -21,7 +21,6 @@ require.config
     # ## UI Libraries
     aloha: 'libs/aloha-editor/src/lib/aloha'
     select2: 'libs/select2/select2'
-    'mathjax-src': '//cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
     # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
@@ -48,7 +47,6 @@ require.config
     '*':
       css: 'libs/require/plugins/require-css/css'
       less: 'libs/require/plugins/require-less/less'
-      mathjax: 'cs!configs/mathjax'
 
   # # Shims
   # Used to support libraries that were not written for AMD
@@ -91,11 +89,16 @@ require.config
       exports: 'Select2'
 
     aloha:
-      deps: ['jquery', 'cs!configs/aloha']
+      deps: ['jquery', 'bootstrapModal', 'bootstrapPopover', 'cs!configs/aloha', 'cs!configs/mathjax']
       exports: 'Aloha'
+      init: ($, alohaConfig, mathjaxConfig) ->
+        script = document.createElement("script")
+        script.src = "http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
+        script.text = 'MathJax.Hub.Config(' + JSON.stringify(mathjaxConfig) + ');' + 'MathJax.Hub.Startup.onload();'
 
-    'mathjax-src':
-      exports: 'MathJax'
+        document.getElementsByTagName("head")[0].appendChild(script);
+
+        return Aloha
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).
@@ -108,4 +111,4 @@ require.config
 
 # # Load and run the application
 define ['cs!app'], (app) ->
-  app.start();
+  app.start()

@@ -7,10 +7,8 @@
 # This module configures MathJax and runs right after `MathJax.js` is pulled into the browser.
 #
 
-define ['mathjax-src'], (MathJax) ->
-  if not MathJax?.Hub then console?.error 'MathJax did not load for some reason.'
-
-  MathJax.Hub.Config
+define [], () ->
+  config =
     jax: [
       'input/MathML'
       'input/TeX'
@@ -47,4 +45,4 @@ define ['mathjax-src'], (MathJax) ->
     AsciiMath:
       noErrors: {disabled:true}
 
-  return MathJax
+  return config
