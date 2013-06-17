@@ -56,4 +56,16 @@ define [
 
     loading: () ->
       return _loaded.promise()
+
+    save: (options) ->
+      options = options or {}
+
+      # Save every model that has changed
+      # FIXME: Send the changed models in a single batch
+      _.each @models, (model, index, arr) ->
+        if not _.isEmpty(model.changed)
+          model.save(null, {patch: true})
+
+      if typeof options.success is 'function'
+        options.success()
   )()
