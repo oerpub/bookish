@@ -15,10 +15,13 @@ define [
     expanded: false
 
     contentView: (callback) ->
-      #require ['cs!views/content'], (view) ->
-      #  callback(view)
+      require ['cs!views/workspace/content/search-results'], (View) =>
+        view = new View({collection: @get('contents')})
+        callback(view)
 
     sidebarView: (callback) ->
       require ['cs!views/workspace/sidebar/toc'], (View) =>
-        view = new View({collection: @get('contents')})
+        view = new View
+          collection: @get('contents')
+          model: @
         callback(view)

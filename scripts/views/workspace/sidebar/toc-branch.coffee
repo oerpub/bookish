@@ -16,7 +16,7 @@ define [
       @collection = @model.get('contents')
 
     render: () ->
-      Marionette.CompositeView::render.apply(@, arguments)
+      result = Marionette.CompositeView::render.apply(@, arguments)
 
       if @model and @model.expanded
         @$el.addClass('editor-node-expanded')
@@ -27,7 +27,7 @@ define [
       # Add DnD options to content
       enableContentDragging(@model, @$el.children().children('*[data-media-type]'))
 
-      return @
+      return result
 
     events:
       # The `.editor-node-body` is needed because `li` elements render differently

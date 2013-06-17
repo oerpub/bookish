@@ -11,13 +11,17 @@
     {{/if}}
   </a>
   {{#if _isDirty}}
-    <span class="has-changed" title="This has unsaved changes"><i class="icon-warning-sign"></i></span>
+    <span class="has-changed" title="This has unsaved changes">
+      <i class="icon-warning-sign"></i>
+    </span>
   {{/if}}
 
   {{! Display a progress bar if the file has not loaded yet }}
   {{#if _loading}}
     {{#unless _done}}
-      <div class="progress progress-striped active" style="display: inline-block; width: 100px;"><div class="bar" style="width: 100%;"></div></div>
+      <div class="progress progress-striped active" style="display: inline-block; width: 100px;">
+        <div class="bar" style="width: 100%;"></div>
+      </div>
     {{/unless}}
   {{/if}}
 </td>

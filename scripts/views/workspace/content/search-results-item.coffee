@@ -17,8 +17,8 @@ define [
   # Since we don't really distinguish between a search result view and a workspace/collection/etc
   # just consider them the same.
   return Marionette.ItemView.extend
-    tagName: 'tr'
     template: searchResultsItemTemplate
+    tagName: 'tr'
 
     initialize: () ->
       @listenTo @model, 'change', => @render()
