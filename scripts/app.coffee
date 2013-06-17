@@ -25,7 +25,7 @@ define [
         if external.test(href)
           window.open(href, '_blank')
         else
-          router.navigate(href, {trigger: true})
+          if href then router.navigate(href, {trigger: true})
 
       Backbone.history.start
         #pushState: true
