@@ -6,7 +6,11 @@
     -->
   <a href="/logout" data-bypass="true" id="sign-out">Sign Out</a>
   {{#if user}}
-    <span class="name">[{{user.name}}]</span>
+    {{#if user.name}}
+      <span class="name">[{{user.name}}]</span>
+    {{else}}
+      <span class="name">[{{user.firstname}} {{user.lastname}}]</span>
+    {{/if}}
   {{/if}}
 {{else}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
