@@ -37,6 +37,6 @@ define [
       @model.set('title', title) if title
 
     initialize: () ->
-      @listenTo(content, 'change', @render)
+      @listenTo(content, 'change change:contents', @render)
 
     #goWorkspace: -> Controller.workspace()

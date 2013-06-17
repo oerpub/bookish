@@ -4,9 +4,12 @@ define [
   'backbone'
   'marionette'
   'session'
+  'cs!collections/content'
   'hbs!templates/workspace/menu/sign-in-out'
   'bootstrapTooltip'
-], ($, _, Backbone, Marionette, session, signInOutTemplate) ->
+], ($, _, Backbone, Marionette, session, content, signInOutTemplate) ->
+  
+  _hasChanged = false
 
   # Default Auth View
   # -------
@@ -21,6 +24,7 @@ define [
       return signInOutTemplate
         authenticated: session.authenticated()
         user: session.user()
+        changed: _hasChanged
 
     events:
       'click #sign-out':      'signOut'
@@ -28,19 +32,20 @@ define [
 
     initialize: () ->
       @listenTo(session, 'login logout', @render)
+      @listenTo(content, 'change add remove', @changed)
 
       # Bind a function to the window if the user tries to navigate away from this page
-      beforeUnload = () =>
-        return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
-
-      $(window).on('beforeunload', beforeUnload)
-
-      # TODO: Listen for changes to content and enable Save button
+      $(window).on 'beforeunload', () ->
+        return 'You have unsaved changes. Are you sure you want to leave this page?' if _hasChanged
 
     onRender: () ->
       @$el.html(@template) # FIXME: Why is marionnete not loading the template correctly
       # Enable tooltip
       @$el.find('#save-content').tooltip()
+
+    changed: () ->
+      _hasChanged = true
+      @render()
 
     # Clicking on the link will redirect to the logoff page
     # Before it does, update the model

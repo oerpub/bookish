@@ -16,7 +16,7 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @fetch()
+      @fetch({silent: true})
 
     add: (model, options) ->
       @get('contents').add(model)
@@ -40,6 +40,6 @@ define [
           content.loading().done () =>
             _.each contents, (item) =>
               @add(content.get({id: item.id}), {silent: true})
-            @trigger('change')
+            @trigger('change:contents')
 
       return Backbone.Model::set.call(@, attrs, options)

@@ -39,7 +39,9 @@ define [
 
     load: () ->
       @fetch
+        silent: true
         success: (model, response, options) =>
+          @trigger('reset')
           _loaded.resolve()
 
     add: (models, options) ->
@@ -48,6 +50,7 @@ define [
       # Listen to models and trigger a change event if any of them change
       _.each models, (model, index, arr) =>
         @listenTo(model, 'change', () => @trigger('change'))
+        @listenTo(model, 'change:contents', () => @trigger('change:contents'))
 
       Backbone.Collection::add.call(@, models, options)
 
