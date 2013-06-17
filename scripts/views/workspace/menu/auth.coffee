@@ -17,9 +17,10 @@ define [
   #
   # This view updates when the login state changes
   return Marionette.ItemView.extend
-    template: signInOutTemplate
-      authenticated: session.authenticated()
-      user: session.user()
+    template: (serializedModel) ->
+      return signInOutTemplate
+        authenticated: session.authenticated()
+        user: session.user()
 
     events:
       'click #sign-out':      'signOut'
@@ -32,7 +33,7 @@ define [
       beforeUnload = () =>
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @hasChanged
 
-      $(window).on 'beforeunload', beforeUnload
+      $(window).on('beforeunload', beforeUnload)
 
       # TODO: Listen for changes to content and enable Save button
 
