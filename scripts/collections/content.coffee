@@ -63,6 +63,9 @@ define [
       # Save every model that has changed
       # FIXME: Send the changed models in a single batch
       _.each @models, (model, index, arr) ->
+        # FIXME: store a variable on the model to track changes
+        #        rather than relying on .changed
+        # FIXME: get a new id for the model if needed (it hasn't been saved before)
         if not _.isEmpty(model.changed)
           model.save(null, {patch: true})
 
