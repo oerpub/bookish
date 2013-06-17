@@ -3,8 +3,9 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Backbone, Marionette, tocBranchTemplate) ->
+], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
 
   return Marionette.CompositeView.extend
     template: tocBranchTemplate
