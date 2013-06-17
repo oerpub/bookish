@@ -31,6 +31,4 @@ define [
       # @$el.on 'click', (e) => controller.edit(@model)
 
       # Add DnD options to content
-      $content = @$el.children('*[data-media-type]')
-      console.log $content
-      enableContentDragging(@model, $content)
+      enableContentDragging(@model, @$el.children('*[data-media-type]'))
