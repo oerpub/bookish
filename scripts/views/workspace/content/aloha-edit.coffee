@@ -5,6 +5,8 @@ define [
   'marionette'
   'aloha'
   'mathjax'
+  'bootstrapModal'
+  'bootstrapPopover'
 ], ($, _, Backbone, Marionette, Aloha, MathJax) ->
 
   return Marionette.ItemView.extend
@@ -22,10 +24,10 @@ define [
 
         alohaId = @$el.attr('id')
         # Sometimes Aloha hasn't loaded up yet
-        if alohaId and @$el.parents()[0]
+        if alohaId and @$el.parents().get(0)
           alohaEditable = Aloha.getEditableById(alohaId)
           editableBody = alohaEditable.getContents()
-          alohaEditable.setContents(value) if value != editableBody
+          if value isnt editableBody then alohaEditable.setContents(value)
         else
           @$el.empty().append(value)
 
@@ -49,11 +51,11 @@ define [
             alohaEditable = Aloha.getEditableById(alohaId)
             editableBody = alohaEditable.getContents()
             # Change the contents but do not update the Aloha editable area
-            @model.set @modelKey, editableBody, {internalAlohaUpdate: true}
+            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
         # Grr, the `aloha-smart-content-changed` can only be listened to globally
         # (via `Aloha.bind`) instead of on each editable.
         #
         # This is problematic when we have multiple Aloha editors on a page.
         # Instead, autosave after some period of inactivity.
-        @$el.on 'blur', updateModelAndSave
+        @$el.on('blur', updateModelAndSave)
