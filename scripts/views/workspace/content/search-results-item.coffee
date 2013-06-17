@@ -28,7 +28,5 @@ define [
       $times = @$el.find('time[datetime]')
       #updateTimes $times
 
-      # @$el.on 'click', (e) => controller.edit(@model)
-
       # Add DnD options to content
       enableContentDragging(@model, @$el.children('*[data-media-type]'))

@@ -23,6 +23,10 @@ define [
         @renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
+      
+      # Add DnD options to content
+      console.log @$el.children().children('*[data-media-type]')
+      enableContentDragging(@model, @$el.children().children('*[data-media-type]'))
 
       return @
 
