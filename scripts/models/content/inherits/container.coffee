@@ -19,10 +19,8 @@ define [
       @fetch({silent: true})
 
     add: (model, options) ->
-      options = options or {}
-
       @get('contents').add(model)
-      if not options.silent then @trigger('change')
+      if not options?.silent then @trigger('change')
       return @
 
     set: (key, val, options) ->
