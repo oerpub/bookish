@@ -6,13 +6,16 @@
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
        and instead go to the login page directly.
     -->
-  <a href="/logout" data-bypass="true" id="sign-out">Sign Out</a>
+  <a href="/logout" data-bypass="true" id="sign-out" class="btn">Sign Out</a>
+  
   {{#if user}}
-    {{#if user.name}}
-      <span class="name">[{{user.name}}]</span>
-    {{else}}
-      <span class="name">[{{user.firstname}} {{user.lastname}}]</span>
-    {{/if}}
+    <span class="name navbar-text">
+      {{#if user.name}}
+        {{user.name}}
+      {{else}}
+        {{user.firstname}} {{user.lastname}}
+      {{/if}}
+    </span>
   {{/if}}
 {{else}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
