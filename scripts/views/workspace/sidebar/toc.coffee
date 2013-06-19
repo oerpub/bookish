@@ -32,4 +32,4 @@ define [
 
     changeTitle: ->
       title = prompt('Enter a new Title', @model.get('title'))
-      @model.set('title', title) if title
+      if title then @model.set('title', title)

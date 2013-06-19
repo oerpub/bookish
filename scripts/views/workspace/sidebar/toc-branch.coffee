@@ -12,8 +12,10 @@ define [
     tagName: "li"
     itemViewContainer: '> ol'
 
-    initialize: () ->
+    initialize: (options) ->
       @collection = @model.get('contents')
+      @itemViewOptions = {container: @collection}
+      @container = options.container
 
     render: () ->
       result = Marionette.CompositeView::render.apply(@, arguments)
@@ -34,7 +36,7 @@ define [
     renderModel: () ->
       data = {}
       data = @serializeData()
-      data.title = @model.collection?.getTitle?(@model) or data.title
+      data.title = @container?.getTitle?(@model) or data.title
       data = @mixinTemplateHelpers(data)
 
       template = @getTemplate()
@@ -88,11 +90,10 @@ define [
       @render()
 
     editSettings: ->
-      collection = @model.collection
-      title = collection?.getTitle?(@model) or @model.get('title')
+      title = @container?.getTitle?(@model) or @model.get('title')
       newTitle = prompt('Edit Title:', title)
 
       if newTitle
-        collection?.setTitle?(@model, newTitle) or @model.set('title', newTitle)
+        @container.setTitle?(@model, newTitle) or @model.set('title', newTitle)
 
       @render()

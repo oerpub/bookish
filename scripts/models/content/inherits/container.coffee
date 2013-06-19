@@ -8,13 +8,21 @@ define [
   Container = Backbone.Collection.extend
     findMatch: (model) ->
       return _.find @titles, (obj) ->
-        return model.id is obj.id or model.cid is obj.cid
+        return model.id is obj.id or model.cid is obj.id
 
     getTitle: (model) ->
-      return @findMatch(model).title
+      return @findMatch(model)?.title
 
     setTitle: (model, title) ->
-      @findMatch(model).title = title
+      match = @findMatch(model)
+      
+      if match
+        match.title = title
+      else
+        @titles.push
+          id: model.id or model.cid
+          mediaType: model.mediaType
+          title: title
 
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
