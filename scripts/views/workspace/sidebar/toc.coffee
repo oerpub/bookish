@@ -17,8 +17,7 @@ define [
       @collection = options?.collection or content
       @listenTo(@collection, 'change change:contents', @render)
 
-    # It would be nice if Marionette exposed a function to filter a collection
-    # Instead, we override showCollection()
+    # Override Marionette's showCollection()
     showCollection: () ->
       if @collection.branches
         data = @collection.branches()
@@ -30,10 +29,7 @@ define [
 
     events:
       'click .editor-content-title': 'changeTitle'
-      #'click .editor-go-workspace': 'goWorkspace'
 
     changeTitle: ->
       title = prompt('Enter a new Title', @model.get('title'))
       @model.set('title', title) if title
-
-    #goWorkspace: -> Controller.workspace()

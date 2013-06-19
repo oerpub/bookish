@@ -18,9 +18,9 @@ define [
     render: () ->
       result = Marionette.CompositeView::render.apply(@, arguments)
 
-      if @model and @model.expanded
+      if @model?.expanded
         @$el.addClass('editor-node-expanded')
-        @renderChildren()
+        @_renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
 
@@ -28,6 +28,17 @@ define [
       enableContentDragging(@model, @$el.children('.editor-drop-zone'))
 
       return result
+
+    # Override Marionette's renderModel() so we can replace the title
+    # if necessary without affecting the model itself
+    renderModel: () ->
+      data = {};
+      data = @serializeData();
+      data.title = @model.collection?.getTitle?(@model) or data.title
+      data = @mixinTemplateHelpers(data);
+
+      template = @getTemplate();
+      return Marionette.Renderer.render(template, data)
 
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
@@ -76,12 +87,6 @@ define [
     expand: (expanded) ->
       @model.expanded = expanded
       @render()
-
-    # From `Marionette.CompositeView`.
-    # Added check to only render when the model `@isExpanded`
-    renderChildren: () ->
-      Marionette.CollectionView::render.call(@)
-      @triggerMethod('composite:collection:rendered')
 
     # Perform the edit action and then expand the node to show children.
     editAction: -> @model.editAction(); @expand(true)

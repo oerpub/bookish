@@ -5,6 +5,13 @@ define [
   'cs!models/content/inherits/base'
 ], ($, _, Backbone, BaseModel) ->
 
+  Container = Backbone.Collection.extend
+    getTitle: (model) ->
+      match = _.find @titles, (obj) ->
+        return model.id is obj.id or model.cid is obj.cid
+      
+      return match.title
+
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
     accept: []
@@ -33,9 +40,11 @@ define [
         (attrs = {})[key] = val
 
       contents = attrs.contents
-      attrs.contents = @get('contents') or new Backbone.Collection()
+      attrs.contents = @get('contents') or new Container()
 
       if contents
+        @get('contents').titles = contents
+        
         require ['cs!collections/content'], (content) =>
           content.loading().done () =>
             _.each contents, (item) =>
