@@ -14,7 +14,12 @@ define [
     itemViewContainer: 'ol'
 
     initialize: (options) ->
-      @collection = options?.collection or content
+      if options?.collection
+        @collection = options.collection
+        @showNodes = true
+      else
+        @collection = content
+
       @listenTo(@collection, 'change change:contents', @render)
 
     # Override Marionette's showCollection()
@@ -26,6 +31,11 @@ define [
 
       _.each data, (item, index) =>
         @addItemView(item, TocBranchView, index)
+
+    # We also need to override addItemView()
+    addItemView: (item, ItemView, index) ->
+      if item.branch or @showNodes
+        Marionette.CompositeView::addItemView.call(@, item, ItemView, index)
 
     events:
       'click .editor-content-title': 'changeTitle'
