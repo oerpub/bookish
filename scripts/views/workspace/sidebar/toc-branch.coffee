@@ -32,12 +32,12 @@ define [
     # Override Marionette's renderModel() so we can replace the title
     # if necessary without affecting the model itself
     renderModel: () ->
-      data = {};
-      data = @serializeData();
+      data = {}
+      data = @serializeData()
       data.title = @model.collection?.getTitle?(@model) or data.title
-      data = @mixinTemplateHelpers(data);
+      data = @mixinTemplateHelpers(data)
 
-      template = @getTemplate();
+      template = @getTemplate()
       return Marionette.Renderer.render(template, data)
 
     events:
@@ -46,7 +46,6 @@ define [
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
       'click > .editor-node-body > .no-edit-action': 'toggleExpanded'
-      'click > .editor-node-body > .edit-action': 'editAction'
       'click > .editor-node-body > .edit-settings': 'editSettings'
 
     # Toggle expanded/collapsed in the View
@@ -87,9 +86,6 @@ define [
     expand: (expanded) ->
       @model.expanded = expanded
       @render()
-
-    # Perform the edit action and then expand the node to show children.
-    editAction: -> @model.editAction(); @expand(true)
 
     editSettings: ->
       collection = @model.collection
