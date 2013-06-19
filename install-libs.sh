@@ -37,7 +37,7 @@ fromGithub "https://github.com/requirejs/text" "2.0.7"
 fromGithub "https://github.com/jrburke/require-cs" "0.4.4"
 fromGithub "https://github.com/guybedford/require-css" "0.0.6"
 fromGithub "https://github.com/guybedford/require-less" "0.0.6"
-fromGithub "https://github.com/SlexAxton/require-handlebars-plugin" "master" # bug in every current tagged release
+fromGithub "https://github.com/SlexAxton/require-handlebars-plugin" "f35a00080cce34ab8b5181247524972aef33e1d0" # bug in every currently tagged release
 fromGithub "https://github.com/millermedeiros/requirejs-plugins" "v1.0.2" "1.0.2"
 cd "../../"
 
