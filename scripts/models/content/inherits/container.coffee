@@ -6,11 +6,15 @@ define [
 ], ($, _, Backbone, BaseModel) ->
 
   Container = Backbone.Collection.extend
-    getTitle: (model) ->
-      match = _.find @titles, (obj) ->
+    findMatch: (model) ->
+      return _.find @titles, (obj) ->
         return model.id is obj.id or model.cid is obj.cid
-      
-      return match.title
+
+    getTitle: (model) ->
+      return @findMatch(model).title
+
+    setTitle: (model, title) ->
+      @findMatch(model).title = title
 
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
@@ -44,7 +48,7 @@ define [
 
       if contents
         @get('contents').titles = contents
-        
+
         require ['cs!collections/content'], (content) =>
           content.loading().done () =>
             _.each contents, (item) =>
