@@ -29,4 +29,4 @@ define [
       #updateTimes $times
 
       # Add DnD options to content
-      enableContentDragging(@model, @$el.children('.editor-drop-zone'))
+      enableContentDragging(@model, @$el.children('*[data-media-type]'))
