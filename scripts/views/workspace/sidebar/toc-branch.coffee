@@ -93,8 +93,10 @@ define [
 
     editSettings: ->
       collection = @model.collection
-      newTitle = prompt 'Edit Title. Enter a single "-" to delete this node in the ToC', collection.getTitle(@model)
+      title = collection?.getTitle?(@model) or @model.get('title')
+      newTitle = prompt('Edit Title:', title)
 
-      if newTitle then collection.setTitle(@model, newTitle)
+      if newTitle
+        collection?.setTitle?(@model, newTitle) or @model.set('title', newTitle)
 
       @render()
