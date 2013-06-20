@@ -1,0 +1,25 @@
+<button id="save-content" type="button" class="btn {{#if changed}}btn-primary{{else}}disabled{{/if}}" data-placement="bottom" data-toggle="tooltip" title="Save all changes">
+  <i class="icon-save"></i> Save
+</button>
+
+{{#if authenticated}}
+  <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
+       and instead go to the login page directly.
+    -->
+  <a href="/logout" data-bypass="true" id="sign-out" class="btn">Sign Out</a>
+  
+  {{#if user}}
+    <span class="name navbar-text">
+      {{#if user.name}}
+        {{user.name}}
+      {{else}}
+        {{user.firstname}} {{user.lastname}}
+      {{/if}}
+    </span>
+  {{/if}}
+{{else}}
+  <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
+       and instead go to the login page directly.
+    -->
+  <a href="/login" data-bypass="true" class="btn btn-primary">Sign In</a>
+{{/if}}

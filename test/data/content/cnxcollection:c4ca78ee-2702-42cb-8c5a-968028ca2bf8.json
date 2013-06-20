@@ -1,0 +1,27 @@
+{
+   "id_": "cnxcollection:c4ca78ee-2702-42cb-8c5a-968028ca2bf8",
+   "language": null,
+   "title": "Android Apps Made Easy",
+   "dateLastModifiedUTC": "2013-05-21T16:01:07.004486",
+   "summary": null,
+   "dateCreatedUTC": "2013-04-19T02:21:04.094163",
+   "subType": null,
+   "maintainers": null,
+   "subjects": null,
+   "copyrightHolders": null,
+   "authors": null,
+   "keywords": null,
+   "mediaType": "application/vnd.org.cnx.collection",
+   "id": "cnxcollection:c4ca78ee-2702-42cb-8c5a-968028ca2bf8",
+   "contents": [
+      {
+         "id": "cnxmodule:9cac2808-f8a1-408d-b6c0-0ad543473b4b"
+      },
+      {
+         "id": "cnxmodule:82b9c309-283f-4468-be4f-c54c0c44d222"
+      },
+      {
+         "id": "cnxmodule:eb4f14e5-e194-46e0-83c7-4d8d45b02650"
+      }
+   ]
+}

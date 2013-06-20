@@ -1,20 +1,17 @@
 {
   "name": "atc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Authoring Tools Client (Javascript Book Editor)",
-  "main": "app.js",
+  "main": "./scripts/main.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "mkdir -p ./lib && cd ./lib && bash ../install-libs.sh && cd ../"
+    "install": "bash install-libs.sh",
+    "update": "bash install-libs.sh"
   },
-  "dependencies": {
-    "underscore": ">=1.4.3",
-    "backbone": ">=0.9.9",
-    "moment": ">=2.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "docco": "~0.4.0"
   },

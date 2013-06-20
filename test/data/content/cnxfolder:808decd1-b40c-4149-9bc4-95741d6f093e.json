@@ -1,0 +1,28 @@
+{
+   "id_": "cnxfolder:808decd1-b40c-4149-9bc4-95741d6f093e",
+   "language": null,
+   "title": "Phil's Folder",
+   "dateLastModifiedUTC": "2013-04-23T16:19:32.459315",
+   "summary": null,
+   "dateCreatedUTC": "2013-04-18T22:35:32.583985",
+   "subType": null,
+   "maintainers": null,
+   "subjects": null,
+   "copyrightHolders": null,
+   "authors": null,
+   "keywords": null,
+   "mediaType": "application/vnd.org.cnx.folder",
+   "id": "cnxfolder:808decd1-b40c-4149-9bc4-95741d6f093e",
+   "contents": [
+      {
+         "id": "cnxmodule:14fd868f-fa74-497f-8e4d-0b06b793e80e",
+         "title": "New Title Cool Mod"
+      },
+      {
+         "id": "cnxmodule:95688d4f-5b07-4f34-8d9f-72075daade1d"
+      },
+      {
+         "id": "cnxmodule:62c50c91-f769-40c2-a0f7-71373b00e778"
+      }
+   ]
+}

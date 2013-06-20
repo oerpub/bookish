@@ -1,0 +1,24 @@
+{
+   "id_": "cnxcollection:916e582c-fc01-41cf-985d-f5a47c046e8f",
+   "language": null,
+   "title": "Moby Dick",
+   "dateLastModifiedUTC": "2013-05-27T12:00:12.616075",
+   "summary": null,
+   "dateCreatedUTC": "2013-04-18T22:33:20.318462",
+   "subType": null,
+   "maintainers": null,
+   "subjects": null,
+   "copyrightHolders": null,
+   "authors": null,
+   "keywords": null,
+   "mediaType": "application/vnd.org.cnx.collection",
+   "id": "cnxcollection:916e582c-fc01-41cf-985d-f5a47c046e8f",
+   "contents": [
+      {
+         "id": "cnxmodule:98e63200-cf7f-4be5-b910-e0c4a0865d49"
+      },
+      {
+         "id": "cnxmodule:95688d4f-5b07-4f34-8d9f-72075daade1d"
+      }
+   ]
+}
