@@ -15,7 +15,7 @@ define [
 
     setTitle: (model, title) ->
       match = @findMatch(model)
-      
+
       if match
         match.title = title
       else
@@ -27,6 +27,9 @@ define [
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
     accept: []
+    unique: true
+    branch: true
+    expanded: false
 
     accepts: (mediaType) ->
       if (typeof mediaType is 'string')
@@ -64,3 +67,15 @@ define [
             @trigger('change:contents')
 
       return Backbone.Model::set.call(@, attrs, options)
+
+    contentView: (callback) ->
+      require ['cs!views/workspace/content/search-results'], (View) =>
+        view = new View({collection: @get('contents')})
+        callback(view)
+
+    sidebarView: (callback) ->
+      require ['cs!views/workspace/sidebar/toc'], (View) =>
+        view = new View
+          collection: @get('contents')
+          model: @
+        callback(view)
