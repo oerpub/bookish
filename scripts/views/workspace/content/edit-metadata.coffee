@@ -59,6 +59,7 @@ define [
     onRender: () ->
       @setupSelect2(@$el.find('[name=subjects]'), 'subjects', config.get('metadataSubjects'))
       @setupSelect2(@$el.find('[name=keywords]'), 'keywords')
+      @setupSelect2(@$el.find('[name=analytics]'), 'analytics')
 
       # Populate the Language dropdown and Subjects checkboxes
       $languages = @$el.find('[name=language]')

@@ -19,6 +19,7 @@ define [
       title: 'Untitled'
       subjects: []
       keywords: []
+      analytics: []
       copyrightHolders: []
       authors: []
       editors: []
