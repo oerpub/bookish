@@ -9,6 +9,7 @@ define [
 ], ($, _, Backbone, Marionette, content, TocBranchView, tocTemplate) ->
 
   return Marionette.CompositeView.extend
+    template: tocTemplate
     itemView: TocBranchView
     itemViewContainer: 'ol'
 
@@ -18,10 +19,6 @@ define [
         @showNodes = true
       else
         @collection = content
-
-      @template = (data) =>
-        data.mediaType = @model?.mediaType
-        return tocTemplate(data)
 
       @listenTo(@collection, 'change change:contents', @render)
 

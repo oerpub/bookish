@@ -14,7 +14,6 @@ define [
     initialize: (options) ->
       @template = (data) =>
         data.id = @model.id
-        data.mediaType = @model.mediaType
         return tocBranchTemplate(data)
 
       @collection = @model.get('contents')

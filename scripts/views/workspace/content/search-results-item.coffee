@@ -22,7 +22,6 @@ define [
     initialize: () ->
       @template = (data) =>
         data.id = @model.id
-        data.mediaType = @model.mediaType
         return searchResultsItemTemplate(data)
 
       @listenTo @model, 'change', => @render()

@@ -31,6 +31,22 @@ define [
     branch: true
     expanded: false
 
+    toJSON: () ->
+      json = BaseModel::toJSON.apply(@, arguments)
+      
+      contents = @get('contents')
+
+      json.contents = []
+      _.each contents.models, (item) ->
+        obj = {}
+        title = contents.getTitle(item)
+        if item.id then obj.id = item.id
+        if title then obj.title = title
+
+        json.contents.push(obj)
+
+      return json
+
     accepts: (mediaType) ->
       if (typeof mediaType is 'string')
         return _.indexOf(@accept, mediaType) is not -1
