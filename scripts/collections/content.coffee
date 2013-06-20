@@ -58,17 +58,29 @@ define [
       return _loaded.promise()
 
     save: (options) ->
-      options = options or {}
+      newModels = []
+      models = []
 
-      # Save every model that has changed
-      # FIXME: Send the changed models in a single batch
       _.each @models, (model, index, arr) ->
-        # FIXME: store a variable on the model to track changes
-        #        rather than relying on .changed
-        # FIXME: get a new id for the model if needed (it hasn't been saved before)
-        if not _.isEmpty(model.changed)
-          model.save(null, {patch: true})
+        if not model.id
+          newModels.push(model)
 
-      if typeof options.success is 'function'
+      $.post '/api/contents', (data) =>
+        # Update ids
+        _.each data, (model, index, arr) =>
+          @models.get(model.cid).set('id', model.id)
+
+      _.each @models, (model, index, arr) ->
+        if model.dirty
+          models.push(model)
+
+      $.ajax
+        type: "PUT"
+        url: '/api/contents'
+        data: models
+        success: (data, textStatus, $xhr) ->
+          console.log 'successfuly updated'
+
+      if typeof options?.success is 'function'
         options.success()
   )()
