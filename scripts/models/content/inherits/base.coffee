@@ -14,3 +14,17 @@ define [
       json.loaded = @loaded
 
       return json
+
+    getTitle: (container) ->
+      if @unique
+        title = @get('title')
+      else
+        title = container?.getTitle?(@) or @get('title')
+
+      return title
+
+    setTitle: (container, title) ->
+      if @unique
+        @set('title', title)
+      else
+        container.setTitle?(@, title) or @set('title', title)

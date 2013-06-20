@@ -90,17 +90,7 @@ define [
       @render()
 
     editSettings: ->
-      if @model.unique
-        title = @model.get('title')
-      else
-        title = @container?.getTitle?(@model) or @model.get('title')
-
-      newTitle = prompt('Edit Title:', title)
-
-      if newTitle
-        if @model.unique
-          @model.set('title', newTitle)
-        else
-          @container.setTitle?(@model, newTitle) or @model.set('title', newTitle)
+      title = prompt('Edit Title:', @model.getTitle(@container))
+      if title then @model.setTitle(@container, title)
 
       @render()
