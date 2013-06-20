@@ -65,22 +65,22 @@ define [
         if not model.id
           newModels.push(model)
 
-      $.post '/api/contents', (data) =>
+      $.post '/api/contents', newModels, (data) =>
         # Update ids
         _.each data, (model, index, arr) =>
           @models.get(model.cid).set('id', model.id)
 
-      _.each @models, (model, index, arr) ->
-        if model.dirty
-          models.push(model)
+        _.each @models, (model, index, arr) ->
+          if model.dirty
+            models.push(model)
 
-      $.ajax
-        type: "PUT"
-        url: '/api/contents'
-        data: models
-        success: (data, textStatus, $xhr) ->
-          console.log 'successfuly updated'
+        $.ajax
+          type: "PATCH"
+          url: '/api/contents'
+          data: models
+          success: (data, textStatus, $xhr) ->
+            console.log 'successfuly updated'
+            options?.success?()
 
-      if typeof options?.success is 'function'
-        options.success()
+      return @
   )()
