@@ -43,3 +43,4 @@ define [
     changeTitle: ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
+      @render()
