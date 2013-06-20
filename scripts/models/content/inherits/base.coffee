@@ -27,4 +27,4 @@ define [
       if @unique
         @set('title', title)
       else
-        container.setTitle?(@, title) or @set('title', title)
+        container?.setTitle?(@, title) or @set('title', title)
