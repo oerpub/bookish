@@ -5,9 +5,9 @@ define [
   'marionette'
   'session'
   'cs!collections/content'
-  'hbs!templates/workspace/menu/sign-in-out'
+  'hbs!templates/workspace/menu/auth'
   'bootstrapTooltip'
-], ($, _, Backbone, Marionette, session, content, signInOutTemplate) ->
+], ($, _, Backbone, Marionette, session, content, authTemplate) ->
 
   _hasChanged = false
 
@@ -21,7 +21,7 @@ define [
   # This view updates when the login state changes
   return Marionette.ItemView.extend
     template: (serializedModel) ->
-      return signInOutTemplate
+      return authTemplate
         authenticated: session.authenticated()
         user: session.user()
         changed: _hasChanged
@@ -51,8 +51,7 @@ define [
     # Before it does, update the model
     signOut: -> @model.signOut()
 
-    # Save each model in sequence.
-    # **FIXME:** This should be done in a commit batch
+    # Save the collection of media in a single batch
     saveContent: () ->
       console.log 'start saving progress'
 
