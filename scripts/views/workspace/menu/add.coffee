@@ -11,8 +11,13 @@ define [
 ], ($, _, Backbone, Marionette, content, mediaTypes, addTemplate, addItemTemplate) ->
 
   AddItemView = Marionette.ItemView.extend
-    template: addItemTemplate
     tagName: 'li'
+
+    initialize: () ->
+      @template = (data) =>
+        data.id = @model.id
+        return addItemTemplate(data)
+
     events:
       'click .add-content-item': 'addItem'
 

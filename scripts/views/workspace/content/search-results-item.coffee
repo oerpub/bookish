@@ -17,10 +17,14 @@ define [
   # Since we don't really distinguish between a search result view and a workspace/collection/etc
   # just consider them the same.
   return Marionette.ItemView.extend
-    template: searchResultsItemTemplate
     tagName: 'tr'
 
     initialize: () ->
+      @template = (data) =>
+        data.id = @model.id
+        data.mediaType = @model.mediaType
+        return searchResultsItemTemplate(data)
+
       @listenTo @model, 'change', => @render()
 
     onRender: () ->

@@ -8,11 +8,15 @@ define [
 ], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
 
   return Marionette.CompositeView.extend
-    template: tocBranchTemplate
     tagName: "li"
     itemViewContainer: '> ol'
 
     initialize: (options) ->
+      @template = (data) =>
+        data.id = @model.id
+        data.mediaType = @model.mediaType
+        return tocBranchTemplate(data)
+
       @collection = @model.get('contents')
       @itemViewOptions = {container: @collection}
       @container = options.container

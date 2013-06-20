@@ -13,7 +13,7 @@ define [
     modelKey: null
     alohaOptions: null
 
-    initialize: ->
+    initialize: () ->
       # Update the view when the content is done loading (remove progress bar)
       @listenTo(@model, 'loaded', @render)
 
@@ -29,7 +29,7 @@ define [
         else
           @$el.empty().append(value)
 
-    onRender: ->
+    onRender: () ->
       # Wait until Aloha is started before loading MathJax.
       MathJax?.Hub.Configured()
 
