@@ -8,6 +8,6 @@ define [
 
   return AlohaEditView.extend
     # **NOTE:** This template is not wrapped in an element
-     template: (serializedModel) -> return "#{serializedModel.title or 'Untitled'}"
-     modelKey: 'title'
-     tagName: 'span' # override the default tagName of `div` so titles can be edited inline.
+     template: (serializedModel) ->
+       return "#{serializedModel.summary or 'Enter a summary here'}"
+     modelKey: 'summary'
