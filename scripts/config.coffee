@@ -21,6 +21,7 @@ require.config
     # ## UI Libraries
     aloha: 'libs/aloha-editor/src/lib/aloha'
     select2: 'libs/select2/select2'
+    moment: 'libs/moment'
     # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'

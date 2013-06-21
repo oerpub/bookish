@@ -50,6 +50,8 @@ fromGithub "https://github.com/appendto/jquery-mockjax" "v1.5.2" "1.5.2"
 singleFile "http://code.jquery.com/jquery-1.8.3.js" "jquery.js"
 singleFile "https://raw.github.com/bestiejs/lodash/v1.3.1/dist/lodash.js" "lodash.js"
 
+singleFile "https://raw.github.com/timrwood/moment/2.0.0/moment.js" "moment.js"
+
 mkdir -p "backbone" && cd "backbone"
 singleFile "https://raw.github.com/documentcloud/backbone/1.0.0/backbone.js" "backbone.js"
 singleFile "https://raw.github.com/marionettejs/backbone.marionette/v1.0.3/lib/backbone.marionette.js" "backbone.marionette.js"
