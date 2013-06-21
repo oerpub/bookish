@@ -19,7 +19,7 @@ define [
       title: 'Untitled'
       subjects: []
       keywords: []
-      analytics: []
+      googleTrackingID: []
       copyrightHolders: []
       authors: []
       editors: []
