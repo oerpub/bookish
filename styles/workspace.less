@@ -35,11 +35,11 @@
     color: @linkColorHover;
     text-decoration: underline;
   }
-  
+
   .navbar-text {
     vertical-align: top;
   }
-  
+
   .name {
     margin-left: 10px;
   }
@@ -197,6 +197,42 @@
     input, .select2-container {
       min-width: 36em;
     }
+  }
+
+  .summary > div {
+    min-height: 20px;
+    width: 36em;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 0;
+    border: 1px solid rgb(170, 170, 170);
+    cursor: text;
+    text-indent: 5px;
+    overflow: hidden;
+    background-color: rgb(255, 255, 255);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, rgb(238, 238, 238)), color-stop(15%, rgb(255, 255, 255)));
+    background-image: -webkit-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -moz-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -o-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -ms-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+
+    p {
+      margin: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 10px;
+    }
+  }
+
+  .summary .aloha-editable-active {
+    border: 1px solid #5897fb;
+    outline: none;
+    
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
+       -moz-box-shadow: 0 0 5px rgba(0,0,0,.3);
+            box-shadow: 0 0 5px rgba(0,0,0,.3);
   }
 
   #layout-body {
