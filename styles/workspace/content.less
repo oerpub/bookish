@@ -1,0 +1,97 @@
+@import "../variables.less";
+
+#content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-flex: 1 0 auto;
+  background-color: #ebebeb;
+  padding: 2em;
+
+  // Make the main editing area white so it looks like a sheet of paper
+  .layout-content {
+    padding: 2em;
+    background-color: white;
+    border: 1px solid black;
+  }
+
+  .search-results {
+    background-color: white;
+    border: 1px solid black;
+    border-collapse: separate;
+
+    th, tr {
+      padding: 1em;
+    }
+  }
+
+  #layout-title {
+    // Hint that the user can edit the title here
+    cursor: pointer;
+
+    &:before {
+      content: "Title: ";
+      opacity: 0.5;
+    }
+
+    // Make the "tooltip" that the user can change the title small
+    + .popover { font-size: 12pt; font-weight: normal; }
+
+  }
+
+  #accordion-metadata .accordion-toggle, #accordion-roles .accordion-toggle {
+    width: 100%;
+    text-align: left;
+  }
+
+  .select2-container {
+    min-width: 15em;
+  }
+
+  .subjects, .keywords, .copyright-holders, .authors, .editors, .translators, .googleTrackingID {
+    input, .select2-container {
+      min-width: 36em;
+    }
+  }
+
+  .summary > div {
+    min-height: 20px;
+    width: 36em;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 0;
+    border: 1px solid rgb(170, 170, 170);
+    cursor: text;
+    text-indent: 5px;
+    overflow: hidden;
+    background-color: rgb(255, 255, 255);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, rgb(238, 238, 238)), color-stop(15%, rgb(255, 255, 255)));
+    background-image: -webkit-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -moz-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -o-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: -ms-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+    background-image: linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
+
+    p {
+      margin: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 10px;
+    }
+  }
+
+  .summary .aloha-editable-active {
+    border: 1px solid #5897fb;
+    outline: none;
+
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
+       -moz-box-shadow: 0 0 5px rgba(0,0,0,.3);
+            box-shadow: 0 0 5px rgba(0,0,0,.3);
+  }
+
+  #layout-body {
+    .aloha-editable {
+      min-height: 5in;
+    }
+  }
+}
