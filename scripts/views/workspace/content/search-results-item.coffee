@@ -47,7 +47,7 @@ define [
 
         return secs * 1000
 
-      updateTime = ($el) ->
+      updateTime = ($el) =>
         if document.contains($el.get(0))
           # Generate a relative time and set it as the text of the `time` element
           utc = $el.attr('datetime')
@@ -57,6 +57,8 @@ define [
             # Set the human-readable text for the time
             $el.text(utcTime.fromNow()) # Passing `true` would drop the suffix
 
+            @timerStarted = true
             setTimeout((() -> updateTime($el)), nextUpdate(utcTime))
 
-      updateTime(@$el.find('time'))
+      if not @timerStarted
+        updateTime(@$el.find('time'))
