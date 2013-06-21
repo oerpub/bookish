@@ -19,9 +19,6 @@ define [
       roles: '#layout-roles'
       edit: '#layout-body'
 
-    initialize: () ->
-      @listenTo(@model, 'change', @render)
-
     onRender: () ->
       @title.show(new TitleView({model: @model}))
       @metadata.show(new MetadataLayout({model: @model}))
