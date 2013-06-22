@@ -9,5 +9,5 @@ define [
   return AlohaEditView.extend
     # **NOTE:** This template is not wrapped in an element
      template: (serializedModel) ->
-       return "#{serializedModel.summary or 'Enter a summary here'}"
+       return "#{serializedModel.summary or ''}"
      modelKey: 'summary'
