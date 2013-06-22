@@ -49,22 +49,19 @@
     min-width: 15em;
   }
 
-  .subjects, .keywords, .copyright-holders, .authors, .editors, .translators, .googleTrackingID {
+  .subjects, .keywords, .copyright-holders, .authors, .editors, .translators {
     input, .select2-container {
       min-width: 36em;
     }
   }
 
-  .summary > div {
-    min-height: 20px;
+  .summary > div, .googleTrackingID > input {
     width: 36em;
-    line-height: 20px;
-    margin: 0;
     padding: 5px 0;
     border: 1px solid rgb(170, 170, 170);
+    border-radius: 0;
     cursor: text;
     text-indent: 5px;
-    overflow: hidden;
     background-color: rgb(255, 255, 255);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, rgb(238, 238, 238)), color-stop(15%, rgb(255, 255, 255)));
     background-image: -webkit-linear-gradient(top, rgb(238, 238, 238) 1%, rgb(255, 255, 255) 15%);
@@ -82,7 +79,7 @@
     }
   }
 
-  .summary .aloha-editable-active {
+  .summary .aloha-editable-active, .googleTrackingID > input:focus {
     border: 1px solid #5897fb;
     outline: none;
 
