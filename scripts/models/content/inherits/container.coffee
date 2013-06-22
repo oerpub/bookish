@@ -33,7 +33,7 @@ define [
 
     toJSON: () ->
       json = BaseModel::toJSON.apply(@, arguments)
-      
+
       contents = @get('contents')
 
       json.contents = []
@@ -54,7 +54,11 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @fetch({silent: true})
+      @loading = true
+      @fetch
+        silent: true
+        success: (model, response, options) =>
+          @loading = false
 
     add: (model, options) ->
       @get('contents').add(model)

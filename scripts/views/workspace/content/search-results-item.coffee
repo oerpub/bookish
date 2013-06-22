@@ -23,6 +23,7 @@ define [
     initialize: () ->
       @template = (data) =>
         data.id = @model.id or @model.cid
+        data.loading = @model.loading
         return searchResultsItemTemplate(data)
 
       @listenTo(@model, 'change sync', @render)
