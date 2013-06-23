@@ -97,6 +97,10 @@ body {
           animation: progress-bar-stripes 2s linear infinite;
 }
 
+.progress-striped .bar-danger {
+  background-color: #ee5f5b;
+}
+
 @-webkit-keyframes progress-bar-stripes {
   from {
     background-position: 40px 0;
