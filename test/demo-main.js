@@ -14,7 +14,7 @@
     shim: {
       mockjax: ['jquery']
     }
-  }, ['cs!../test/demo-mock2']);
+  }, ['cs!../test/demo-mock']);
 
   /* If an error occurs in requirejs then change the loading HTML. */
   require.onError = function (err) {
