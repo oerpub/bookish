@@ -24,6 +24,8 @@ define [
           mediaType: model.mediaType
           title: title
 
+      model.trigger('change')
+
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
     accept: []
@@ -60,9 +62,14 @@ define [
         success: (model, response, options) =>
           @loading = false
 
-    add: (model, options) ->
-      @get('contents').add(model)
+    add: (models, options) ->
+      if (!_.isArray(models)) then (models = if models then [models] else [])
+
+      _.each models, (model, index, arr) =>
+        @get('contents').add(model)
+
       if not options?.silent then @trigger('change')
+
       return @
 
     set: (key, val, options) ->
