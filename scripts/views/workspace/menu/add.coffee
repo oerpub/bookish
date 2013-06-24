@@ -28,9 +28,8 @@ define [
       model.loaded = true
       content.add(model)
 
-      # Begin editing an item as soon as it is added.
-      # Some content (like Books and Folders) do not have an `editAction`
-      #model.editAction?()
+      # Begin editing certain media as soon as it is added.
+      model.editAction?()
 
   return new (Marionette.CompositeView.extend
     collection: mediaTypes
