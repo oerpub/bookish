@@ -59,6 +59,7 @@ define [
       @loading = true
       @fetch
         silent: true
+        loading: true
         success: (model, response, options) =>
           @loading = false
 
@@ -66,7 +67,12 @@ define [
       if (!_.isArray(models)) then (models = if models then [models] else [])
 
       _.each models, (model, index, arr) =>
-        @get('contents').add(model)
+        contents = @get('contents')
+
+        if contents.length and not options?.loading
+          @get('contents').unshift(model)
+        else
+          @get('contents').add(model)
 
       if not options?.silent then @trigger('change')
 
@@ -81,6 +87,7 @@ define [
       else
         (attrs = {})[key] = val
 
+      options = options || {}
       contents = attrs.contents
       attrs.contents = @get('contents') or new Container()
 
@@ -90,7 +97,7 @@ define [
         require ['cs!collections/content'], (content) =>
           content.loading().done () =>
             _.each contents, (item) =>
-              @add(content.get({id: item.id}), {silent: true})
+              @add(content.get({id: item.id}), options)
             @trigger('change:contents')
 
       return Backbone.Model::set.call(@, attrs, options)
