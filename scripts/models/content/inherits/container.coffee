@@ -5,26 +5,7 @@ define [
   'cs!models/content/inherits/base'
 ], ($, _, Backbone, BaseModel) ->
 
-  parseHTML = (html) ->
-    if typeof html isnt 'string' then return []
-
-    results = []
-    $html = $(html)
-
-    $('> nav > ol > li', $html).each (index, $el) ->
-      $node = $el.children.eq(0)
-
-      if $node.is('a')
-        id = $node.attr('href')
-        title = $node.text()
-
-      if not title or title is 'DEFAULT_TITLE'
-        results.push({id: id})
-      else
-        results.push({id: id, title: title})
-
-    return results
-
+  # Backbone Collection used to store a container's contents
   Container = Backbone.Collection.extend
     findMatch: (model) ->
       return _.find @titles, (obj) ->
@@ -53,6 +34,28 @@ define [
         model.trigger('change')
 
       return @
+
+  # Helper function to parse html-encoded data
+  parseHTML = (html) ->
+    if typeof html isnt 'string' then return []
+
+    results = []
+    $html = $(html)
+
+    $('> nav > ol > li', $html).each (index, $el) ->
+      $node = $el.children.eq(0)
+
+      if $node.is('a')
+        id = $node.attr('href')
+        title = $node.text()
+
+      # Only remember the title if it's overridden
+      if not title or title is 'DEFAULT_TITLE'
+        results.push({id: id})
+      else
+        results.push({id: id, title: title})
+
+    return results
 
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
@@ -99,6 +102,7 @@ define [
       _.each models, (model, index, arr) =>
         contents = @get('contents')
 
+        # Add new media to the beginning of the array
         if contents.length and not options?.loading
           @get('contents').unshift(model)
         else
@@ -135,11 +139,13 @@ define [
 
       return Backbone.Model::set.call(@, attrs, options)
 
+    # Change the content view when editing this
     contentView: (callback) ->
       require ['cs!views/workspace/content/search-results'], (View) =>
         view = new View({collection: @get('contents')})
         callback(view)
 
+    # Change the sidebar view when editing this
     sidebarView: (callback) ->
       require ['cs!views/workspace/sidebar/toc'], (View) =>
         view = new View
