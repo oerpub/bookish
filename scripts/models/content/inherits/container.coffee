@@ -5,6 +5,26 @@ define [
   'cs!models/content/inherits/base'
 ], ($, _, Backbone, BaseModel) ->
 
+  parseHTML = (html) ->
+    if typeof html isnt 'string' then return []
+
+    results = []
+    $html = $(html)
+
+    $('> nav > ol > li', $html).each (index, $el) ->
+      $node = $el.children.eq(0)
+
+      if $node.is('a')
+        id = $node.attr('href')
+        title = $node.text()
+
+      if not title or title is 'DEFAULT_TITLE'
+        results.push({id: id})
+      else
+        results.push({id: id, title: title})
+
+    return results
+
   Container = Backbone.Collection.extend
     findMatch: (model) ->
       return _.find @titles, (obj) ->
@@ -37,7 +57,7 @@ define [
     toJSON: () ->
       json = BaseModel::toJSON.apply(@, arguments)
 
-      contents = @get('contents')
+      contents = @get('contents') or {}
 
       json.contents = []
       _.each contents.models, (item) ->
@@ -90,11 +110,17 @@ define [
         (attrs = {})[key] = val
 
       options = options || {}
-      contents = attrs.contents
-      attrs.contents = @get('contents') or new Container()
-
+      contents = attrs.contents or attrs.body
+      
       if contents
-        @get('contents').titles = contents
+        if not _.isArray(contents)
+          contents = parseHTML(contents)
+        
+        # If a medium should be unique, don't remember its title
+        
+
+        attrs.contents = @get('contents') or new Container()
+        attrs.contents.titles = contents
 
         require ['cs!collections/content'], (content) =>
           content.loading().done () =>
