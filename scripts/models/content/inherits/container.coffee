@@ -40,11 +40,9 @@ define [
     if typeof html isnt 'string' then return []
 
     results = []
-    $html = $(html)
 
-    $html.find('> ol').find('> li').each (index, el) ->
+    $(html).find('> ol').find('> li').each (index, el) ->
       $el = $(el)
-
       $node = $el.children().eq(0)
 
       if $node.is('a')
