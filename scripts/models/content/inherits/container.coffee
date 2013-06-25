@@ -42,8 +42,10 @@ define [
     results = []
     $html = $(html)
 
-    $('> nav > ol > li', $html).each (index, $el) ->
-      $node = $el.children.eq(0)
+    $html.find('> ol').find('> li').each (index, el) ->
+      $el = $(el)
+
+      $node = $el.children().eq(0)
 
       if $node.is('a')
         id = $node.attr('href')
