@@ -20,7 +20,7 @@ define [
       else
         @collection = content
 
-      @listenTo(@collection, 'change change:contents', @render)
+      @listenTo(@collection, 'change', @render)
 
     # Override Marionette's showCollection()
     showCollection: () ->
@@ -40,7 +40,10 @@ define [
     events:
       'click .editor-content-title': 'changeTitle'
 
-    changeTitle: ->
+    changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
       @render()
+
+    render: () ->
+      Marionette.CompositeView::render.apply(@, arguments)

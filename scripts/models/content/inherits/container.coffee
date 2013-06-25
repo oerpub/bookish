@@ -32,6 +32,7 @@ define [
     unique: true
     branch: true
     expanded: false
+    promise: () -> return @_deferred.promise()
 
     toJSON: () ->
       json = BaseModel::toJSON.apply(@, arguments)
@@ -56,6 +57,7 @@ define [
       return @accept
 
     initialize: (attrs) ->
+      @_deferred = $.Deferred()
       @loading = true
       @fetch
         silent: true
@@ -98,7 +100,7 @@ define [
           content.loading().done () =>
             _.each contents, (item) =>
               @add(content.get({id: item.id}), options)
-            @trigger('change:contents')
+            @_deferred.resolve()
 
       return Backbone.Model::set.call(@, attrs, options)
 
