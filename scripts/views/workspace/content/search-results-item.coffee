@@ -21,7 +21,7 @@ define [
 
     initialize: () ->
       @template = (data) =>
-        data.id = @model.id
+        data.id = @model.id or @model.cid
         return searchResultsItemTemplate(data)
 
       @listenTo @model, 'change', => @render()

@@ -5,12 +5,13 @@ define [
   'marionette'
   'cs!configs/app'
   'cs!models/languages'
-  'hbs!templates/workspace/content/edit-metadata'
+  'cs!views/workspace/content/edit-summary'
+  'hbs!templates/workspace/content/layouts/edit-metadata'
   'hbs!templates/workspace/content/language-variants'
   'i18n!nls/strings'
   'select2'
   'bootstrapCollapse'
-], ($, _, Backbone, Marionette, config, languagesModel, metadataTemplate, languagesTemplate, __) ->
+], ($, _, Backbone, Marionette, config, languagesModel, SummaryView, metadataTemplate, languagesTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.
@@ -20,10 +21,33 @@ define [
     $.extend(value, {code: languageCode})
     languages.push(value)
 
-  return Marionette.ItemView.extend
+  return Marionette.Layout.extend
     template: metadataTemplate
 
-    # Bind methods onto jQuery events that happen in the view
+    regions:
+      summary: '.summary'
+
+    onRender: () ->
+      @summary.show(new SummaryView({model: @model}))
+
+      @setupSelect2(@$el.find('[name=subjects]'), 'subjects', config.get('metadataSubjects'))
+      @setupSelect2(@$el.find('[name=keywords]'), 'keywords')
+      @setupSelect2(@$el.find('[name=analytics]'), 'analytics')
+
+      # Populate the Language dropdown and Subjects checkboxes
+      $languages = @$el.find('[name=language]')
+      for lang in languages
+        $lang = $('<option></option>').attr('value', lang.code).text(lang.native)
+        $languages.append($lang)
+
+      $languages.select2
+        placeholder: __('Select a language')
+
+      # Select the correct language (Handlebars can't do that)
+      @_updateLanguage()
+
+      @delegateEvents()
+
     events:
       'change [name=language]': '_updateLanguageVariant'
 
@@ -53,27 +77,6 @@ define [
         @model.set(attr, $el.val().split('|'), {silent: true})
 
       @makeSortable($el)
-
-    # Populate some of the dropdowns like language and subjects.
-    # Also, initialize the select2 widget on elements
-    onRender: () ->
-      @setupSelect2(@$el.find('[name=subjects]'), 'subjects', config.get('metadataSubjects'))
-      @setupSelect2(@$el.find('[name=keywords]'), 'keywords')
-      @setupSelect2(@$el.find('[name=analytics]'), 'analytics')
-
-      # Populate the Language dropdown and Subjects checkboxes
-      $languages = @$el.find('[name=language]')
-      for lang in languages
-        $lang = $('<option></option>').attr('value', lang.code).text(lang.native)
-        $languages.append($lang)
-
-      $languages.select2
-        placeholder: __('Select a language')
-
-      # Select the correct language (Handlebars can't do that)
-      @_updateLanguage()
-
-      @delegateEvents()
 
     # Update the UI when the language changes.
     # Also called during initial render

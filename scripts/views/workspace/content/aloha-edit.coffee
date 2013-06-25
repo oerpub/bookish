@@ -12,6 +12,7 @@ define [
     template: () -> throw 'You need to specify a template, modelKey, and optionally alohaOptions'
     modelKey: null
     alohaOptions: null
+    loaded: false
 
     initialize: () ->
       # Update the view when the content is done loading (remove progress bar)
@@ -30,10 +31,15 @@ define [
           @$el.empty().append(value)
 
     onRender: () ->
+      # Only load once
+      if @loaded then return
+
       # Wait until Aloha is started before loading MathJax.
       MathJax?.Hub.Configured()
 
       if @model.loaded
+        @loaded = true
+
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
         Aloha.ready =>
