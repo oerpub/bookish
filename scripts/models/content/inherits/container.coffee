@@ -31,20 +31,28 @@ define [
         return model.id is obj.id or model.cid is obj.id
 
     getTitle: (model) ->
-      return @findMatch(model)?.title
+      if model.unique
+        return model.get('title')
+
+      return @findMatch(model)?.title or model.get('title')
 
     setTitle: (model, title) ->
-      match = @findMatch(model)
-
-      if match
-        match.title = title
+      if model.unique
+        model.set('title', title)
       else
-        @titles.push
-          id: model.id or model.cid
-          mediaType: model.mediaType
-          title: title
+        match = @findMatch(model)
 
-      model.trigger('change')
+        if match
+          match.title = title
+        else
+          @titles.push
+            id: model.id or model.cid
+            mediaType: model.mediaType
+            title: title
+
+        model.trigger('change')
+
+      return @
 
   return BaseModel.extend
     mediaType: 'application/vnd.org.cnx.folder'
@@ -111,13 +119,10 @@ define [
 
       options = options || {}
       contents = attrs.contents or attrs.body
-      
+
       if contents
         if not _.isArray(contents)
           contents = parseHTML(contents)
-        
-        # If a medium should be unique, don't remember its title
-        
 
         attrs.contents = @get('contents') or new Container()
         attrs.contents.titles = contents
