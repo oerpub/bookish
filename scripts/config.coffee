@@ -57,12 +57,6 @@ require.config
   shim:
 
     # ## Core Libraries
-    jquery:
-      exports: 'jQuery'
-      init: ->
-        this.jQuery.browser.version = 10000; # Hack to fix aloha-editor's version checking
-        return this.jQuery
-
     underscore:
       exports: '_'
 
@@ -104,6 +98,8 @@ require.config
         script.text = 'MathJax.Hub.Config(' + JSON.stringify(mathjaxConfig) + ');' + 'MathJax.Hub.Startup.onload();'
 
         document.getElementsByTagName("head")[0].appendChild(script);
+
+        jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
 
         return Aloha
 
