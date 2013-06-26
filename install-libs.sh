@@ -57,5 +57,6 @@ singleFile "https://raw.github.com/documentcloud/backbone/1.0.0/backbone.js" "ba
 singleFile "https://raw.github.com/marionettejs/backbone.marionette/v1.0.3/lib/backbone.marionette.js" "backbone.marionette.js"
 cd "../"
 
-fromGithub "https://github.com/oerpub/Aloha-Editor" "master" "" "aloha-editor"
+fromGithub "https://github.com/dak1/Aloha-Editor" "master" "" "aloha-editor"
+#fromGithub "https://github.com/oerpub/Aloha-Editor" "master" "" "aloha-editor"
 fromGithub "https://github.com/twitter/bootstrap" "v2.3.2" "2.3.2"
