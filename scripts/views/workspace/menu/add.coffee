@@ -29,7 +29,7 @@ define [
       content.add(model)
 
       # Begin editing certain media as soon as it is added.
-      model.editAction?()
+      model.addAction?()
 
   return new (Marionette.CompositeView.extend
     collection: mediaTypes

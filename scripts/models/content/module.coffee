@@ -28,7 +28,7 @@ define [
       language: navigator?.language or navigator?.userLanguage or 'en'
 
     # Begin editing this medium as soon as it is added
-    editAction: () ->
+    addAction: () ->
       id = @id or @cid
       require ['cs!routers/router'], (router) ->
         router.navigate("content/#{ id }", {trigger: true});
