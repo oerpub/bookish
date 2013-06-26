@@ -57,6 +57,12 @@ require.config
   shim:
 
     # ## Core Libraries
+    jquery:
+      exports: 'jQuery'
+      init: ->
+        this.jQuery.browser.version = 10000; # Hack to fix aloha-editor's version checking
+        return this.jQuery
+
     underscore:
       exports: '_'
 
