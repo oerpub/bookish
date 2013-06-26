@@ -28,7 +28,7 @@ define [
       model.loaded = true
       content.add(model)
 
-      # Begin editing certain media as soon as it is added.
+      # Begin editing certain media as soon as they are added.
       model.addAction?()
 
   return new (Marionette.CompositeView.extend
