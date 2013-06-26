@@ -21,6 +21,7 @@ require.config
     # ## UI Libraries
     aloha: 'libs/aloha-editor/src/lib/aloha'
     select2: 'libs/select2/select2'
+    moment: 'libs/moment'
     # Bootstrap Plugins
     bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
     bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
@@ -97,6 +98,8 @@ require.config
         script.text = 'MathJax.Hub.Config(' + JSON.stringify(mathjaxConfig) + ');' + 'MathJax.Hub.Startup.onload();'
 
         document.getElementsByTagName("head")[0].appendChild(script);
+
+        jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
 
         return Aloha
 

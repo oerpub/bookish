@@ -32,7 +32,9 @@ define [
 
       @setupSelect2(@$el.find('[name=subjects]'), 'subjects', config.get('metadataSubjects'))
       @setupSelect2(@$el.find('[name=keywords]'), 'keywords')
-      @setupSelect2(@$el.find('[name=analytics]'), 'analytics')
+
+      @$el.find('.googleTrackingID').find('input').on 'input', (e) =>
+        @model.set('googleTrackingID', $(e.currentTarget).val(), {silent: true})
 
       # Populate the Language dropdown and Subjects checkboxes
       $languages = @$el.find('[name=language]')

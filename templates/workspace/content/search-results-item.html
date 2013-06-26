@@ -15,22 +15,20 @@
       <i class="icon-warning-sign"></i>
     </span>
   {{/if}}
-
-  {{! Display a progress bar if the file has not loaded yet }}
-  {{#if _loading}}
-    {{#unless _done}}
-      <div class="progress progress-striped active" style="display: inline-block; width: 100px;">
-        <div class="bar" style="width: 100%;"></div>
-      </div>
-    {{/unless}}
-  {{/if}}
 </td>
 
 {{! Last Modified }}
 <td>
-  {{#if dateLastModifiedUTC}}
-    <time datetime="{{dateLastModifiedUTC}}"></time>
+  {{! Display a progress bar if the file has not loaded yet }}
+  {{#if loading}}
+    <div class="progress progress-striped active" style="display: inline-block; width: 100px;">
+      <div class="bar" style="width: 100%;"></div>
+    </div>
   {{else}}
-    <time datetime="{{dateCreatedUTC}}"></time>
+    {{#if dateLastModifiedUTC}}
+      <time datetime="{{dateLastModifiedUTC}}"></time>
+    {{else}}
+      <time datetime="{{dateCreatedUTC}}"></time>
+    {{/if}}
   {{/if}}
 </td>

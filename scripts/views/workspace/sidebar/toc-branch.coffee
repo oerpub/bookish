@@ -50,7 +50,6 @@ define [
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
-      'click > .editor-node-body > .no-edit-action': 'toggleExpanded'
       'click > .editor-node-body > .edit-settings': 'editSettings'
 
     # Toggle expanded/collapsed in the View

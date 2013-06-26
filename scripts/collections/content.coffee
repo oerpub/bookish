@@ -38,49 +38,19 @@ define [
       return _.where(@models, {branch: true})
 
     load: () ->
+      promises = []
+
       @fetch
-        silent: true
-        success: (model, response, options) =>
-          @trigger('reset')
+        success: (data, response, options) =>
+          _.each data.models, (model) ->
+            if typeof model.promise is 'function'
+              promises.push(model.promise())
+
           _loaded.resolve()
 
-    add: (models, options) ->
-      if (!_.isArray(models)) then (models = if models then [models] else [])
-
-      # Listen to models and trigger a change event if any of them change
-      _.each models, (model, index, arr) =>
-        @listenTo(model, 'change', () => @trigger('change'))
-        @listenTo(model, 'change:contents', () => @trigger('change:contents'))
-
-      Backbone.Collection::add.call(@, models, options)
+          $.when.apply($, promises).done () =>
+            @trigger('change')
 
     loading: () ->
       return _loaded.promise()
-
-    save: (options) ->
-      newModels = []
-      models = []
-
-      _.each @models, (model, index, arr) ->
-        if not model.id
-          newModels.push(model)
-
-      $.post '/api/contents', newModels, (data) =>
-        # Update ids
-        _.each data, (model, index, arr) =>
-          @models.get(model.cid).set('id', model.id)
-
-        _.each @models, (model, index, arr) ->
-          if model.dirty
-            models.push(model)
-
-        $.ajax
-          type: "PATCH"
-          url: '/api/contents'
-          data: models
-          success: (data, textStatus, $xhr) ->
-            console.log 'successfuly updated'
-            options?.success?()
-
-      return @
   )()

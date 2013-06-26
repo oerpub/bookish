@@ -1,4 +1,5 @@
-(function() {
+(function () {
+  "use strict";
 
   require({
     paths: {
@@ -8,17 +9,17 @@
   }, ['cs!config']);
 
   /* If an error occurs in requirejs then change the loading HTML. */
-  require.onError = function(err) {
-    "use strict";
+  require.onError = function (err) {
     var title = document.getElementById('loading-text'),
-        progress = document.getElementById('loading-progress');
+        bar = document.getElementById('loading-bar');
 
-    if (title != null) {
-      title.textContent = 'Loading failed. Please try again in a bit.';
+    if (title) {
+      title.innerHTML = 'Loading failed.<br />Please try again later.';
     }
-    if (progress != null) {
-      progress.className = 'progress progress-danger';
+
+    if (bar) {
+      bar.className = 'bar bar-danger';
     }
   };
 
-}) ();
+})();
