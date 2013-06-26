@@ -31,8 +31,17 @@ define [
           @$el.empty().append(value)
 
     onRender: () ->
+      if @model.loaded and document.contains(@el)
+        @load()
+
+    onShow: () ->
+      @load()
+
+    load: () ->
       # Only load once
       if @loaded then return
+
+      @loaded = true
 
       # Auto save after the user has stopped making changes
       updateModelAndSave = =>
@@ -45,24 +54,18 @@ define [
           # Change the contents but do not update the Aloha editable area
           @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-      if @model.loaded and document.contains(@el)
-        @loaded = true
+      # Once Aloha has finished loading enable
+      @$el.addClass('disabled')
+      Aloha.ready =>
+        # Wait until Aloha is started before loading MathJax.
+        MathJax?.Hub.Configured()
 
-        # Once Aloha has finished loading enable
-        @$el.addClass('disabled')
-        Aloha.ready =>
-          # Wait until Aloha is started before loading MathJax.
-          MathJax?.Hub.Configured()
+        @$el.aloha(@alohaOptions)
+        @$el.removeClass('disabled')
 
-          @$el.aloha(@alohaOptions)
-          @$el.removeClass('disabled')
-
-          # Grr, the `aloha-smart-content-changed` can only be listened to globally
-          # (via `Aloha.bind`) instead of on each editable.
-          #
-          # This is problematic when we have multiple Aloha editors on a page.
-          # Instead, autosave after some period of inactivity.
-          @$el.on('blur', updateModelAndSave)
-
-    onShow: () ->
-      @onRender()
+        # Grr, the `aloha-smart-content-changed` can only be listened to globally
+        # (via `Aloha.bind`) instead of on each editable.
+        #
+        # This is problematic when we have multiple Aloha editors on a page.
+        # Instead, autosave after some period of inactivity.
+        @$el.on('blur', updateModelAndSave)
