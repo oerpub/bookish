@@ -65,7 +65,7 @@ require.config
       exports: 'Backbone'
 
     marionette:
-      deps: ['underscore', 'backbone']
+      deps: ['underscore', 'backbone', 'cs!helpers/logging']
       exports: 'Marionette'
 
     # ## UI Libraries
@@ -110,7 +110,6 @@ require.config
     helperPathCallback: (name) ->
       return "cs!../templates/helpers/#{name}"
     templateExtension: 'html'
-
 
 # # Load and run the application
 define ['cs!app'], (app) ->
