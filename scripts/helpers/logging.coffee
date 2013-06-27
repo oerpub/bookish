@@ -6,7 +6,8 @@ define [
 
   Backbone.Events.trigger = _.wrap Backbone.Events.trigger, (originalTrigger) ->
     args = _.toArray(arguments).slice(1)
-    console.log args
-    console.log console, _.flatten(['trigger', args])
+
+    log = {'msg': _.flatten(['trigger', args, console])}
+    $.post('/api/logging', log)
 
     originalTrigger.apply(@, args)
