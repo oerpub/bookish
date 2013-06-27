@@ -41,20 +41,36 @@ define [
       html = html.replace(/<head>/g, "<prefix-head>")
       html = html.replace(/<body/g, "<prefix-body")
 
+      # When an `<img src="...">` is parsed by jQuery the src attribute is fetched
+      # even if the image hasn't been added to the DOM yet.
+      # Instead of letting that silently fail,
+      # replace the `img` tag with another element until the bytes are retrieved
+      # via the github API.
+      html = html.replace(/<img/g, '<prefix-img')
+      html = html.replace(/<\/img>/g, '</prefix-img>')
+
       $html = jQuery(html)
 
       $head = $html.find('prefix-head')
       $body = $html.find('prefix-body')
 
       # Change the `src` attribute to be a `data-src` attribute if the URL is relative
-      $html.find('img').each (i, img) ->
-        $img = jQuery(img)
-        src = $img.attr 'src'
+      $html.find('prefix-img').each (i, img) ->
+        $imgHolder = jQuery(img)
+        src = $imgHolder.attr 'src'
         return if /^https?:/.test src
         return if /^data:/.test src
 
-        $img.removeAttr 'src'
+        $imgHolder.removeAttr 'src'
+
+        # Replace the `<prefix-img>` with a real `<img>` and set the `src` attribute
+        $img = jQuery('<img></img>')
         $img.attr 'data-src', src
+        # Transfer all the attributes to `$img`
+        jQuery.each $imgHolder[0].attributes, (index, attr) =>
+          $img.attr attr.name, attr.value
+
+        $imgHolder.replaceWith $img
 
 
       $images = $html.find('img[data-src]')
