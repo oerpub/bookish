@@ -8,6 +8,6 @@ define [
     args = _.toArray(arguments).slice(1)
 
     log = {'msg': _.flatten(['trigger', args, console])}
-    $.post('/api/logging', log)
+    $.post('/logging', log)
 
     originalTrigger.apply(@, args)
