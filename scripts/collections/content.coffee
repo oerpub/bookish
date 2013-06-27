@@ -40,11 +40,18 @@ define [
       return _.where(@models, {branch: true})
 
     load: () ->
+      promises = []
+
       @fetch
-        silent: true
-        success: (model, response, options) =>
-          @trigger('reset')
+        success: (data, response, options) =>
+          _.each data.models, (model) ->
+            if typeof model.promise is 'function'
+              promises.push(model.promise())
+
           _loaded.resolve()
+
+          $.when.apply($, promises).done () =>
+            @trigger('change')
 
     loading: () ->
       return _loaded.promise()
