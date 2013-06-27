@@ -27,8 +27,10 @@ define [
 
     model: (attrs, options) ->
       if attrs.mediaType
-        Medium = mediaTypes.type(attrs.mediaType)
-        delete attrs.mediaType
+        mediaType = attrs.mediaType
+        Medium = mediaTypes.type(mediaType)
+        # Include the `mediaType` in case models support multiple media types (like images).
+        #delete attrs.mediaType
 
         return new Medium(attrs)
 
@@ -38,18 +40,11 @@ define [
       return _.where(@models, {branch: true})
 
     load: () ->
-      promises = []
-
       @fetch
-        success: (data, response, options) =>
-          _.each data.models, (model) ->
-            if typeof model.promise is 'function'
-              promises.push(model.promise())
-
+        silent: true
+        success: (model, response, options) =>
+          @trigger('reset')
           _loaded.resolve()
-
-          $.when.apply($, promises).done () =>
-            @trigger('change')
 
     loading: () ->
       return _loaded.promise()
