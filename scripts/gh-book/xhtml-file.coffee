@@ -2,7 +2,9 @@ define [
   'underscore'
   'backbone'
   'cs!models/content/module'
-], (_, Backbone, ModuleModel) ->
+  'cs!collections/content'
+  'cs!gh-book/utils'
+], (_, Backbone, ModuleModel, allContent, Utils) ->
 
   # The `Content` model contains the following members:
   #
@@ -61,16 +63,15 @@ define [
       $images.each (i, img) =>
         $img = jQuery(img)
         src = $img.attr 'data-src'
+        id = Utils.resolvePath @id, src
+        imageModel = allContent.get(id)
         # Load the image file somehow (see below for my github.js changes)
-        doneLoading = readBinaryFile(src)
+        doneLoading = imageModel.fetch()
         .done (bytes, statusMessage, xhr) =>
           # Grab the mediaType from the response header (or look in the EPUB3 OPF file)
-          mediaType = AtcModels.ALL_CONTENT.get(src).mediaType # xhr.getResponseHeader('Content-Type').split(';')[0]
+          mediaType = imageModel.mediaType # xhr.getResponseHeader('Content-Type').split(';')[0]
 
-          # Use the browser's Base64 encode if available
-          encode = btoa or @Base64?.encode
-
-          encoded = encode(bytes)
+          encoded = imageModel.get 'base64Encoded'
           $img.attr('src', "data:#{mediaType};base64,#{encoded}")
 
           counter--

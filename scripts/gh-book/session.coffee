@@ -11,16 +11,20 @@ define [
     'cs!collections/media-types'
     'cs!gh-book/xhtml-file'
     'cs!gh-book/opf-file'
-  ], (mediaTypes, XhtmlFile, OpfFile) ->
+    'cs!gh-book/binary-file'
+  ], (mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
 
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
+    mediaTypes.add BinaryFile, {mediaType:'image/png'}
+    mediaTypes.add BinaryFile, {mediaType:'image/jpg'}
+    mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
 
   session = new Backbone.Model()
   session.set
     'repoUser': 'philschatz'
-    'repoName': 'books'
+    'repoName': 'epub-anatomy'
     'branch'  : 'master'
     'rootPath': ''
 
@@ -44,7 +48,11 @@ define [
     console.log method, path
     ret = null
     switch method
-      when 'read' then ret = readFile(path)
+      when 'read'
+        if model.isBinary
+          ret = readBinaryFile(path)
+        else
+          ret = readFile(path)
       when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save')
       when 'create'
         # Create an id if this model has not been saved yet

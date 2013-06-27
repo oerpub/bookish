@@ -35,7 +35,7 @@ define [
     model: (attrs, options) ->
       if attrs.mediaType
         Medium = mediaTypes.type(attrs.mediaType)
-        delete attrs.mediaType
+        # delete attrs.mediaType
 
         return new Medium(attrs)
 

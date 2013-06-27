@@ -5,27 +5,8 @@ define [
   'cs!collections/media-types'
   'cs!collections/content'
   'cs!models/content/inherits/container'
-], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel) ->
-
-
-  # Links in a navigation document are relative to where the nav document resides.
-  # If it does not live in the same directory then they need to be resolved to
-  # an absolute path so content Models can be looked up
-  resolvePath = (context, relPath) ->
-    return relPath if context.search('/') < 0
-    path = context.replace(/\/[^\/]*$/, '') + '/' + relPath.split('#')[0]
-    # path may still contain '..' so clean those up
-    parts = path.split('/')
-
-    i = 0
-    while i < parts.length
-      switch parts[i]
-        when '.' then parts.splice(i, 1)
-        when '..' then parts.splice(i-1, 2); i -= 1
-        else i++
-
-    parts.join '/'
-
+  'cs!gh-book/utils'
+], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, Utils) ->
 
   return class PackageFile extends BaseContainerModel
     defaults:
@@ -53,7 +34,7 @@ define [
       $links.each (i, el) =>
         $link = $(el)
         href = $link.attr 'href'
-        id = resolvePath @navModel.id, href
+        id = Utils.resolvePath @navModel.id, href
         title = $link.text()
 
         model = allContent.get id
@@ -85,7 +66,7 @@ define [
         path = $item.attr 'href'
         model = allContent.model
           # Set the path to the file to be relative to the OPF file
-          id: resolvePath(@id, path)
+          id: Utils.resolvePath(@id, path)
           mediaType: mediaType
           properties: $item.attr 'properties'
 
