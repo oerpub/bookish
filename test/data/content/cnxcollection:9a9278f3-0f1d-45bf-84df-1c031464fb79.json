@@ -1,14 +1,17 @@
 {
-   "id_": "cnxcollection:9a9278f3-0f1d-45bf-84df-1c031464fb79",
-   "title": "Untitled Book",
-   "dateLastModifiedUTC": "2013-06-05T20:06:08.030055",
-   "dateCreatedUTC": "2013-06-05T20:06:07.906153",
-   "mediaType": "application/vnd.org.cnx.collection",
-   "id": "cnxcollection:9a9278f3-0f1d-45bf-84df-1c031464fb79",
-   "contents": [
-      {
-         "id": "cnxmodule:cec9f083-3657-4b93-9146-bc1ddc2ea40e",
-         "title": "Untitled - Override Title"
-      }
-   ]
+    "body": "<nav>\n  <ol>\n  \n    <li>\n    \n      <a href=\"cnxmodule:cec9f083-3657-4b93-9146-bc1ddc2ea40e\">Untitled - Override Title</a>\n      \n    \n    \n    </li>\n  \n      </ol>\n    \n    </li>\n  \n  </ol>\n</nav>\n",
+    "id_": "cnxcollection:9a9278f3-0f1d-45bf-84df-1c031464fb79",
+    "language": null,
+    "title": "Untitled Book",
+    "dateLastModifiedUTC": "2013-06-05T20:06:08.030055",
+    "summary": null,
+    "dateCreatedUTC": "2013-06-05T20:06:07.906153",
+    "subType": null,
+    "maintainers": null,
+    "subjects": null,
+    "copyrightHolders": null,
+    "authors": null,
+    "keywords": null,
+    "mediaType": "application/vnd.org.cnx.collection",
+    "id": "cnxcollection:9a9278f3-0f1d-45bf-84df-1c031464fb79"
 }

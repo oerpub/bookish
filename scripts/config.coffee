@@ -105,6 +105,8 @@ require.config
 
         document.getElementsByTagName("head")[0].appendChild(script);
 
+        jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
+
         return Aloha
 
   # Handlebars Requirejs Plugin Configuration

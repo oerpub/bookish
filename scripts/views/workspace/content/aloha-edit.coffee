@@ -31,31 +31,37 @@ define [
           @$el.empty().append(value)
 
     onRender: () ->
+      if @model.loaded and document.contains(@el)
+        @load()
+
+    onShow: () ->
+      @load()
+
+    load: () ->
       # Only load once
       if @loaded then return
 
-      # Wait until Aloha is started before loading MathJax.
-      MathJax?.Hub.Configured()
+      @loaded = true
 
-      if @model.loaded
-        @loaded = true
+      # Auto save after the user has stopped making changes
+      updateModelAndSave = =>
+        alohaId = @$el.attr('id')
+        # Sometimes Aloha hasn't loaded up yet
+        # Only save when the editable has changed
+        if alohaId
+          alohaEditable = Aloha.getEditableById(alohaId)
+          editableBody = alohaEditable.getContents()
+          # Change the contents but do not update the Aloha editable area
+          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-        # Once Aloha has finished loading enable
-        @$el.addClass('disabled')
-        Aloha.ready =>
-          @$el.aloha(@alohaOptions)
-          @$el.removeClass('disabled')
+      # Once Aloha has finished loading enable
+      @$el.addClass('disabled')
+      Aloha.ready =>
+        # Wait until Aloha is started before loading MathJax.
+        MathJax?.Hub.Configured()
 
-        # Auto save after the user has stopped making changes
-        updateModelAndSave = =>
-          alohaId = @$el.attr('id')
-          # Sometimes Aloha hasn't loaded up yet
-          # Only save when the editable has changed
-          if alohaId
-            alohaEditable = Aloha.getEditableById(alohaId)
-            editableBody = alohaEditable.getContents()
-            # Change the contents but do not update the Aloha editable area
-            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+        @$el.aloha(@alohaOptions)
+        @$el.removeClass('disabled')
 
         # Grr, the `aloha-smart-content-changed` can only be listened to globally
         # (via `Aloha.bind`) instead of on each editable.

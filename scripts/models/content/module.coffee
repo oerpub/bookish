@@ -27,6 +27,13 @@ define [
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
 
+    # Begin editing this medium as soon as it is added
+    addAction: () ->
+      id = @id or @cid
+      require ['cs!routers/router'], (router) ->
+        router.navigate("content/#{ id }", {trigger: true});
+
+    # Change the content view when editing this
     contentView: (callback) ->
       require ['cs!views/workspace/content/layouts/editor'], (View) =>
         view = new View({model: @})
@@ -38,6 +45,7 @@ define [
               @loaded = true
               @trigger('loaded')
 
+    # Change the toolbar view when editing this
     toolbarView: (callback) ->
       require ['cs!views/workspace/menu/toolbar-aloha'], (view) ->
         callback(view)
