@@ -1,6 +1,12 @@
 require.config
   # # Configure Library Locations
   paths:
+
+    # Change some of the models for the Application to use github and EPUB
+    github: '../node_modules/github-client/github'
+    session: 'gh-book/session'
+    'collections/content': 'gh-book/content'
+
     # ## Template and Style paths
     templates: '../templates'
     styles: '../styles'

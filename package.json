@@ -11,7 +11,9 @@
     "install": "bash install-libs.sh",
     "update": "bash install-libs.sh"
   },
-  "dependencies": {},
+  "dependencies": {
+    "github-client": "*"
+  },
   "devDependencies": {
     "docco": "~0.4.0"
   },
