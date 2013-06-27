@@ -65,7 +65,7 @@ require.config
       exports: 'Backbone'
 
     marionette:
-      deps: ['underscore', 'backbone', 'cs!helpers/logging']
+      deps: ['underscore', 'backbone', 'cs!helpers/logger']
       exports: 'Marionette'
 
     # ## UI Libraries
