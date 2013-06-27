@@ -3,6 +3,8 @@ define [
   'mockjax'
 ], ($) ->
 
+  # GET
+
   $.mockjax
     url: '/me'
     proxy: 'data/me.json'
@@ -16,6 +18,12 @@ define [
     id = settings.url.match(/\/api\/content\/(.*)$/);
     if id
       return {proxy: 'data/content/' + id[1] + '.json'}
+
+  # POST
+  
+  $.mockjax
+    url: '/logging'
+    type: 'post'
 
   # Load the actual app
   require(['cs!../scripts/config'])
