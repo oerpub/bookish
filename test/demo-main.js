@@ -28,6 +28,8 @@
     if (bar) {
       bar.className = 'bar bar-danger';
     }
+
+    throw err;
   };
 
 })();
