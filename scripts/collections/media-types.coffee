@@ -37,8 +37,9 @@ define [
       @add Book
       @add Folder
 
-    add: (modelType, options) ->
-      mediaType = modelType::mediaType
+    # Optionally pass in the `mediaType` so one model can handle multiple media types (like images)
+    add: (modelType, options={}) ->
+      mediaType = options.mediaType or modelType::mediaType
       Backbone.Collection::add.call(@, {id: mediaType, modelType: modelType}, options)
 
     type: (medium) ->
