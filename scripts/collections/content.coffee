@@ -17,7 +17,7 @@ define [
 
   _loaded = $.Deferred()
 
-  return new (Backbone.Collection.extend
+  return new (class AllContent extends Backbone.Collection
     url: '/api/content'
 
     initialize: () ->

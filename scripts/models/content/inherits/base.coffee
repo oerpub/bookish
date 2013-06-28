@@ -3,12 +3,12 @@ define [
   'backbone'
 ], (_, Backbone) ->
 
-  return Backbone.Model.extend
+  class BaseModel extends Backbone.Model
     url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
 
     toJSON: () ->
-      json = Backbone.Model::toJSON.apply(@, arguments)
+      json = super()
       json.mediaType = @mediaType
 
       return json

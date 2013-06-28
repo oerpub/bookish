@@ -10,7 +10,7 @@ define [
   'bootstrapDropdown'
 ], ($, _, Backbone, Marionette, content, mediaTypes, addTemplate, addItemTemplate) ->
 
-  AddItemView = Marionette.ItemView.extend
+  class AddItemView extends Marionette.ItemView
     tagName: 'li'
 
     initialize: () ->
@@ -31,7 +31,7 @@ define [
       # Begin editing certain media as soon as they are added.
       model.addAction?()
 
-  return new (Marionette.CompositeView.extend
+  return new (class AddView extends Marionette.CompositeView
     collection: mediaTypes
     template: addTemplate
     itemView: AddItemView
