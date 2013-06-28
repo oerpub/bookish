@@ -4,20 +4,19 @@ define [
   'backbone'
 ], ($, _, Backbone) ->
 
-  wrapper = (trigger) ->
-    return _.wrap trigger, (originalTrigger) ->
-      args = _.toArray(arguments).slice(1)
+  isEnabled = true
 
+  Backbone.Events.trigger = _.wrap Backbone.Events.trigger, (originalTrigger) ->
+    args = _.toArray(arguments).slice(1)
+
+    if isEnabled
       log = "trigger: #{ args }"
       $.post('/logging', log)
 
-      originalTrigger.apply(@, args)
+    originalTrigger.apply(@, args)
 
-  logger = {
-    start: () ->
-      Backbone.Events.trigger = wrapper(Backbone.Events.trigger)
-  };
+  class Logger
+    start: () -> isEnabled = true
+    stop: () -> isEnabled = false
 
-  logger.start()
-
-  return logger
+  return new Logger()
