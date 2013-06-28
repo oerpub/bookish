@@ -16,7 +16,7 @@ define [
         data.id = @model.id
         return tocBranchTemplate(data)
 
-      @collection = @model.get('contents')
+      @collection = @model.getChildren?()
       @itemViewOptions = {container: @collection}
       @container = options.container
 
@@ -30,7 +30,7 @@ define [
         @$el.removeClass('editor-node-expanded')
 
       # Add DnD options to content
-      enableContentDragging(@model, @$el.children('.editor-drop-zone'))
+      enableContentDragging(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
       return result
 
