@@ -16,7 +16,7 @@ define [
         data.id = @model.id
         return tocBranchTemplate(data)
 
-      @collection = @model.get('contents')
+      @collection = @model.getChildren?()
       @itemViewOptions = {container: @collection}
       @container = options.container
 

@@ -68,12 +68,12 @@ define [
     toJSON: () ->
       json = BaseModel::toJSON.apply(@, arguments)
 
-      contents = @get('contents') or {}
+      contents = @getChildren() or {}
 
       json.contents = []
       _.each contents.models, (item) ->
         obj = {}
-        title = contents.getTitle(item)
+        title = contents.getTitle?(item) or contents.get 'title'
         if item.id then obj.id = item.id
         if title then obj.title = title
 
@@ -96,17 +96,19 @@ define [
         success: (model, response, options) =>
           @loading = false
 
+    getChildren: () -> @get('contents')
+
     add: (models, options) ->
       if (!_.isArray(models)) then (models = if models then [models] else [])
 
       _.each models, (model, index, arr) =>
-        contents = @get('contents')
+        contents = @getChildren()
 
         # Add new media to the beginning of the array
         if contents.length and not options?.loading
-          @get('contents').unshift(model)
+          @getChildren().unshift(model)
         else
-          @get('contents').add(model)
+          @getChildren().add(model)
 
       if not options?.silent then @trigger('change')
 
@@ -128,7 +130,7 @@ define [
         if not _.isArray(contents)
           contents = parseHTML(contents)
 
-        attrs.contents = @get('contents') or new Container()
+        attrs.contents = @getChildren() or new Container()
         attrs.contents.titles = contents
 
         require ['cs!collections/content'], (content) =>
@@ -142,13 +144,13 @@ define [
     # Change the content view when editing this
     contentView: (callback) ->
       require ['cs!views/workspace/content/search-results'], (View) =>
-        view = new View({collection: @get('contents')})
+        view = new View({collection: @getChildren()})
         callback(view)
 
     # Change the sidebar view when editing this
     sidebarView: (callback) ->
       require ['cs!views/workspace/sidebar/toc'], (View) =>
         view = new View
-          collection: @get('contents')
+          collection: @getChildren()
           model: @
         callback(view)
