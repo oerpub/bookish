@@ -1,8 +1,11 @@
+# This file takes every `Backbone.Event` and POSTs it to the URL `/logging`
 define [
   'jquery'
   'underscore'
   'backbone'
 ], ($, _, Backbone) ->
+
+  LOGGING_URL = '/logging'
 
   isEnabled = true
 
@@ -11,7 +14,7 @@ define [
 
     if isEnabled
       log = "trigger: #{ args }"
-      $.post('/logging', log)
+      $.post(LOGGING_URL, log)
 
     originalTrigger.apply(@, args)
 
