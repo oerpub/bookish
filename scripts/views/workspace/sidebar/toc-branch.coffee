@@ -30,7 +30,7 @@ define [
         @$el.removeClass('editor-node-expanded')
 
       # Add DnD options to content
-      enableContentDragging(@model, @$el.children('.editor-drop-zone'))
+      enableContentDragging(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
       return result
 
