@@ -27,8 +27,10 @@ define [
       $xml = jQuery(xmlStr)
       ret = []
       $xml.find('rootfiles > rootfile').each (i, el) =>
-        href = jQuery(el).attr 'full-path'
-        ret.push {id: href, mediaType: 'application/oebps-package+xml'}
+        $el = jQuery(el)
+        href = $el.attr 'full-path'
+        mediaType = $el.attr 'media-type'
+        ret.push {id: href, mediaType: mediaType}
       return ret
 
 
