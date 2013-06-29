@@ -71,7 +71,10 @@ require.config
       exports: 'Backbone'
 
     marionette:
-      deps: ['underscore', 'backbone']
+      # Load the Backbone Logger before Marionette, since Marionette clones `Backbone.Events`.
+      # Waiting until after Marionette loads requires modifying every single Marionette component,
+      # or nearly all of them (as they nearly all individually clone `Backbone.Events`).
+      deps: ['underscore', 'backbone', 'cs!helpers/logger']
       exports: 'Marionette'
 
     # ## UI Libraries
@@ -116,7 +119,6 @@ require.config
     helperPathCallback: (name) ->
       return "cs!../templates/helpers/#{name}"
     templateExtension: 'html'
-
 
 # # Load and run the application
 define ['cs!app'], (app) ->

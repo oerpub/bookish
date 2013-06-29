@@ -89,12 +89,16 @@ define [
 
     initialize: (attrs) ->
       @_deferred = $.Deferred()
-      @loading = true
-      @fetch
-        silent: true
-        loading: true
-        success: (model, response, options) =>
-          @loading = false
+
+      if not @isNew()
+        @loading = true
+        @fetch
+          silent: true
+          loading: true
+          success: (model, response, options) =>
+            @loading = false
+      else
+        @_deferred.resolve()
 
     getChildren: () -> @get('contents')
 
