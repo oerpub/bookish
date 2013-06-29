@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Downloads a single file (like jQuery) from a remote URL
 function singleFile () {
   URL=$1
