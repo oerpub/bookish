@@ -67,8 +67,7 @@ define [
         $img = jQuery('<img></img>')
         $img.attr 'data-src', src
         # Transfer all the attributes to `$img`
-        jQuery.each $imgHolder[0].attributes, (index, attr) =>
-          $img.attr attr.name, attr.value
+        $img.attr(Utils.elementAttributes $imgHolder)
 
         $imgHolder.replaceWith $img
 

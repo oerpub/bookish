@@ -11,9 +11,8 @@ define [
 ], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, XhtmlFile, TocNode, Utils) ->
 
 
-  return class PackageFile extends BaseContainerModel
+  class PackageFile extends BaseContainerModel
     defaults:
-      manifest: null
       title: 'Untitled Book'
 
     mediaType: 'application/oebps-package+xml'
@@ -21,9 +20,23 @@ define [
 
 
     initialize: () ->
+      # Contains all entries in the OPF file (including images)
       @manifest = new Backbone.Collection()
+      # Contains all items in the ToC (including internal nodes like "Chapter 3")
+      @tocNodes = new Backbone.Collection()
+      # Contains root ToC nodes (like "Unit 1")
       @children = new Backbone.Collection()
+
+      setNavModel = () => @navModel.set 'body', @_serializeNavModel()
+
+      @listenTo @tocNodes, 'add remove', (collection, model, options) =>
+         setNavModel() if not options.loading
+      @listenTo @tocNodes, 'change reset', (collection, options) =>
+        # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
+        setNavModel() if not options?.loading
+
       @load()
+
     load: () ->
       @fetch()
       .fail((err) => throw err)
@@ -33,17 +46,18 @@ define [
         .done () =>
           @parseNavModel()
 
+
     parseNavModel: () ->
       $body = $(@navModel.get 'body')
       $body = $('<div></div>').append $body
-
-
-
 
       # Generate a tree of the ToC
       recBuildTree = (collection, $rootOl, contextPath) =>
         $rootOl.children('li').each (i, li) =>
           $li = $(li)
+
+          # Remember attributes (like `class` and `data-`)
+          attributes = Utils.elementAttributes $li
 
           # If the node contains a `<span>` then it is a container node
           # If the node contains a `<a>` then we currently only support them as leaves
@@ -58,25 +72,63 @@ define [
             path = Utils.resolvePath(contextPath, href)
             model = allContent.get path
 
-            model.set 'title', title
+            model.set 'title', title, {loading:true}
             collection.add model
 
             @listenTo model, 'change:title', () =>
               console.warn 'TODO: BUG: Change the title in the ToC'
 
           else if $span[0]
-            model = new TocNode {title: $span.text()}
+            model = new TocNode {title: $span.text(), attributes: attributes}
             collection.add model
 
             # Recurse
             recBuildTree(model.getChildren(), $ol, contextPath) if $ol[0]
           else throw 'ERROR: Invalid Navigation Tree Structure'
 
+          # Add the model to the tocNodes so we can listen to changes and update the ToC HTML
+          @tocNodes.add model, {loading:true}
+
 
       $root = $body.find('nav > ol')
+      @tocNodes.reset [], {loading: true}
       @children.reset()
       recBuildTree(@children, $root, @navModel.id)
 
+
+    _serializeNavModel: () ->
+      $body = $(@navModel.get 'body')
+      $wrapper = $('<div></div>').append $body
+      $nav = $wrapper.find 'nav'
+      $nav.empty()
+
+      $navOl = $('<ol></ol>')
+
+      recBuildList = ($rootOl, model) =>
+        $li = $('<li></li>')
+        $rootOl.append $li
+
+        switch model.mediaType
+          when XhtmlFile::mediaType
+            $node = $('<a></a>')
+            .attr('href', model.id)
+          else
+            $node = $('<span></span>')
+            $li.attr(model.attributes or {})
+
+        title = model.getTitle?() or model.get 'title'
+        $node.html(title)
+        $li.append $node
+
+        if model.getChildren?().first()
+          $ol = $('<ol></ol>')
+          # recursively add children
+          model.getChildren().forEach (child) => recBuildList($ol, child)
+          $li.append $ol
+
+      @children.forEach (child) => recBuildList($navOl, child)
+      $nav.append($navOl)
+      $wrapper[0].innerHTML
 
     parse: (xmlStr) ->
       return xmlStr if 'string' != typeof xmlStr

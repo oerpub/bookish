@@ -1,4 +1,4 @@
-define [], () ->
+define ['jquery'], ($) ->
 
   return {
     # Links in a navigation document are relative to where the nav document resides.
@@ -18,4 +18,11 @@ define [], () ->
           else i++
 
       parts.join '/'
+
+
+    elementAttributes: ($el) ->
+      attrs = {}
+      $.each $el[0].attributes, (index, attr) =>
+        attrs[attr.name] = attr.value
+      attrs
   }
