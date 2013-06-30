@@ -88,62 +88,51 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @_deferred = $.Deferred()
+      # TODO: Make this a private variable once this class actually becomes a coffeescript class
 
-      if not @isNew()
-        @loading = true
-        @fetch
-          silent: true
-          loading: true
-          success: (model, response, options) =>
-            @loading = false
-      else
-        @_deferred.resolve()
+      if @isNew()
+        # If this is a new model then `.load()` should resolve immediately
+        @_loading = $.Deferred().resolve()
 
-    getChildren: () -> @get('contents')
+        # Ensure the container always has a contents
+        @set('contents', new Container())
 
-    add: (models, options) ->
-      if (!_.isArray(models)) then (models = if models then [models] else [])
+    load: () ->
+      if not @_loading
+        @_loading = @fetch()
+        # Weird: wait for the Workspace to finish loading for some reason
+        # so, make another promise
+        @_loading = @_loading.then () =>
+      @_loading
 
-      _.each models, (model, index, arr) =>
-        contents = @getChildren()
 
-        # Add new media to the beginning of the array
-        if contents.length and not options?.loading
-          @getChildren().unshift(model)
+    getChildren: () ->
+      @get('contents')
+
+    addChild: (models, options) ->
+      @getChildren().add(models, options)
+
+    parse: (json) ->
+      if json.contents
+        if _.isArray(json.contents)
+          json.contents = new Container(json.contents)
         else
-          @getChildren().add(model)
+          json.contents = parseHTML(json.contents)
 
-      if not options?.silent then @trigger('change')
+      else if json.body
+        json.contents = json.body
+      else throw 'BUG: Container must contain either a contents or a body'
 
-      return @
+      # Toss the contents into the workspace
+      # Weird odd that it's being done in parse
+      require ['cs!collections/content'], (content) =>
+        content.load().done () =>
+          _.each contents, (item) =>
+            @add(content.get({id: item.id}), options)
+          # TODO: Why does loading have to wait until the workspace loads fully
+          # Seems like an odd dependency (the code is weird too)
+          @_loading.resolve(@)
 
-    set: (key, val, options) ->
-      if (key == null) then return this;
-
-      if typeof key is 'object'
-        attrs = key
-        options = val
-      else
-        (attrs = {})[key] = val
-
-      options = options || {}
-      contents = attrs.contents or attrs.body
-
-      if contents
-        if not _.isArray(contents)
-          contents = parseHTML(contents)
-
-        attrs.contents = @getChildren() or new Container()
-        attrs.contents.titles = contents
-
-        require ['cs!collections/content'], (content) =>
-          content.loading().done () =>
-            _.each contents, (item) =>
-              @add(content.get({id: item.id}), options)
-            @_deferred.resolve()
-
-      return Backbone.Model::set.call(@, attrs, options)
 
     # Change the content view when editing this
     contentView: (callback) ->
