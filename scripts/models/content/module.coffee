@@ -12,6 +12,10 @@ define [
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
   return BaseModel.extend
+    # This is a "loading" promise (result of 1st fetch)
+    # TODO: use a private instance variable once this class becomes a coffeescript class
+    _loading: null
+
     mediaType: 'application/vnd.org.cnx.module'
     accept: []
     loaded: false
@@ -27,6 +31,14 @@ define [
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
 
+    load: () ->
+      if not @_loading
+        @_loading = @fetch()
+        @_loading.done () =>
+          @trigger('loaded')
+          @loaded = true
+      @_loading
+
     # Begin editing this medium as soon as it is added
     addAction: () ->
       id = @id or @cid
@@ -39,11 +51,7 @@ define [
         view = new View({model: @})
         callback(view)
 
-        if not @loaded
-          @fetch
-            success: (model, response, options) =>
-              @loaded = true
-              @trigger('loaded')
+        @load()
 
     # Change the toolbar view when editing this
     toolbarView: (callback) ->
