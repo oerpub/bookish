@@ -22,7 +22,32 @@ define [
       @set 'title', options.title
       #@attributes = options.attributes or {}
 
-      @on 'change:title', () ->
-        console.log "TItle changed to #{@get 'title'}"
+      @on 'change:title', (model, options) =>
+        @trigger 'tree:change', model, @, options
+
+      @children.on 'add', (child, collection, options) =>
+        # Parent is useful for DnD but since we don't use a `TocNode`
+        # for the leaves (`Module`) the view needs to pass the
+        # model in anyway, so it's commented.
+        #
+        #child.parent = @
+        @trigger 'tree:add', child, @, options
+
+      @children.on 'remove', (child, collection, options) =>
+        #delete child.parent
+        @trigger 'tree:remove', child, @, options
+
+      @children.on 'change', (child, collection, options) =>
+        @trigger 'tree:change', child, @, options
+
+      trickleEvents = (name) =>
+        @children.on name, (model, collection, options) =>
+          @trigger name, model, collection, options
+
+      # Trickle up tree change events so the Navigation HTML
+      # updates when the nodes or title changes
+      trickleEvents 'tree:add'
+      trickleEvents 'tree:remove'
+      trickleEvents 'tree:change'
 
     getChildren: () -> @children

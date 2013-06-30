@@ -29,7 +29,7 @@ define [
 
       setNavModel = () => @navModel.set 'body', @_serializeNavModel()
 
-      @listenTo @tocNodes, 'add remove', (collection, model, options) =>
+      @listenTo @tocNodes, 'add remove tree:add tree:remove tree:change', (collection, model, options) =>
          setNavModel() if not options.loading
       @listenTo @tocNodes, 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
@@ -41,7 +41,7 @@ define [
       @fetch()
       .fail((err) => throw err)
       .done () =>
-        @navModel.fetch()
+        @navModel.load()
         .fail((err) => throw err)
         .done () =>
           @parseNavModel()
