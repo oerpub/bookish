@@ -66,12 +66,10 @@ define [
     return ret
 
 
-
-  # Set to true so we load the workspace
-  # TODO: Workspace loading should not be dependent on this being true
-  _authenticated = true
-
   return new (class Session extends Backbone.Model
+    # Set to true so we load the workspace
+    # TODO: Workspace loading should not be dependent on this being true
+    _authenticated = true
 
     login: () ->
       _authenticated = true
