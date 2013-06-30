@@ -109,7 +109,7 @@ define [
     getChildren: () ->
       @get('contents')
 
-    add: (models, options) ->
+    addChild: (models, options) ->
       @getChildren().add(models, options)
 
     parse: (json) ->
