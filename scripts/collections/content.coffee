@@ -53,6 +53,4 @@ define [
           $.when.apply($, promises).done () =>
             @trigger('change')
 
-    loading: () ->
-      return _loaded.promise()
   )()
