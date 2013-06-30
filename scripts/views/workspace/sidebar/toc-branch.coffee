@@ -20,6 +20,16 @@ define [
       @itemViewOptions = {container: @collection}
       @container = options.container
 
+      @listenTo @model, 'change', (model, collection, options) =>
+        @renderModel() if model == @model
+
+      if @collection
+        @listenTo @collection, 'add remove', (model, collection, options) =>
+          if collection == @collection
+            # Figure out if the expanded state has changed (see if we need to re-render the model)
+            @renderModel()
+
+
     render: () ->
       result = Marionette.CompositeView::render.apply(@, arguments)
 
@@ -33,6 +43,12 @@ define [
       enableContentDragging(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
       return result
+
+    templateHelpers: () ->
+      return {
+        hasChildren: @model.getChildren?()?.length
+        isExpanded: @expanded
+      }
 
     # Override Marionette's renderModel() so we can replace the title
     # if necessary without affecting the model itself
