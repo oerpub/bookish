@@ -38,7 +38,7 @@
 
 </div>
 
-{{#if parent}}
+{{#if hasParent}}
   {{#if hasChildren}}
   {{else}}
     <div class="editor-drop-zone editor-drop-zone-after editor-node-after"></div>
@@ -50,7 +50,7 @@
 {{! Always include the list because a node _may_ get children later}}
 <ol></ol>
 
-{{#if parent}}
+{{#if hasParent}}
   {{#if hasChildren}}
     <div class="editor-drop-zone editor-drop-zone-after editor-node-after"></div>
   {{/if}}

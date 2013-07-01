@@ -54,34 +54,59 @@ define [
 
         return $(handle)
 
-  # Since we use jqueryui's draggable which is loaded when Aloha loads
-  # delay until Aloha is finished loading
-  return (model, $content) ->
+
+  # Defines drop zones based on `model.accepts()` media types
+  # `onDrop` takes 2 arguments: `drag` and `drop`.
+  enableDrop = (model, $content, onDrop) ->
+    # Since we use jqueryui's draggable which is loaded when Aloha loads
+    # delay until Aloha is finished loading
     Aloha.ready =>
-      enableContentDragging(model, $content)
-
       # Figure out which mediaTypes can be dropped onto each element
-      $.each $content, (key, el) ->
-        $el = $(el)
+      validSelectors = _.map(model.accepts?(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]")
+      validSelectors = validSelectors.join(',')
 
-        validSelectors = _.map(model.accepts?(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]")
-        validSelectors = validSelectors.join(',')
+      if validSelectors
+        $content.droppable
+          greedy: true
+          addClasses: false
+          accept: validSelectors
+          activeClass: 'editor-drop-zone-active'
+          hoverClass: 'editor-drop-zone-hover'
+          drop: (evt, ui) ->
+            $drag = ui.draggable
+            $drop = $(evt.target)
 
-        if validSelectors
-          $el.droppable
-            greedy: true
-            addClasses: false
-            accept: validSelectors
-            activeClass: 'editor-drop-zone-active'
-            hoverClass: 'editor-drop-zone-hover'
-            drop: (evt, ui) ->
-              $drag = ui.draggable
-              $drop = $(evt.target)
+            # Find the model representing the id that was dragged
+            drag = $drag.data 'editor-model'
+            drop = $drop.data 'editor-model'
 
-              # Find the model representing the id that was dragged
-              model = $drag.data 'editor-model'
-              drop = $drop.data 'editor-model'
+            # Delay the call so $.droppable has time to clean up before the DOM changes
+            delay = => onDrop(drag, drop)
+            setTimeout(delay, 10)
 
-              # Delay the call so $.droppable has time to clean up before the DOM changes
-              delay = => drop.addChild model, {at:0}
-              setTimeout(delay, 10)
+  return {
+    enableContentDnD: (model, $content) ->
+      # Since we use jqueryui's draggable which is loaded when Aloha loads
+      # delay until Aloha is finished loading
+      Aloha.ready =>
+        enableContentDragging(model, $content)
+
+      enableDrop model, $content, (drag, drop) ->
+        # If the model is already in the tree then remove it
+        # If the model is in the same collection but at a different index then
+        #   account for the model being removed
+
+        drop.addChild drag
+
+    # Enable drop zones after a node.
+    # Used for tree reordering.
+    #
+    # This zone is based on the parent model's `accepts()` media types
+    enableDropAfter: (model, $content) ->
+      throw 'BUG: model MUST have a parent' if not model.parent
+      $content.data('editor-model', model)
+
+      enableDrop model, $content, (drag, drop) ->
+        index = drop.parent.getChildren().indexOf(drop)
+        drop.parent.addChild drag, index+1
+  }
