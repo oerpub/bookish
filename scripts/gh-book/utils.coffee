@@ -20,6 +20,35 @@ define ['jquery'], ($) ->
       parts.join '/'
 
 
+    # Given 2 paths that have the same root
+    # generate a path that is relative from `context` to `relPath`.
+    # For example: `A/B/cntx` and `A/C/D/file.txt` should yield `../C/D/file.txt`
+    relativePath: (contextPath, targetPath) ->
+      return targetPath if contextPath.search('/') < 0
+      contextParts = contextPath.split('/')
+      targetParts = targetPath.split('/')
+
+      # Pop the end of both so we only deal with directories
+      contextParts.pop()
+      targetName = targetParts.pop()
+
+      sameUntil = contextParts.length
+      for part, i in contextParts
+        if part != targetParts[i]
+          sameUntil = i
+          break
+
+      if sameUntil == contextParts.length
+        parts = []
+      else
+        parts = ('..' for i in [sameUntil..contextParts.length-1])
+
+      # We have all the '..'; now add in the rest of parts
+      parts = parts.concat targetParts.slice(sameUntil)
+      parts.push targetName
+      parts.join '/'
+
+
     elementAttributes: ($el) ->
       attrs = {}
       $.each $el[0].attributes, (index, attr) =>
