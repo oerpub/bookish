@@ -100,6 +100,8 @@ define [
       else
         @_deferred.resolve()
 
+      @get('contents') || @set('contents', new Backbone.Collection(), {parse:true})
+
     getChildren: () -> @get('contents')
 
     add: (models, options) ->
