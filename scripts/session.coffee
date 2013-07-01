@@ -20,19 +20,19 @@ define [
 
             @set('user', response)
 
-            _authenticated = true;
+            _authenticated = true
             @trigger('login')
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
 
     login: () ->
-      this.load()
+      @load()
 
     logout: () ->
-      this.reset()
-      this.clear()
-      this.trigger('logout')
+      @reset()
+      @clear()
+      @trigger('logout')
 
     reset: () ->
       _authenticated = false
