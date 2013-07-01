@@ -6,7 +6,7 @@ define [
 ], ($, _, Backbone, BaseModel) ->
 
   # Backbone Collection used to store a container's contents
-  Container = Backbone.Collection.extend
+  class Container extends Backbone.Collection
     findMatch: (model) ->
       return _.find @titles, (obj) ->
         return model.id is obj.id or model.cid is obj.id
@@ -57,7 +57,7 @@ define [
 
     return results
 
-  return BaseModel.extend
+  class ContainerModel extends BaseModel
     mediaType: 'application/vnd.org.cnx.folder'
     accept: []
     unique: true
@@ -66,7 +66,7 @@ define [
     promise: () -> return @_deferred.promise()
 
     toJSON: () ->
-      json = BaseModel::toJSON.apply(@, arguments)
+      json = super()
 
       contents = @getChildren() or {}
 
@@ -143,7 +143,7 @@ define [
               @add(content.get({id: item.id}), options)
             @_deferred.resolve()
 
-      return Backbone.Model::set.call(@, attrs, options)
+      return super(attrs, options)
 
     # Change the content view when editing this
     contentView: (callback) ->
