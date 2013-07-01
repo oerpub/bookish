@@ -63,7 +63,6 @@ define [
     unique: true
     branch: true
     expanded: false
-    promise: () -> return @_deferred.promise()
 
     toJSON: () ->
       json = super()
@@ -88,19 +87,10 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @_deferred = $.Deferred()
-
-      if not @isNew()
-        @loading = true
-        @fetch
-          silent: true
-          loading: true
-          success: (model, response, options) =>
-            @loading = false
-      else
-        @_deferred.resolve()
-
+      # Ensure there is always a Collection in `contents`
       @get('contents') || @set('contents', new Backbone.Collection(), {parse:true})
+
+      @load()
 
     getChildren: () -> @get('contents')
 
@@ -143,7 +133,7 @@ define [
           content.loading().done () =>
             _.each contents, (item) =>
               @add(content.get({id: item.id}), options)
-            @_deferred.resolve()
+            @_loading.resolve()
 
       return super(attrs, options)
 

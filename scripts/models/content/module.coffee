@@ -12,9 +12,9 @@ define [
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
   class Module extends BaseModel
+
     mediaType: 'application/vnd.org.cnx.module'
     accept: []
-    loaded: false
     defaults:
       title: 'Untitled'
       subjects: []
@@ -38,12 +38,6 @@ define [
       require ['cs!views/workspace/content/layouts/editor'], (View) =>
         view = new View({model: @})
         callback(view)
-
-        if not @loaded
-          @fetch
-            success: (model, response, options) =>
-              @loaded = true
-              @trigger('loaded')
 
     # Change the toolbar view when editing this
     toolbarView: (callback) ->
