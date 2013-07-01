@@ -17,7 +17,7 @@ define [
   #
   # Since we don't really distinguish between a search result view and a workspace/collection/etc
   # just consider them the same.
-  return Marionette.ItemView.extend
+  return class SearchResultsItem extends Marionette.ItemView
     tagName: 'tr'
 
     initialize: () ->
