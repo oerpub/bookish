@@ -30,15 +30,17 @@ define [
         # for the leaves (`Module`) the view needs to pass the
         # model in anyway, so it's commented.
         #
-        #child.parent = @
-        @trigger 'tree:add', child, @, options
+        child.parent = @
+        child.root = @root
+        @trigger 'tree:add', child, collection, options
 
       @children.on 'remove', (child, collection, options) =>
-        #delete child.parent
-        @trigger 'tree:remove', child, @, options
+        delete child.parent
+        delete child.root
+        @trigger 'tree:remove', child, collection, options
 
       @children.on 'change', (child, collection, options) =>
-        @trigger 'tree:change', child, @, options
+        @trigger 'tree:change', child, collection, options
 
       trickleEvents = (name) =>
         @children.on name, (model, collection, options) =>

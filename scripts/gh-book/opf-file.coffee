@@ -24,16 +24,48 @@ define [
       @manifest = new Backbone.Collection()
       # Contains all items in the ToC (including internal nodes like "Chapter 3")
       @tocNodes = new Backbone.Collection()
+      @tocNodes.add @
+
       # Contains root ToC nodes (like "Unit 1")
       @children = new Backbone.Collection()
 
       setNavModel = () => @navModel.set 'body', @_serializeNavModel()
 
-      @listenTo @tocNodes, 'add remove tree:add tree:remove tree:change', (collection, model, options) =>
-         setNavModel() if not options.loading
-      @listenTo @tocNodes, 'change reset', (collection, options) =>
+      # if the added node already exists in the tree then remove it.
+      # @tocNodes.on 'add', (model, collection, options) =>
+      #   if @tocNodes.contains model
+      #     @tocNodes.each (parent) =>
+      #       parentChildren = parent.getChildren?()
+      #       if parentChildren and parentChildren != collection and parentChildren.contains model
+      #         parentChildren.remove model
+
+
+      @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model
+      @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model
+
+      @tocNodes.on 'add remove tree:change', (model, collection, options) =>
+        setNavModel() if not options.loading
+      @tocNodes.on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel() if not options?.loading
+
+
+      @children.on 'add', (child, collection, options) =>
+        # Parent is useful for DnD but since we don't use a `TocNode`
+        # for the leaves (`Module`) the view needs to pass the
+        # model in anyway, so it's commented.
+        #
+        child.parent = @
+        child.root = @
+        @trigger 'tree:add', child, collection, options
+
+      @children.on 'remove', (child, collection, options) =>
+        delete child.parent
+        delete child.root
+        @trigger 'tree:remove', child, collection, options
+
+      @children.on 'change', (child, collection, options) =>
+        @trigger 'tree:change', child, collection, options
 
       @load()
 
@@ -91,7 +123,7 @@ define [
 
 
       $root = $body.find('nav > ol')
-      @tocNodes.reset [], {loading: true}
+      @tocNodes.reset [@], {loading:true}
       @children.reset()
       recBuildTree(@children, $root, @navModel.id)
 
