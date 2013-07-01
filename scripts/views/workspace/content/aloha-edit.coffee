@@ -7,7 +7,7 @@ define [
   #'mathjax'
 ], ($, _, Backbone, Marionette, Aloha) ->
 
-  return Marionette.ItemView.extend
+  class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
     template: () -> throw 'You need to specify a template, modelKey, and optionally alohaOptions'
     modelKey: null

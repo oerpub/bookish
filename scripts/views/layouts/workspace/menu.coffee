@@ -8,10 +8,10 @@ define [
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
 ], ($, _, Backbone, Marionette, AuthView, addView, toolbarView, menuTemplate) ->
-  
+
   _toolbar = null
 
-  return new (Marionette.Layout.extend
+  return new (class MenuLayout extends Marionette.Layout
     template: menuTemplate
 
     regions:

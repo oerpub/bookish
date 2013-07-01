@@ -6,7 +6,7 @@ define [
   'cs!controllers/routing'
 ], ($, _, Backbone, Marionette, routerController) ->
 
-  return new (Marionette.AppRouter.extend
+  return new (class Router extends Marionette.AppRouter
     controller: routerController
     appRoutes:
       '':             'workspace' # Show the workspace list of content

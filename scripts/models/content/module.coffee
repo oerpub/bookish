@@ -11,7 +11,7 @@ define [
   # * `subjects` - an array of strings (eg `['Mathematics', 'Business']`)
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
-  return BaseModel.extend
+  class Module extends BaseModel
     # This is a "loading" promise (result of 1st fetch)
     # TODO: use a private instance variable once this class becomes a coffeescript class
     _loading: null

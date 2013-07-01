@@ -5,10 +5,10 @@ define [
   'marionette'
   'hbs!templates/workspace/menu/toolbar-search'
 ], ($, _, Backbone, Marionette, toolbarTemplate) ->
-  
+
   _rendered = false
 
-  return new (Marionette.ItemView.extend
+  return new (class ToolbarSearchView extends Marionette.ItemView
     template: toolbarTemplate
     tagName: 'span'
 
