@@ -117,7 +117,7 @@ define [
               console.warn 'TODO: BUG: Change the title in the ToC'
 
           else if $span[0]
-            model = new TocNode {title: $span.text(), attributes: attributes}
+            model = new TocNode {title: $span.text(), htmlAttributes: attributes}
             collection.add model, {parse:true}
 
             # Recurse
@@ -152,7 +152,7 @@ define [
             .attr('href', model.id)
           else
             $node = $('<span></span>')
-            $li.attr(model.attributes or {})
+            $li.attr(model.htmlAttributes or {})
 
         title = model.getTitle?() or model.get 'title'
         $node.html(title)

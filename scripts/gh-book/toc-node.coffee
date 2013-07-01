@@ -20,7 +20,7 @@ define [
 
       @children = new Backbone.Collection()
       @set 'title', options.title
-      #@attributes = options.attributes or {}
+      @htmlAttributes = options.htmlAttributes or {}
 
       @on 'change:title', (model, options) =>
         @trigger 'tree:change', model, @, options
