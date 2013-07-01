@@ -29,7 +29,11 @@ define [
       # Contains root ToC nodes (like "Unit 1")
       @children = new Backbone.Collection()
 
-      setNavModel = () => @navModel.set 'body', @_serializeNavModel()
+      # Use the `parse:true` option instead of `loading:true` because
+      # Backbone sets this option when a model is being parsed.
+      # This way we can ignore firing events when Backbone is parsing as well as
+      # when we are internally updating models.
+      setNavModel = () => @navModel.set 'body', @_serializeNavModel(), {parse:true}
 
       # if the added node already exists in the tree then remove it.
       # @tocNodes.on 'add', (model, collection, options) =>
@@ -40,14 +44,14 @@ define [
       #         parentChildren.remove model
 
 
-      @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model
-      @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model
+      @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
+      @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
       @tocNodes.on 'add remove tree:change', (model, collection, options) =>
-        setNavModel() if not options.loading
+        setNavModel() if not options.parse
       @tocNodes.on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
-        setNavModel() if not options?.loading
+        setNavModel() if not options?.parse
 
 
       @children.on 'add', (child, collection, options) =>
@@ -77,6 +81,8 @@ define [
         .fail((err) => throw err)
         .done () =>
           @parseNavModel()
+          @listenTo @navModel, 'change:body', (model, value, options) =>
+            @parseNavModel() if not options.parse
 
 
     parseNavModel: () ->
@@ -104,26 +110,26 @@ define [
             path = Utils.resolvePath(contextPath, href)
             model = allContent.get path
 
-            model.set 'title', title, {loading:true}
-            collection.add model
+            model.set 'title', title, {parse:true}
+            collection.add model, {parse:true}
 
             @listenTo model, 'change:title', () =>
               console.warn 'TODO: BUG: Change the title in the ToC'
 
           else if $span[0]
             model = new TocNode {title: $span.text(), attributes: attributes}
-            collection.add model
+            collection.add model, {parse:true}
 
             # Recurse
             recBuildTree(model.getChildren(), $ol, contextPath) if $ol[0]
           else throw 'ERROR: Invalid Navigation Tree Structure'
 
           # Add the model to the tocNodes so we can listen to changes and update the ToC HTML
-          @tocNodes.add model, {loading:true}
+          @tocNodes.add model, {parse:true}
 
 
       $root = $body.find('nav > ol')
-      @tocNodes.reset [@], {loading:true}
+      @tocNodes.reset [@], {parse:true}
       @children.reset()
       recBuildTree(@children, $root, @navModel.id)
 
