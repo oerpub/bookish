@@ -148,8 +148,9 @@ define [
 
         switch model.mediaType
           when XhtmlFile::mediaType
+            path = Utils.relativePath(@navModel.id, model.id)
             $node = $('<a></a>')
-            .attr('href', model.id)
+            .attr('href', path)
           else
             $node = $('<span></span>')
             $li.attr(model.htmlAttributes or {})
