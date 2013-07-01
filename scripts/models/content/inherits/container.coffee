@@ -63,7 +63,6 @@ define [
     unique: true
     branch: true
     expanded: false
-    promise: () -> return @_deferred.promise()
 
     toJSON: () ->
       json = super()
@@ -88,26 +87,12 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      # TODO: Make this a private variable once this class actually becomes a coffeescript class
+      # Ensure there is always a Collection in `contents`
+      @get('contents') || @set('contents', new Container(), {parse:true})
 
-      if @isNew()
-        # If this is a new model then `.load()` should resolve immediately
-        @_loading = $.Deferred().resolve()
+      @load()
 
-        # Ensure the container always has a contents
-        @set('contents', new Container())
-
-    load: () ->
-      if not @_loading
-        @_loading = @fetch()
-        # Weird: wait for the Workspace to finish loading for some reason
-        # so, make another promise
-        @_loading = @_loading.then () =>
-      @_loading
-
-
-    getChildren: () ->
-      @get('contents')
+    getChildren: () -> @get('contents')
 
     addChild: (models, options) ->
       @getChildren().add(models, options)

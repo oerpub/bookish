@@ -9,14 +9,18 @@ define [
 
   class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
-    template: () -> throw 'You need to specify a template, modelKey, and optionally alohaOptions'
+    template: () -> throw 'BUG: You need to specify a template, modelKey, and optionally alohaOptions'
     modelKey: null
     alohaOptions: null
-    loaded: false
+
+    templateHelpers: () ->
+      return {isLoaded: @isLoaded}
 
     initialize: () ->
-      # Update the view when the content is done loading (remove progress bar)
-      @listenTo(@model, 'loaded', @render)
+      @isLoaded = false
+      @model.load().done () =>
+        @isLoaded = true
+        @render()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
@@ -30,19 +34,8 @@ define [
         else
           @$el.empty().append(value)
 
+
     onRender: () ->
-      if @model.loaded and document.contains(@el)
-        @load()
-
-    onShow: () ->
-      @load()
-
-    load: () ->
-      # Only load once
-      if @loaded then return
-
-      @loaded = true
-
       # Auto save after the user has stopped making changes
       updateModelAndSave = =>
         alohaId = @$el.attr('id')
