@@ -102,11 +102,11 @@ define [
     # Used for tree reordering.
     #
     # This zone is based on the parent model's `accepts()` media types
-    enableDropAfter: (model, $content) ->
+    enableDropAfter: (model, parent, $content) ->
       throw 'BUG: model MUST have a parent' if not model.parent
       $content.data('editor-model', model)
 
+      index = parent.getChildren().indexOf(model)
       enableDrop model, $content, (drag, drop) ->
-        index = drop.parent.getChildren().indexOf(drop)
-        drop.parent.addChild drag, index+1
+        parent.addChild drag, index+1
   }
