@@ -29,8 +29,6 @@ define [
       if attrs.mediaType
         mediaType = attrs.mediaType
         Medium = mediaTypes.type(mediaType)
-        # Include the `mediaType` in case models support multiple media types (like images).
-        #delete attrs.mediaType
 
         return new Medium(attrs)
 
