@@ -10,7 +10,7 @@ define [
   'hbs!templates/layouts/workspace'
 ], ($, _, Backbone, Marionette, content, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
 
-  return Marionette.Layout.extend
+  class Workspace extends Marionette.Layout
     template: workspaceTemplate
 
     regions:

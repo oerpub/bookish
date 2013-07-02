@@ -29,7 +29,7 @@ define [
   # When something registers a "New... mediaType" view can update
   return new class MediaTypes extends Backbone.Collection
     # Just a glorified JSON holder (that cannot `sync`)
-    model: Backbone.Model.extend
+    model: class MediaType extends Backbone.Model
       sync: -> throw 'This model cannot be syncd'
 
     initialize: () ->
