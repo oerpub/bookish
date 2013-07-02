@@ -13,10 +13,7 @@ define [
   class AddItemView extends Marionette.ItemView
     tagName: 'li'
 
-    initialize: () ->
-      @template = (data) =>
-        data.id = @model.id
-        return addItemTemplate(data)
+    template: addItemTemplate
 
     events:
       'click .add-content-item': 'addItem'

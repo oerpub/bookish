@@ -20,12 +20,15 @@ define [
   return class SearchResultsItem extends Marionette.ItemView
     tagName: 'tr'
 
-    initialize: () ->
-      @template = (data) =>
-        data.id = @model.id or @model.cid
-        data.loading = @model.loading
-        return searchResultsItemTemplate(data)
+    template: searchResultsItemTemplate
 
+    templateHelpers: () ->
+      return {
+        id: @model.id or @model.cid
+        isLoading: @model.loading
+      }
+
+    initialize: () ->
       @listenTo(@model, 'change sync', @render)
       @listenTo(@, 'render show', @updateTimer)
 

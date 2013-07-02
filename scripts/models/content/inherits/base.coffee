@@ -1,11 +1,23 @@
 define [
+  'jquery'
   'underscore'
   'backbone'
-], (_, Backbone) ->
+], ($, _, Backbone) ->
 
   class BaseModel extends Backbone.Model
     url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
+
+    load: () ->
+      if not @_loading
+        if @isNew()
+          @_loading = new $.Deferred()
+          @_loading.resolve(@)
+        else
+          @_loading = @fetch()
+        @_loading.done () =>
+          @trigger('loaded')
+      @_loading
 
     toJSON: () ->
       json = super()
