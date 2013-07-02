@@ -33,7 +33,11 @@ define [
             dataType: 'text'
             data: false
             url:"#{PATH_PREFIX}/#{path}"
-      else throw "Model sync method not supported: #{method}"
+      else
+        console.error "Model sync method not supported: #{method} for #{model.id}"
+        ret = $.Deferred()
+        ret.resolve(model.serialize())
+
 
     # From github-client. Parse the string if isBinary
     ret = ret.then (data, textStatus, jqXHR) ->
