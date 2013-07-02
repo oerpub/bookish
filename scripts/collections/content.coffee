@@ -55,3 +55,21 @@ define [
 
     loading: () ->
       return _loaded.promise()
+
+    save: (options) ->
+      # Save serially.
+      # Pull the next model off the queue and save it.
+      # When saving has completed save the next model.
+      saveNextItem = (queue) =>
+        if not queue.length
+          options?.success?()
+          return
+
+        model = queue.shift()
+        model.save()
+        .fail((err) -> throw err)
+        .done () -> saveNextItem(queue)
+
+      # Save all the models that have changes
+      changedModels = @filter (model) -> model.hasChanged()
+      saveNextItem(changedModels)
