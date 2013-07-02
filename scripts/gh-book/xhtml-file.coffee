@@ -78,8 +78,14 @@ define [
       $images.each (i, img) =>
         $img = jQuery(img)
         src = $img.attr 'data-src'
-        id = Utils.resolvePath @id, src
-        imageModel = allContent.get(id)
+        path = Utils.resolvePath @id, src
+        imageModel = allContent.get(path)
+        if ! imageModel
+          console.error "ERROR: Manifest missing image file #{path}"
+          counter--
+          @set 'body', $body[0].innerHTML if counter == 0
+          return
+
         # Load the image file somehow (see below for my github.js changes)
         doneLoading = imageModel.fetch()
         .done (bytes, statusMessage, xhr) =>
