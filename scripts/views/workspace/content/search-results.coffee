@@ -8,13 +8,13 @@ define [
   'hbs!templates/workspace/content/search-results'
 ], ($, _, Backbone, Marionette, SearchResultsItemView, searchView, searchResultsTemplate) ->
 
-  return Marionette.CompositeView.extend
+  return class SearchResultsView extends Marionette.CompositeView
     template: searchResultsTemplate
     itemViewContainer: 'tbody'
     itemView: SearchResultsItemView
 
     initialize: () ->
-      Marionette.CompositeView::initialize.apply(@, arguments)
+      super()
       @contents = @collection # Keep a reference to the original collection
 
       @listenTo(searchView, 'search', @filter)

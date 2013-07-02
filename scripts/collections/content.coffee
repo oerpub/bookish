@@ -17,7 +17,7 @@ define [
 
   _loaded = $.Deferred()
 
-  return new (Backbone.Collection.extend
+  return new class Content extends Backbone.Collection
     url: '/api/content'
 
     initialize: () ->
@@ -55,4 +55,3 @@ define [
 
     loading: () ->
       return _loaded.promise()
-  )()

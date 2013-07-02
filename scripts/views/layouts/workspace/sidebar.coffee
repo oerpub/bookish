@@ -7,7 +7,7 @@ define [
   'hbs!templates/layouts/workspace/sidebar'
 ], ($, _, Backbone, Marionette, TocView, sidebarTemplate) ->
 
-  return new (Marionette.Layout.extend
+  return new class Sidebar extends Marionette.Layout
     template: sidebarTemplate
 
     regions:
@@ -15,4 +15,3 @@ define [
 
     onRender: () ->
       @toc.show(new TocView())
-  )()

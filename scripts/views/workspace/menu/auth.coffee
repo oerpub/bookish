@@ -19,7 +19,7 @@ define [
   # 2. a logoff link with the current user name if logged in
   #
   # This view updates when the login state changes
-  return Marionette.ItemView.extend
+  return class AuthView extends Marionette.ItemView
     template: (serializedModel) ->
       return authTemplate
         authenticated: session.authenticated()

@@ -9,7 +9,7 @@ define [
 
   # Edit Content Body
   # -------
-  return AlohaEditView.extend
+  return class ContentEditView extends AlohaEditView
     modelKey: 'body'
 
     initialize: () ->
@@ -18,4 +18,4 @@ define [
         data.loaded = @model.loaded
         return contentEditTemplate(data)
 
-      AlohaEditView::initialize.apply(@, arguments)
+      super()

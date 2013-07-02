@@ -7,7 +7,7 @@ define [
   'hbs!templates/workspace/sidebar/toc-branch'
 ], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
 
-  return Marionette.CompositeView.extend
+  return class TocBranchView extends Marionette.CompositeView
     tagName: "li"
     itemViewContainer: '> ol'
 
@@ -21,7 +21,7 @@ define [
       @container = options.container
 
     render: () ->
-      result = Marionette.CompositeView::render.apply(@, arguments)
+      result = super()
 
       if @model?.expanded
         @$el.addClass('editor-node-expanded')

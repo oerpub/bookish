@@ -6,7 +6,7 @@ define [
 
   _authenticated = false
 
-  return new (Backbone.Model.extend
+  return new class Session extends Backbone.Model
     url: '/api/me'
 
     initialize: () ->
@@ -43,4 +43,3 @@ define [
 
     user: () ->
       return @get('user')
-  )()

@@ -28,7 +28,7 @@ define [
       }
   ###
 
-  return Marionette.ItemView.extend
+  return class EditRolesView extends Marionette.ItemView
     template: rolesTemplate
 
     # Make a multiselect widget sortable using jQueryUI.

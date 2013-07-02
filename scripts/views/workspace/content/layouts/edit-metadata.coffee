@@ -21,7 +21,7 @@ define [
     $.extend(value, {code: languageCode})
     languages.push(value)
 
-  return Marionette.Layout.extend
+  return class EditMetadataLayout extends Marionette.Layout
     template: metadataTemplate
 
     regions:

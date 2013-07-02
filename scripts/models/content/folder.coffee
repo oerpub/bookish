@@ -4,7 +4,7 @@ define [
   'cs!models/content/inherits/container'
 ], (_, Backbone, BaseContainerModel) ->
 
-  return BaseContainerModel.extend
+  return class Folder extends BaseContainerModel
     defaults:
       title: 'Untitled Folder'
 
