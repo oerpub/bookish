@@ -59,7 +59,7 @@ define [
     save: (options) ->
       # Save serially.
       # Pull the next model off the queue and save it.
-      # When saving has completed save the next model.
+      # When saving has completed, save the next model.
       saveNextItem = (queue) =>
         if not queue.length
           options?.success?()
