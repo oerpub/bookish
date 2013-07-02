@@ -79,8 +79,15 @@ define [
   # Custom routes to configure the Github User and Repo from the browser
   class GithubRouter extends Backbone.Router
     routes:
+      '':                                 'justStart'
       'repo/:repoUser/:repoName':         'configRepo'
       'repo/:repoUser/:repoName/:branch': 'configRepo'
+
+    justStart: () ->
+      # HACK: Another async require so we don't start fetching prematurely.
+      require ['cs!controllers/routing'], (controller) ->
+        # Open the workspace
+        controller.workspace()
 
     configRepo: (repoUser, repoName, branch='master') ->
       session.set
@@ -88,10 +95,7 @@ define [
         'repoName': repoName
         'branch': branch
 
-      # HACK: Another async require so we don't start fetching prematurely.
-      require ['cs!controllers/routing'], (controller) ->
-        # Open the workspace
-        controller.workspace()
+      @justStart()
 
   new GithubRouter()
   Backbone.history.start() if not Backbone.History.started
