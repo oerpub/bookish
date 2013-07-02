@@ -4,7 +4,7 @@ define [
 ], ($) ->
 
   $.mockjax
-    url: '/api/me'
+    url: '/me'
     proxy: 'data/me.json'
 
   $.mockjax
