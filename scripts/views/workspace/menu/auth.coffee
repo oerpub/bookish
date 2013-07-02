@@ -59,6 +59,7 @@ define [
         success: () =>
           console.log 'end saving progress'
           _hasChanged = false
+          @render()
 
       ###
       return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'
