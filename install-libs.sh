@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Downloads a single file (like jQuery) from a remote URL
 function singleFile () {
