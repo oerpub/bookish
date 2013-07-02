@@ -35,9 +35,11 @@ define [
     'repoName': 'atc'
     'branch'  : 'sample-book'
     'rootPath': ''
+    'auth'    : 'oauth'
+    'token'   : null         # Set your token here if you want
 
   getRepo = () ->
-    gh = new Github()
+    gh = new Github(session.toJSON())
     gh.getRepo(session.get('repoUser'), session.get('repoName'))
 
 
@@ -72,3 +74,24 @@ define [
     ret.done (value) => options?.success?(value)
     ret.fail (error) => options?.error?(ret, error)
     return ret
+
+
+  # Custom routes to configure the Github User and Repo from the browser
+  class GithubRouter extends Backbone.Router
+    routes:
+      'repo/:repoUser/:repoName':         'configRepo'
+      'repo/:repoUser/:repoName/:branch': 'configRepo'
+
+    configRepo: (repoUser, repoName, branch='master') ->
+      session.set
+        'repoUser': repoUser
+        'repoName': repoName
+        'branch': branch
+
+      # HACK: Another async require so we don't start fetching prematurely.
+      require ['cs!controllers/routing'], (controller) ->
+        # Open the workspace
+        controller.workspace()
+
+  new GithubRouter()
+  Backbone.history.start() if not Backbone.History.started
