@@ -32,7 +32,10 @@ define [
 
     initialize: () ->
       @listenTo(session, 'login logout', @render)
-      @listenTo(content, 'change add remove', @changed)
+      @listenTo(content, 'add remove', @changed)
+      @listenTo content, 'change', (model, options) =>
+        # A change event can occur (ie setting a title during parsing but the changed set is still empty)
+        @changed() if model.hasChanged()
 
       # Bind a function to the window if the user tries to navigate away from this page
       $(window).on 'beforeunload', () ->
