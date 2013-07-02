@@ -3,16 +3,18 @@ define [
   'underscore'
   'backbone'
   'github'
-], ($, _, Backbone, Github, mediaTypes, XhtmlFile, OpfFile) ->
+  'cs!helpers/logger'
+], ($, _, Backbone, Github, logger) ->
 
 
   # Nested require is so we can rebind `Backbone.sync` before any ajax calls are made.
   require [
+    'cs!app'
     'cs!collections/media-types'
     'cs!gh-book/xhtml-file'
     'cs!gh-book/opf-file'
     'cs!gh-book/binary-file'
-  ], (mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
+  ], (app, mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
 
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
@@ -20,12 +22,18 @@ define [
     mediaTypes.add BinaryFile, {mediaType:'image/jpg'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
+    app.start()
+
+
+  # Stop logging.
+  logger.stop()
+
 
   session = new Backbone.Model()
   session.set
-    'repoUser': 'philschatz'
-    'repoName': 'epub-anatomy'
-    'branch'  : 'master'
+    'repoUser': 'Connexions'
+    'repoName': 'atc'
+    'branch'  : 'sample-book'
     'rootPath': ''
 
   getRepo = () ->
@@ -64,28 +72,3 @@ define [
     ret.done (value) => options?.success?(value)
     ret.fail (error) => options?.error?(ret, error)
     return ret
-
-
-  return new (class Session extends Backbone.Model
-    # Set to true so we load the workspace
-    # TODO: Workspace loading should not be dependent on this being true
-    _authenticated = true
-
-    login: () ->
-      _authenticated = true
-
-    logout: () ->
-      this.reset()
-      this.clear()
-      this.trigger('logout')
-
-    reset: () ->
-      _authenticated = false
-      @set('user', null)
-
-    authenticated: () ->
-      return _authenticated
-
-    user: () ->
-      return @get('user')
-  )()

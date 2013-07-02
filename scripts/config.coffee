@@ -4,7 +4,6 @@ require.config
 
     # Change some of the models for the Application to use github and EPUB
     github: '../node_modules/github-client/github'
-    session: 'gh-book/session'
     'collections/content': 'gh-book/content'
 
     # ## Template and Style paths
@@ -121,5 +120,4 @@ require.config
     templateExtension: 'html'
 
 # # Load and run the application
-define ['cs!app'], (app) ->
-  app.start()
+define ['cs!gh-book/app'], (app) ->
