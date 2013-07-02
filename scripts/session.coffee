@@ -15,13 +15,11 @@ define [
     load: () ->
       @fetch
         success: (model, response, options) =>
-          if response.id
-            # Logged in
+          # Logged in
+          @set('user', response)
 
-            @set('user', response)
-
-            _authenticated = true
-            @trigger('login')
+          _authenticated = true
+          @trigger('login')
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
