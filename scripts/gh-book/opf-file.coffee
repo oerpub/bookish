@@ -10,10 +10,8 @@ define [
   'cs!gh-book/utils'
 ], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, XhtmlFile, TocNode, Utils) ->
 
-
   class PackageFile extends BaseContainerModel
-    defaults:
-      title: 'Untitled Book'
+    serializer = new XMLSerializer()
 
     mediaType: 'application/oebps-package+xml'
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
@@ -82,12 +80,12 @@ define [
         @navModel.load()
         .fail((err) => throw err)
         .done () =>
-          @parseNavModel()
+          @_parseNavModel()
           @listenTo @navModel, 'change:body', (model, value, options) =>
-            @parseNavModel() if not options.parse
+            @_parseNavModel() if not options.parse
 
 
-    parseNavModel: () ->
+    _parseNavModel: () ->
       $body = $(@navModel.get 'body')
       $body = $('<div></div>').append $body
 
@@ -113,6 +111,7 @@ define [
             model = allContent.get path
 
             model.set 'title', title, {parse:true}
+
             collection.add model, {parse:true}
 
             @listenTo model, 'change:title', () =>
@@ -173,20 +172,20 @@ define [
 
     parse: (xmlStr) ->
       return xmlStr if 'string' != typeof xmlStr
-      $xml = $($.parseXML xmlStr)
+      @$xml = $($.parseXML xmlStr)
 
       # If we were unable to parse the XML then trigger an error
-      return model.trigger 'error', 'INVALID_OPF' if not $xml[0]
+      return model.trigger 'error', 'INVALID_OPF' if not @$xml[0]
 
       # For the structure of the TOC file see `OPF_TEMPLATE`
-      bookId = $xml.find("##{$xml.get 'unique-identifier'}").text()
+      bookId = @$xml.find("##{@$xml.get 'unique-identifier'}").text()
 
-      title = $xml.find('title').text()
+      title = @$xml.find('title').text()
 
       # The manifest contains all the items in the spine
       # but the spine element says which order they are in
 
-      $xml.find('package > manifest > item').each (i, item) =>
+      @$xml.find('package > manifest > item').each (i, item) =>
         $item = $(item)
 
         # Add it to the set of all content and construct the correct model based on the mimetype
@@ -209,5 +208,7 @@ define [
       # Ignore the spine because it is defined by the navTree in EPUB3.
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
       return {title: title, bookId: bookId}
+
+    serialize: () -> serializer.serializeToString(@$xml[0])
 
     getChildren: () -> @children

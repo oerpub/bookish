@@ -107,3 +107,29 @@ define [
           $img.attr('src', 'path/to/failure.png')
 
       return {head: $head[0]?.innerHTML, body: $body[0]?.innerHTML}
+
+
+    serialize: ->
+      head = @get 'head'
+      body = @get 'body'
+      $head = jQuery("<div class='unwrap-me'>#{head}</div>")
+      $body = jQuery("<div class='unwrap-me'>#{body}</div>")
+
+      # Replace all the `img[data-src]` attributes with `img[src]`
+      $body.find('img[data-src]').each (i, img) ->
+        $img = jQuery(img)
+        src = $img.attr('data-src')
+        $img.removeAttr('data-src')
+        $img.attr 'src', src
+
+      return """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+          <head>
+            #{$head[0].innerHTML}
+          </head>
+          <body>
+            #{$body[0].innerHTML}
+          </body>
+        </html>
+        """
