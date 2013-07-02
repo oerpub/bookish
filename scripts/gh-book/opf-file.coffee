@@ -77,6 +77,8 @@ define [
       @fetch()
       .fail((err) => throw err)
       .done () =>
+        # Clear that anything on the model has changed
+        @changed = {}
         @navModel.load()
         .fail((err) => throw err)
         .done () =>
