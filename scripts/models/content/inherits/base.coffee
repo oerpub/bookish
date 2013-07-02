@@ -17,7 +17,8 @@ define [
           @_loading = @fetch()
         @_loading.done () =>
           @trigger('loaded')
-      @_loading
+
+      return @_loading
 
     toJSON: () ->
       json = super()
