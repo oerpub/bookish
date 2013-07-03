@@ -28,8 +28,6 @@ define [
       if attrs.mediaType
         mediaType = attrs.mediaType
         Medium = mediaTypes.type(mediaType)
-        # Include the `mediaType` in case models support multiple media types (like images).
-        #delete attrs.mediaType
 
         return new Medium(attrs)
 
@@ -51,7 +49,26 @@ define [
 
 
     loading: () ->
-      return @load.promise()
+      return @load().promise()
+
+
+    save: (options) ->
+      # Save serially.
+      # Pull the next model off the queue and save it.
+      # When saving has completed, save the next model.
+      saveNextItem = (queue) =>
+        if not queue.length
+          options?.success?()
+          return
+
+        model = queue.shift()
+        model.save()
+        .fail((err) -> throw err)
+        .done () -> saveNextItem(queue)
+
+      # Save all the models that have changes
+      changedModels = @filter (model) -> model.hasChanged()
+      saveNextItem(changedModels)
 
 
   # Mix in the loadable methods

@@ -8,7 +8,7 @@ define [
   'hbs!templates/workspace/sidebar/toc'
 ], ($, _, Backbone, Marionette, content, TocBranchView, tocTemplate) ->
 
-  class TocView extends Marionette.CompositeView
+  return class TocView extends Marionette.CompositeView
     template: tocTemplate
     itemView: TocBranchView
     itemViewContainer: 'ol'
@@ -34,7 +34,8 @@ define [
 
     # We also need to override addItemView()
     addItemView: (item, ItemView, index) ->
-      super(item, ItemView, index) if item.branch or @showNodes
+      if item.branch or @showNodes
+        super(item, ItemView, index)
 
     events:
       'click .editor-content-title': 'changeTitle'

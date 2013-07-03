@@ -11,7 +11,7 @@ define [
 
   _toolbar = null
 
-  return new (class MenuLayout extends Marionette.Layout
+  return new class MenuLayout extends Marionette.Layout
     template: menuTemplate
 
     regions:
@@ -31,4 +31,3 @@ define [
 
     showToolbar: (view) ->
       @showView(view or toolbarView)
-  )()

@@ -27,7 +27,7 @@ define [
 
   # Collection used for storing the various mediaTypes.
   # When something registers a "New... mediaType" view can update
-  return new (class MediaTypes extends Backbone.Collection
+  return new class MediaTypes extends Backbone.Collection
     # Just a glorified JSON holder (that cannot `sync`)
     model: class MediaType extends Backbone.Model
       sync: -> throw 'This model cannot be syncd'
@@ -55,4 +55,3 @@ define [
       return (type.get 'id' for type in @models)
 
     sync: -> throw 'This collection cannot be syncd'
-  )()

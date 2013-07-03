@@ -27,8 +27,9 @@ define [
         else
           if href then router.navigate(href, {trigger: true})
 
-      Backbone.history.start
-        #pushState: true
-        root: app.root
+      if not Backbone.History.started
+        Backbone.history.start
+          #pushState: true
+          root: app.root
 
   return app

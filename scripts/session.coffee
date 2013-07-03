@@ -6,7 +6,7 @@ define [
 
   _authenticated = false
 
-  return new (class Session extends Backbone.Model
+  return new class Session extends Backbone.Model
     url: '/me'
 
     initialize: () ->
@@ -15,13 +15,11 @@ define [
     login: () ->
       @fetch
         success: (model, response, options) =>
-          if response.user_id
-            # Logged in
+          # Logged in
+          @set('user', response)
 
-            @set('user', response)
-
-            _authenticated = true;
-            @trigger('login')
+          _authenticated = true
+          @trigger('login')
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
@@ -40,4 +38,3 @@ define [
 
     user: () ->
       return @get('user')
-  )()
