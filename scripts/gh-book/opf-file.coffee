@@ -7,8 +7,9 @@ define [
   'cs!models/content/inherits/container'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
+  'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
-], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, XhtmlFile, TocNode, Utils) ->
+], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
   class PackageFile extends BaseContainerModel
     serializer = new XMLSerializer()
@@ -57,6 +58,10 @@ define [
         # for the leaves (`Module`) the view needs to pass the
         # model in anyway, so it's commented.
         #
+
+        # Remove the child if it is already attached somewhere
+        child.parent.removeChild(child) if child.parent
+
         child.parent = @
         child.root = @
         @trigger 'tree:add', child, collection, options
@@ -108,9 +113,8 @@ define [
             href = $a.attr('href')
 
             path = Utils.resolvePath(contextPath, href)
-            model = allContent.get path
-
-            model.set 'title', title, {parse:true}
+            contentModel = allContent.get path
+            model = new TocPointerNode {title: title, htmlAttributes: attributes, model: contentModel}
 
             collection.add model, {parse:true}
 
@@ -212,3 +216,7 @@ define [
     serialize: () -> serializer.serializeToString(@$xml[0])
 
     getChildren: () -> @children
+    removeChild: (model) ->
+      throw 'BUG: child is not in this node' if not @getChildren().contains(model)
+      @getChildren().remove(model)
+
