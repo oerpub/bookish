@@ -57,12 +57,12 @@ define [
 
   # Defines drop zones based on `model.accepts()` media types
   # `onDrop` takes 2 arguments: `drag` and `drop`.
-  enableDrop = (model, $content, onDrop) ->
+  enableDrop = (model, $content, accepts, onDrop) ->
     # Since we use jqueryui's draggable which is loaded when Aloha loads
     # delay until Aloha is finished loading
     Aloha.ready =>
       # Figure out which mediaTypes can be dropped onto each element
-      validSelectors = _.map(model.accepts?(), (mediaType) -> "*[data-media-type=\"#{mediaType}\"]")
+      validSelectors = _.map(accepts, (mediaType) -> "*[data-media-type=\"#{mediaType}\"]")
       validSelectors = validSelectors.join(',')
 
       if validSelectors
@@ -91,7 +91,7 @@ define [
       Aloha.ready =>
         enableContentDragging(model, $content)
 
-      enableDrop model, $content, (drag, drop) ->
+      enableDrop model, $content, model.accepts?(), (drag, drop) ->
         # If the model is already in the tree then remove it
         # If the model is in the same collection but at a different index then
         #   account for the model being removed
@@ -107,6 +107,6 @@ define [
       $content.data('editor-model', model)
 
       index = parent.getChildren().indexOf(model)
-      enableDrop model, $content, (drag, drop) ->
+      enableDrop model, $content, parent.accepts?(), (drag, drop) ->
         parent.addChild drag, index+1
   }
