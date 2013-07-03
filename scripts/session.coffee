@@ -10,9 +10,9 @@ define [
     url: '/me'
 
     initialize: () ->
-      @load()
+      @login()
 
-    load: () ->
+    login: () ->
       @fetch
         success: (model, response, options) =>
           if response.user_id
@@ -26,13 +26,10 @@ define [
         error: (model, response, options) ->
           console.log 'Failed to load session.'
 
-    login: () ->
-      this.load()
-
     logout: () ->
-      this.reset()
-      this.clear()
-      this.trigger('logout')
+      @reset()
+      @clear()
+      @trigger('logout')
 
     reset: () ->
       _authenticated = false
