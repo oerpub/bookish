@@ -7,6 +7,9 @@ define [
 
   # Backbone Collection used to store a container's contents
   class Container extends Backbone.Collection
+    initialize: () ->
+      @titles = []
+
     findMatch: (model) ->
       return _.find @titles, (obj) ->
         return model.id is obj.id or model.cid is obj.id

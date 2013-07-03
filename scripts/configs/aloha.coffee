@@ -13,6 +13,9 @@ define ['jquery'], ($) ->
   @Aloha = @Aloha or {}
   @Aloha.settings =
     jQuery: $ # Use the same version of jQuery
+
+    # Disable global error handling and let the exception go all the way back to the browser
+    errorhandling: false
     logLevels:
       error: true
       warn: true
@@ -34,7 +37,6 @@ define ['jquery'], ($) ->
         '*':
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
 
-    errorhandling: true
     plugins:
       # All the plugins we use in Aloha
       load: [
