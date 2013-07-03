@@ -2,23 +2,12 @@ define [
   'jquery'
   'underscore'
   'backbone'
-], ($, _, Backbone) ->
+  'cs!mixins/loadable'
+], ($, _, Backbone, loadable) ->
 
   class BaseModel extends Backbone.Model
     url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
-
-    load: () ->
-      if not @_loading
-        if @isNew()
-          @_loading = new $.Deferred()
-          @_loading.resolve(@)
-        else
-          @_loading = @fetch()
-        @_loading.done () =>
-          @trigger('loaded')
-
-      return @_loading
 
     toJSON: () ->
       json = super()
@@ -39,3 +28,7 @@ define [
         @set('title', title)
       else
         container?.setTitle?(@, title) or @set('title', title)
+
+  # Mix in the loadable methods
+  BaseModel = BaseModel.extend loadable
+  return BaseModel

@@ -27,14 +27,6 @@ define [
       # Default language for new content is the browser's language
       language: navigator?.language or navigator?.userLanguage or 'en'
 
-    load: () ->
-      if not @_loading
-        @_loading = @fetch()
-        @_loading.done () =>
-          @trigger('loaded')
-          @loaded = true
-      @_loading
-
     # Begin editing this medium as soon as it is added
     addAction: () ->
       id = @id or @cid
