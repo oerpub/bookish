@@ -8,7 +8,7 @@ define [
 
   _rendered = false
 
-  return new (class ToolbarSearchView extends Marionette.ItemView
+  return new class ToolbarSearchView extends Marionette.ItemView
     template: toolbarTemplate
     tagName: 'span'
 
@@ -23,4 +23,3 @@ define [
 
     search: (e) ->
       @trigger('search', $(e.currentTarget).val())
-  )()

@@ -19,7 +19,7 @@ define [
   # 2. a logoff link with the current user name if logged in
   #
   # This view updates when the login state changes
-  class AuthView extends Marionette.ItemView
+  return class AuthView extends Marionette.ItemView
     template: (serializedModel) ->
       return authTemplate
         authenticated: session.authenticated()
@@ -32,7 +32,10 @@ define [
 
     initialize: () ->
       @listenTo(session, 'login logout', @render)
-      @listenTo(content, 'change add remove', @changed)
+      @listenTo(content, 'add remove', @changed)
+      @listenTo content, 'change', (model, options) =>
+        # A change event can occur (ie setting a title during parsing but the changed set is still empty)
+        @changed() if model?.hasChanged()
 
       # Bind a function to the window if the user tries to navigate away from this page
       $(window).on 'beforeunload', () ->
@@ -59,6 +62,7 @@ define [
         success: () =>
           console.log 'end saving progress'
           _hasChanged = false
+          @render()
 
       ###
       return alert 'You need to Sign In (and make sure you can edit) before you can save changes' if not @model.get 'id'

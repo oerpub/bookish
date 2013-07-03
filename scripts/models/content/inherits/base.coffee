@@ -4,7 +4,7 @@ define [
   'backbone'
 ], ($, _, Backbone) ->
 
-  class BaseModel extends Backbone.Model
+  return class BaseModel extends Backbone.Model
     url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
 

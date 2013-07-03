@@ -28,10 +28,9 @@ define [
       # Begin editing certain media as soon as they are added.
       model.addAction?()
 
-  return new (class AddView extends Marionette.CompositeView
+  return new class AddView extends Marionette.CompositeView
     collection: mediaTypes
     template: addTemplate
     itemView: AddItemView
     itemViewContainer: '.btn-group > ul'
     tagName: 'span'
-  )()

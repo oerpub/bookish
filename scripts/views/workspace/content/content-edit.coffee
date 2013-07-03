@@ -9,7 +9,7 @@ define [
 
   # Edit Content Body
   # -------
-  class ContentEditView extends AlohaEditView
+  return class ContentEditView extends AlohaEditView
     modelKey: 'body'
 
     # **NOTE:** This template is not wrapped in an element
