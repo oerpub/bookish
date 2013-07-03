@@ -2,11 +2,10 @@
 # =======
 #
 # This provides models or collections with a `.load()` method which calls
-# `.fetch()` only once and
+# `.fetch()` only once.
 define ['jquery'], ($) ->
 
   loadableMixin =
-    # Copy/Pasted from `inherits/base`
     # Returns a promise.
     # If this has not been fully populated it will be fetched exactly once
     load: () ->
