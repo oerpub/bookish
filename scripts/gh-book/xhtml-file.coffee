@@ -16,6 +16,9 @@ define [
   return class XhtmlModel extends ModuleModel
     mediaType: 'application/xhtml+xml'
 
+    defaults:
+      title: null
+
     initialize: () ->
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
