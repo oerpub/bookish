@@ -57,7 +57,7 @@ define [
 
     return results
 
-  class ContainerModel extends BaseModel
+  return class ContainerModel extends BaseModel
     mediaType: 'application/vnd.org.cnx.folder'
     accept: []
     unique: true

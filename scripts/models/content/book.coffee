@@ -4,7 +4,7 @@ define [
   'cs!models/content/inherits/container'
 ], (_, Backbone, BaseContainerModel) ->
 
-  class Book extends BaseContainerModel
+  return class Book extends BaseContainerModel
     defaults:
       manifest: null
       title: 'Untitled Book'

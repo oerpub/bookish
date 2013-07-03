@@ -7,7 +7,7 @@ define [
   'hbs!templates/workspace/menu/toolbar-aloha'
 ], ($, _, Backbone, Marionette, Aloha, toolbarTemplate) ->
 
-  return new (class ToolbarAlohaView extends Marionette.ItemView
+  return new class ToolbarAlohaView extends Marionette.ItemView
     template: toolbarTemplate
     tagName: 'span'
 
@@ -15,4 +15,3 @@ define [
       # Wait until Aloha is started before enabling the toolbar
       @$el.addClass('disabled')
       Aloha.ready => @$el.removeClass('disabled')
-  )()

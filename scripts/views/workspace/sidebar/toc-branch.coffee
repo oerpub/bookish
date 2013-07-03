@@ -7,7 +7,7 @@ define [
   'hbs!templates/workspace/sidebar/toc-branch'
 ], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
 
-  class TocBranchView extends Marionette.CompositeView
+  return class TocBranchView extends Marionette.CompositeView
     tagName: "li"
     itemViewContainer: '> ol'
 

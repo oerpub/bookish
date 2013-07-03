@@ -9,7 +9,7 @@ define [
 
   # Edit Content Body
   # -------
-  class ContentEditView extends AlohaEditView
+  return class ContentEditView extends AlohaEditView
     modelKey: 'body'
 
     initialize: () ->

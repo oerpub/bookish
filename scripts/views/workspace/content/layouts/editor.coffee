@@ -10,7 +10,7 @@ define [
   'hbs!templates/workspace/content/layouts/editor'
 ], ($, _, Backbone, Marionette, ContentEditView, TitleView, MetadataLayout, RolesView, editorTemplate) ->
 
-  class EditorLayout extends Marionette.Layout
+  return class EditorLayout extends Marionette.Layout
     template: editorTemplate
 
     regions:

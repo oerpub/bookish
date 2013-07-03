@@ -11,7 +11,7 @@ define [
   # * `subjects` - an array of strings (eg `['Mathematics', 'Business']`)
   # * `keywords` - an array of keywords (eg `['constant', 'boltzmann constant']`)
   # * `authors` - an `Collection` of `User`s that are attributed as authors
-  class Module extends BaseModel
+  return class Module extends BaseModel
     mediaType: 'application/vnd.org.cnx.module'
     accept: []
     loaded: false
