@@ -19,7 +19,7 @@ define [
         app.main.show(@layout)
       else
         # load default views
-        @layout.load()
+        @layout.showViews()
 
     # Edit existing content
     # -------
@@ -38,4 +38,4 @@ define [
         app.main.show(@layout)
       else
         # load editor views
-        @layout.load({model: model})
+        @layout.showViews({model: model})

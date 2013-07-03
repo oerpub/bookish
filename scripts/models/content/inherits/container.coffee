@@ -7,6 +7,9 @@ define [
 
   # Backbone Collection used to store a container's contents
   class Container extends Backbone.Collection
+    initialize: () ->
+      @titles = []
+
     findMatch: (model) ->
       return _.find @titles, (obj) ->
         return model.id is obj.id or model.cid is obj.id
@@ -67,7 +70,7 @@ define [
     toJSON: () ->
       json = super()
 
-      contents = @getChildren() or {}
+      contents = @getChildren?().toArray() or []
 
       json.contents = []
       _.each contents.models, (item) ->
@@ -92,6 +95,22 @@ define [
 
       @load()
 
+    _loadComplex: (promise) ->
+      # This container is not considered loaded until the ALL content container
+      # has finished loading.
+      # Weird.
+      # TODO: Untangle this dependency later
+      newPromise = new $.Deferred()
+
+      # Since this is a nested require and `.parse()` depends on all content being loaded
+      # We need to squirrel `cs!collections/content` onto the object so parse can use it
+      require ['cs!collections/content'], (allContent) =>
+        @_ALL_CONTENT_HACK = allContent
+        allContent.load().done () =>
+          newPromise.resolve(@)
+
+      return newPromise
+
     getChildren: () -> @get('contents')
 
     addChild: (model, at=0) ->
@@ -108,27 +127,19 @@ define [
       children.add(model, {at:at})
 
     parse: (json) ->
-      if json.contents
-        if _.isArray(json.contents)
-          json.contents = new Container(json.contents)
-        else
-          json.contents = parseHTML(json.contents)
+      contents = json.body or json.contents
+      if contents
+        if not _.isArray(contents)
+          contents = parseHTML(contents)
 
-      else if json.body
-        json.contents = json.body
       else throw 'BUG: Container must contain either a contents or a body'
 
-      # Toss the contents into the workspace
-      # Weird odd that it's being done in parse
-      require ['cs!collections/content'], (content) =>
-        content.load().done () =>
-          _.each contents, (item) =>
-            @add(content.get({id: item.id}), options)
-          # TODO: Why does loading have to wait until the workspace loads fully
-          # Seems like an odd dependency (the code is weird too)
-          @_loading.resolve(@)
+      # Look up each entry in Contents
+      contentsModels = _.map contents, (item) =>
+        @_ALL_CONTENT_HACK.get({id: item.id})
+      json.contents = new Container(contentsModels)
 
-      return super(attrs, options)
+      return json
 
     # Change the content view when editing this
     contentView: (callback) ->
