@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'session'
+  'cs!session'
   'cs!collections/content'
   'hbs!templates/workspace/menu/auth'
   'bootstrapTooltip'
