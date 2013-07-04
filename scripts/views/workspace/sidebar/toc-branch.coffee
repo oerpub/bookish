@@ -42,14 +42,14 @@ define [
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
-      if @model.parent
-        EnableDnD.enableDropAfter(@model, @model.parent, @$el.find('> .editor-drop-zone-after'))
+      if @model.getParent?()
+        EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
 
       return result
 
     templateHelpers: () ->
       return {
-        hasParent: !! @model.parent
+        hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
       }

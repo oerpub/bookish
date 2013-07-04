@@ -15,6 +15,7 @@ define [
     mediaType: 'application/oebps-package+xml'
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
+    branch: true # This element will show up in the sidebar listing
 
     initialize: () ->
       # Contains all entries in the OPF file (including images)
@@ -29,9 +30,7 @@ define [
       # when we are internally updating models.
       setNavModel = (options) => @navModel.set 'body', @_serializeNavModel(), options
 
-      @tocNodes.on 'tree:add',    (model, collection, options) =>
-        #PHILconsole.error 'BUG: Model is already in tocNodes' if @tocNodes.get(model.id)
-        @tocNodes.add model, options
+      @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
       @tocNodes.on 'add remove', (model, collection, options) =>
@@ -142,7 +141,7 @@ define [
           model.getChildren().forEach (child) => recBuildList($ol, child)
           $li.append $ol
 
-      @_children.forEach (child) => recBuildList($navOl, child)
+      @getChildren().forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
       $wrapper[0].innerHTML
 
@@ -194,6 +193,22 @@ define [
         node = new TocPointerNode {root:@, model:model}
         #@tocNodes.add node
       return node
+
+
+    # Change the content view when editing this
+    contentView: (callback) ->
+      require ['cs!views/workspace/content/search-results'], (View) =>
+        view = new View({collection: @getChildren()})
+        callback(view)
+
+    # Change the sidebar view when editing this
+    sidebarView: (callback) ->
+      require ['cs!views/workspace/sidebar/toc'], (View) =>
+        view = new View
+          collection: @getChildren()
+          model: @
+        callback(view)
+
 
   # Mix in the loadable
   PackageFile = PackageFile.extend loadable

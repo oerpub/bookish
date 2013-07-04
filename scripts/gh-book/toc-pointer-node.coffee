@@ -1,7 +1,7 @@
 define ['cs!gh-book/toc-node'], (TocNode) ->
 
   class TocPointerNode extends TocNode
-    mediaType: null # This will get overridden to be whatever this node points to
+    mediaType: 'application/BUG-mediaType-not-set' # This will get overridden to be whatever this node points to
     accept: []      # This will get overridden to be whatever this node points to
 
     initialize: (options) ->

@@ -91,7 +91,7 @@ define [
       Aloha.ready =>
         enableContentDragging(model, $content)
 
-      enableDrop model, $content, model.accepts?(), (drag, drop) ->
+      enableDrop model, $content, model.accept, (drag, drop) ->
         # If the model is already in the tree then remove it
         # If the model is in the same collection but at a different index then
         #   account for the model being removed
@@ -103,10 +103,10 @@ define [
     #
     # This zone is based on the parent model's `accepts()` media types
     enableDropAfter: (model, parent, $content) ->
-      throw 'BUG: model MUST have a parent' if not model.parent
+      throw 'BUG: model MUST have a parent' if not parent
       $content.data('editor-model', model)
 
       index = parent.getChildren().indexOf(model)
-      enableDrop model, $content, parent.accepts?(), (drag, drop) ->
+      enableDrop model, $content, parent.accept, (drag, drop) ->
         parent.addChild drag, index+1
   }
