@@ -36,6 +36,6 @@ define [
       if not @layout
         @layout = new WorkspaceLayout({model: model})
         app.main.show(@layout)
-      else
-        # load editor views
-        @layout.showViews({model: model})
+
+      # load editor views
+      @layout.showViews({model: model})

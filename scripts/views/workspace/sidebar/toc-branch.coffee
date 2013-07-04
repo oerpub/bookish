@@ -49,6 +49,7 @@ define [
 
     templateHelpers: () ->
       return {
+        mediaType: @model.mediaType
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded

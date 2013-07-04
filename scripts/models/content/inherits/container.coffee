@@ -113,18 +113,8 @@ define [
 
     getChildren: () -> @get('contents')
 
-    addChild: (model, at=0) ->
-      children = @getChildren()
-
-      # If `model` is already in `@getChildren()` then we are reordering.
-      # By removing the model, we need to adjust the index where it will be
-      # added.
-      if children.contains(model)
-        if children.indexOf(model) < at
-          at = at - 1
-        children.remove(model)
-
-      children.add(model, {at:at})
+    addChild: (models, options) ->
+      @getChildren().add(models, options)
 
     parse: (json) ->
       contents = json.body or json.contents

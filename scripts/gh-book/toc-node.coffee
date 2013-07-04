@@ -18,7 +18,7 @@ define [
       @on 'change:title', (model, options) =>
         @trigger 'tree:change', model, @, options
 
-      @initializeTreeHandlers(options)
+      @_initializeTreeHandlers(options)
 
     # Views rely on the mediaType to be set in here
     # TODO: Fix it in the view's `templateHelpers`

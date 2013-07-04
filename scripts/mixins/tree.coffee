@@ -8,12 +8,13 @@
 # - defers construction of new nodes when they are dropped to the root
 # - works when moving from one tree to another
 #
+# **Note:** Be sure to call `_initializeTreeHandlers` during `initialize`
 # **Note:** Instance variables used by this mixin are prefixed with `_tree_`
 define ['backbone'], (Backbone) ->
 
   treeMixin =
 
-    initializeTreeHandlers: (options) ->
+    _initializeTreeHandlers: (options) ->
       throw 'BUG: Missing constructor options' if not options
       throw 'BUG: Missing root' if not options.root
       #throw 'BUG: Missing title or model' if not options.title
