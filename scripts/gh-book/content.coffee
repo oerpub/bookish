@@ -12,7 +12,8 @@ define [
   'underscore'
   'backbone'
   'cs!collections/media-types'
-], ($, _, Backbone, mediaTypes) ->
+  'cs!mixins/loadable'
+], ($, _, Backbone, mediaTypes, loadableMixin) ->
 
 
   class EPUBContainer extends Backbone.Collection
@@ -43,23 +44,11 @@ define [
 
       throw 'You must pass in the model or set its mediaType when adding to the content collection.'
 
-    initialize: () ->
-      @load()
-      # @listenTo(session, 'login', @load)
-
     branches: () ->
       return _.where(@models, {branch: true})
 
     loading: () ->
       return _loaded.promise()
-
-    load: () ->
-      @fetch
-        silent: true
-        success: (model, response, options) =>
-          @trigger('reset')
-          _loaded.resolve()
-
 
     save: (options) ->
       # Save serially.
@@ -79,5 +68,6 @@ define [
       changedModels = @filter (model) -> model.hasChanged()
       saveNextItem(changedModels)
 
+  EPUBContainer = EPUBContainer.extend loadableMixin
   # All content in the Workspace
   return new EPUBContainer()
