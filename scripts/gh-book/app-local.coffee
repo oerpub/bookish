@@ -8,52 +8,56 @@ define [
   'jquery'
   'backbone'
   'cs!gh-book/app'
-], ($, Backbone, app) ->
+], ($, Backbone, App) ->
 
   PATH_PREFIX = '../books'
 
-  console.log "NOTE: Using path to local book instead of github API: #{PATH_PREFIX}"
+  App.addInitializer (options) ->
 
-  # HACK to load files locally
-  Backbone.sync = (method, model, options) ->
+    console.warn "NOTE: Using path to local book instead of github API: #{PATH_PREFIX}"
 
-    path = model.id or model.url?() or model.url
+    # HACK to load files locally
+    Backbone.sync = (method, model, options) ->
 
-    console.log method, path
-    ret = null
-    switch method
-      when 'read'
-        if model.isBinary
-          ret = $.ajax
-            beforeSend: (xhr) ->
-              xhr.overrideMimeType 'text/plain; charset=x-user-defined'
-            url:"#{PATH_PREFIX}/#{path}"
+      path = model.id or model.url?() or model.url
+
+      console.log "App-Local", method, path
+      ret = null
+      switch method
+        when 'read'
+          if model.isBinary
+            ret = $.ajax
+              beforeSend: (xhr) ->
+                xhr.overrideMimeType 'text/plain; charset=x-user-defined'
+              url:"#{PATH_PREFIX}/#{path}"
+          else
+            ret = $.ajax
+              dataType: 'text'
+              data: false
+              url:"#{PATH_PREFIX}/#{path}"
         else
-          ret = $.ajax
-            dataType: 'text'
-            data: false
-            url:"#{PATH_PREFIX}/#{path}"
-      else
-        console.error "Model sync method not supported: #{method} for #{model.id}"
+          console.error "Model sync method not supported: #{method} for #{model.id}"
+          ret = $.Deferred()
+          ret.resolve(model.serialize())
+
+
+      # From github-client. Parse the string if isBinary
+      ret = ret.then (data, textStatus, jqXHR) ->
         ret = $.Deferred()
-        ret.resolve(model.serialize())
+        if model.isBinary
+          # Convert raw data to binary chopping off the higher-order bytes in each char.
+          # Useful for Base64 encoding.
+          converted = ''
+          for i in [0..data.length]
+            converted += String.fromCharCode(data.charCodeAt(i) & 0xff)
+          converted
 
+          ret.resolve(converted, textStatus, jqXHR)
+        else
+          ret.resolve(data, textStatus, jqXHR)
 
-    # From github-client. Parse the string if isBinary
-    ret = ret.then (data, textStatus, jqXHR) ->
-      ret = $.Deferred()
-      if model.isBinary
-        # Convert raw data to binary chopping off the higher-order bytes in each char.
-        # Useful for Base64 encoding.
-        converted = ''
-        for i in [0..data.length]
-          converted += String.fromCharCode(data.charCodeAt(i) & 0xff)
-        converted
+      ret.done (value) => options?.success?(value)
+      ret.fail (error) => options?.error?(ret, error)
+      return ret
 
-        ret.resolve(converted, textStatus, jqXHR)
-      else
-        ret.resolve(data, textStatus, jqXHR)
-
-    ret.done (value) => options?.success?(value)
-    ret.fail (error) => options?.error?(ret, error)
-    return ret
+  return App

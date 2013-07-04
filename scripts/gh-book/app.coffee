@@ -2,19 +2,26 @@ define [
   'jquery'
   'underscore'
   'backbone'
+  'marionette'
   'github'
   'cs!helpers/logger'
-], ($, _, Backbone, Github, logger) ->
+  'cs!collections/content'
+  'cs!collections/media-types'
+  'cs!gh-book/xhtml-file'
+  'cs!gh-book/opf-file'
+  'cs!gh-book/binary-file'
+], ($, _, Backbone, Marionette, Github, logger, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
+
+  # Stop logging.
+  logger.stop()
+
+  App = new Marionette.Application()
+
+  App.addRegions
+    main: '#main'
 
 
-  # Nested require is so we can rebind `Backbone.sync` before any ajax calls are made.
-  require [
-    'cs!app'
-    'cs!collections/media-types'
-    'cs!gh-book/xhtml-file'
-    'cs!gh-book/opf-file'
-    'cs!gh-book/binary-file'
-  ], (app, mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
+  App.addInitializer (options) ->
 
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
@@ -22,80 +29,97 @@ define [
     mediaTypes.add BinaryFile, {mediaType:'image/jpg'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
-    app.start()
+    $(document).on 'click', 'a:not([data-bypass])', (e) ->
+      external = new RegExp('^((f|ht)tps?:)?//')
+      href = $(@).attr('href')
+
+      e.preventDefault()
+
+      if external.test(href)
+        window.open(href, '_blank')
+      else
+        if href then Backbone.history.navigate(href, {trigger: true})
 
 
-  # Stop logging.
-  logger.stop()
+
+    session = new Backbone.Model()
+    session.set
+      'repoUser': 'Connexions'
+      'repoName': 'atc'
+      'branch'  : 'sample-book'
+      'rootPath': ''
+      'auth'    : 'oauth'
+      'token'   : null         # Set your token here if you want
+
+    getRepo = () ->
+      gh = new Github(session.toJSON())
+      gh.getRepo(session.get('repoUser'), session.get('repoName'))
 
 
-  session = new Backbone.Model()
-  session.set
-    'repoUser': 'Connexions'
-    'repoName': 'atc'
-    'branch'  : 'sample-book'
-    'rootPath': ''
-    'auth'    : 'oauth'
-    'token'   : null         # Set your token here if you want
+    writeFile = (path, text, commitText) ->
+      getRepo().write session.get('branch'), "#{session.get('rootPath')}#{path}", text, commitText
 
-  getRepo = () ->
-    gh = new Github(session.toJSON())
-    gh.getRepo(session.get('repoUser'), session.get('repoName'))
+    readFile =       (path) -> getRepo().read       session.get('branch'), "#{session.get('rootPath')}#{path}"
+    readBinaryFile = (path) -> getRepo().readBinary session.get('branch'), "#{session.get('rootPath')}#{path}"
+    readDir =        (path) -> getRepo().contents   session.get('branch'), path
 
 
-  writeFile = (path, text, commitText) ->
-    getRepo().write session.get('branch'), "#{session.get('rootPath')}#{path}", text, commitText
+    Backbone.sync = (method, model, options) ->
 
-  readFile =       (path) -> getRepo().read       session.get('branch'), "#{session.get('rootPath')}#{path}"
-  readBinaryFile = (path) -> getRepo().readBinary session.get('branch'), "#{session.get('rootPath')}#{path}"
-  readDir =        (path) -> getRepo().contents   session.get('branch'), path
+      path = model.id or model.url?() or model.url
 
+      console.log method, path
+      ret = null
+      switch method
+        when 'read'
+          if model.isBinary
+            ret = readBinaryFile(path)
+          else
+            ret = readFile(path)
+        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save')
+        when 'create'
+          # Create an id if this model has not been saved yet
+          id = _uuid()
+          model.set 'id', id
+          ret = writeFile(path, model.serialize())
+        else throw "Model sync method not supported: #{method}"
 
-  Backbone.sync = (method, model, options) ->
-
-    path = model.id or model.url?() or model.url
-
-    console.log method, path
-    ret = null
-    switch method
-      when 'read'
-        if model.isBinary
-          ret = readBinaryFile(path)
-        else
-          ret = readFile(path)
-      when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save')
-      when 'create'
-        # Create an id if this model has not been saved yet
-        id = _uuid()
-        model.set 'id', id
-        ret = writeFile(path, model.serialize())
-      else throw "Model sync method not supported: #{method}"
-
-    ret.done (value) => options?.success?(value)
-    ret.fail (error) => options?.error?(ret, error)
-    return ret
+      ret.done (value) => options?.success?(value)
+      ret.fail (error) => options?.error?(ret, error)
+      return ret
 
 
-  # Custom routes to configure the Github User and Repo from the browser
-  class GithubRouter extends Backbone.Router
-    routes:
-      '':                                 'justStart'
-      'repo/:repoUser/:repoName':         'configRepo'
-      'repo/:repoUser/:repoName/:branch': 'configRepo'
+    # Remove cyclic dependency. Controller depends on `App.main` region
+    require ['cs!controllers/routing'], (controller) ->
 
-    justStart: () ->
-      # HACK: Another async require so we don't start fetching prematurely.
-      require ['cs!controllers/routing'], (controller) ->
-        # Open the workspace
-        controller.workspace()
+      # Custom routes to configure the Github User and Repo from the browser
+      new class GithubRouter extends Backbone.Router
+        routes:
+          'repo/:repoUser/:repoName':         'configRepo'
+          'repo/:repoUser/:repoName/:branch': 'configRepo'
 
-    configRepo: (repoUser, repoName, branch='master') ->
-      session.set
-        'repoUser': repoUser
-        'repoName': repoName
-        'branch': branch
+          '':             'workspace' # Show the workspace list of content
+          'workspace':    'workspace'
+          'edit/*id':     'edit' # Edit an existing piece of content (id can be a path)
 
-      @justStart()
+        configRepo: (repoUser, repoName, branch='master') ->
+          session.set
+            'repoUser': repoUser
+            'repoName': repoName
+            'branch': branch
 
-  new GithubRouter()
-  Backbone.history.start() if not Backbone.History.started
+          @workspace()
+
+        # Delay the route handling until the initial content is loaded
+        # TODO: Move this into the controller
+        workspace: () -> allContent.load().done () => controller.workspace()
+        edit: (id)    -> allContent.load().done () => controller.edit(id)
+
+
+      Backbone.history.start
+        pushState: false
+        hashChange: true
+        root: ''
+
+
+  return App
