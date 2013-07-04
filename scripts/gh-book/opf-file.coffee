@@ -28,16 +28,18 @@ define [
       # Backbone sets this option when a model is being parsed.
       # This way we can ignore firing events when Backbone is parsing as well as
       # when we are internally updating models.
-      setNavModel = (options) => @navModel.set 'body', @_serializeNavModel(), options
+      setNavModel = (options) =>
+        options.doNotReparse = true
+        @navModel.set 'body', @_serializeNavModel(), options
 
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
       @tocNodes.on 'add remove', (model, collection, options) =>
-        setNavModel() if not options.parse
+        setNavModel(options)
       @tocNodes.on 'tree:change change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
-        setNavModel() if not options?.parse
+        setNavModel(options)
 
       @load()
 
@@ -48,11 +50,11 @@ define [
       .then () =>
         # Clear that anything on the model has changed
         @changed = {}
-        @navModel.load()
+        return @navModel.load()
       .then () =>
         @_parseNavModel()
         @listenTo @navModel, 'change:body', (model, value, options) =>
-          @_parseNavModel() if not options.parse
+          @_parseNavModel() if not options.doNotReparse
 
 
     _parseNavModel: () ->
