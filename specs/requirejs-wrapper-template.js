@@ -78,4 +78,17 @@ requirejs.config = function(config){
 };
 
 require = requirejs;
-define = requirejs.define;
+
+var jasmineCounter = 0;
+define = function(name, deps, callback) {
+  if (typeof name == 'string') {
+    return requirejs.define(name, deps, callback);
+  } else {
+    callback = deps;
+    deps = name;
+    jasmineCounter++;
+    requirejs.define('__jasmine-node__' + jasmineCounter, deps, callback);
+
+    return require(['__jasmine-node__' + jasmineCounter], function(obj) {return obj;});
+  }
+};

@@ -1,9 +1,7 @@
-REQUIRE = (if exports? then require else define)
-
 Backbone = null
 TocNode = null
 
-describe 'A Toc Node Mixin2', ->
+describe 'A Toc Node', ->
 
   it 'should exist', ->
     runs () ->

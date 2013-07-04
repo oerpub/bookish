@@ -1,6 +1,4 @@
-REQUIRE = (if window? then define else require)
-
-REQUIRE ['backbone', 'cs!mixins/tree'], (Backbone, treeMixin) ->
+define ['backbone', 'cs!mixins/tree'], (Backbone, treeMixin) ->
 
   class TreeNode extends Backbone.Model
     initialize: (options={}) ->
@@ -19,3 +17,4 @@ REQUIRE ['backbone', 'cs!mixins/tree'], (Backbone, treeMixin) ->
     it 'should initially have an empty Collection', ->
       node = new TreeNode()
       expect(node.getChildren().length).toBe 0
+
