@@ -9,9 +9,6 @@ define [
   return new class Session extends Backbone.Model
     url: '/me'
 
-    initialize: () ->
-      @login()
-
     login: () ->
       @fetch
         success: (model, response, options) =>
