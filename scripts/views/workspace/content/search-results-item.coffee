@@ -25,6 +25,7 @@ define [
     templateHelpers: () ->
       return {
         id: @model.id or @model.cid
+        mediaType: @model.mediaType
         isLoading: @model.loading
       }
 
