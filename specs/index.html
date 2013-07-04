@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Spec Runner</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./jasmine.css" />
+
+    <script src="../scripts/libs/require/require.js"></script>
+
+    <script>
+
+    require.config({
+      baseUrl: '../scripts',
+      paths: {
+        specs: '../specs',
+        underscore: 'libs/lodash',
+        backbone: 'libs/backbone/backbone',
+        jquery: 'libs/jquery',
+        cs: 'libs/require/plugins/require-cs/cs',
+        'coffee-script': 'libs/require/plugins/require-cs/coffee-script'
+      },
+
+      shim: {
+          underscore: {
+            exports: '_'
+          },
+          backbone: {
+            deps: ['underscore', 'jquery'],
+            exports: 'Backbone'
+          }
+        }
+
+    });
+
+    require(['cs!../specs/runner']);
+
+    </script>
+
+
+    <script src="./jasmine.js"></script>
+    <script src="./jasmine-html.js"></script>
+  </head>
+  <body>
+    <h1>Browser-based Spec File Runner</h1>
+    <p>You can also run them by running <code>npm test</code>.</p>
+  </body>
+</html>
