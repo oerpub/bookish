@@ -7,7 +7,7 @@ define [
   'cs!collections/media-types'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/content/search-results-item'
-], ($, _, Backbone, Marionette, Moment, mediaTypes, enableContentDragging, searchResultsItemTemplate) ->
+], ($, _, Backbone, Marionette, Moment, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
 
   # Search Result View (workspace)
   # -------
@@ -34,7 +34,7 @@ define [
 
     onRender: () ->
       # Add DnD options to content
-      enableContentDragging(@model, @$el.children('*[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.children('*[data-media-type]'))
 
     # Updates the relative time for a set of elements periodically
     updateTimer: () ->

@@ -5,7 +5,7 @@ define [
   'marionette'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
+], ($, _, Backbone, Marionette, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
     tagName: "li"
@@ -40,13 +40,17 @@ define [
         @$el.removeClass('editor-node-expanded')
 
       # Add DnD options to content
-      enableContentDragging(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+
+      if @model.parent
+        EnableDnD.enableDropAfter(@model, @model.parent, @$el.find('> .editor-drop-zone-after'))
 
       return result
 
     templateHelpers: () ->
       return {
-        hasChildren: @model.getChildren?()?.length
+        hasParent: !! @model.parent
+        hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
       }
 
@@ -60,6 +64,16 @@ define [
 
       template = @getTemplate()
       return Marionette.Renderer.render(template, data)
+
+    # Override internal Marionette method.
+    # This method adds a child list item at a given index.
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
 
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
