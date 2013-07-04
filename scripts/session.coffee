@@ -10,9 +10,9 @@ define [
     url: '/me'
 
     initialize: () ->
-      @load()
+      @login()
 
-    load: () ->
+    login: () ->
       @fetch
         success: (model, response, options) =>
           # Logged in
@@ -23,9 +23,6 @@ define [
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
-
-    login: () ->
-      @load()
 
     logout: () ->
       @reset()

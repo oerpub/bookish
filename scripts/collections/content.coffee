@@ -13,11 +13,10 @@ define [
   'backbone'
   'cs!session'
   'cs!collections/media-types'
-], ($, _, Backbone, session, mediaTypes) ->
+  'cs!mixins/loadable'
+], ($, _, Backbone, session, mediaTypes, loadable) ->
 
-  _loaded = $.Deferred()
-
-  return new class Content extends Backbone.Collection
+  class AllContent extends Backbone.Collection
     url: '/api/content'
 
     initialize: () ->
@@ -37,22 +36,21 @@ define [
     branches: () ->
       return _.where(@models, {branch: true})
 
-    load: () ->
-      promises = []
 
-      @fetch
-        success: (data, response, options) =>
-          _.each data.models, (model) ->
-            if typeof model.promise is 'function'
-              promises.push(model.promise())
+    # Extend the `load()` to wait until all content is loaded
+    _loadComplex: (fetchPromise) ->
+      promise = new $.Deferred()
+      fetchPromise.done () =>
+        contentPromises = @map (model) => model.load()
+        $.when.apply($, contentPromises).done () =>
+          promise.resolve(@)
+          @trigger('change')
+      return promise
 
-          _loaded.resolve()
-
-          $.when.apply($, promises).done () =>
-            @trigger('change')
 
     loading: () ->
-      return _loaded.promise()
+      return @load().promise()
+
 
     save: (options) ->
       # Save serially.
@@ -71,3 +69,9 @@ define [
       # Save all the models that have changes
       changedModels = @filter (model) -> model.hasChanged()
       saveNextItem(changedModels)
+
+
+  # Mix in the loadable methods
+  AllContent = AllContent.extend loadable
+
+  return new AllContent()

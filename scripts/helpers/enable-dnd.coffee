@@ -83,5 +83,5 @@ define [
               drop = $drop.data 'editor-model'
 
               # Delay the call so $.droppable has time to clean up before the DOM changes
-              delay = -> drop.add(model)
+              delay = => drop.addChild model, {at:0}
               setTimeout(delay, 10)

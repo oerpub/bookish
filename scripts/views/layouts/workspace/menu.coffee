@@ -20,9 +20,9 @@ define [
       toolbar: '#workspace-menu-toolbar'
 
     onRender: () ->
-      @load(_toolbar)
+      @showView(_toolbar)
 
-    load: (view) ->
+    showView: (view) ->
       _toolbar = view or toolbarView
 
       @add.show(addView)
@@ -30,4 +30,4 @@ define [
       @toolbar.show(_toolbar)
 
     showToolbar: (view) ->
-      @load(view or toolbarView)
+      @showView(view or toolbarView)

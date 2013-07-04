@@ -12,10 +12,5 @@ define [
   return class ContentEditView extends AlohaEditView
     modelKey: 'body'
 
-    initialize: () ->
-      # **NOTE:** This template is not wrapped in an element
-      @template = (data) =>
-        data.loaded = @model.loaded
-        return contentEditTemplate(data)
-
-      super()
+    # **NOTE:** This template is not wrapped in an element
+    template: contentEditTemplate
