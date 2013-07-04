@@ -94,7 +94,7 @@ define [
           return
 
         # Load the image file somehow (see below for my github.js changes)
-        doneLoading = imageModel.fetch()
+        doneLoading = imageModel.load()
         .done (bytes, statusMessage, xhr) =>
           # Grab the mediaType from the response header (or look in the EPUB3 OPF file)
           mediaType = imageModel.mediaType # xhr.getResponseHeader('Content-Type').split(';')[0]
