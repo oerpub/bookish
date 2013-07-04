@@ -1,8 +1,4 @@
-define [
-  'underscore'
-  'backbone'
-  'cs!gh-book/toc-node'
-], (_, Backbone, TocNode) ->
+define ['cs!gh-book/toc-node'], (TocNode) ->
 
   class TocPointerNode extends TocNode
     mediaType: null # This will get overridden to be whatever this node points to
@@ -22,4 +18,5 @@ define [
 
       @model.on 'all', () => @trigger.apply @, arguments
 
+      options.title = options.title or @model.get 'title'
       super(options)

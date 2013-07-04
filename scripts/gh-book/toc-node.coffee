@@ -1,27 +1,26 @@
 define [
-  'underscore'
   'backbone'
   'cs!models/content/inherits/container'
   'cs!gh-book/xhtml-file'
-], (_, Backbone, BaseContainerModel, XhtmlFile) ->
+], (Backbone, BaseContainerModel, XhtmlFile) ->
 
   mediaType = 'application/vnd.org.cnx.folder'
 
   class TocNode extends BaseContainerModel
-    defaults:
-      title: 'Untitled Section'
 
     mediaType: mediaType
     accept: [mediaType, XhtmlFile::mediaType]
 
-    sync: () -> throw new 'BUG: This Model should not be syncd'
-
     initialize: (options) ->
       throw 'BUG: Missing constructor options' if not options
-      throw 'BUG: Missing title' if not options.title
+      throw 'BUG: Missing root' if not options.root
+      #throw 'BUG: Missing title or model' if not options.title
+
+      @root = options.root
 
       @_children = new Backbone.Collection()
-      @set 'title', options.title if options.title
+
+      @set 'title', options.title
       @htmlAttributes = options.htmlAttributes or {}
 
       @on 'change:title', (model, options) =>
@@ -58,8 +57,33 @@ define [
       trickleEvents 'tree:remove'
       trickleEvents 'tree:change'
 
+
+    newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
+
     getChildren: () -> @_children
     removeChild: (model) ->
-      throw 'BUG: child is not in this node' if not @getChildren().contains(model)
-      @getChildren().remove(model)
+      throw 'BUG: child is not in this node' if not @getChildren().get(model.id)
+      @getChildren().remove(model.id)
+
+    addChild: (model, at=0) ->
+      children = @getChildren()
+
+      # If `model` is already in `@getChildren()` then we are reordering.
+      # By removing the model, we need to adjust the index where it will be
+      # added.
+
+      # Don't use `children.contains()` because `model` may be a pointer (only the id's match)
+      realModel = children.get(model.id) or children.get(model) # `or` is in there because Chapters do not have an id
+      if realModel
+        if children.indexOf(realModel) < at
+          at = at - 1
+        children.remove(realModel)
+
+      # Before adding the model make sure it's a `TocNode`.
+      # If not, wrap it in one
+      if ! (model instanceof TocNode)
+        model = @root.newNode {model:model}
+
+      children.add(model, {at:at})
+
 

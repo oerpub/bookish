@@ -1,17 +1,15 @@
 define [
-  'jquery'
-  'underscore'
   'backbone'
   'cs!collections/media-types'
   'cs!collections/content'
-  'cs!models/content/inherits/container'
+  'cs!mixins/loadable'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
-], ($, _, Backbone, mediaTypes, allContent, BaseContainerModel, XhtmlFile, TocNode, TocPointerNode, Utils) ->
+], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
-  class PackageFile extends BaseContainerModel
+  class PackageFile extends TocNode
     serializer = new XMLSerializer()
 
     mediaType: 'application/oebps-package+xml'
@@ -25,25 +23,15 @@ define [
       @tocNodes = new Backbone.Collection()
       @tocNodes.add @
 
-      # Contains root ToC nodes (like "Unit 1")
-      @children = new Backbone.Collection()
-
       # Use the `parse:true` option instead of `loading:true` because
       # Backbone sets this option when a model is being parsed.
       # This way we can ignore firing events when Backbone is parsing as well as
       # when we are internally updating models.
-      setNavModel = () => @navModel.set 'body', @_serializeNavModel(), {parse:true}
+      setNavModel = (options) => @navModel.set 'body', @_serializeNavModel(), options
 
-      # if the added node already exists in the tree then remove it.
-      # @tocNodes.on 'add', (model, collection, options) =>
-      #   if @tocNodes.contains model
-      #     @tocNodes.each (parent) =>
-      #       parentChildren = parent.getChildren?()
-      #       if parentChildren and parentChildren != collection and parentChildren.contains model
-      #         parentChildren.remove model
-
-
-      @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
+      @tocNodes.on 'tree:add',    (model, collection, options) =>
+        #PHILconsole.error 'BUG: Model is already in tocNodes' if @tocNodes.get(model.id)
+        @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
       @tocNodes.on 'add remove', (model, collection, options) =>
@@ -52,47 +40,26 @@ define [
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel() if not options?.parse
 
-
-      @children.on 'add', (child, collection, options) =>
-        # Parent is useful for DnD but since we don't use a `TocNode`
-        # for the leaves (`Module`) the view needs to pass the
-        # model in anyway, so it's commented.
-        #
-
-        # Remove the child if it is already attached somewhere
-        child.parent.removeChild(child) if child.parent
-
-        child.parent = @
-        child.root = @
-        @trigger 'tree:add', child, collection, options
-
-      @children.on 'remove', (child, collection, options) =>
-        delete child.parent
-        delete child.root
-        @trigger 'tree:remove', child, collection, options
-
-      @children.on 'change', (child, collection, options) =>
-        @trigger 'tree:change', child, collection, options
-
       @load()
 
-    load: () ->
-      @fetch()
-      .fail((err) => throw err)
-      .done () =>
+      super {root:@}
+
+    _loadComplex: (fetchPromise) ->
+      fetchPromise
+      .then () =>
         # Clear that anything on the model has changed
         @changed = {}
         @navModel.load()
-        .fail((err) => throw err)
-        .done () =>
-          @_parseNavModel()
-          @listenTo @navModel, 'change:body', (model, value, options) =>
-            @_parseNavModel() if not options.parse
+      .then () =>
+        @_parseNavModel()
+        @listenTo @navModel, 'change:body', (model, value, options) =>
+          @_parseNavModel() if not options.parse
 
 
     _parseNavModel: () ->
       $body = $(@navModel.get 'body')
       $body = $('<div></div>').append $body
+
 
       # Generate a tree of the ToC
       recBuildTree = (collection, $rootOl, contextPath) =>
@@ -114,7 +81,12 @@ define [
 
             path = Utils.resolvePath(contextPath, href)
             contentModel = allContent.get path
-            model = new TocPointerNode {title: title, htmlAttributes: attributes, model: contentModel}
+
+            # Set all the titles of models in the workspace based on the nav tree
+            # XhtmlModel titles are not saved anyway.
+            contentModel.set 'title', title
+
+            model = @newNode {title: title, htmlAttributes: attributes, model: contentModel}
 
             collection.add model, {parse:true}
 
@@ -122,7 +94,7 @@ define [
               console.warn 'TODO: BUG: Change the title in the ToC'
 
           else if $span[0]
-            model = new TocNode {title: $span.text(), htmlAttributes: attributes}
+            model = new TocNode {title: $span.text(), htmlAttributes: attributes, root: @}
             collection.add model, {parse:true}
 
             # Recurse
@@ -135,8 +107,8 @@ define [
 
       $root = $body.find('nav > ol')
       @tocNodes.reset [@], {parse:true}
-      @children.reset()
-      recBuildTree(@children, $root, @navModel.id)
+      @getChildren().reset()
+      recBuildTree(@getChildren(), $root, @navModel.id)
 
 
     _serializeNavModel: () ->
@@ -170,7 +142,7 @@ define [
           model.getChildren().forEach (child) => recBuildList($ol, child)
           $li.append $ol
 
-      @children.forEach (child) => recBuildList($navOl, child)
+      @_children.forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
       $wrapper[0].innerHTML
 
@@ -215,8 +187,13 @@ define [
 
     serialize: () -> serializer.serializeToString(@$xml[0])
 
-    getChildren: () -> @children
-    removeChild: (model) ->
-      throw 'BUG: child is not in this node' if not @getChildren().contains(model)
-      @getChildren().remove(model)
+    newNode: (options) ->
+      model = options.model
+      node = @tocNodes.get model.id
+      if !node
+        node = new TocPointerNode {root:@, model:model}
+        #@tocNodes.add node
+      return node
 
+  # Mix in the loadable
+  PackageFile = PackageFile.extend loadable

@@ -17,7 +17,7 @@ define ['jquery'], ($) ->
           promise = @fetch()
 
         # See if we need to daisy-chain loading
-        @_loading = @_loadComplex(promise)
+        @_loading = @_loadComplex?(promise) or promise
 
         @_loading.fail (err) =>
           # Since we failed clear the promise so we can try again later.
@@ -31,7 +31,7 @@ define ['jquery'], ($) ->
     # By overriding this method the subclass can load other files before
     # this model is considered loaded.
     # This method should only be called by `.load()`
-    _loadComplex: (fetchPromise) -> fetchPromise
+    # _loadComplex: (fetchPromise) -> fetchPromise
 
 
   return loadableMixin
