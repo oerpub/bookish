@@ -127,7 +127,12 @@ define [
       # Look up each entry in Contents
       contentsModels = _.map contents, (item) =>
         @_ALL_CONTENT_HACK.get({id: item.id})
-      json.contents = new Container(contentsModels)
+
+      if @getChildren()
+        @getChildren().reset(contentsModels)
+        delete json.contents
+      else
+        json.contents = new Container(contentsModels)
 
       return json
 
