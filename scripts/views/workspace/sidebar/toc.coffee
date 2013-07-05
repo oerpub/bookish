@@ -20,8 +20,6 @@ define [
       else
         @collection = content
 
-      @listenTo(@collection, 'change', @render)
-
     # Override Marionette's showCollection()
     showCollection: () ->
       if @collection.branches

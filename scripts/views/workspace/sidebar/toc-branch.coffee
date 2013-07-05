@@ -20,15 +20,27 @@ define [
       @itemViewOptions = {container: @collection}
       @container = options.container
 
-      @listenTo @model, 'change', (model, collection, options) =>
-        @renderModel() if model == @model
+      @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
 
-      if @collection
-        @listenTo @collection, 'add remove', (model, collection, options) =>
-          if collection == @collection
-            # Figure out if the expanded state has changed (see if we need to re-render the model)
-            @renderModel()
 
+    renderModelOnly: () ->
+      # Detach the children
+      $children = @$el.find(@itemViewContainer).children()
+
+      @triggerBeforeRender()
+      html = @renderModel()
+      @$el.html(html)
+      # the ui bindings is done here and not at the end of render since they
+      # will not be available until after the model is rendered, but should be
+      # available before the collection is rendered.
+      @bindUIElements()
+      @triggerMethod("composite:model:rendered")
+
+      # Reattach the children
+      @$el.find(@itemViewContainer).append($children)
+
+      @triggerMethod("composite:rendered")
+      @triggerRendered()
 
     render: () ->
       result = super()
@@ -38,14 +50,14 @@ define [
         @_renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
+      return result
 
+    onRender: () ->
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
-
-      return result
 
     templateHelpers: () ->
       return {
@@ -123,7 +135,7 @@ define [
       @render()
 
     editSettings: ->
-      title = prompt('Edit Title:', @model.getTitle(@container))
-      if title then @model.setTitle(@container, title)
+      title = prompt('Edit Title:', @model.getTitle?(@container) or @model.get('title'))
+      if title then @model.setTitle?(@container, title) or @model.set('title', title)
 
       @render()
