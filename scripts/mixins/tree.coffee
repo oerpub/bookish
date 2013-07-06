@@ -30,7 +30,7 @@ define ['backbone'], (Backbone) ->
         #
 
         # Remove the child if it is already attached somewhere
-        child._tree_parent.removeChild(child) if child._tree_parent
+        child._tree_parent.removeChild(child) if child._tree_parent and child._tree_parent != @
 
         child._tree_parent = @
         child._tree_root = @_tree_root
@@ -57,15 +57,14 @@ define ['backbone'], (Backbone) ->
 
     newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
 
-    getParent: () -> @_tree_parent
-    getChildren: () -> @_tree_children
+    getParent:   () -> @_tree_parent
+    getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
 
     removeChild: (model) ->
       children = @getChildren()
-      #throw 'BUG: child is not in this node' if not model.parent and children.get(model.id) or children.get(model)
-      @getChildren().remove(model.id)
-      @getChildren().remove(model)
-
+      throw 'BUG: child is not in this node' if not (children.contains(model) or children.get(model.id))
+      model = children.get(model.id) if !children.contains(model)
+      children.remove(model)
 
     addChild: (model, at=0) ->
       children = @getChildren()
@@ -80,6 +79,7 @@ define ['backbone'], (Backbone) ->
         if children.indexOf(realModel) < at
           at = at - 1
         children.remove(realModel)
+        realModel._tree_parent = null
 
       # Before adding the model make sure it's a Tree Node (does it have `._children`.
       # If not, wrap it in a node
