@@ -177,7 +177,7 @@ define [
           mediaType: mediaType
           properties: $item.attr 'properties'
 
-        allContent.add model
+        allContent.add model, {loading:true}
         @manifest.add model
 
         # If we stumbled upon the special navigation document

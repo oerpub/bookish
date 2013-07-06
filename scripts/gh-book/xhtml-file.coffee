@@ -103,7 +103,7 @@ define [
           $img.attr('src', "data:#{mediaType};base64,#{encoded}")
 
           counter--
-          @set 'body', $body[0].innerHTML if counter == 0
+          @set 'body', $body[0].innerHTML, {loading:true} if counter == 0
 
         .fail ->
           counter--
