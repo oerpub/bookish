@@ -58,7 +58,7 @@ define ['backbone'], (Backbone) ->
     newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
 
     getParent:   () -> @_tree_parent
-    getChildren: () -> @_tree_children
+    getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
 
     removeChild: (model) ->
       children = @getChildren()
