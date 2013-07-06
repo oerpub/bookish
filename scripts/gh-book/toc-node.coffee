@@ -4,7 +4,7 @@ define [
   'cs!mixins/tree'
 ], (Backbone, XhtmlFile, treeMixin) ->
 
-  mediaType = 'application/vnd.org.cnx.folder'
+  mediaType = 'application/vnd.org.cnx.section'
 
   class TocNode extends Backbone.Model
 

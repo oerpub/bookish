@@ -10,6 +10,7 @@ define [
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
+  'less!./gh-book'
 ], ($, _, Backbone, Marionette, Github, logger, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
 
   # Stop logging.
