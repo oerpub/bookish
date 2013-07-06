@@ -61,8 +61,11 @@ define ['backbone'], (Backbone) ->
     getChildren: () -> @_tree_children
 
     removeChild: (model) ->
-      throw 'BUG: child is not in this node' if not @getChildren().get(model.id)
+      children = @getChildren()
+      #throw 'BUG: child is not in this node' if not model.parent and children.get(model.id) or children.get(model)
       @getChildren().remove(model.id)
+      @getChildren().remove(model)
+
 
     addChild: (model, at=0) ->
       children = @getChildren()
