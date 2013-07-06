@@ -22,6 +22,11 @@ define [
 
       @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
 
+      if @collection
+        # Figure out if the expanded state has changed (see if we need to re-render the model)
+        @listenTo @collection, 'add', (model, collection, options) => @renderModelOnly() if @collection.length == 1
+        @listenTo @collection, 'remove', (model, collection, options) => @renderModelOnly() if @collection.length == 0
+
 
     renderModelOnly: () ->
       # Detach the children
