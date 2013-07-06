@@ -62,7 +62,6 @@ define ['backbone'], (Backbone) ->
 
     removeChild: (model) ->
       children = @getChildren()
-
       throw 'BUG: child is not in this node' if not (children.contains(model) or children.get(model.id))
       model = children.get(model.id) if !children.contains(model)
       children.remove(model)

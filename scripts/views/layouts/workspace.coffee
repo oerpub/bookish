@@ -6,9 +6,10 @@ define [
   'cs!collections/content'
   'cs!views/workspace/content/search-results'
   'cs!views/layouts/workspace/menu'
-  'cs!views/layouts/workspace/sidebar'
+  'cs!views/workspace/sidebar/toc'
   'hbs!templates/layouts/workspace'
-], ($, _, Backbone, Marionette, content, SearchResultsView, menuLayout, sidebarLayout, workspaceTemplate) ->
+], ($, _, Backbone, Marionette, content, SearchResultsView, menuLayout, TocView, workspaceTemplate) ->
+
 
   return class Workspace extends Marionette.Layout
     template: workspaceTemplate
@@ -41,4 +42,5 @@ define [
       # Load the sidebar
       if @model?.sidebarView?
         @model.sidebarView((view) => if view then @sidebar.show(view))
-      else @sidebar.show(sidebarLayout)
+      else
+        content.load().done () => @sidebar.show(new TocView {model:content})
