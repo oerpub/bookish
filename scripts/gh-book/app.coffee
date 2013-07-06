@@ -10,8 +10,10 @@ define [
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
-  'less!./gh-book'
-], ($, _, Backbone, Marionette, Github, logger, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile) ->
+  'cs!gh-book/sign-in'
+  'less!styles/main'
+  'less!gh-book/gh-book'
+], ($, _, Backbone, Marionette, Github, logger, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, SignInView) ->
 
   # Stop logging.
   logger.stop()
@@ -24,12 +26,15 @@ define [
 
   App.addInitializer (options) ->
 
+    # Register media types for editing
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpg'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
+
+    # Views use anchors with hrefs so catch the click and send it to Backbone
     $(document).on 'click', 'a:not([data-bypass])', (e) ->
       external = new RegExp('^((f|ht)tps?:)?//')
       href = $(@).attr('href')
@@ -41,7 +46,7 @@ define [
       else
         if href then Backbone.history.navigate(href, {trigger: true})
 
-
+    # Github read/write and repo configuration
 
     session = new Backbone.Model()
     session.set
@@ -53,7 +58,13 @@ define [
       'token'   : null         # Set your token here if you want
 
     getRepo = () ->
-      gh = new Github(session.toJSON())
+      config =
+        auth: (if session.get('token') then 'oauth' else 'basic')
+        token:    session.get('token')
+        id:       session.get('id')
+        password: session.get('password')
+
+      gh = new Github(config)
       gh.getRepo(session.get('repoUser'), session.get('repoName'))
 
 
@@ -90,37 +101,42 @@ define [
       return ret
 
 
-    # Remove cyclic dependency. Controller depends on `App.main` region
-    require ['cs!controllers/routing'], (controller) ->
+    startRouting = () ->
+      # Remove cyclic dependency. Controller depends on `App.main` region
+      require ['cs!controllers/routing'], (controller) ->
 
-      # Custom routes to configure the Github User and Repo from the browser
-      new class GithubRouter extends Backbone.Router
-        routes:
-          'repo/:repoUser/:repoName':         'configRepo'
-          'repo/:repoUser/:repoName/:branch': 'configRepo'
+        # Custom routes to configure the Github User and Repo from the browser
+        new class GithubRouter extends Backbone.Router
+          routes:
+            'repo/:repoUser/:repoName':         'configRepo'
+            'repo/:repoUser/:repoName/:branch': 'configRepo'
 
-          '':             'workspace' # Show the workspace list of content
-          'workspace':    'workspace'
-          'edit/*id':     'edit' # Edit an existing piece of content (id can be a path)
+            '':             'workspace' # Show the workspace list of content
+            'workspace':    'workspace'
+            'edit/*id':     'edit' # Edit an existing piece of content (id can be a path)
 
-        configRepo: (repoUser, repoName, branch='master') ->
-          session.set
-            'repoUser': repoUser
-            'repoName': repoName
-            'branch': branch
+          configRepo: (repoUser, repoName, branch='master') ->
+            session.set
+              'repoUser': repoUser
+              'repoName': repoName
+              'branch': branch
 
-          @workspace()
+            @workspace()
 
-        # Delay the route handling until the initial content is loaded
-        # TODO: Move this into the controller
-        workspace: () -> allContent.load().done () => controller.workspace()
-        edit: (id)    -> allContent.load().done () => controller.edit(id)
+          # Delay the route handling until the initial content is loaded
+          # TODO: Move this into the controller
+          workspace: () -> allContent.load().done () => controller.workspace()
+          edit: (id)    -> allContent.load().done () => controller.edit(id)
 
 
-      Backbone.history.start
-        pushState: false
-        hashChange: true
-        root: ''
+        Backbone.history.start
+          pushState: false
+          hashChange: true
+          root: ''
 
+
+    signIn = new SignInView {model:session}
+    signIn.once 'close', startRouting
+    App.main.show(signIn)
 
   return App
