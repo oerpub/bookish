@@ -15,7 +15,7 @@ define [
       @set 'title', options.title
       @htmlAttributes = options.htmlAttributes or {}
 
-      @on 'change:title', (model, options) =>
+      @on 'change:title', (model, value, options) =>
         @trigger 'tree:change', model, @, options
 
       @_initializeTreeHandlers(options)

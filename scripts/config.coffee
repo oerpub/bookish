@@ -6,6 +6,9 @@ require.config
     app: 'gh-book/app'
     github: '../node_modules/github-client/github'
     'collections/content': 'gh-book/content'
+    'views/workspace/menu/auth': 'gh-book/auth'
+    session: 'gh-book/session'
+
 
     # ## Template and Style paths
     templates: '../templates'

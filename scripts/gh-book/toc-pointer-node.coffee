@@ -18,5 +18,8 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
 
       @model.on 'all', () => @trigger.apply @, arguments
 
+      # When the title changes on the XhtmlModel update it in the ToC as well
+      @model.on 'change:title', () => @set('title', @model.get('title'))
+
       options.title = options.title or @model.get 'title'
       super(options)

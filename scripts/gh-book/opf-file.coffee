@@ -38,9 +38,9 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
-      @getChildren().on 'add remove', (model, collection, options) =>
+      @getChildren().on 'tree:change add remove', (model, collection, options) =>
         setNavModel(options)
-      @getChildren().on 'tree:change change reset', (collection, options) =>
+      @getChildren().on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel(options)
 
@@ -92,9 +92,6 @@ define [
             model = @newNode {title: title, htmlAttributes: attributes, model: contentModel}
 
             collection.add model, {doNotReparse:true}
-
-            @listenTo model, 'change:title', () =>
-              console.warn 'TODO: BUG: Change the title in the ToC'
 
           else if $span[0]
             model = new TocNode {title: $span.text(), htmlAttributes: attributes, root: @}

@@ -5,15 +5,16 @@ define [
   'marionette'
   'github'
   'cs!helpers/logger'
+  'cs!session'
   'cs!collections/content'
   'cs!collections/media-types'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
-  'cs!gh-book/sign-in'
+  'cs!gh-book/welcome-sign-in'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, Github, logger, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, SignInView) ->
+], ($, _, Backbone, Marionette, Github, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView) ->
 
   # Stop logging.
   logger.stop()
@@ -46,16 +47,25 @@ define [
       else
         if href then Backbone.history.navigate(href, {trigger: true})
 
-    # Github read/write and repo configuration
 
-    session = new Backbone.Model()
-    session.set
-      'repoUser': 'Connexions'
-      'repoName': 'atc'
-      'branch'  : 'sample-book'
-      'rootPath': ''
-      'auth'    : 'oauth'
-      'token'   : null         # Set your token here if you want
+    # Populate the Session Model from localStorage
+    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'rootPath', 'id', 'password']
+    props = {}
+    _.each STORED_KEYS, (key) ->
+      value = window.sessionStorage.getItem key
+      props[key] = value if value
+    session.set props
+
+    # On change, store info to localStorage
+    session.on 'change', () =>
+      # Update session storage
+      for key in STORED_KEYS
+        value =  session.get key
+        window.sessionStorage.setItem key, value
+
+
+
+    # Github read/write and repo configuration
 
     getRepo = () ->
       config =
@@ -135,8 +145,9 @@ define [
           root: ''
 
 
-    signIn = new SignInView {model:session}
+    signIn = new WelcomeSignInView {model:session}
     signIn.once 'close', startRouting
     App.main.show(signIn)
+    signIn.signInModal()
 
   return App
