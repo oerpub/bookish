@@ -41,8 +41,8 @@ define ['backbone'], (Backbone) ->
         delete child._tree_root
         @trigger 'tree:remove', child, collection, options
 
-      @_tree_children.on 'change', (child, collection, options) =>
-        @trigger 'tree:change', child, collection, options
+      @_tree_children.on 'change', (child, options) =>
+        @trigger 'tree:change', child, @_tree_children, options
 
       trickleEvents = (name) =>
         @_tree_children.on name, (model, collection, options) =>
@@ -81,7 +81,7 @@ define ['backbone'], (Backbone) ->
         children.remove(realModel)
         realModel._tree_parent = null
 
-      # Before adding the model make sure it's a Tree Node (does it have `._children`.
+      # Before adding the model make sure it's a Tree Node (does it have `._tree_children`.
       # If not, wrap it in a node
       if ! (model._tree_children)
         model = @_tree_root.newNode {model:model}
