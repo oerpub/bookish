@@ -71,7 +71,7 @@ define [
       config =
         auth: (if session.get('token') then 'oauth' else 'basic')
         token:    session.get('token')
-        id:       session.get('id')
+        username: session.get('id')
         password: session.get('password')
 
       gh = new Github(config)
