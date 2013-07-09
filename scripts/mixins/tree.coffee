@@ -42,6 +42,8 @@ define ['backbone'], (Backbone) ->
         @trigger 'tree:remove', child, collection, options
 
       @_tree_children.on 'change', (child, options) =>
+        # Send 3 arguments so it matches the same signature
+        # as `Collection.add/remove` and `tree:add/tree:remove`.
         @trigger 'tree:change', child, @_tree_children, options
 
       trickleEvents = (name) =>
