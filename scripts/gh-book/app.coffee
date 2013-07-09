@@ -135,8 +135,8 @@ define [
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
-          workspace: () -> allContent.load().done () => controller.workspace()
-          edit: (id)    -> allContent.load().done () => controller.edit(id)
+          workspace: () -> allContent.reload().done () => controller.workspace()
+          edit: (id)    -> allContent.reload().done () => controller.edit(id)
 
 
         Backbone.history.start

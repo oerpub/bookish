@@ -34,4 +34,19 @@ define ['jquery'], ($) ->
     # _loadComplex: (fetchPromise) -> fetchPromise
 
 
+    # Force a `Backbone.Collection` or `Backbone.Model` to reload its contents.
+    # If in the middle of a `load` it waits until the load completes.
+    # Returns a Promise when the reload complates.
+    reload: () ->
+      # Finish reloading if loading has already started
+      if @_loading
+        return @_loading.then () =>
+          delete @_loading
+          return @reload()
+
+      else
+        # For collections reset the contents to nothing
+        @reset?()
+        return @load()
+
   return loadableMixin
