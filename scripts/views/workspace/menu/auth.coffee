@@ -3,7 +3,7 @@ define [
   'underscore'
   'backbone'
   'marionette'
-  'session'
+  'cs!session'
   'cs!collections/content'
   'hbs!templates/workspace/menu/auth'
   'bootstrapTooltip'
@@ -32,10 +32,11 @@ define [
 
     initialize: () ->
       @listenTo(session, 'login logout', @render)
-      @listenTo(content, 'add remove', @changed)
+      @listenTo content, 'add remove', (model, collection, options) =>
+        @changed() if not (options.loading or options.parse)
       @listenTo content, 'change', (model, options) =>
         # A change event can occur (ie setting a title during parsing but the changed set is still empty)
-        @changed() if model?.hasChanged()
+        @changed() if model?.hasChanged() and not (options.loading or options.parse)
 
       # Bind a function to the window if the user tries to navigate away from this page
       $(window).on 'beforeunload', () ->

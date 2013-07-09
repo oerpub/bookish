@@ -7,6 +7,9 @@ define [
 
   # Backbone Collection used to store a container's contents
   class Container extends Backbone.Collection
+    initialize: () ->
+      @titles = []
+
     findMatch: (model) ->
       return _.find @titles, (obj) ->
         return model.id is obj.id or model.cid is obj.id
@@ -63,12 +66,11 @@ define [
     unique: true
     branch: true
     expanded: false
-    promise: () -> return @_deferred.promise()
 
     toJSON: () ->
       json = super()
 
-      contents = @getChildren() or {}
+      contents = @getChildren?().toArray() or []
 
       json.contents = []
       _.each contents.models, (item) ->
@@ -88,62 +90,59 @@ define [
       return @accept
 
     initialize: (attrs) ->
-      @_deferred = $.Deferred()
+      # Ensure there is always a Collection in `contents`
+      @get('contents') || @set('contents', new Container(), {parse:true})
 
-      if not @isNew()
-        @loading = true
-        @fetch
-          silent: true
-          loading: true
-          success: (model, response, options) =>
-            @loading = false
-      else
-        @_deferred.resolve()
+      @load()
+
+    _loadComplex: (promise) ->
+      # This container is not considered loaded until the ALL content container
+      # has finished loading.
+      # Weird.
+      # TODO: Untangle this dependency later
+      newPromise = new $.Deferred()
+
+      # Since this is a nested require and `.parse()` depends on all content being loaded
+      # We need to squirrel `cs!collections/content` onto the object so parse can use it
+      require ['cs!collections/content'], (allContent) =>
+        @_ALL_CONTENT_HACK = allContent
+        allContent.load().done () =>
+          newPromise.resolve(@)
+
+      return newPromise
 
     getChildren: () -> @get('contents')
 
-    add: (models, options) ->
-      if (!_.isArray(models)) then (models = if models then [models] else [])
+    addChild: (models, options) ->
+      @getChildren().add(models, options)
 
-      _.each models, (model, index, arr) =>
-        contents = @getChildren()
-
-        # Add new media to the beginning of the array
-        if contents.length and not options?.loading
-          @getChildren().unshift(model)
-        else
-          @getChildren().add(model)
-
-      if not options?.silent then @trigger('change')
-
-      return @
-
-    set: (key, val, options) ->
-      if (key == null) then return this;
-
-      if typeof key is 'object'
-        attrs = key
-        options = val
-      else
-        (attrs = {})[key] = val
-
-      options = options || {}
-      contents = attrs.contents or attrs.body
-
+    parse: (json) ->
+      contents = json.body or json.contents
+      titles = []
       if contents
         if not _.isArray(contents)
           contents = parseHTML(contents)
+          # Only books can contain overridden titles.
+          titles = contents
 
-        attrs.contents = @getChildren() or new Container()
-        attrs.contents.titles = contents
+      else throw 'BUG: Container must contain either a contents or a body'
 
-        require ['cs!collections/content'], (content) =>
-          content.loading().done () =>
-            _.each contents, (item) =>
-              @add(content.get({id: item.id}), options)
-            @_deferred.resolve()
+      # Look up each entry in Contents
+      contentsModels = _.map contents, (item) =>
+        @_ALL_CONTENT_HACK.get({id: item.id})
 
-      return super(attrs, options)
+      container = @getChildren()
+      if container
+        container.reset(contentsModels)
+        delete json.contents
+      else
+        container = new Container(contentsModels)
+        json.contents = container
+
+      # Set the titles (for a book)
+      container.titles = titles
+
+      return json
 
     # Change the content view when editing this
     contentView: (callback) ->

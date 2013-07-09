@@ -19,7 +19,7 @@ define [
         app.main.show(@layout)
       else
         # load default views
-        @layout.load()
+        @layout.showViews()
 
     # Edit existing content
     # -------
@@ -36,6 +36,6 @@ define [
       if not @layout
         @layout = new WorkspaceLayout({model: model})
         app.main.show(@layout)
-      else
-        # load editor views
-        @layout.load({model: model})
+
+      # load editor views
+      @layout.showViews({model: model})

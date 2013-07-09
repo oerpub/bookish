@@ -9,10 +9,7 @@ define [
   return new class Session extends Backbone.Model
     url: '/me'
 
-    initialize: () ->
-      @load()
-
-    load: () ->
+    login: () ->
       @fetch
         success: (model, response, options) =>
           # Logged in
@@ -23,9 +20,6 @@ define [
 
         error: (model, response, options) ->
           console.log 'Failed to load session.'
-
-    login: () ->
-      @load()
 
     logout: () ->
       @reset()

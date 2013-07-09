@@ -7,7 +7,7 @@ define [
   'cs!collections/media-types'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/content/search-results-item'
-], ($, _, Backbone, Marionette, Moment, mediaTypes, enableContentDragging, searchResultsItemTemplate) ->
+], ($, _, Backbone, Marionette, Moment, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
 
   # Search Result View (workspace)
   # -------
@@ -20,18 +20,22 @@ define [
   return class SearchResultsItem extends Marionette.ItemView
     tagName: 'tr'
 
-    initialize: () ->
-      @template = (data) =>
-        data.id = @model.id or @model.cid
-        data.loading = @model.loading
-        return searchResultsItemTemplate(data)
+    template: searchResultsItemTemplate
 
+    templateHelpers: () ->
+      return {
+        id: @model.id or @model.cid
+        mediaType: @model.mediaType
+        isLoading: @model.loading
+      }
+
+    initialize: () ->
       @listenTo(@model, 'change sync', @render)
       @listenTo(@, 'render show', @updateTimer)
 
     onRender: () ->
       # Add DnD options to content
-      enableContentDragging(@model, @$el.children('*[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.children('*[data-media-type]'))
 
     # Updates the relative time for a set of elements periodically
     updateTimer: () ->

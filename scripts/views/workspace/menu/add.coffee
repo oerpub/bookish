@@ -4,19 +4,15 @@ define [
   'backbone'
   'marionette'
   'cs!collections/content'
-  'cs!collections/media-types'
   'hbs!templates/workspace/menu/add'
   'hbs!templates/workspace/menu/add-item'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, content, mediaTypes, addTemplate, addItemTemplate) ->
+], ($, _, Backbone, Marionette, content, addTemplate, addItemTemplate) ->
 
   class AddItemView extends Marionette.ItemView
     tagName: 'li'
 
-    initialize: () ->
-      @template = (data) =>
-        data.id = @model.id
-        return addItemTemplate(data)
+    template: addItemTemplate
 
     events:
       'click .add-content-item': 'addItem'
@@ -31,8 +27,7 @@ define [
       # Begin editing certain media as soon as they are added.
       model.addAction?()
 
-  return new class AddView extends Marionette.CompositeView
-    collection: mediaTypes
+  return class AddView extends Marionette.CompositeView
     template: addTemplate
     itemView: AddItemView
     itemViewContainer: '.btn-group > ul'

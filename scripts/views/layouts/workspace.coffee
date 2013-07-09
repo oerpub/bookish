@@ -19,9 +19,9 @@ define [
       sidebar: '#sidebar'
 
     onRender: () ->
-      @load(@model)
+      @showViews()
 
-    load: (options) ->
+    showViews: (options) ->
       @model = options?.model
 
       # Make sure the menu is loaded

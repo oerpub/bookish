@@ -2,7 +2,7 @@
 
 <td data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}">
   <i class="icon-content"></i>
-  <a href="content/{{id}}">
+  <a href="edit/{{id}}">
     <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
     {{#if title}}
       {{{title}}}
@@ -20,7 +20,7 @@
 {{! Last Modified }}
 <td>
   {{! Display a progress bar if the file has not loaded yet }}
-  {{#if loading}}
+  {{#if isLoading}}
     <div class="progress progress-striped active" style="display: inline-block; width: 100px;">
       <div class="bar" style="width: 100%;"></div>
     </div>

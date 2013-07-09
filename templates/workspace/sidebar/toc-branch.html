@@ -3,7 +3,7 @@
 {{! Includes drop zones and supports nodes that point to content (with ids) and containers (chapter/unit)}}
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
-{{#if contents.length}}
+{{#if hasChildren}}
   <span class="editor-expand-collapse" title="Click to expand/collapse"><i class="icon-content"></i></span>
 {{/if}}
 
@@ -24,7 +24,7 @@
 {{else}}
   <span data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
     <span class="editor-node-title">
-      <a href="content/{{id}}">
+      <a href="edit/{{id}}">
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
         {{#if title}}
           {{{title}}}
@@ -38,8 +38,8 @@
 
 </div>
 
-{{#if parent}}
-  {{#if children}}
+{{#if hasParent}}
+  {{#if hasChildren}}
   {{else}}
     <div class="editor-drop-zone editor-drop-zone-after editor-node-after"></div>
   {{/if}}
@@ -50,8 +50,8 @@
 {{! Always include the list because a node _may_ get children later}}
 <ol></ol>
 
-{{#if parent}}
-  {{#if children}}
+{{#if hasParent}}
+  {{#if hasChildren}}
     <div class="editor-drop-zone editor-drop-zone-after editor-node-after"></div>
   {{/if}}
 {{/if}}

@@ -32,4 +32,5 @@ define [
           #pushState: true
           root: app.root
 
+    session.login()
   return app

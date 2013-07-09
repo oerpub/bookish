@@ -5,7 +5,7 @@ define [
   'marionette'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Backbone, Marionette, enableContentDragging, tocBranchTemplate) ->
+], ($, _, Backbone, Marionette, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
     tagName: "li"
@@ -20,6 +20,33 @@ define [
       @itemViewOptions = {container: @collection}
       @container = options.container
 
+      @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
+
+      if @collection
+        # Figure out if the expanded state has changed (see if we need to re-render the model)
+        @listenTo @collection, 'add', (model, collection, options) => @renderModelOnly() if @collection.length == 1
+        @listenTo @collection, 'remove', (model, collection, options) => @renderModelOnly() if @collection.length == 0
+
+
+    renderModelOnly: () ->
+      # Detach the children
+      $children = @$el.find(@itemViewContainer).children()
+
+      @triggerBeforeRender()
+      html = @renderModel()
+      @$el.html(html)
+      # the ui bindings is done here and not at the end of render since they
+      # will not be available until after the model is rendered, but should be
+      # available before the collection is rendered.
+      @bindUIElements()
+      @triggerMethod("composite:model:rendered")
+
+      # Reattach the children
+      @$el.find(@itemViewContainer).append($children)
+
+      @triggerMethod("composite:rendered")
+      @triggerRendered()
+
     render: () ->
       result = super()
 
@@ -28,11 +55,22 @@ define [
         @_renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
-
-      # Add DnD options to content
-      enableContentDragging(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
-
       return result
+
+    onRender: () ->
+      # Add DnD options to content
+      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+
+      if @model.getParent?()
+        EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
+
+    templateHelpers: () ->
+      return {
+        mediaType: @model.mediaType
+        hasParent: !! @model.getParent?()
+        hasChildren: !! @model.getChildren?()?.length
+        isExpanded: @expanded
+      }
 
     # Override Marionette's renderModel() so we can replace the title
     # if necessary without affecting the model itself
@@ -44,6 +82,16 @@ define [
 
       template = @getTemplate()
       return Marionette.Renderer.render(template, data)
+
+    # Override internal Marionette method.
+    # This method adds a child list item at a given index.
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
 
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
@@ -92,7 +140,7 @@ define [
       @render()
 
     editSettings: ->
-      title = prompt('Edit Title:', @model.getTitle(@container))
-      if title then @model.setTitle(@container, title)
+      title = prompt('Edit Title:', @model.getTitle?(@container) or @model.get('title'))
+      if title then @model.setTitle?(@container, title) or @model.set('title', title)
 
       @render()
