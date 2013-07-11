@@ -8,7 +8,7 @@
   },
   "scripts": {
     "install": "./install-libs.sh",
-    "update": "./install-libs.sh"
+    "update": "./install-libs.sh",
     "test": "jasmine-node --verbose --coffee --runWithRequireJs --requireJsSetup ./specs/requirejs-wrapper-template.js  ./specs/"
   },
   "dependencies": {
