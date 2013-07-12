@@ -13,7 +13,7 @@ define [
 
     initialize: (options) ->
       @template = (data) =>
-        data.id = @model.id
+        data.id = @model.id or @model.cid
         return tocBranchTemplate(data)
 
       @collection = @model.getChildren?()
