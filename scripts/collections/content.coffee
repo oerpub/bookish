@@ -17,7 +17,7 @@ define [
 ], ($, _, Backbone, session, mediaTypes, loadable) ->
 
   class AllContent extends Backbone.Collection
-    url: '/api/content'
+    url: '/workspace'
 
     initialize: () ->
       if session.authenticated() then @load()
