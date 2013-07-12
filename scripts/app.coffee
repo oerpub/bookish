@@ -20,11 +20,10 @@ define [
         external = new RegExp('^((f|ht)tps?:)?//')
         href = $(@).attr('href')
 
-        if not href or href is '#' then return
-
         e.preventDefault()
 
-        if external.test(href)
+        if not href or href is '#' then return
+        else if external.test(href)
           window.open(href, '_blank')
         else
           if href then router.navigate(href, {trigger: true})
