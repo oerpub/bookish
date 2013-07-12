@@ -67,7 +67,7 @@ define [
         .done () -> saveNextItem(queue)
 
       # Save all the models that have changes
-      changedModels = @filter (model) -> model.hasChanged()
+      changedModels = @filter (model) -> model.hasChanged() or model.isNew()
       saveNextItem(changedModels)
 
 
