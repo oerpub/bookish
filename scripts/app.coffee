@@ -20,6 +20,8 @@ define [
         external = new RegExp('^((f|ht)tps?:)?//')
         href = $(@).attr('href')
 
+        if not href or href is '#' then return
+
         e.preventDefault()
 
         if external.test(href)
