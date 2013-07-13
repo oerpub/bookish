@@ -118,9 +118,12 @@ define [
 
     parse: (json) ->
       contents = json.body or json.contents
+      titles = []
       if contents
         if not _.isArray(contents)
           contents = parseHTML(contents)
+          # Only books can contain overridden titles.
+          titles = contents
 
       else throw 'BUG: Container must contain either a contents or a body'
 
@@ -128,11 +131,16 @@ define [
       contentsModels = _.map contents, (item) =>
         @_ALL_CONTENT_HACK.get({id: item.id})
 
-      if @getChildren()
-        @getChildren().reset(contentsModels)
+      container = @getChildren()
+      if container
+        container.reset(contentsModels)
         delete json.contents
       else
-        json.contents = new Container(contentsModels)
+        container = new Container(contentsModels)
+        json.contents = container
+
+      # Set the titles (for a book)
+      container.titles = titles
 
       return json
 

@@ -60,4 +60,4 @@ singleFile "https://raw.github.com/marionettejs/backbone.marionette/v1.0.3/lib/b
 cd "../"
 
 fromGithub "https://github.com/oerpub/Aloha-Editor" "master" "" "aloha-editor"
-fromGithub "https://github.com/twitter/bootstrap" "v2.3.2" "2.3.2"
+fromGithub "https://github.com/twitter/bootstrap" "v2.2.2" "2.2.2"

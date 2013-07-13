@@ -10,7 +10,7 @@ define [
     proxy: 'data/me.json'
 
   $.mockjax
-    url: '/api/content'
+    url: '/workspace'
     proxy: 'data/content.json'
 
   $.mockjax (settings) ->
