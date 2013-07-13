@@ -17,7 +17,7 @@ define [
 ], ($, _, Backbone, session, mediaTypes, loadable) ->
 
   class AllContent extends Backbone.Collection
-    url: '/api/content'
+    url: '/workspace'
 
     initialize: () ->
       if session.authenticated() then @load()
@@ -67,7 +67,7 @@ define [
         .done () -> saveNextItem(queue)
 
       # Save all the models that have changes
-      changedModels = @filter (model) -> model.hasChanged()
+      changedModels = @filter (model) -> model.hasChanged() or model.isNew()
       saveNextItem(changedModels)
 
 
