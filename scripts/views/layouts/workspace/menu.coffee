@@ -4,17 +4,23 @@ define [
   'backbone'
   'marionette'
   'cs!collections/media-types'
+  'cs!controllers/routing'
   'cs!session'
   'cs!views/workspace/menu/auth'
   'cs!views/workspace/menu/add'
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, mediaTypes, session, AuthView, AddView, toolbarView, menuTemplate) ->
+], ($, _, Backbone, Marionette, mediaTypes, controller, session, AuthView, AddView, toolbarView, menuTemplate) ->
 
   _toolbar = null
 
   return new class MenuLayout extends Marionette.Layout
     template: menuTemplate
+
+    events:
+      'click .go-workspace': 'goWorkspace'
+
+    goWorkspace: () -> controller.goWorkspace()
 
     regions:
       add: '#workspace-menu-add'

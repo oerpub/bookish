@@ -4,6 +4,7 @@ define [
   'backbone'
   'marionette'
   'cs!session'
+  'less!styles/main.less'
 ], ($, _, Backbone, Marionette, session) ->
 
   app = new Marionette.Application()
@@ -14,18 +15,10 @@ define [
     main: '#main'
 
   app.on 'start', (options) ->
-    # Load router
-    require ['cs!routers/router'], (router) ->
-      $(document).on 'click', 'a:not([data-bypass])', (e) ->
-        external = new RegExp('^((f|ht)tps?:)?//')
-        href = $(@).attr('href')
-
-        e.preventDefault()
-
-        if external.test(href)
-          window.open(href, '_blank')
-        else
-          if href then router.navigate(href, {trigger: true})
+    # Load router (it registers globally to Backbone.history)
+    require ['cs!controllers/routing', 'cs!routers/router'], (controller) =>
+      # set the main div for all the layouts
+      controller.main = @main
 
       if not Backbone.History.started
         Backbone.history.start
