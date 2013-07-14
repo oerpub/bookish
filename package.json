@@ -12,7 +12,7 @@
     "test": "jasmine-node --verbose --coffee --runWithRequireJs --requireJsSetup ./specs/requirejs-wrapper-template.js  ./specs/"
   },
   "dependencies": {
-    "github-client": "*",
+    "github-client": "~0.1.4",
     "backbone": "~1.0",
     "jquery": "~1.8",
     "coffee-script": "~1.6",

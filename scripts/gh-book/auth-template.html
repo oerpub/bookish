@@ -1,6 +1,13 @@
+{{#if canCollaborate}}
 <button id="save-content" type="button" class="btn {{#if isDirty}}btn-primary{{else}}disabled{{/if}}" data-placement="bottom" data-toggle="tooltip" title="Save all changes">
   <i class="icon-save"></i> Save
 </button>
+{{else}}
+<button id="fork-content" type="button" class="btn btn-success" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
+  <i class="icon-code-fork"></i> Fork This Book!
+</button>
+
+{{/if}}
 
 {{#if isAuthenticated}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
@@ -40,6 +47,24 @@
   </div>
   <div class="modal-footer">
     <button id="sign-in-ok" type="submit" class="btn btn-primary" data-dismiss="modal">Sign In</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+  </div>
+</div>
+
+
+<!-- Fork Book Modal -->
+<div id="fork-book-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="fork-book-modal-label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="fork-book-modal-label">Copy this book!</h3>
+  </div>
+  <h4>&#160; Places I have permission to make changes:</h4>
+  <div class="modal-body">
+
+    [Places to fork to go here]
+
+  </div>
+  <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
   </div>
 </div>

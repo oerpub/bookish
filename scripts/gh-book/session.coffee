@@ -1,12 +1,28 @@
-define ['backbone'], (Backbone) ->
+define ['backbone', 'github'], (Backbone, Github) ->
 
-  session = new Backbone.Model()
-  session.set
-    'repoUser': 'Connexions'
-    'repoName': 'atc'
-    'branch'  : 'sample-book'
-    'rootPath': ''
-    'auth'    : 'oauth'
-    'token'   : null         # Set your token here if you want
+  class GithubSession extends Backbone.Model
+    initialize: () ->
+      @on 'change', () =>
+        # See if this user can collaborate
+        @getRepo().canCollaborate().done (canCollaborate) =>
+          @set 'canCollaborate', canCollaborate
 
-  return session
+    getClient: () ->
+      config =
+        auth: (if @get('token') then 'oauth' else 'basic')
+        token:    @get('token')
+        username: @get('id')
+        password: @get('password')
+
+      return new Github(config)
+
+    getRepo: () ->
+      @getClient().getRepo(@get('repoUser'), @get('repoName'))
+
+    getBranch: () ->
+      if @get 'branch'
+        @getRepo().getBranch(@get 'branch')
+      else
+        @getRepo().getDefaultBranch()
+
+  return new GithubSession()
