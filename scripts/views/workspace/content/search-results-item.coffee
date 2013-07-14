@@ -26,7 +26,8 @@ define [
       return {
         id: @model.id or @model.cid
         mediaType: @model.mediaType
-        isLoading: @model.loading
+        isLoaded: @isLoaded
+        isDirty: @model.isDirty()
       }
 
     initialize: () ->

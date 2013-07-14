@@ -20,6 +20,7 @@ define [
       title: null
 
     initialize: () ->
+      super()
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
       # The title of the XhtmlFile is not stored inside the file;

@@ -50,23 +50,28 @@ define [
     loading: () ->
       return _loaded.promise()
 
+    # Save serially.
     save: (options) ->
-      # Save serially.
+      # save returns a promise.
+      promise = new $.Deferred()
+
       # Pull the next model off the queue and save it.
       # When saving has completed, save the next model.
       saveNextItem = (queue) =>
         if not queue.length
           options?.success?()
+          promise.resolve(@)
           return
 
         model = queue.shift()
         model.save()
-        .fail((err) -> throw err)
+        .fail((err) -> promise.reject(err))
         .done () -> saveNextItem(queue)
 
       # Save all the models that have changes
-      changedModels = @filter (model) -> model.hasChanged()
+      changedModels = @filter (model) -> model.isDirty()
       saveNextItem(changedModels)
+      return promise.promise()
 
   EPUBContainer = EPUBContainer.extend loadableMixin
   # All content in the Workspace

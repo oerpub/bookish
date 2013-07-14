@@ -26,6 +26,10 @@ define [
       $(window).on 'beforeunload', () ->
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @isDirty
 
+      # Since this View is reloaded all the time (whenever a route change occurs)
+      # re-set the `isDirty` bit.
+      @isDirty = true if allContent.some (model) -> model.isDirty()
+
     templateHelpers: () ->
       return {
         isDirty: @isDirty

@@ -1,17 +1,19 @@
 define [
   'backbone'
   'cs!gh-book/xhtml-file'
+  'cs!models/content/inherits/saveable'
   'cs!mixins/tree'
-], (Backbone, XhtmlFile, treeMixin) ->
+], (Backbone, XhtmlFile, SaveableModel, treeMixin) ->
 
   mediaType = 'application/vnd.org.cnx.section'
 
-  class TocNode extends Backbone.Model
+  class TocNode extends SaveableModel # Extend SaveableModel so you can get the isDirty for saving
 
     mediaType: mediaType
     accept: [mediaType, XhtmlFile::mediaType]
 
     initialize: (options) ->
+      super(options)
       @set 'title', options.title
       @htmlAttributes = options.htmlAttributes or {}
 
