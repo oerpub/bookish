@@ -133,11 +133,11 @@ define [
             'workspace':    'goWorkspace'
             'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a path)
 
-          configRepo: (repoUser, repoName, branch=null) ->
-            config = {repoUser:repoUser, repoName:repoName}
-            config.branch = branch if branch
-
-            session.set config
+          configRepo: (repoUser, repoName, branch='') ->
+            session.set
+              repoUser: repoUser
+              repoName: repoName
+              branch:   branch
 
             allContent.reload()
             @goWorkspace()
