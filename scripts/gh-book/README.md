@@ -20,5 +20,4 @@ Some example Repositories you can use:
 Then, make the following changes:
 
 1. Change `./app-local.coffee` to point to your unzipped book (ie `../books`)
-2. update `../config.coffee` to load `cs!gh-book/app-local` instead of `cs!gh-book/app`
-
+2. update `../config.coffee` and change `app` (under `paths`) to point to `gh-book/app-local` instead of `gh-book/app`
