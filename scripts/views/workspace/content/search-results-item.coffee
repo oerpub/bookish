@@ -31,7 +31,7 @@ define [
       }
 
     initialize: () ->
-      @listenTo(@model, 'change sync', @render)
+      @listenTo(@model, 'dirty change sync', @render)
       @listenTo(@, 'render show', @updateTimer)
 
     onRender: () ->
