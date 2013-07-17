@@ -3,9 +3,10 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!controllers/routing'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Backbone, Marionette, EnableDnD, tocBranchTemplate) ->
+], ($, _, Backbone, Marionette, controller, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
     tagName: "li"
@@ -99,6 +100,9 @@ define [
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
       'click > .editor-node-body > .edit-settings': 'editSettings'
+      'click > .editor-node-body .go-edit': 'goEdit'
+
+    goEdit: () -> controller.goEdit(@model)
 
     # Toggle expanded/collapsed in the View
     # -------

@@ -4,10 +4,11 @@ define [
   'backbone'
   'marionette'
   'moment'
+  'cs!controllers/routing'
   'cs!collections/media-types'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/content/search-results-item'
-], ($, _, Backbone, Marionette, Moment, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
+], ($, _, Backbone, Marionette, Moment, controller, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
 
   # Search Result View (workspace)
   # -------
@@ -21,6 +22,11 @@ define [
     tagName: 'tr'
 
     template: searchResultsItemTemplate
+
+    events:
+      'click .go-edit': 'goEdit'
+
+    goEdit: () -> controller.goEdit(@model)
 
     templateHelpers: () ->
       return {
