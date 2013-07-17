@@ -7,7 +7,14 @@ define [
 ], ($, _, Backbone, SaveableModel, loadable) ->
 
   class BaseModel extends SaveableModel
-    url: () -> return "/api/content/#{ @id }"
+    url: () ->
+      if @isNew()
+        # POST to `/content/` if new
+        return '/api/content/'
+      else
+        # GET/PUT with the id in the URL if it is not new content
+        return "/api/content/#{ @id }"
+
     mediaType: 'application/vnd.org.cnx.module'
 
     getTitle: (container) ->
