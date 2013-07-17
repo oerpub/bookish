@@ -23,3 +23,5 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
 
       options.title = options.title or @model.get 'title'
       super(options)
+
+    contentView: (callback) -> @model.contentView(callback)
