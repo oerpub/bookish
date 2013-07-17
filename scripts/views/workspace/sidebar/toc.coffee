@@ -3,10 +3,11 @@ define [
   'underscore'
   'backbone'
   'marionette'
+  'cs!controllers/routing'
   'cs!collections/content'
   'cs!views/workspace/sidebar/toc-branch'
   'hbs!templates/workspace/sidebar/toc'
-], ($, _, Backbone, Marionette, content, TocBranchView, tocTemplate) ->
+], ($, _, Backbone, Marionette, controller, content, TocBranchView, tocTemplate) ->
 
   return class TocView extends Marionette.CompositeView
     template: tocTemplate
@@ -19,6 +20,9 @@ define [
         @showNodes = true
       else
         @collection = content
+
+    templateHelpers: () ->
+      return {mediaType: @model?.mediaType}
 
     # Override Marionette's showCollection()
     showCollection: () ->
@@ -37,8 +41,11 @@ define [
 
     events:
       'click .editor-content-title': 'changeTitle'
+      'click .go-workspace': 'goWorkspace'
 
     changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
       @render()
+
+    goWorkspace: () -> controller.goWorkspace()

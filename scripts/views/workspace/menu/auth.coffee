@@ -32,11 +32,12 @@ define [
 
     initialize: () ->
       @listenTo(session, 'login logout', @render)
+
+      # When a model has changed (triggered `dirty`) update the Save button
+      @listenTo content, 'dirty', (model, options) => @changed()
+      # Update the Save button when new Folder/Book/Module is created (added to `content`)
       @listenTo content, 'add remove', (model, collection, options) =>
         @changed() if not (options.loading or options.parse)
-      @listenTo content, 'change', (model, options) =>
-        # A change event can occur (ie setting a title during parsing but the changed set is still empty)
-        @changed() if model?.hasChanged() and not (options.loading or options.parse)
 
       # Bind a function to the window if the user tries to navigate away from this page
       $(window).on 'beforeunload', () ->

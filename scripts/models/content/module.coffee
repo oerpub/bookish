@@ -2,7 +2,8 @@ define [
   'underscore'
   'backbone'
   'cs!models/content/inherits/base'
-], (_, Backbone, BaseModel) ->
+  'cs!controllers/routing'
+], (_, Backbone, BaseModel, controller) ->
 
   # The `Content` model contains the following members:
   #
@@ -27,10 +28,7 @@ define [
       language: navigator?.language or navigator?.userLanguage or 'en'
 
     # Begin editing this medium as soon as it is added
-    addAction: () ->
-      id = @id or @cid
-      require ['cs!routers/router'], (router) ->
-        router.navigate("edit/#{ id }", {trigger: true});
+    addAction: () -> controller.goEdit(@)
 
     # Change the content view when editing this
     contentView: (callback) ->

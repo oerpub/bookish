@@ -48,7 +48,7 @@ define [
 
 
     # Populate the Session Model from localStorage
-    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'id', 'password']
+    STORED_KEYS = ['repoUser', 'repoName', 'id', 'password', 'token']
     props = {}
     _.each STORED_KEYS, (key) ->
       value = window.sessionStorage.getItem key
@@ -60,7 +60,10 @@ define [
       # Update session storage
       for key in STORED_KEYS
         value =  session.get key
-        window.sessionStorage.setItem key, value
+        if value
+          window.sessionStorage.setItem key, value
+        else
+          window.sessionStorage.removeItem key, value
 
 
 
@@ -99,9 +102,14 @@ define [
       return ret
 
 
+  App.on 'start', () ->
+
     startRouting = () ->
       # Remove cyclic dependency. Controller depends on `App.main` region
-      require ['cs!controllers/routing'], (controller) ->
+      require ['cs!controllers/routing'], (controller) =>
+
+        # Tell the controller which region to put all the views/layouts in
+        controller.main = App.main
 
         # Custom routes to configure the Github User and Repo from the browser
         new class GithubRouter extends Backbone.Router
@@ -121,23 +129,23 @@ define [
             'repo/:repoUser/:repoName':         'configRepo'
             'repo/:repoUser/:repoName/:branch': 'configRepo'
 
-            '':             'workspace' # Show the workspace list of content
-            'workspace':    'workspace'
-            'edit/*id':     'edit' # Edit an existing piece of content (id can be a path)
+            '':             'goWorkspace' # Show the workspace list of content
+            'workspace':    'goWorkspace'
+            'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a path)
 
-          configRepo: (repoUser, repoName, branch) ->
-            session.set
-              repoUser: repoUser
-              repoName: repoName
-              branch: branch
+          configRepo: (repoUser, repoName, branch=null) ->
+            config = {repoUser:repoUser, repoName:repoName}
+            config.branch = branch if branch
+
+            session.set config
 
             allContent.reload()
-            @workspace()
+            @goWorkspace()
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
-          workspace: () -> setDefaultRepo(); allContent.load().done () => controller.workspace()
-          edit: (id)    -> setDefaultRepo(); allContent.load().done () => controller.edit(id)
+          goWorkspace: () -> setDefaultRepo(); allContent.load().done () => controller.goWorkspace()
+          goEdit: (id)    -> setDefaultRepo(); allContent.load().done () => controller.goEdit(id)
 
 
         Backbone.history.start

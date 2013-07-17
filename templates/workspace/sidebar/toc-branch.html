@@ -22,16 +22,16 @@
     {{/if}}
   </span>
 {{else}}
-  <span data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
+  <span class="go-edit" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
     <span class="editor-node-title">
-      <a href="edit/{{id}}">
+      <span class="btn-link">
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
         {{#if title}}
           {{{title}}}
         {{else}}
           {{id}}
         {{/if}}
-      </a>
+      </span>
     </span>
   </span>
 {{/if}}
