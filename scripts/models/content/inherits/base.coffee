@@ -8,12 +8,28 @@ define [
 
   class BaseModel extends SaveableModel
     url: () ->
+      ###
       if @isNew()
         # POST to `/content/` if new
-        return '/api/content/'
+        return '/content/'
       else
         # GET/PUT with the id in the URL if it is not new content
-        return "/api/content/#{ @id }"
+        return "/content/#{ @id }"
+      ###
+
+      if @mediaType is 'application/vnd.org.cnx.module'
+        url = '/module/'
+      else if @mediaType is 'application/vnd.org.cnx.folder'
+        url = '/folder/'
+      else if @mediaType is 'application/vnd.org.cnx.collection'
+        url = '/collection/'
+      else
+        url = '/content/'
+
+      if @isNew()
+        return url
+      else
+        return url + @id
 
     mediaType: 'application/vnd.org.cnx.module'
 
