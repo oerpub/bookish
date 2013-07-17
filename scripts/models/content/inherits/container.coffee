@@ -90,8 +90,15 @@ define [
       return @accept
 
     initialize: (attrs) ->
+      super(attrs)
       # Ensure there is always a Collection in `contents`
       @get('contents') || @set('contents', new Container(), {parse:true})
+
+      contents = @get('contents')
+
+      # When something is added/removed from a Folder or Book mark the Folder/Book as Dirty
+      contents.on 'add remove', (model, collection, options) => @_markDirty() if not options.parse
+      contents.on 'reset',      (collection, options)        => @_markDirty() if not options.parse
 
       @load()
 
@@ -133,7 +140,7 @@ define [
 
       container = @getChildren()
       if container
-        container.reset(contentsModels)
+        container.reset(contentsModels, {parse:true})
         delete json.contents
       else
         container = new Container(contentsModels)

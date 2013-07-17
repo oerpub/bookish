@@ -2,10 +2,11 @@ define [
   'jquery'
   'underscore'
   'backbone'
+  'cs!./saveable'
   'cs!mixins/loadable'
-], ($, _, Backbone, loadable) ->
+], ($, _, Backbone, SaveableModel, loadable) ->
 
-  class BaseModel extends Backbone.Model
+  class BaseModel extends SaveableModel
     url: () -> return "/api/content/#{ @id }"
     mediaType: 'application/vnd.org.cnx.module'
 

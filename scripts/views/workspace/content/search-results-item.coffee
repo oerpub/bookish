@@ -32,11 +32,12 @@ define [
       return {
         id: @model.id or @model.cid
         mediaType: @model.mediaType
-        isLoading: @model.loading
+        isLoaded: @isLoaded
+        isDirty: @model.isDirty()
       }
 
     initialize: () ->
-      @listenTo(@model, 'change sync', @render)
+      @listenTo(@model, 'dirty change sync', @render)
       @listenTo(@, 'render show', @updateTimer)
 
     onRender: () ->
