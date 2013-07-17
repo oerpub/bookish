@@ -1,14 +1,12 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!controllers/routing'
-], ($, _, Backbone, Marionette, routerController) ->
+  'less!styles/main.less'
+], (Marionette, appController) ->
 
   return new class Router extends Marionette.AppRouter
-    controller: routerController
+    controller: appController
     appRoutes:
-      '':             'workspace' # Show the workspace list of content
-      'workspace':    'workspace'
-      'edit/*id':     'edit' # Edit an existing piece of content (id can be a path)
+      '':             'goWorkspace' # Show the workspace list of content
+      'workspace':    'goWorkspace'
+      'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a path)

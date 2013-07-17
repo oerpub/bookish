@@ -87,7 +87,8 @@
   }
 
   #layout-body {
-    .aloha-editable {
+    // Make sure only the top editable is big (notes, exercises, etc have nested editables)
+    > .aloha-editable {
       min-height: 5in;
     }
   }

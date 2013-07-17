@@ -1,41 +1,48 @@
-define [
-  'jquery'
-  'underscore'
-  'backbone'
-  'marionette'
-  'cs!app'
-  'cs!collections/content'
-  'cs!views/layouts/workspace'
-  'less!styles/main.less'
-], ($, _, Backbone, Marionette, app, content, WorkspaceLayout) ->
+# The controller is used by various views to change the UI (what is being edited).
+# For example, clicking on a piece of content or a book will replace the workspace list with
+# a large area for editing the document
 
-  return new class Router extends Marionette.AppRouter
+# There is a cyclic dependency between this and various views (`->` means "depends on"):
+# controller -> layout -> WorkspaceView -> WorkspaceItemView -> controller (because clicking an item will begin editing)
+define ['marionette'], (Marionette) ->
+
+  # Only reason to extend Backbone.Router is to get the @navigate method
+  return new class AppController extends Marionette.AppRouter
     # Show Workspace
     # -------
     # Show the workspace listing and update the URL
-    workspace: () ->
-      if not @layout
-        @layout = new WorkspaceLayout()
-        app.main.show(@layout)
-      else
-        # load default views
-        @layout.showViews()
+    goWorkspace: () ->
+      # To prevent cyclic dependencies, load the views once the app has loaded.
+      require ['cs!views/layouts/workspace'], (WorkspaceLayout) =>
+        if not @layout
+          @layout = new WorkspaceLayout()
+          @main.show(@layout)
+        else
+          # load default views
+          @layout.showViews()
+        # Update the URL without triggering the router
+        @navigate('workspace')
 
     # Edit existing content
     # -------
     # Start editing an existing piece of content and update the URL.
-    edit: (model) ->
-      if typeof model is 'string'
-        model = content.get(model)
+    goEdit: (model) ->
+      # To prevent cyclic dependencies, load the views once the app has loaded.
+      require ['cs!views/layouts/workspace', 'cs!collections/content'], (WorkspaceLayout, allContent) =>
 
-      # Redirect to workspace if model does not exist
-      if not model
-        require ['cs!routers/router'], (router) ->
-          router.navigate('/', {trigger: true, replace: true});
+        if typeof model is 'string'
+          model = allContent.get(model)
 
-      if not @layout
-        @layout = new WorkspaceLayout({model: model})
-        app.main.show(@layout)
+        # Redirect to workspace if model does not exist
+        if not model
+          @goWorkspace()
+        else
+          if not @layout
+            @layout = new WorkspaceLayout({model: model})
+            @main.show(@layout)
 
-      # load editor views
-      @layout.showViews({model: model})
+          # load editor views
+          @layout.showViews({model: model})
+
+          # Update the URL without triggering the router
+          @navigate("edit/#{model.id or model.cid}")
