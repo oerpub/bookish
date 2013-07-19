@@ -98,6 +98,10 @@ define [
         if id of memoryContent
           memoryContent[id] = JSON.parse(settings.data)
           # TODO: Validation goes here
+
+          # Update the lastModified time because they saved
+          memoryContent[id].dateLastModifiedUTC = (new Date()).toJSON()
+
           res = memoryContent[id]
           @responseText = JSON.stringify(res)
         else
@@ -108,11 +112,16 @@ define [
       url: /^\/(content|module|folder|collection)\/$/
       urlParams: ['HACK_PREFIX_DISCARDED']
       response: (settings) ->
-        id = "mock-id-#{counter++}"
+        id = "new-mock-id-#{counter++}"
 
         json = JSON.parse(settings.data)
         json.id = id
         memoryContent[id] = json
+
+        # Update the lastModified time **and** created time
+        now = (new Date()).toJSON()
+        memoryContent[id].dateCreatedUTC = now
+        memoryContent[id].dateLastModifiedUTC = now
 
         res = memoryContent[id]
         @responseText = JSON.stringify(res)
