@@ -24,7 +24,7 @@ define [
 
   $.mockjax (settings) ->
     # url: '/content/<id>'
-    id = settings.url.match(/\/(content|module|folder|collection)\/(.*)$/)
+    id = settings.url.match(/\/(content|folder)\/(.*)$/)
     id = id?[2] or null
 
     switch settings.type

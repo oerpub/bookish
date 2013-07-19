@@ -17,12 +17,8 @@ define [
         return "/content/#{ @id }"
       ###
 
-      if @mediaType is 'application/vnd.org.cnx.module'
-        url = '/module/'
-      else if @mediaType is 'application/vnd.org.cnx.folder'
+      if @mediaType is 'application/vnd.org.cnx.folder'
         url = '/folder/'
-      else if @mediaType is 'application/vnd.org.cnx.collection'
-        url = '/collection/'
       else
         url = '/content/'
 
