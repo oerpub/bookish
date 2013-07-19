@@ -8,10 +8,14 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "print-mock-data": "node ./test/print-mock-data.js",
     "install": "./install-libs.sh",
     "update": "./install-libs.sh"
   },
-  "dependencies": {},
+  "dependencies": {
+    "requirejs": "~2.1",
+    "cs": "git://github.com/jrburke/require-cs.git"
+  },
   "devDependencies": {
     "docco": "~0.4.0"
   },
