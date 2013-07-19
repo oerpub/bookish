@@ -6,7 +6,6 @@ define [
 
   return class Book extends BaseContainerModel
     defaults:
-      manifest: null
       title: 'Untitled Book'
 
     mediaType: 'application/vnd.org.cnx.collection'
