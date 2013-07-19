@@ -97,8 +97,8 @@ define [
       contents = @get('contents')
 
       # When something is added/removed from a Folder or Book mark the Folder/Book as Dirty
-      contents.on 'add remove', (model, collection, options) => @_markDirty() if not options.parse
-      contents.on 'reset',      (collection, options)        => @_markDirty() if not options.parse
+      contents.on 'add remove', (model, collection, options) => @_markDirty(options)
+      contents.on 'reset',      (collection, options)        => @_markDirty(options)
 
       @load()
 
