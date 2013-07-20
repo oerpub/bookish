@@ -51,8 +51,6 @@ define [
 
   # GET/PUT/POST for `/content*`
 
-  # GET/PUT/POST for `/content*`
-
   $.mockjax
     type: 'GET'
     dataType: 'json'
