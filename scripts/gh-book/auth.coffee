@@ -17,11 +17,12 @@ define [
 
 
     initialize: () ->
+      # When a model has changed (triggered `dirty`) update the Save button
+      @listenTo allContent, 'dirty', (model, options) => @setDirty()
+      # Update the Save button when new Folder/Book/Module is created (added to `allContent`)
       @listenTo allContent, 'add remove', (model, collection, options) =>
         @setDirty() if not (options.loading or options.parse)
-      @listenTo allContent, 'change', (model, options) =>
-        # A change event can occur (ie setting a title during parsing but the changed set is still empty)
-        @setDirty() if model?.hasChanged() and not (options.loading or options.parse)
+
 
       @listenTo @model, 'change', () => @render()
 
