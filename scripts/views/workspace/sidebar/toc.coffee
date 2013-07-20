@@ -1,13 +1,11 @@
 define [
-  'jquery'
   'underscore'
-  'backbone'
   'marionette'
   'cs!controllers/routing'
   'cs!collections/content'
   'cs!views/workspace/sidebar/toc-branch'
   'hbs!templates/workspace/sidebar/toc'
-], ($, _, Backbone, Marionette, controller, content, TocBranchView, tocTemplate) ->
+], (_, Marionette, controller, content, TocBranchView, tocTemplate) ->
 
   return class TocView extends Marionette.CompositeView
     template: tocTemplate

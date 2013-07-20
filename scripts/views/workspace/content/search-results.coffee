@@ -1,12 +1,9 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!views/workspace/content/search-results-item'
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/workspace/content/search-results'
-], ($, _, Backbone, Marionette, SearchResultsItemView, searchView, searchResultsTemplate) ->
+], (Marionette, SearchResultsItemView, searchView, searchResultsTemplate) ->
 
   return class SearchResultsView extends Marionette.CompositeView
     template: searchResultsTemplate

@@ -1,6 +1,4 @@
 define [
-  'jquery'
-  'underscore'
   'backbone'
   'marionette'
   'cs!session'
@@ -9,7 +7,7 @@ define [
   'cs!models/content/folder'
   'cs!models/content/module'
   'less!styles/main.less'
-], ($, _, Backbone, Marionette, session, mediaTypes, Book, Folder, Module) ->
+], (Backbone, Marionette, session, mediaTypes, Book, Folder, Module) ->
 
   app = new Marionette.Application()
 

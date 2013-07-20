@@ -1,13 +1,10 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'aloha'
   'hbs!templates/workspace/content/edit-roles'
   'select2'
   'bootstrapCollapse'
-], ($, _, Backbone, Marionette, Aloha, rolesTemplate) ->
+], (Marionette, Aloha, rolesTemplate) ->
 
   # Select2 is a multiselect UI library.
   # It queries the webserver to provide search results as you type

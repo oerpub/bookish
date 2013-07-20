@@ -1,13 +1,11 @@
 define [
   'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!session'
   'cs!collections/content'
   'hbs!templates/workspace/menu/auth'
   'bootstrapTooltip'
-], ($, _, Backbone, Marionette, session, content, authTemplate) ->
+], ($, Marionette, session, content, authTemplate) ->
 
   _hasChanged = false
 
