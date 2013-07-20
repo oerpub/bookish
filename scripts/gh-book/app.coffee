@@ -144,8 +144,16 @@ define [
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
-          goWorkspace: () -> setDefaultRepo(); allContent.load().done () => controller.goWorkspace()
-          goEdit: (id)    -> setDefaultRepo(); allContent.load().done () => controller.goEdit(id)
+          goWorkspace: () ->
+            setDefaultRepo()
+            allContent.load()
+            .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
+            .done () => controller.goWorkspace()
+          goEdit: (id)    ->
+            setDefaultRepo()
+            allContent.load()
+            .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
+            .done () => controller.goEdit(id)
 
 
         Backbone.history.start
