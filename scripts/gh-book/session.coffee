@@ -1,11 +1,13 @@
-define ['backbone', 'github'], (Backbone, Github) ->
+define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
   class GithubSession extends Backbone.Model
     initialize: () ->
       @_reloadClient()
 
       @on 'change', () =>
-        @_reloadClient()
+        # If any authentication info has changed then reload the client
+        if not _.isEmpty _.pick @.changed, ['token', 'id', 'password']
+          @_reloadClient()
 
         # See if this user can collaborate
         @getRepo().canCollaborate().done (canCollaborate) =>
