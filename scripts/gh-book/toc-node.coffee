@@ -14,7 +14,7 @@ define [
 
     initialize: (options) ->
       super(options)
-      @set 'title', options.title
+      @set 'title', options.title, {parse:true}
       @htmlAttributes = options.htmlAttributes or {}
 
       @on 'change:title', (model, value, options) =>
