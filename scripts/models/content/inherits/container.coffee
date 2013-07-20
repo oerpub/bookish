@@ -67,22 +67,6 @@ define [
     branch: true
     expanded: false
 
-    toJSON: () ->
-      json = super()
-
-      contents = @getChildren?().toArray() or []
-
-      json.contents = []
-      _.each contents.models, (item) ->
-        obj = {}
-        title = contents.getTitle?(item) or contents.get 'title'
-        if item.id then obj.id = item.id
-        if title then obj.title = title
-
-        json.contents.push(obj)
-
-      return json
-
     accepts: (mediaType) ->
       if (typeof mediaType is 'string')
         return _.indexOf(@accept, mediaType) is not -1
