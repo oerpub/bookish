@@ -25,7 +25,13 @@ define [
       # so it does not get saved unnecessarily.
       # The title of the XhtmlFile is not stored inside the file;
       # it is stored in the navigation file
-      @on 'change:title', () => delete @changed['title']
+      @on 'change:title', (model, value, options) =>
+        head = @get 'head'
+        $head = jQuery("<div class='unwrap-me'>#{head}</div>")
+
+        $head.children('title').text(value)
+        @set 'head', $head[0].innerHTML, options
+
 
     parse: (html) ->
 
@@ -110,7 +116,13 @@ define [
           counter--
           $img.attr('src', 'path/to/failure.png')
 
-      return {head: $head[0]?.innerHTML, body: $body[0]?.innerHTML}
+      attributes = {head: $head[0]?.innerHTML, body: $body[0]?.innerHTML}
+
+      # Set the title that is in the `<head>`
+      title = $head.children('title').text()
+      attributes.title = title if title
+
+      return attributes
 
 
     serialize: ->

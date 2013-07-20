@@ -87,7 +87,7 @@ define [
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
-            contentModel.set 'title', title
+            contentModel.set 'title', title, {parse:true} if not contentModel.get('title')
 
             model = @newNode {title: title, htmlAttributes: attributes, model: contentModel}
 
