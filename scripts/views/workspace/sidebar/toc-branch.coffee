@@ -18,7 +18,7 @@ define [
         return tocBranchTemplate(data)
 
       @collection = @model.getChildren?()
-      @itemViewOptions = {container: @collection}
+      # Brought in by either toc's itemViewOptions or tocBranch's itemViewOptions
       @container = options.container
 
       @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
@@ -28,6 +28,8 @@ define [
         @listenTo @collection, 'add', (model, collection, options) => @renderModelOnly() if @collection.length == 1
         @listenTo @collection, 'remove', (model, collection, options) => @renderModelOnly() if @collection.length == 0
 
+    # Pass down the Book so we can look up the overridden title
+    itemViewOptions: () -> {container: @collection}
 
     renderModelOnly: () ->
       # Detach the children
@@ -71,18 +73,9 @@ define [
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
+        # Look up the overridden title
+        title: @container?.getTitle?(@model) or @model.get('title')
       }
-
-    # Override Marionette's renderModel() so we can replace the title
-    # if necessary without affecting the model itself
-    renderModel: () ->
-      data = {}
-      data = @serializeData()
-      data.title = @container?.getTitle?(@model) or data.title
-      data = @mixinTemplateHelpers(data)
-
-      template = @getTemplate()
-      return Marionette.Renderer.render(template, data)
 
     # Override internal Marionette method.
     # This method adds a child list item at a given index.
