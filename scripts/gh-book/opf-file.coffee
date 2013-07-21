@@ -147,8 +147,12 @@ define [
       $nav.append($navOl)
       $wrapper[0].innerHTML
 
-    parse: (xmlStr) ->
-      return xmlStr if 'string' != typeof xmlStr
+    parse: (json) ->
+      # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
+      sha = json.sha
+      xmlStr = json.content
+
+      return xmlStr if not json.sha
       @$xml = $($.parseXML xmlStr)
 
       # If we were unable to parse the XML then trigger an error

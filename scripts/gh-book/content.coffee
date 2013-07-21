@@ -24,7 +24,11 @@ define [
     url: -> 'META-INF/container.xml'
 
     toJSON: -> model.toJSON() for model in @models
-    parse: (xmlStr) ->
+    parse: (json) ->
+      # Github.read returns a `{sha: "1234", content: "<rootfiles>...</rootfiles>"}
+      sha = json.sha
+      xmlStr = json.content
+
       $xml = jQuery(xmlStr)
       ret = []
       $xml.find('rootfiles > rootfile').each (i, el) =>

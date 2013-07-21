@@ -33,11 +33,13 @@ define [
         @set 'head', $head[0].innerHTML, options
 
 
-    parse: (html) ->
+    parse: (json) ->
+      sha = json.sha
+      html = json.content
 
       # The result of a Github PUT is an object instead of the new state of the model.
       # Basically ignore it.
-      return html if 'string' != typeof html
+      return json if not json.sha
 
       # Rename elements before jQuery parses and removes them
       # (because they are not valid children of a div)
@@ -116,7 +118,8 @@ define [
           counter--
           $img.attr('src', 'path/to/failure.png')
 
-      attributes = {head: $head[0]?.innerHTML, body: $body[0]?.innerHTML}
+      # Save the commit sha so we can compare when a remote update occurs
+      attributes = {sha:sha, head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
 
       # Set the title that is in the `<head>`
       title = $head.children('title').text()
