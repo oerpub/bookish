@@ -11,9 +11,10 @@ define [
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
   'cs!gh-book/welcome-sign-in'
+  'cs!gh-book/remote-updater'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater) ->
 
   # Stop logging.
   logger.stop()
@@ -139,6 +140,7 @@ define [
               repoName: repoName
               branch:   branch
 
+            remoteUpdater.stop()
             allContent.reload()
             @goWorkspace()
 
@@ -146,14 +148,20 @@ define [
           # TODO: Move this into the controller
           goWorkspace: () ->
             setDefaultRepo()
-            allContent.load()
-            .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-            .done () => controller.goWorkspace()
+            remoteUpdater.start()
+            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
+            .done () =>
+              allContent.load()
+              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
+              .done () => controller.goWorkspace()
           goEdit: (id)    ->
             setDefaultRepo()
-            allContent.load()
-            .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-            .done () => controller.goEdit(id)
+            remoteUpdater.start()
+            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
+            .done () =>
+              allContent.load()
+              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
+              .done () => controller.goEdit(id)
 
 
         Backbone.history.start
