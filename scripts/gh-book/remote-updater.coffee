@@ -26,14 +26,14 @@ define [
     _pollUpdates: () ->
       return if not @keepUpdating
 
-      setTimeout (() => @_pollUpdates()), UPDATE_TIMEOUT
-
       branch = session.getBranch()
 
       return branch.getCommits().done (commits) =>
         lastUpdatedSha = @lastSeenSha
 
         @lastSeenSha = commits[0].sha
+
+        setTimeout (() => @_pollUpdates()), UPDATE_TIMEOUT
 
         return if not lastUpdatedSha
 

@@ -31,5 +31,8 @@
     {{else}}
       <time datetime="{{dateCreatedUTC}}"></time>
     {{/if}}
+    {{#if lastEditedBy}}
+      <span class="last-edited-by">by {{lastEditedBy}}</span>
+    {{/if}}
   {{/if}}
 </td>
