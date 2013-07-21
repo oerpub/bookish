@@ -149,10 +149,15 @@ define [
 
     parse: (json) ->
       # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
-      sha = json.sha
+      # Save the commit sha so we can compare when a remote update occurs
+      @commitSha = json.sha
+
       xmlStr = json.content
 
-      return xmlStr if not json.sha
+      # If the parse is a result of a write then update the sha.
+      # The parse is a result of a GitHub.write if there is no `.content`
+      return {} if not json.content
+
       @$xml = $($.parseXML xmlStr)
 
       # If we were unable to parse the XML then trigger an error

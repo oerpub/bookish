@@ -34,12 +34,13 @@ define [
 
 
     parse: (json) ->
-      sha = json.sha
+      # Save the commit sha so we can compare when a remote update occurs
+      @commitSha = json.sha
       html = json.content
 
-      # The result of a Github PUT is an object instead of the new state of the model.
-      # Basically ignore it.
-      return json if not json.sha
+      # If the parse is a result of a write then update the sha.
+      # The parse is a result of a GitHub.write if there is no `.content`
+      return {} if not json.content
 
       # Rename elements before jQuery parses and removes them
       # (because they are not valid children of a div)
@@ -118,8 +119,7 @@ define [
           counter--
           $img.attr('src', 'path/to/failure.png')
 
-      # Save the commit sha so we can compare when a remote update occurs
-      attributes = {sha:sha, head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
+      attributes = {head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
 
       # Set the title that is in the `<head>`
       title = $head.children('title').text()
