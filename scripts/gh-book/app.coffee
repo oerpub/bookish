@@ -31,7 +31,6 @@ define [
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
-    mediaTypes.add BinaryFile, {mediaType:'image/jpg'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
 
@@ -74,7 +73,7 @@ define [
       session.getBranch().write path, text, commitText
 
     readFile =       (path) -> session.getBranch().read       path
-    readBinaryFile = (path) -> session.getBranch().readBinary path
+    readBinaryFile = (path) -> session.getBranch().read       path, true # isBinary == true
     readDir =        (path) -> session.getBranch().contents   path
 
 
