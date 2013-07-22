@@ -10,7 +10,7 @@
     {{else}}
       {{id}}
     {{/if}}
-  </a>
+  </span>
   {{#if isDirty}}
     <span class="has-changed" title="This has unsaved changes">
       <i class="icon-warning-sign"></i>
@@ -30,6 +30,9 @@
       <time datetime="{{dateLastModifiedUTC}}"></time>
     {{else}}
       <time datetime="{{dateCreatedUTC}}"></time>
+    {{/if}}
+    {{#if lastEditedBy}}
+      <span class="last-edited-by">by {{lastEditedBy}}</span>
     {{/if}}
   {{/if}}
 </td>

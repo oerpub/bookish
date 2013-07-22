@@ -17,13 +17,7 @@
 # - `.accepts` hash of `mediaType -> addOperation` that is used for Drag-and-Dropping onto the content in the workspace list
 #
 # Different plugins (EPUB OPF, XHTML, Markdown, ASCIIDoc, cnxml) can add themselves to this
-define [
-  'underscore'
-  'backbone'
-  'cs!models/content/book'
-  'cs!models/content/folder'
-  'cs!models/content/module'
-], (_, Backbone, Book, Folder, Module) ->
+define ['backbone'], (Backbone) ->
 
   # Collection used for storing the various mediaTypes.
   # When something registers a "New... mediaType" view can update
@@ -31,11 +25,6 @@ define [
     # Just a glorified JSON holder (that cannot `sync`)
     model: class MediaType extends Backbone.Model
       sync: -> throw 'This model cannot be syncd'
-
-    initialize: () ->
-      @add Module
-      @add Book
-      @add Folder
 
     # Optionally pass in the `mediaType` so one model can handle multiple media types (like images)
     add: (modelType, options={}) ->

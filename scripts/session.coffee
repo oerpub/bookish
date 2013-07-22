@@ -1,8 +1,4 @@
-define [
-  'jquery'
-  'underscore'
-  'backbone'
-], ($, _, Backbone) ->
+define ['backbone'], (Backbone) ->
 
   _authenticated = false
 

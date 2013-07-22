@@ -1,10 +1,8 @@
 define [
   'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'hbs!templates/workspace/menu/toolbar-search'
-], ($, _, Backbone, Marionette, toolbarTemplate) ->
+], ($, Marionette, toolbarTemplate) ->
 
   _rendered = false
 

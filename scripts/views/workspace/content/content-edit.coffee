@@ -1,11 +1,7 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
-  'marionette'
   'cs!views/workspace/content/aloha-edit'
   'hbs!templates/workspace/content/content-edit'
-], ($, _, Backbone, Marionette, AlohaEditView, contentEditTemplate) ->
+], (AlohaEditView, contentEditTemplate) ->
 
   # Edit Content Body
   # -------

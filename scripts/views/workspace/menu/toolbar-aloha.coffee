@@ -1,11 +1,8 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'aloha'
   'hbs!templates/workspace/menu/toolbar-aloha'
-], ($, _, Backbone, Marionette, Aloha, toolbarTemplate) ->
+], (Marionette, Aloha, toolbarTemplate) ->
 
   return new class ToolbarAlohaView extends Marionette.ItemView
     template: toolbarTemplate
