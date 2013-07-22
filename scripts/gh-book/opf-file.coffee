@@ -183,13 +183,17 @@ define [
           mediaType: mediaType
           properties: $item.attr 'properties'
 
-        allContent.add model, {loading:true}
+        # Add it to the manifest and then do a batch add to `allContent`
+        # at the end so the views do not re-sort on every add.
         @manifest.add model
 
         # If we stumbled upon the special navigation document
         # then remember it.
         if 'nav' == $item.attr('properties')
           @navModel = model
+
+      # Add all the models in one batch so views do not re-sort on every add.
+      allContent.add @manifest.models, {loading:true}
 
       # Ignore the spine because it is defined by the navTree in EPUB3.
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
