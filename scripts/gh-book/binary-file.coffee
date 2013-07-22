@@ -11,7 +11,10 @@ define [
     initialize: (options) ->
       @mediaType = options.mediaType if options.mediaType
 
-    parse: (bytes) ->
+    parse: (json) ->
+
+      @sha = json.sha
+      bytes = json.content
 
       # The result of a Github PUT is an object instead of the new state of the model.
       # Basically ignore it.
