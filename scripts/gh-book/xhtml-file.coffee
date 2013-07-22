@@ -100,7 +100,7 @@ define [
         if ! imageModel
           console.error "ERROR: Manifest missing image file #{path}"
           counter--
-          @set 'body', $body[0].innerHTML if counter == 0
+          @set 'body', $body[0].innerHTML, {loading:true} if counter == 0
           return
 
         # Load the image file somehow (see below for my github.js changes)
