@@ -5,10 +5,10 @@
     baseUrl: '../scripts/',
 
     paths: {
-      cs: 'libs/require/plugins/require-cs/cs',
-      'coffee-script': 'libs/require/plugins/require-cs/coffee-script',
-      jquery: 'libs/jquery',
-      mockjax: 'libs/jquery-mockjax/jquery.mockjax'
+      cs: '../bower_components/require-cs/cs',
+      'coffee-script': '../bower_components/coffee-script/index',
+      jquery: '../bower_components/jquery/jquery',
+      mockjax: '../bower_components/jquery-mockjax/jquery.mockjax'
     },
 
     shim: {

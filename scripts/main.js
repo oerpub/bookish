@@ -3,8 +3,8 @@
 
   require({
     paths: {
-      cs: 'libs/require/plugins/require-cs/cs',
-      'coffee-script': 'libs/require/plugins/require-cs/coffee-script'
+      cs: '../bower_components/require-cs/cs',
+      'coffee-script': '../bower_components/coffee-script/index'
     }
   }, ['cs!config']);
 
@@ -20,7 +20,7 @@
     if (bar) {
       bar.className = 'bar bar-danger';
     }
-    
+
     throw err;
   };
 

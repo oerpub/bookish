@@ -1,3 +1,5 @@
+BOWER = '../bower_components' # The path to the downloaded bower components
+
 require.config
   # # Configure Library Locations
   paths:
@@ -6,48 +8,48 @@ require.config
     styles: '../styles'
 
     # ## Requirejs plugins
-    text: 'libs/require/plugins/text/text'
-    json: 'libs/require/plugins/requirejs-plugins/src/json'
+    text: "#{BOWER}/requirejs-text/text"
+    json: "#{BOWER}/requirejs-plugins/src/json"
     i18n: 'helpers/i18n-custom'
-    hbs: 'libs/require/plugins/require-handlebars-plugin/hbs'
+    hbs: "#{BOWER}/require-handlebars-plugin/hbs"
 
     # ## Core Libraries
-    jquery: 'libs/jquery'
-    underscore: 'libs/lodash'
-    backbone: 'libs/backbone/backbone'
+    jquery: "#{BOWER}/jquery/jquery"
+    underscore: "#{BOWER}/lodash/lodash"
+    backbone: "#{BOWER}/backbone/backbone"
     # Layout manager for backbone
-    marionette: 'libs/backbone/backbone.marionette'
+    marionette: "#{BOWER}/backbone.marionette/lib/backbone.marionette"
 
     # ## UI Libraries
-    aloha: 'libs/aloha-editor/src/lib/aloha'
-    select2: 'libs/select2/select2'
-    moment: 'libs/moment'
+    aloha: "#{BOWER}/aloha-editor/src/lib/aloha"
+    select2: "#{BOWER}/select2/select2"
+    moment: "#{BOWER}/moment/moment"
     # Bootstrap Plugins
-    bootstrapAffix: 'libs/bootstrap/js/bootstrap-affix'
-    bootstrapAlert: 'libs/bootstrap/js/bootstrap-alert'
-    bootstrapButton: 'libs/bootstrap/js/bootstrap-button'
-    bootstrapCarousel: 'libs/bootstrap/js/bootstrap-carousel'
-    bootstrapCollapse: 'libs/bootstrap/js/bootstrap-collapse'
-    bootstrapDropdown: 'libs/bootstrap/js/bootstrap-dropdown'
-    bootstrapModal: 'libs/bootstrap/js/bootstrap-modal'
-    bootstrapPopover: 'libs/bootstrap/js/bootstrap-popover'
-    bootstrapScrollspy: 'libs/bootstrap/js/bootstrap-scrollspy'
-    bootstrapTab: 'libs/bootstrap/js/bootstrap-tab'
-    bootstrapTooltip: 'libs/bootstrap/js/bootstrap-tooltip'
-    bootstrapTransition: 'libs/bootstrap/js/bootstrap-transition'
-    bootstrapTypeahead: 'libs/bootstrap/js/bootstrap-typeahead'
+    bootstrapAffix: "#{BOWER}/bootstrap/js/bootstrap-affix"
+    bootstrapAlert: "#{BOWER}/bootstrap/js/bootstrap-alert"
+    bootstrapButton: "#{BOWER}/bootstrap/js/bootstrap-button"
+    bootstrapCarousel: "#{BOWER}/bootstrap/js/bootstrap-carousel"
+    bootstrapCollapse: "#{BOWER}/bootstrap/js/bootstrap-collapse"
+    bootstrapDropdown: "#{BOWER}/bootstrap/js/bootstrap-dropdown"
+    bootstrapModal: "#{BOWER}/bootstrap/js/bootstrap-modal"
+    bootstrapPopover: "#{BOWER}/bootstrap/js/bootstrap-popover"
+    bootstrapScrollspy: "#{BOWER}/bootstrap/js/bootstrap-scrollspy"
+    bootstrapTab: "#{BOWER}/bootstrap/js/bootstrap-tab"
+    bootstrapTooltip: "#{BOWER}/bootstrap/js/bootstrap-tooltip"
+    bootstrapTransition: "#{BOWER}/bootstrap/js/bootstrap-transition"
+    bootstrapTypeahead: "#{BOWER}/bootstrap/js/bootstrap-typeahead"
 
     # ## Handlebars Dependencies
-    Handlebars: 'libs/require/plugins/require-handlebars-plugin/Handlebars'
-    i18nprecompile: 'libs/require/plugins/require-handlebars-plugin/hbs/i18nprecompile'
-    json2: 'libs/require/plugins/require-handlebars-plugin/hbs/json2'
+    Handlebars: "#{BOWER}/require-handlebars-plugin/Handlebars"
+    i18nprecompile: "#{BOWER}/require-handlebars-plugin/hbs/i18nprecompile"
+    json2: "#{BOWER}/require-handlebars-plugin/hbs/json2"
 
 
   # # Map prefixes
   map:
     '*':
-      css: 'libs/require/plugins/require-css/css'
-      less: 'libs/require/plugins/require-less/less'
+      css: "#{BOWER}/require-css/css"
+      less: "#{BOWER}/require-less/less"
 
   # # Shims
   # Used to support libraries that were not written for AMD
