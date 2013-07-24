@@ -51,6 +51,8 @@ define [
 
   # GET/PUT/POST for `/content*`
 
+  # GET/PUT/POST for `/content*`
+
   $.mockjax
     type: 'GET'
     dataType: 'json'
@@ -75,6 +77,10 @@ define [
       if id of memoryRepo
         memoryRepo[id] = JSON.parse(settings.data)
         # TODO: Validation goes here
+
+        # Update the lastModified time because they saved
+        memoryRepo[id].dateLastModifiedUTC = (new Date()).toJSON()
+
         res = memoryRepo[id]
         @responseText = JSON.stringify(res)
       else
@@ -90,6 +96,11 @@ define [
       json = JSON.parse(settings.data)
       json.id = id
       memoryRepo[id] = json
+
+      # Update the lastModified time **and** created time
+      now = (new Date()).toJSON()
+      memoryRepo[id].dateCreatedUTC = now
+      memoryRepo[id].dateLastModifiedUTC = now
 
       res = memoryRepo[id]
       @responseText = JSON.stringify(res)
