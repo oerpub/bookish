@@ -48,9 +48,3 @@ define ['backbone'], (Backbone) ->
 
         @set 'dateLastModifiedUTC', (new Date()).toJSON(), options
 
-    # Everything that is Saveable needs a `mediaType` so the webserver can distinguish between
-    # different types of content (Book, Module, etc)
-    toJSON: (options) ->
-      json = super(options)
-      json.mediaType = @mediaType
-      return json

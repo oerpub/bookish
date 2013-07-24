@@ -7,13 +7,13 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "print-mock-data": "node ./test/print-mock-data.js",
-    "install": "./install-libs.sh",
-    "update": "./install-libs.sh",
-    "test": "jasmine-node --verbose --coffee --runWithRequireJs --requireJsSetup ./specs/requirejs-wrapper-template.js  ./specs/"
+    "test": "jasmine-node --verbose --coffee --runWithRequireJs --requireJsSetup ./specs/requirejs-wrapper-template.js  ./specs/",
+    "install": "bower install",
+    "update": "bower update"
   },
   "dependencies": {
+    "bower": "~1.0",
     "requirejs": "~2.1",
     "cs": "git://github.com/jrburke/require-cs.git",
     "github-client": "~0.1.4",

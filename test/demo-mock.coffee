@@ -1,7 +1,9 @@
+BOWER = '../bower_components' # The path to the downloaded bower components
+
 require.config
   paths:
     mock: '../test/data'
-    underscore: './libs/lodash'
+    underscore: "#{BOWER}/lodash/lodash"
 
 define [
   'underscore'
@@ -48,6 +50,8 @@ define [
         ret.push _.pick attributes, 'id', 'mediaType', 'title'
 
       @responseText = ret
+
+  # GET/PUT/POST for `/content*`
 
   # GET/PUT/POST for `/content*`
 

@@ -6,7 +6,7 @@ of how the code is organized.
 ## Building Yourself
 
 1. Download and extract (if necessary)
-2. Run `npm install` or `bash install-libs.sh` in the directory to download and install dependencies
+2. Run `npm install` or `bower install` in the directory to download and install dependencies
 3. Configure your server to point /workspace, /login, and /logout at index.html
 4. (optional) Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
 
@@ -14,7 +14,7 @@ of how the code is organized.
 
 Documentation is built using `docco`.
 
-    find . -name "*.coffee" | grep -v './lib/' | grep -v './node_modules' | xargs ./node_modules/docco/bin/docco
+    find . -name "*.coffee" | grep -v './bower_components/' | grep -v './node_modules' | xargs ./node_modules/docco/bin/docco
 
 Check the `./docs` directory to read through the different modules.
 
@@ -24,7 +24,6 @@ Check the `./docs` directory to read through the different modules.
 * `scripts/configs/`       App and 3rd party configs
 * `scripts/controllers/`   Marionette Controllers
 * `scripts/helpers/`       Miscellaneous helper functions
-* `scripts/libs/`          3rd Party Libraries
 * `scripts/models/`        Backbone Models and Marionette Modules
 * `scripts/nls/`           Internationalized strings
 * `scripts/routers/`       Marionette Routers
@@ -39,7 +38,6 @@ Check the `./docs` directory to read through the different modules.
 * `templates/helpers/`     Handlebars Helpers
 * `test/`                  Testable mock data and scripts
 * `index.html`             App's HTML Page
-* `install-libs.sh`        Bash script to install 3rd party libraries
 
 License
 -------
