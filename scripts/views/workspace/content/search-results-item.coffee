@@ -1,14 +1,11 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'moment'
   'cs!controllers/routing'
   'cs!collections/media-types'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/content/search-results-item'
-], ($, _, Backbone, Marionette, Moment, controller, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
+], (Marionette, Moment, controller, mediaTypes, EnableDnD, searchResultsItemTemplate) ->
 
   # Search Result View (workspace)
   # -------

@@ -1,15 +1,11 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!collections/content'
   'cs!views/workspace/content/search-results'
   'cs!views/layouts/workspace/menu'
   'cs!views/workspace/sidebar/toc'
   'hbs!templates/layouts/workspace'
-], ($, _, Backbone, Marionette, content, SearchResultsView, menuLayout, TocView, workspaceTemplate) ->
-
+], (Marionette, content, SearchResultsView, menuLayout, TocView, workspaceTemplate) ->
 
   return class Workspace extends Marionette.Layout
     template: workspaceTemplate

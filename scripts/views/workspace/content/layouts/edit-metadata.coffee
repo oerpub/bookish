@@ -1,7 +1,5 @@
 define [
   'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!configs/app'
   'cs!models/languages'
@@ -11,7 +9,7 @@ define [
   'i18n!nls/strings'
   'select2'
   'bootstrapCollapse'
-], ($, _, Backbone, Marionette, config, languagesModel, SummaryView, metadataTemplate, languagesTemplate, __) ->
+], ($, Marionette, config, languagesModel, SummaryView, metadataTemplate, languagesTemplate, __) ->
 
   # Given the language list in [languages.coffee](languages.html)
   # this reorganizes them so they can be shown in a dropdown.

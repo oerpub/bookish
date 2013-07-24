@@ -1,13 +1,10 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!collections/content'
   'hbs!templates/workspace/menu/add'
   'hbs!templates/workspace/menu/add-item'
   'bootstrapDropdown'
-], ($, _, Backbone, Marionette, content, addTemplate, addItemTemplate) ->
+], (Marionette, content, addTemplate, addItemTemplate) ->
 
   class AddItemView extends Marionette.ItemView
     tagName: 'li'

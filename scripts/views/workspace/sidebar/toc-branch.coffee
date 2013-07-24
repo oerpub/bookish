@@ -1,15 +1,12 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!controllers/routing'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Backbone, Marionette, controller, EnableDnD, tocBranchTemplate) ->
+], (Marionette, controller, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
-    tagName: "li"
+    tagName: 'li'
     itemViewContainer: '> ol'
 
     initialize: (options) ->
@@ -40,12 +37,12 @@ define [
       # will not be available until after the model is rendered, but should be
       # available before the collection is rendered.
       @bindUIElements()
-      @triggerMethod("composite:model:rendered")
+      @triggerMethod('composite:model:rendered')
 
       # Reattach the children
       @$el.find(@itemViewContainer).append($children)
 
-      @triggerMethod("composite:rendered")
+      @triggerMethod('composite:rendered')
       @triggerRendered()
 
     render: () ->

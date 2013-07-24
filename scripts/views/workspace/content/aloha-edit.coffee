@@ -1,11 +1,8 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'aloha'
   #'mathjax'
-], ($, _, Backbone, Marionette, Aloha) ->
+], (Marionette, Aloha) ->
 
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element

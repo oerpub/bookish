@@ -1,14 +1,11 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!views/workspace/content/content-edit'
   'cs!views/workspace/content/edit-title'
   'cs!views/workspace/content/layouts/edit-metadata'
   'cs!views/workspace/content/edit-roles'
   'hbs!templates/workspace/content/layouts/editor'
-], ($, _, Backbone, Marionette, ContentEditView, TitleView, MetadataLayout, RolesView, editorTemplate) ->
+], (Marionette, ContentEditView, TitleView, MetadataLayout, RolesView, editorTemplate) ->
 
   return class EditorLayout extends Marionette.Layout
     template: editorTemplate

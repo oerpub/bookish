@@ -1,10 +1,4 @@
-define [
-  'jquery'
-  'underscore'
-  'backbone'
-  'marionette'
-  'cs!views/workspace/content/aloha-edit'
-], ($, _, Backbone, Marionette, AlohaEditView) ->
+define ['cs!views/workspace/content/aloha-edit'], (AlohaEditView) ->
 
   return class EditTitleView extends AlohaEditView
     # **NOTE:** This template is not wrapped in an element

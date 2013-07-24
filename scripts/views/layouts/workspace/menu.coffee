@@ -1,7 +1,4 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'marionette'
   'cs!collections/media-types'
   'cs!controllers/routing'
@@ -10,7 +7,7 @@ define [
   'cs!views/workspace/menu/add'
   'cs!views/workspace/menu/toolbar-search'
   'hbs!templates/layouts/workspace/menu'
-], ($, _, Backbone, Marionette, mediaTypes, controller, session, AuthView, AddView, toolbarView, menuTemplate) ->
+], (Marionette, mediaTypes, controller, session, AuthView, AddView, toolbarView, menuTemplate) ->
 
   _toolbar = null
 

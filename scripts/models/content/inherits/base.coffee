@@ -1,10 +1,7 @@
 define [
-  'jquery'
-  'underscore'
-  'backbone'
   'cs!./saveable'
   'cs!mixins/loadable'
-], ($, _, Backbone, SaveableModel, loadable) ->
+], (SaveableModel, loadable) ->
 
   class BaseModel extends SaveableModel
     url: () ->
