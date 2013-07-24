@@ -9,8 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "print-mock-data": "node ./test/print-mock-data.js",
-    "install": "./node_modules/.bin/bower install",
-    "update": "./node_modules/.bin/bower update"
+    "install": "bower install",
+    "update": "bower update"
   },
   "dependencies": {
     "bower": "~1.0",
