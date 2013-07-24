@@ -100,7 +100,8 @@ define [
         if ! imageModel
           console.error "ERROR: Manifest missing image file #{path}"
           counter--
-          @set 'body', $body[0].innerHTML, {loading:true} if counter == 0
+          # Set `parse:true` so the dirty flag for saving is not set
+          @set 'body', $body[0].innerHTML, {parse:true, loading:true} if counter == 0
           return
 
         # Load the image file somehow (see below for my github.js changes)
@@ -113,7 +114,8 @@ define [
           $img.attr('src', "data:#{mediaType};base64,#{encoded}")
 
           counter--
-          @set 'body', $body[0].innerHTML, {loading:true} if counter == 0
+          # Set `parse:true` so the dirty flag for saving is not set
+          @set 'body', $body[0].innerHTML, {parse:true, loading:true} if counter == 0
 
         .fail ->
           counter--
