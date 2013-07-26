@@ -21,6 +21,10 @@ define [
     templateHelpers: () ->
       return {mediaType: @model?.mediaType}
 
+    # Used by TocBranchView to know which collection to ask for an overridden title
+    itemViewOptions: () ->
+      return {container: @collection}
+
     # Override Marionette's showCollection()
     showCollection: () ->
       if @collection.branches
