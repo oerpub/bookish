@@ -24,6 +24,18 @@ define [
     url: -> 'META-INF/container.xml'
 
     toJSON: -> model.toJSON() for model in @models
+
+    # Extend the `load()` to wait until all content is loaded
+    _loadComplex: (fetchPromise) ->
+      promise = new $.Deferred()
+      fetchPromise.done () =>
+        contentPromises = @map (model) => model.load()
+        $.when.apply($, contentPromises)
+        .fail(() => alert 'problem loading book (OPF)')
+        .done () =>
+          promise.resolve(@)
+      return promise
+
     parse: (json) ->
       # Github.read returns a `{sha: "1234", content: "<rootfiles>...</rootfiles>"}
       sha = json.sha
