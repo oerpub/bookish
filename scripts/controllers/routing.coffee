@@ -25,6 +25,11 @@ define [
       # TODO: This can be removed if the "Home" button (and click event) are moved into this layout
       @layout.menu.show(menuLayout) if not @layout.menu.currentView
 
+    _showWorkspacePane: (TocView) ->
+      if not @layout.workspace.currentView
+        @layout.workspace.show(new TocView {model:allContent})
+
+
     # Show Workspace
     # -------
     # Show the workspace listing and update the URL
@@ -42,7 +47,8 @@ define [
         allContent.load()
         .fail(() => alert 'Problem loading workspace. Please refresh and try again')
         .done () =>
-          @layout.sidebar.show(new TocView {model:allContent})
+          @_showWorkspacePane(TocView)
+          @layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
           # Update the URL without triggering the router
@@ -78,6 +84,9 @@ define [
             @goWorkspace()
           else
 
+            # Always show the workspace pane
+            @_showWorkspacePane(TocView)
+
             # load editor views
 
             # Force the sidebar if a contextModel is passed in
@@ -86,11 +95,6 @@ define [
             else if model.sidebarView
               # Some models do not change the sidebar (like Module)
               model.sidebarView((view) => if view then @layout.sidebar.show(view))
-
-            else
-              # If no sidebar is opened then open the workspace sidebar
-              if not @layout.sidebar.currentView
-                @layout.sidebar.show(new TocView {model:allContent})
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 

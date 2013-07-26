@@ -10,3 +10,11 @@ define [
       content: '#content'
       menu: '#menu'
       sidebar: '#sidebar'
+      workspace: '#workspace'
+
+    events:
+      'click #workspace-container > .close': 'minimizeWorkspace'
+      'click #sidebar-container > .close':   'minimizeSidebar'
+
+    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('minimized')
+    minimizeSidebar: () -> @$('#sidebar-container').toggleClass('minimized')
