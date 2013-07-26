@@ -37,17 +37,6 @@ define [
       return _.where(@models, {branch: true})
 
 
-    # Extend the `load()` to wait until all content is loaded
-    _loadComplex: (fetchPromise) ->
-      promise = new $.Deferred()
-      fetchPromise.done () =>
-        contentPromises = @map (model) => model.load()
-        $.when.apply($, contentPromises).done () =>
-          promise.resolve(@)
-          @trigger('change')
-      return promise
-
-
     loading: () ->
       return @load().promise()
 

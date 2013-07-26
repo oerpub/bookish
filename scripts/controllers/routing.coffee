@@ -4,45 +4,107 @@
 
 # There is a cyclic dependency between this and various views (`->` means "depends on"):
 # controller -> layout -> WorkspaceView -> WorkspaceItemView -> controller (because clicking an item will begin editing)
-define ['marionette'], (Marionette) ->
+define [
+  'marionette'
+  'cs!collections/content'
+  'cs!views/layouts/workspace'
+  ], (Marionette, allContent, WorkspaceLayout) ->
+
 
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
+
+    _ensureLayout: (menuLayout) ->
+      # TODO: This can be moved into the initialize once the
+      # WorkspaceLayout constructor does not trigger logging POST events
+      if not @layout
+        @layout = new WorkspaceLayout()
+        @main.show(@layout)
+
+      # Make sure the menu is loaded
+      # TODO: This can be removed if the "Home" button (and click event) are moved into this layout
+      @layout.menu.show(menuLayout) if not @layout.menu.currentView
+
+    _showWorkspacePane: (TocView) ->
+      if not @layout.workspace.currentView
+        @layout.workspace.show(new TocView {model:allContent})
+
+
     # Show Workspace
     # -------
     # Show the workspace listing and update the URL
     goWorkspace: () ->
       # To prevent cyclic dependencies, load the views once the app has loaded.
-      require ['cs!views/layouts/workspace'], (WorkspaceLayout) =>
-        if not @layout
-          @layout = new WorkspaceLayout()
-          @main.show(@layout)
-        else
-          # load default views
-          @layout.showViews()
-        # Update the URL without triggering the router
-        @navigate('workspace')
+      require [
+        'cs!views/layouts/workspace/menu'
+        'cs!views/workspace/sidebar/toc'
+        'cs!views/workspace/content/search-results'
+        ], (menuLayout, TocView, SearchResultsView) =>
+
+        @_ensureLayout(menuLayout)
+
+        # Load the sidebar
+        allContent.load()
+        .fail(() => alert 'Problem loading workspace. Please refresh and try again')
+        .done () =>
+          @_showWorkspacePane(TocView)
+          @layout.sidebar.close()
+          @layout.content.show(new SearchResultsView {collection:allContent})
+
+          # Update the URL without triggering the router
+          @navigate('workspace')
+
 
     # Edit existing content
     # -------
     # Start editing an existing piece of content and update the URL.
-    goEdit: (model) ->
+    goEdit: (model, contextModel=null) ->
       # To prevent cyclic dependencies, load the views once the app has loaded.
-      require ['cs!views/layouts/workspace', 'cs!collections/content'], (WorkspaceLayout, allContent) =>
+      require [
+        'cs!views/layouts/workspace/menu'
+        'cs!views/workspace/sidebar/toc'
+        ], (menuLayout, TocView) =>
 
-        if typeof model is 'string'
-          model = allContent.get(model)
+        @_ensureLayout(menuLayout)
 
-        # Redirect to workspace if model does not exist
-        if not model
-          @goWorkspace()
-        else
-          if not @layout
-            @layout = new WorkspaceLayout({model: model})
-            @main.show(@layout)
+        allContent.load()
+        .fail(() => alert 'Problem loading workspace. Please refresh and try again')
+        .done () =>
+          if typeof model is 'string'
+            [model, contextModel] = model.split('|')
+            model = decodeURIComponent(model)
+            model = allContent.get(model)
 
-          # load editor views
-          @layout.showViews({model: model})
+            if contextModel
+              contextModel = decodeURIComponent(contextModel)
+              contextModel = allContent.get(contextModel)
 
-          # Update the URL without triggering the router
-          @navigate("edit/#{model.id or model.cid}")
+          # Redirect to workspace if model does not exist
+          if not model
+            @goWorkspace()
+          else
+
+            # Always show the workspace pane
+            @_showWorkspacePane(TocView)
+
+            # load editor views
+
+            # Force the sidebar if a contextModel is passed in
+            if contextModel
+              contextModel.sidebarView((view) => if view then @layout.sidebar.show(view))
+            else if model.sidebarView
+              # Some models do not change the sidebar (like Module)
+              model.sidebarView((view) => if view then @layout.sidebar.show(view))
+
+            model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
+
+            # Load the menu's toolbar
+            if model.toolbarView
+              model.toolbarView((view) => if view then @layout.menu.currentView.showToolbar(view))
+            else @layout.menu.currentView.showToolbar()
+
+            # Update the URL without triggering the router
+            if contextModel
+              @navigate("edit/#{encodeURIComponent(model.id or model.cid)}|#{encodeURIComponent(contextModel.id or contextModel.cid)}")
+            else
+              @navigate("edit/#{encodeURIComponent(model.id or model.cid)}")
