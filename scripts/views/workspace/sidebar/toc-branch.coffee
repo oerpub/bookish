@@ -99,7 +99,9 @@ define [
       'click > .editor-node-body > .edit-settings': 'editSettings'
       'click > .editor-node-body .go-edit': 'goEdit'
 
-    goEdit: () -> controller.goEdit(@model)
+    goEdit: () ->
+      # Edit the model in the context of this folder/book
+      controller.goEdit(@model, @model.getRoot?())
 
     # Toggle expanded/collapsed in the View
     # -------
