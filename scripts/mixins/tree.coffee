@@ -64,7 +64,8 @@ define ['backbone'], (Backbone) ->
 
     getRoot: () ->
       root = null
-      while parent = getParent()
+      parent = @
+      while parent = parent.getParent()
         root = parent
       return root
 
