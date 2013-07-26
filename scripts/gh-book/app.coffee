@@ -131,7 +131,15 @@ define [
 
             '':             'goWorkspace' # Show the workspace list of content
             'workspace':    'goWorkspace'
-            'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a path)
+            'edit/:id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
+
+          _loadFirst: () ->
+            setDefaultRepo()
+            return remoteUpdater.start()
+            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
+            .then () =>
+              allContent.load()
+              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
 
           configRepo: (repoUser, repoName, branch='') ->
             session.set
@@ -146,21 +154,9 @@ define [
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
           goWorkspace: () ->
-            setDefaultRepo()
-            remoteUpdater.start()
-            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
-            .done () =>
-              allContent.load()
-              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-              .done () => controller.goWorkspace()
+            @_loadFirst().done () => controller.goWorkspace()
           goEdit: (id)    ->
-            setDefaultRepo()
-            remoteUpdater.start()
-            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
-            .done () =>
-              allContent.load()
-              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-              .done () => controller.goEdit(id)
+            @_loadFirst().done () => controller.goEdit(id)
 
 
         Backbone.history.start
