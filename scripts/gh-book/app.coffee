@@ -69,11 +69,12 @@ define [
 
     # Github read/write and repo configuration
 
-    writeFile = (path, text, commitText) ->
-      session.getBranch().write path, text, commitText
+    writeFile = (path, text, commitText, isBinary) ->
+      if isBinary
+        text = btoa(text)
+      session.getBranch().write path, text, commitText, isBinary
 
-    readFile =       (path) -> session.getBranch().read       path
-    readBinaryFile = (path) -> session.getBranch().read       path, true # isBinary == true
+    readFile = (path, isBinary) -> session.getBranch().read path, isBinary
     readDir =        (path) -> session.getBranch().contents   path
 
 
@@ -84,17 +85,13 @@ define [
       console.log method, path
       ret = null
       switch method
-        when 'read'
-          if model.isBinary
-            ret = readBinaryFile(path)
-          else
-            ret = readFile(path)
-        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save')
+        when 'read' then ret = readFile(path, model.isBinary)
+        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save', model.isBinary)
         when 'create'
           # Create an id if this model has not been saved yet
           id = _uuid()
           model.set 'id', id
-          ret = writeFile(path, model.serialize())
+          ret = writeFile(path, model.serialize(), model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
