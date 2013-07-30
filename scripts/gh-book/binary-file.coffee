@@ -10,6 +10,7 @@ define [
 
     initialize: (options) ->
       @mediaType = options.mediaType if options.mediaType
+      super()
 
     parse: (json) ->
 
