@@ -27,14 +27,10 @@ define [
 
     # Extend the `load()` to wait until all content is loaded
     _loadComplex: (fetchPromise) ->
-      promise = new $.Deferred()
-      fetchPromise.done () =>
+      return fetchPromise.then () =>
         contentPromises = @map (model) => model.load()
-        $.when.apply($, contentPromises)
-        .fail(() => alert 'problem loading book (OPF)')
-        .done () =>
-          promise.resolve(@)
-      return promise
+        # Return a new promise that finishes once all the contentPromises have loaded
+        return $.when.apply($, contentPromises)
 
     parse: (json) ->
       # Github.read returns a `{sha: "1234", content: "<rootfiles>...</rootfiles>"}
