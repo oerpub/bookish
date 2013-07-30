@@ -19,6 +19,17 @@ define [
   # Stop logging.
   logger.stop()
 
+
+  # This is a utility that wraps a promise and alerts when the promise fails.
+  onFail = (promise, message='There was a problem.') ->
+    return promise.fail (err) =>
+      repoUser = session.get('repoUser')
+      repoName = session.get('repoName')
+      branch = session.get('branch') or ''
+      branch = "##{branch}" if branch
+      alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
+
+
   App = new Marionette.Application()
 
   App.addRegions
@@ -135,11 +146,10 @@ define [
 
           _loadFirst: () ->
             setDefaultRepo()
-            return remoteUpdater.start()
-            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
+            updater = remoteUpdater.start()
+            return onFail(updater, 'There was a problem starting the remote updater')
             .then () =>
-              allContent.load()
-              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
+              return onFail(allContent.load(), 'There was a problem loading the repo')
 
           configRepo: (repoUser, repoName, branch='') ->
             session.set
@@ -148,7 +158,7 @@ define [
               branch:   branch
 
             remoteUpdater.stop()
-            allContent.reload()
+            onFail(allContent.reload(), 'There was a problem re-loading the repo')
             @goWorkspace()
 
           # Delay the route handling until the initial content is loaded
