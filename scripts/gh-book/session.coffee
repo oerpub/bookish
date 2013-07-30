@@ -10,7 +10,7 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
           @_reloadClient()
 
         # See if this user can collaborate
-        @getRepo().canCollaborate().done (canCollaborate) =>
+        @getRepo()?.canCollaborate().done (canCollaborate) =>
           @set 'canCollaborate', canCollaborate
 
     _reloadClient: () ->
@@ -25,12 +25,14 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
       return @_client or throw 'BUG: Client was not loaded yet'
 
     getRepo: () ->
-      @getClient().getRepo(@get('repoUser'), @get('repoName'))
+      repoUser = @get('repoUser')
+      repoName = @get('repoName')
+      @getClient().getRepo(repoUser, repoName) if repoUser and repoName
 
     getBranch: () ->
       if @get 'branch'
-        @getRepo().getBranch(@get 'branch')
+        @getRepo()?.getBranch(@get 'branch')
       else
-        @getRepo().getDefaultBranch()
+        @getRepo()?.getDefaultBranch()
 
   return new GithubSession()

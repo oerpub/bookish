@@ -62,7 +62,7 @@ define [
         return
 
       @model.getClient().getLogin().done (login) =>
-        @model.getRepo().fork().done () =>
+        @model.getRepo()?.fork().done () =>
           @model.set 'repoUser', login
 
     signIn: () ->
