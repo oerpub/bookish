@@ -40,6 +40,16 @@ define [
       if item.branch or @showNodes
         super(item, ItemView, index)
 
+    # Override internal Marionette method.
+    # This method adds a child list item at a given index.
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
+
     events:
       'click .editor-content-title': 'changeTitle'
 
