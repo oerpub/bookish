@@ -181,17 +181,28 @@ define [
           root: ''
 
 
-    signIn = new WelcomeSignInView {model:session}
-    signIn.once 'close', () =>
+    # If localStorage does not contain a password or OAuth token then show the SignIn modal.
+    # Otherwise, load the workspace
+    if session.get('password') or session.get('token')
+      # Use the default book if one is not already set
       if not session.get 'repoName'
         session.set
           'repoUser': 'Connexions'
           'repoName': 'atc'
           'branch'  : 'sample-book'
-          'token'   : null         # Set your token here if you want
-
       startRouting()
-    App.main.show(signIn)
-    signIn.signInModal()
+    else
+      # The user has not logged in yet so pop up the modal
+      signIn = new WelcomeSignInView {model:session}
+      signIn.once 'close', () =>
+        # Use the default book if one is not already set
+        if not session.get 'repoName'
+          session.set
+            'repoUser': 'Connexions'
+            'repoName': 'atc'
+            'branch'  : 'sample-book'
+        startRouting()
+      App.main.show(signIn)
+      signIn.signInModal()
 
   return App
