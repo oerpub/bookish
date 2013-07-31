@@ -1,12 +1,29 @@
 define [
   'marionette'
-  'cs!collections/content'
-  'cs!views/workspace/content/search-results'
-  'cs!views/layouts/workspace/menu'
-  'cs!views/workspace/sidebar/toc'
   'hbs!templates/layouts/workspace'
-], (Marionette, content, SearchResultsView, menuLayout, TocView, workspaceTemplate) ->
+], (Marionette, workspaceTemplate) ->
 
+  # This layout looks as follows:
+  #
+  #     |    [menu: Home, Toolbar, Signin/Signout]    |
+  #     | ------------------------------------------- |
+  #     |                                             |
+  #     | ----------- | --------- | ------------------|
+  #     |          X  |        X  |                   |
+  #     |             |           |                   |
+  #     | [workspace] | [sidebar] | [content]         |
+  #     |             |           |                   |
+  #     | ----------- | --------- | ------------------|
+  #
+  # The `minimized` class is added to the `*-container`
+  # element when the `X` is pressed.
+  #
+  # Collapsing the views this way is done because:
+  #
+  # - CSS transitions can be applied to move the view
+  # - The controller only needs to show/close a view to change the current Book pane (`sidebar`)
+  #   it does not need to know about the current expanded/collapsed state of the pane
+  #
   return class Workspace extends Marionette.Layout
     template: workspaceTemplate
 
@@ -14,29 +31,15 @@ define [
       content: '#content'
       menu: '#menu'
       sidebar: '#sidebar'
+      workspace: '#workspace'
 
-    onRender: () ->
-      @showViews()
+    events:
+      'click #workspace-container > .close': 'minimizeWorkspace'
+      'click #sidebar-container > .close':   'minimizeSidebar'
 
-    showViews: (options) ->
-      @model = options?.model
+    initialize: () ->
+      @workspace.on 'show', => @$('#workspace-container').removeClass('minimized')
+      @sidebar.on   'show', => @$('#sidebar-container').removeClass('minimized')
 
-      # Make sure the menu is loaded
-      if not @menu.currentView
-        @menu.show(menuLayout)
-
-      # Load the content view
-      if @model?.contentView?
-        @model.contentView((view) => if view then @content.show(view))
-      else @content.show(new SearchResultsView({collection: content}))
-
-      # Load the menu's toolbar
-      if @model?.toolbarView?
-        @model.toolbarView((view) => if view then @menu.currentView.showToolbar(view))
-      else @menu.currentView.showToolbar()
-
-      # Load the sidebar
-      if @model?.sidebarView?
-        @model.sidebarView((view) => if view then @sidebar.show(view))
-      else
-        content.load().done () => @sidebar.show(new TocView {model:content})
+    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('minimized')
+    minimizeSidebar: () -> @$('#sidebar-container').toggleClass('minimized')

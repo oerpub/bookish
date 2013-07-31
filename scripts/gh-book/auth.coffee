@@ -62,16 +62,22 @@ define [
         return
 
       @model.getClient().getLogin().done (login) =>
-        @model.getRepo().fork().done () =>
+        @model.getRepo()?.fork().done () =>
           @model.set 'repoUser', login
 
     signIn: () ->
       # Set the username and password in the `Auth` model
-      @model.set
+      attrs =
         id:       @$el.find('#github-id').val()
-        password: @$el.find('#github-password').val()
         token:    @$el.find('#github-token').val()
 
+      # Only set the password if it is not empty
+      # This way, if localstorage contains your
+      # Credentials you can just click SignIn
+      password = @$el.find('#github-password').val()
+      attrs.password = password if password
+
+      @model.set(attrs)
       @render()
 
       # The 1st time the editor loads up it waits for the modal to close

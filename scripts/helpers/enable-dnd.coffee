@@ -106,7 +106,7 @@ define [
       throw 'BUG: model MUST have a parent' if not parent
       $content.data('editor-model', model)
 
-      index = parent.getChildren().indexOf(model)
       enableDrop model, $content, parent.accept, (drag, drop) ->
+        index = parent.getChildren().indexOf(model)
         parent.addChild drag, index+1
   }

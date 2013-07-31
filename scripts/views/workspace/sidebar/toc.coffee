@@ -1,11 +1,10 @@
 define [
   'underscore'
   'marionette'
-  'cs!controllers/routing'
   'cs!collections/content'
   'cs!views/workspace/sidebar/toc-branch'
   'hbs!templates/workspace/sidebar/toc'
-], (_, Marionette, controller, content, TocBranchView, tocTemplate) ->
+], (_, Marionette, allContent, TocBranchView, tocTemplate) ->
 
   return class TocView extends Marionette.CompositeView
     template: tocTemplate
@@ -17,10 +16,14 @@ define [
         @collection = options.collection
         @showNodes = true
       else
-        @collection = content
+        @collection = allContent
 
     templateHelpers: () ->
       return {mediaType: @model?.mediaType}
+
+    # Used by TocBranchView to know which collection to ask for an overridden title
+    itemViewOptions: () ->
+      return {container: @collection}
 
     # Override Marionette's showCollection()
     showCollection: () ->
@@ -37,13 +40,20 @@ define [
       if item.branch or @showNodes
         super(item, ItemView, index)
 
+    # Override internal Marionette method.
+    # This method adds a child list item at a given index.
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
+      else
+        $container.append(iv.el)
+
     events:
       'click .editor-content-title': 'changeTitle'
-      'click .go-workspace': 'goWorkspace'
 
     changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
       @render()
-
-    goWorkspace: () -> controller.goWorkspace()
