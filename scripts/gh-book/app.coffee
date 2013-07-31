@@ -22,6 +22,15 @@ define [
 
   # This is a utility that wraps a promise and alerts when the promise fails.
   onFail = (promise, message='There was a problem.') ->
+    complete = 0
+    total = 0
+
+    promise.progress (msg) =>
+      switch msg.type
+        when 'start'  then total++
+        when 'end'    then complete++
+      console.log "Progress: #{complete}/#{total}: ", msg
+
     return promise.fail (err) =>
       repoUser = session.get('repoUser')
       repoName = session.get('repoName')
