@@ -14,6 +14,9 @@ define [
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
 
+    # For all the views ensure there is a layout.
+    # There is a cyclic dependency between the controller and `menuLayout`
+    # because `menuLayout` has a "Home" button.
     _ensureLayout: (menuLayout) ->
       # TODO: This can be moved into the initialize once the
       # WorkspaceLayout constructor does not trigger logging POST events
@@ -25,6 +28,8 @@ define [
       # TODO: This can be removed if the "Home" button (and click event) are moved into this layout
       @layout.menu.show(menuLayout) if not @layout.menu.currentView
 
+    # There is a cyclic dependency between the controller and the ToC tree because
+    # the user can click an item in the ToC to `goEdit`.
     _showWorkspacePane: (TocView) ->
       if not @layout.workspace.currentView
         @layout.workspace.show(new TocView {model:allContent})
@@ -58,6 +63,11 @@ define [
     # Edit existing content
     # -------
     # Start editing an existing piece of content and update the URL.
+    #
+    # An optional `contextModel` can also be sent which will change the side pane
+    # which shows the current Book/Folder being edited.
+    #
+    # Also, the route is updated to include this context.
     goEdit: (model, contextModel=null) ->
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
@@ -72,10 +82,12 @@ define [
         .done () =>
           if typeof model is 'string'
             [model, contextModel] = model.split('|')
+            # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
             model = decodeURIComponent(model)
             model = allContent.get(model)
 
             if contextModel
+              # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
               contextModel = decodeURIComponent(contextModel)
               contextModel = allContent.get(contextModel)
 
@@ -103,8 +115,9 @@ define [
               model.toolbarView((view) => if view then @layout.menu.currentView.showToolbar(view))
             else @layout.menu.currentView.showToolbar()
 
+            # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
+            contextPath = ''
+            contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
+
             # Update the URL without triggering the router
-            if contextModel
-              @navigate("edit/#{encodeURIComponent(model.id or model.cid)}|#{encodeURIComponent(contextModel.id or contextModel.cid)}")
-            else
-              @navigate("edit/#{encodeURIComponent(model.id or model.cid)}")
+            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
