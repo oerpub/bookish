@@ -73,7 +73,7 @@ define [
     _.each STORED_KEYS, (key) ->
       value = window.sessionStorage.getItem key
       props[key] = value if value
-    session.set props, {silent:true}
+    session.set props
 
     # On change, store info to localStorage
     session.on 'change', () =>
