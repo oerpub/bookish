@@ -70,19 +70,17 @@ define [
       attrs =
         id:       @$el.find('#github-id').val()
         token:    @$el.find('#github-token').val()
+        password: @$el.find('#github-password').val()
 
-      # Only set the password if it is not empty
-      # This way, if localstorage contains your
-      # Credentials you can just click SignIn
-      password = @$el.find('#github-password').val()
-      attrs.password = password if password
+      if not attrs.password or attrs.token
+        alert 'We are terribly sorry but github recently changed so you must login to use their API.\nPlease refresh and provide a password or an OAuth token.'
+      else
+        @model.set(attrs)
+        @render()
 
-      @model.set(attrs)
-      @render()
-
-      # The 1st time the editor loads up it waits for the modal to close
-      # but `render` will hide the modal without triggering 'close'
-      @trigger 'close'
+        # The 1st time the editor loads up it waits for the modal to close
+        # but `render` will hide the modal without triggering 'close'
+        @trigger 'close'
 
     signOut: () ->
       settings =
