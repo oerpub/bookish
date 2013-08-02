@@ -108,6 +108,14 @@ define [
 
     # Edit the current repo settings
     editSettings: () ->
+      # Silently clear the settings first.
+      # This way listeners are **forced** to update and reload when
+      # "Save Settings" is clicked.
+      #
+      # The reason for **forcing** a reload is because this modal is also shown
+      # when there is a connection problem loading the workspace.
+      @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+
       @model.set
         repoUser: @$el.find('#repo-user').val()
         repoName: @$el.find('#repo-name').val()

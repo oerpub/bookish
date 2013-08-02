@@ -20,6 +20,16 @@ define [
   logger.stop()
 
 
+  # The WelcomeSignInView is overloaded to show Various Dialogs.
+  #
+  # - SignIn
+  # - Repo Settings
+  #
+  # When there is a failure show the Settings/SignIn Modal
+  welcomeView = new WelcomeSignInView {model:session}
+
+
+
   # This is a utility that wraps a promise and alerts when the promise fails.
   onFail = (promise, message='There was a problem.') ->
     complete = 0
@@ -36,7 +46,13 @@ define [
       repoName = session.get('repoName')
       branch = session.get('branch') or ''
       branch = "##{branch}" if branch
-      alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
+
+      # Show the WelcomeView's settings modal if there was a connection problem
+      try
+        App.main.show(welcomeView)
+        welcomeView.editSettingsModal(msg)
+      catch:
+        alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
 
 
   App = new Marionette.Application()
@@ -188,6 +204,7 @@ define [
           root: ''
 
 
+
     # If localStorage does not contain a password or OAuth token then show the SignIn modal.
     # Otherwise, load the workspace
     if session.get('password') or session.get('token')
@@ -200,8 +217,7 @@ define [
       startRouting()
     else
       # The user has not logged in yet so pop up the modal
-      signIn = new WelcomeSignInView {model:session}
-      signIn.once 'close', () =>
+      welcomeView.once 'close', () =>
         # Use the default book if one is not already set
         if not session.get 'repoName'
           session.set
@@ -209,7 +225,7 @@ define [
             'repoName': 'atc'
             'branch'  : 'sample-book'
         startRouting()
-      App.main.show(signIn)
-      signIn.signInModal()
+      App.main.show(welcomeView)
+      welcomeView.signInModal()
 
   return App
