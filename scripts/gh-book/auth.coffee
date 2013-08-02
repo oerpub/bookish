@@ -14,7 +14,8 @@ define [
       'click #sign-out': 'signOut'
       'click #save-content': 'saveContent'
       'click #fork-content': 'forkContent'
-
+      'click #edit-settings': 'editSettingsModal'
+      'click #edit-settings-ok': 'editSettings'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
@@ -97,3 +98,17 @@ define [
       allContent.save().done () =>
         @isDirty = false
         @render()
+
+    # Show the "Edit Settings" modal
+    editSettingsModal: () ->
+      $modal = @$el.find('#edit-settings-modal')
+
+      # Show the modal
+      $modal.modal {show:true}
+
+    # Edit the current repo settings
+    editSettings: () ->
+      @model.set
+        repoUser: @$el.find('#repo-user').val()
+        repoName: @$el.find('#repo-name').val()
+        branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
