@@ -20,7 +20,7 @@
     "backbone": "1.0.0",
     "backbone.marionette": "v1.0.3",
     "aloha-editor": "oerpub/Aloha-Editor#master",
-    "bootstrap": "v2.2.2"
+    "bootstrap": "v2.3.2"
   },
   "ignore": [
     "**/.*",

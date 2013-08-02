@@ -49,7 +49,7 @@ define ['jquery'], ($) ->
         'common/table'
         'extra/draganddropfiles'
         'common/image'
-        'oer/popover'
+        'oer/overlay'
         'oer/math'
         'oer/assorted'
         'oer/note'

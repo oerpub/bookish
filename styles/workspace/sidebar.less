@@ -1,6 +1,11 @@
 @import "../variables.less";
 
-#sidebar {
+// Use for the workspace picker and the sidebar
+#container > aside.minimized {
+  min-width: 1em;
+  > div { display: none; }
+}
+#container > aside:not(.minimized) {
   ol ol a {
     color: @grayDark;
   }

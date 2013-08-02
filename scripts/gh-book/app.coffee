@@ -19,6 +19,26 @@ define [
   # Stop logging.
   logger.stop()
 
+
+  # This is a utility that wraps a promise and alerts when the promise fails.
+  onFail = (promise, message='There was a problem.') ->
+    complete = 0
+    total = 0
+
+    promise.progress (msg) =>
+      switch msg.type
+        when 'start'  then total++
+        when 'end'    then complete++
+      console.log "Progress: #{complete}/#{total}: ", msg
+
+    return promise.fail (err) =>
+      repoUser = session.get('repoUser')
+      repoName = session.get('repoName')
+      branch = session.get('branch') or ''
+      branch = "##{branch}" if branch
+      alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
+
+
   App = new Marionette.Application()
 
   App.addRegions
@@ -53,7 +73,7 @@ define [
     _.each STORED_KEYS, (key) ->
       value = window.sessionStorage.getItem key
       props[key] = value if value
-    session.set props, {silent:true}
+    session.set props
 
     # On change, store info to localStorage
     session.on 'change', () =>
@@ -128,7 +148,14 @@ define [
 
             '':             'goWorkspace' # Show the workspace list of content
             'workspace':    'goWorkspace'
-            'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a path)
+            'edit/:id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
+
+          _loadFirst: () ->
+            setDefaultRepo()
+            updater = remoteUpdater.start()
+            return onFail(updater, 'There was a problem starting the remote updater')
+            .then () =>
+              return onFail(allContent.load(), 'There was a problem loading the repo')
 
           configRepo: (repoUser, repoName, branch='') ->
             session.set
@@ -137,27 +164,15 @@ define [
               branch:   branch
 
             remoteUpdater.stop()
-            allContent.reload()
+            onFail(allContent.reload(), 'There was a problem re-loading the repo')
             @goWorkspace()
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
           goWorkspace: () ->
-            setDefaultRepo()
-            remoteUpdater.start()
-            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
-            .done () =>
-              allContent.load()
-              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-              .done () => controller.goWorkspace()
+            @_loadFirst().done () => controller.goWorkspace()
           goEdit: (id)    ->
-            setDefaultRepo()
-            remoteUpdater.start()
-            .fail((err) => alert('There was a problem starting the remote updater. Are you pointing to a valid book?'))
-            .done () =>
-              allContent.load()
-              .fail((err) => alert('There was a problem loading the repo. Are you pointing to a valid book?'))
-              .done () => controller.goEdit(id)
+            @_loadFirst().done () => controller.goEdit(id)
 
 
         Backbone.history.start
@@ -166,17 +181,28 @@ define [
           root: ''
 
 
-    signIn = new WelcomeSignInView {model:session}
-    signIn.once 'close', () =>
+    # If localStorage does not contain a password or OAuth token then show the SignIn modal.
+    # Otherwise, load the workspace
+    if session.get('password') or session.get('token')
+      # Use the default book if one is not already set
       if not session.get 'repoName'
         session.set
           'repoUser': 'Connexions'
           'repoName': 'atc'
           'branch'  : 'sample-book'
-          'token'   : null         # Set your token here if you want
-
       startRouting()
-    App.main.show(signIn)
-    signIn.signInModal()
+    else
+      # The user has not logged in yet so pop up the modal
+      signIn = new WelcomeSignInView {model:session}
+      signIn.once 'close', () =>
+        # Use the default book if one is not already set
+        if not session.get 'repoName'
+          session.set
+            'repoUser': 'Connexions'
+            'repoName': 'atc'
+            'branch'  : 'sample-book'
+        startRouting()
+      App.main.show(signIn)
+      signIn.signInModal()
 
   return App

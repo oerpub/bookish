@@ -210,11 +210,8 @@ define [
       return node
 
 
-    # Change the content view when editing this
-    contentView: (callback) ->
-      require ['cs!views/workspace/content/search-results'], (View) =>
-        view = new View({collection: @getChildren()})
-        callback(view)
+    # Do not change the contentView when the book opens
+    contentView: null
 
     # Change the sidebar view when editing this
     sidebarView: (callback) ->

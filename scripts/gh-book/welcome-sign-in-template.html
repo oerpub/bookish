@@ -1,12 +1,10 @@
 <!-- Sign in Modal -->
 <div id="sign-in-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sign-in-modal-label" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="sign-in-modal-label">Sign in to Github!</h3>
   </div>
   <div class="modal-body">
-    <p>You can view any book without logging in but need a username and password to make changes.</p>
-    <p>If you plan on making changes to a book you will need to enter your github credentials.</p>
+    <p>To edit a book you must provide a username and password or an OAuth token.</p>
 
     <p>If you refresh this page you may need to re-enter this information.</p>
     <div class="form-inline">
@@ -20,7 +18,6 @@
     <p><strong>Note:</strong> To save changes on Github you may still need to click <button type="button" class="btn btn-mini" data-target="#settings-modal" data-toggle="modal"><i class="icon-cogs"></i> Settings</button>  and change to a repository you have access to.</p>
   </div>
   <div class="modal-footer">
-    <button id="sign-in-ok" type="submit" class="btn btn-primary" data-dismiss="modal">Sign In</button>
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button id="sign-in-ok" type="submit" class="btn btn-primary">Sign In</button>
   </div>
 </div>
