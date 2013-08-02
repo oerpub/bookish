@@ -129,7 +129,7 @@ define [
         controller.main = App.main
 
         # Custom routes to configure the Github User and Repo from the browser
-        new class GithubRouter extends Backbone.Router
+        router = new class GithubRouter extends Backbone.Router
 
           setDefaultRepo = () ->
             if not session.get('repoName')
@@ -163,9 +163,9 @@ define [
               repoName: repoName
               branch:   branch
 
-            remoteUpdater.stop()
-            onFail(allContent.reload(), 'There was a problem re-loading the repo')
-            @goWorkspace()
+            # The app listens to session onChange events and will call .goWorkspace
+            # It listens to 'change' because the auth view may also change the session
+
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
@@ -173,6 +173,13 @@ define [
             @_loadFirst().done () => controller.goWorkspace()
           goEdit: (id)    ->
             @_loadFirst().done () => controller.goEdit(id)
+
+
+        session.on 'change', () =>
+          if not _.isEmpty _.pick(session.changed, ['repoUser', 'repoName', 'branch'])
+            remoteUpdater.stop()
+            onFail(allContent.reload(), 'There was a problem re-loading the repo')
+            router.goWorkspace()
 
 
         Backbone.history.start
