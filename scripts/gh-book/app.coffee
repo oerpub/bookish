@@ -50,8 +50,8 @@ define [
       # Show the WelcomeView's settings modal if there was a connection problem
       try
         App.main.show(welcomeView)
-        welcomeView.editSettingsModal(msg)
-      catch:
+        welcomeView.editSettingsModal(message)
+      catch err
         alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
 
 
