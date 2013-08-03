@@ -24,6 +24,10 @@ define [
       @listenTo allContent, 'add remove', (model, collection, options) =>
         @setDirty() if not (options.loading or options.parse)
 
+      @listenTo allContent, 'reset', (collection, options) =>
+        # Clear the dirty bit since allContent has been reparsed
+        @isDirty = allContent.some (model) -> model.isDirty()
+
 
       @listenTo @model, 'change', () => @render()
 
