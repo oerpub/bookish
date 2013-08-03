@@ -12,9 +12,10 @@ define [
   'cs!gh-book/binary-file'
   'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
+  'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
@@ -84,7 +85,7 @@ define [
 
 
     # Populate the Session Model from localStorage
-    STORED_KEYS = ['repoUser', 'repoName', 'id', 'password', 'token']
+    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'id', 'password', 'token']
     props = {}
     _.each STORED_KEYS, (key) ->
       value = window.sessionStorage.getItem key
@@ -168,10 +169,12 @@ define [
 
           _loadFirst: () ->
             setDefaultRepo()
-            updater = remoteUpdater.start()
-            return onFail(updater, 'There was a problem starting the remote updater')
+            promise = onFail(remoteUpdater.start(), 'There was a problem starting the remote updater')
             .then () =>
               return onFail(allContent.load(), 'There was a problem loading the repo')
+
+            App.main.show(new LoadingView {model:allContent, promise:promise})
+            return promise
 
           configRepo: (repoUser, repoName, branch='') ->
             session.set
