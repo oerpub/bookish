@@ -10,7 +10,7 @@ define [
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
-  'cs!gh-book/welcome-sign-in'
+  'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
   'less!styles/main'
   'less!gh-book/gh-book'
