@@ -5,6 +5,7 @@ define [
   'marionette'
   'cs!helpers/logger'
   'cs!session'
+  'cs!collections/content'
   'cs!collections/media-types'
   'cs!gh-book/epub-container'
   'cs!gh-book/xhtml-file'
@@ -15,13 +16,26 @@ define [
   'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
 
   # Singleton that gets reloaded when the repo changes
   epubContainer = new EpubContainer()
+
+  allContent.on 'add', (model, collection, options) ->
+    return if options.loading
+
+    # If the new model is a book then add it to epubContainer
+    # Otherwise, add it to the manifest for all the books (Better safe than sorry)
+    switch model.mediaType
+      when OpfFile::mediaType
+        epubContainer.addChild(model)
+      else
+        allContent.each (book) ->
+          book.manifest?.add(model) # Only books have a manifest
+
 
   # The WelcomeSignInView is overloaded to show Various Dialogs.
   #

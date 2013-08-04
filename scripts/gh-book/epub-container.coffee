@@ -12,26 +12,30 @@ define [
   'cs!models/content/inherits/saveable'
   'cs!mixins/loadable'
   'cs!mixins/tree'
-], (allContent, Saveable, loadableMixin, treeMixin) ->
+  'cs!gh-book/opf-file'
+], (allContent, Saveable, loadableMixin, treeMixin, OpfFile) ->
 
 
   class EpubContainer extends Saveable
     mediaType: 'application/epub+zip'
-    accept: ['application/oebps-package+xml'] # Hardcode the OpfFile::mediaType because otherwise there would be a cyclic dependency on allContent
+    accept: [OpfFile::mediaType]
 
     defaults:
       urlRoot: ''
     id: 'META-INF/container.xml'
 
-    initialize: (options) ->
-      options ?= {}
-      options.root = @
-      @_initializeTreeHandlers(options)
+    initialize: () ->
+      @children = new Backbone.Collection()
+
+      @children.on 'reset', (collection, options) =>
+        return if options.loading
+
+        allContent.reset(@children.models)
 
     # Extend the `load()` to wait until all content is loaded
     _loadComplex: (fetchPromise) ->
       return fetchPromise.then () =>
-        contentPromises = @getChildren().map (model) => model.load()
+        contentPromises = @children.map (model) => model.load()
         # Return a new promise that finishes once all the contentPromises have loaded
         return $.when.apply($, contentPromises)
 
@@ -49,18 +53,16 @@ define [
         model = allContent.get(href)
         if not model
           model = allContent.model {id: href, mediaType: mediaType}
-          allContent.add(model)
+          allContent.add(model, {loading:true})
         ret.push model
 
-      @getChildren().reset(ret)
+      return @children.reset(ret, {loading:true})
 
     # Called by `loadableMixin.reload` when the repo settings change
-    reset: () ->
-      @getChildren().reset()
-      allContent.reset()
+    reset: () -> @children.reset()
 
+    addChild: (book) -> @children.add(book)
 
   EpubContainer = EpubContainer.extend loadableMixin
-  EpubContainer = EpubContainer.extend treeMixin
   # All content in the Workspace
   return EpubContainer
