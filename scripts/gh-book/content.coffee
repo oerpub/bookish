@@ -16,37 +16,10 @@ define [
 ], ($, _, Backbone, mediaTypes, loadableMixin) ->
 
 
-  class EPUBContainer extends Backbone.Collection
-    _loaded = $.Deferred()
-
-    defaults:
-      urlRoot: ''
-    url: -> 'META-INF/container.xml'
-
+  class Epub extends Backbone.Collection
     toJSON: -> model.toJSON() for model in @models
 
-    # Extend the `load()` to wait until all content is loaded
-    _loadComplex: (fetchPromise) ->
-      return fetchPromise.then () =>
-        contentPromises = @map (model) => model.load()
-        # Return a new promise that finishes once all the contentPromises have loaded
-        return $.when.apply($, contentPromises)
-
-    parse: (json) ->
-      # Github.read returns a `{sha: "1234", content: "<rootfiles>...</rootfiles>"}
-      sha = json.sha
-      xmlStr = json.content
-
-      $xml = jQuery(xmlStr)
-      ret = []
-      $xml.find('rootfiles > rootfile').each (i, el) =>
-        $el = jQuery(el)
-        href = $el.attr 'full-path'
-        mediaType = $el.attr 'media-type'
-        ret.push {id: href, mediaType: mediaType}
-      return ret
-
-
+    # Use mediaTypes to instantiate a new Model
     model: (attrs, options) ->
       if attrs.mediaType
         Medium = mediaTypes.type(attrs.mediaType)
@@ -58,9 +31,6 @@ define [
 
     branches: () ->
       return _.where(@models, {branch: true})
-
-    loading: () ->
-      return _loaded.promise()
 
     # Save serially.
     save: (options) ->
@@ -85,6 +55,15 @@ define [
       saveNextItem(changedModels)
       return promise.promise()
 
-  EPUBContainer = EPUBContainer.extend loadableMixin
+  Epub = Epub.extend loadableMixin
+
+  # Load the container file
+  # Done after `EPub.extend` to ensure the default load is overridden
+  Epub::load = () ->
+    if not @container
+      @container = @model {mediaType:'application/epub+zip'}
+      @add(@container, {silent:true})
+    return @container.load()
+
   # All content in the Workspace
-  return new EPUBContainer()
+  return new Epub()

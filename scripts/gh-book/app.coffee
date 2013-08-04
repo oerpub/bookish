@@ -5,8 +5,8 @@ define [
   'marionette'
   'cs!helpers/logger'
   'cs!session'
-  'cs!collections/content'
   'cs!collections/media-types'
+  'cs!gh-book/epub-container'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
@@ -15,11 +15,13 @@ define [
   'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
+], ($, _, Backbone, Marionette, logger, session, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
 
+  # Singleton that gets reloaded when the repo changes
+  epubContainer = new EpubContainer()
 
   # The WelcomeSignInView is overloaded to show Various Dialogs.
   #
@@ -65,6 +67,7 @@ define [
   App.addInitializer (options) ->
 
     # Register media types for editing
+    mediaTypes.add EpubContainer
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
@@ -171,9 +174,9 @@ define [
             setDefaultRepo()
             promise = onFail(remoteUpdater.start(), 'There was a problem starting the remote updater')
             .then () =>
-              return onFail(allContent.load(), 'There was a problem loading the repo')
+              return onFail(epubContainer.load(), 'There was a problem loading the repo')
 
-            App.main.show(new LoadingView {model:allContent, promise:promise})
+            App.main.show(new LoadingView {model:epubContainer, promise:promise})
             return promise
 
           configRepo: (repoUser, repoName, branch='') ->
@@ -197,7 +200,7 @@ define [
         session.on 'change', () =>
           if not _.isEmpty _.pick(session.changed, ['repoUser', 'repoName', 'branch'])
             remoteUpdater.stop()
-            onFail(allContent.reload(), 'There was a problem re-loading the repo')
+            onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
             router.goWorkspace()
 
 
