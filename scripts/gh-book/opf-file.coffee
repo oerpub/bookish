@@ -44,8 +44,6 @@ define [
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel(options)
 
-      @load()
-
 
     _loadComplex: (fetchPromise) ->
       fetchPromise
