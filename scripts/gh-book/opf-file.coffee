@@ -44,6 +44,21 @@ define [
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel(options)
 
+      @manifest.on 'add', (model, collection, options) =>
+        # Create a new `<item>` in the manifest
+        item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
+        $item = $(item)
+        $item.attr
+          href:         model.id
+          id:           model.id # TODO: escape the slashes so it is a valid id
+          'media-type': model.mediaType
+
+        $manifest = @$xml.find('manifest')
+        $manifest.append($item)
+        # TODO: Depending on the type add it to the spine for EPUB2
+
+        @_markDirty(options, true) # true == force because hasChanged == false
+
 
     _loadComplex: (fetchPromise) ->
       fetchPromise
@@ -183,7 +198,7 @@ define [
 
         # Add it to the manifest and then do a batch add to `allContent`
         # at the end so the views do not re-sort on every add.
-        @manifest.add model
+        @manifest.add model, {loading:true}
 
         # If we stumbled upon the special navigation document
         # then remember it.
