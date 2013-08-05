@@ -45,6 +45,11 @@ define [
         setNavModel(options)
 
       @manifest.on 'add', (model, collection, options) =>
+        $manifest = @$xml.find('manifest')
+
+        # Check if the item is not already in the manifest
+        return if $manifest.find("item[href='#{model.id}']")[0]
+
         # Create a new `<item>` in the manifest
         item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
         $item = $(item)
@@ -53,7 +58,6 @@ define [
           id:           model.id # TODO: escape the slashes so it is a valid id
           'media-type': model.mediaType
 
-        $manifest = @$xml.find('manifest')
         $manifest.append($item)
         # TODO: Depending on the type add it to the spine for EPUB2
 

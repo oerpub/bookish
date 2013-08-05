@@ -123,10 +123,9 @@ define [
 
     # Github read/write and repo configuration
 
-    writeFile = (path, text, commitText, isBinary) ->
-      if isBinary
-        text = btoa(text)
-      session.getBranch().write path, text, commitText, isBinary
+    writeFile = (path, text, commitText, isBase64) ->
+      # .write expects the text to be base64 encoded so no need to convert it
+      session.getBranch().write path, text, commitText, isBase64
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
     readDir =        (path) -> session.getBranch().contents   path

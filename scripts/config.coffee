@@ -10,6 +10,7 @@ require.config
     'collections/content': 'gh-book/content'
     'views/workspace/menu/auth': 'gh-book/auth'
     session: 'gh-book/session'
+    jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
 
 
     # ## Template and Style paths
@@ -66,6 +67,10 @@ require.config
   # List the dependencies and what global object is available
   # when the library is done loading (for jQuery plugins this can be `jQuery`)
   shim:
+
+    # jsSHA does not use requirejs so use the global
+    jsSHA:
+      exports: 'jsSHA'
 
     # ## Core Libraries
     underscore:

@@ -33,3 +33,5 @@ define [
 
       return {body: bytes, base64Encoded: base64Encoded}
 
+
+    serialize: () -> @get('base64Encoded')
