@@ -1,10 +1,11 @@
 define [
   'underscore'
   'backbone'
+  'cs!gh-book/uuid'
   'cs!models/content/module'
   'cs!collections/content'
   'cs!gh-book/utils'
-], (_, Backbone, ModuleModel, allContent, Utils) ->
+], (_, Backbone, uuid, ModuleModel, allContent, Utils) ->
 
   # The `Content` model contains the following members:
   #
@@ -21,6 +22,10 @@ define [
 
     initialize: () ->
       super()
+
+      # Give the content an id if it does not already have one
+      @id ?= "content/#{uuid()}"
+
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
       # The title of the XhtmlFile is not stored inside the file;
