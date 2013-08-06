@@ -1,6 +1,6 @@
 define [
-  'session'
-  'collections/content'
+  'cs!session'
+  'cs!collections/content'
 ], (session, allContent) ->
 
   UPDATE_TIMEOUT = 60 * 1000 # Update every minute

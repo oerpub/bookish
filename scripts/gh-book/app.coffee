@@ -7,17 +7,44 @@ define [
   'cs!session'
   'cs!collections/content'
   'cs!collections/media-types'
+  'cs!gh-book/epub-container'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
   'cs!gh-book/binary-file'
-  'cs!gh-book/welcome-sign-in'
+  'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
+  'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
+
+  # Singleton that gets reloaded when the repo changes
+  epubContainer = new EpubContainer()
+
+  allContent.on 'add', (model, collection, options) ->
+    return if options.loading
+
+    # If the new model is a book then add it to epubContainer
+    # Otherwise, add it to the manifest for all the books (Better safe than sorry)
+    switch model.mediaType
+      when OpfFile::mediaType
+        epubContainer.addChild(model)
+      else
+        allContent.each (book) ->
+          book.manifest?.add(model) # Only books have a manifest
+
+
+  # The WelcomeSignInView is overloaded to show Various Dialogs.
+  #
+  # - SignIn
+  # - Repo Settings
+  #
+  # When there is a failure show the Settings/SignIn Modal
+  welcomeView = new WelcomeSignInView {model:session}
+
 
 
   # This is a utility that wraps a promise and alerts when the promise fails.
@@ -36,7 +63,13 @@ define [
       repoName = session.get('repoName')
       branch = session.get('branch') or ''
       branch = "##{branch}" if branch
-      alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
+
+      # Show the WelcomeView's settings modal if there was a connection problem
+      try
+        App.main.show(welcomeView)
+        welcomeView.editSettingsModal(message)
+      catch err
+        alert("#{message} Are you pointing to a valid book? Using github/#{repoUser}/#{repoName}#{branch}")
 
 
   App = new Marionette.Application()
@@ -48,6 +81,7 @@ define [
   App.addInitializer (options) ->
 
     # Register media types for editing
+    mediaTypes.add EpubContainer
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
@@ -68,7 +102,7 @@ define [
 
 
     # Populate the Session Model from localStorage
-    STORED_KEYS = ['repoUser', 'repoName', 'id', 'password', 'token']
+    STORED_KEYS = ['repoUser', 'repoName', 'branch', 'id', 'password', 'token']
     props = {}
     _.each STORED_KEYS, (key) ->
       value = window.sessionStorage.getItem key
@@ -89,10 +123,9 @@ define [
 
     # Github read/write and repo configuration
 
-    writeFile = (path, text, commitText, isBinary) ->
-      if isBinary
-        text = btoa(text)
-      session.getBranch().write path, text, commitText, isBinary
+    writeFile = (path, text, commitText, isBase64) ->
+      # .write expects the text to be base64 encoded so no need to convert it
+      session.getBranch().write path, text, commitText, isBase64
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
     readDir =        (path) -> session.getBranch().contents   path
@@ -129,7 +162,7 @@ define [
         controller.main = App.main
 
         # Custom routes to configure the Github User and Repo from the browser
-        new class GithubRouter extends Backbone.Router
+        router = new class GithubRouter extends Backbone.Router
 
           setDefaultRepo = () ->
             if not session.get('repoName')
@@ -152,10 +185,12 @@ define [
 
           _loadFirst: () ->
             setDefaultRepo()
-            updater = remoteUpdater.start()
-            return onFail(updater, 'There was a problem starting the remote updater')
+            promise = onFail(remoteUpdater.start(), 'There was a problem starting the remote updater')
             .then () =>
-              return onFail(allContent.load(), 'There was a problem loading the repo')
+              return onFail(epubContainer.load(), 'There was a problem loading the repo')
+
+            App.main.show(new LoadingView {model:epubContainer, promise:promise})
+            return promise
 
           configRepo: (repoUser, repoName, branch='') ->
             session.set
@@ -163,9 +198,9 @@ define [
               repoName: repoName
               branch:   branch
 
-            remoteUpdater.stop()
-            onFail(allContent.reload(), 'There was a problem re-loading the repo')
-            @goWorkspace()
+            # The app listens to session onChange events and will call .goWorkspace
+            # It listens to 'change' because the auth view may also change the session
+
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
@@ -175,10 +210,18 @@ define [
             @_loadFirst().done () => controller.goEdit(id)
 
 
+        session.on 'change', () =>
+          if not _.isEmpty _.pick(session.changed, ['repoUser', 'repoName', 'branch'])
+            remoteUpdater.stop()
+            onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
+            router.goWorkspace()
+
+
         Backbone.history.start
           pushState: false
           hashChange: true
           root: ''
+
 
 
     # If localStorage does not contain a password or OAuth token then show the SignIn modal.
@@ -193,8 +236,7 @@ define [
       startRouting()
     else
       # The user has not logged in yet so pop up the modal
-      signIn = new WelcomeSignInView {model:session}
-      signIn.once 'close', () =>
+      welcomeView.once 'close', () =>
         # Use the default book if one is not already set
         if not session.get 'repoName'
           session.set
@@ -202,7 +244,7 @@ define [
             'repoName': 'atc'
             'branch'  : 'sample-book'
         startRouting()
-      App.main.show(signIn)
-      signIn.signInModal()
+      App.main.show(welcomeView)
+      welcomeView.signInModal()
 
   return App
