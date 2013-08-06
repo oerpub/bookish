@@ -125,6 +125,8 @@ require.config
       return "cs!../templates/helpers/#{name}"
     templateExtension: 'html'
 
+  waitSeconds: 42
+
 # # Load and run the application
 define ['cs!app'], (app) ->
   app.start()
