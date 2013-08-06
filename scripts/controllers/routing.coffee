@@ -20,7 +20,7 @@ define [
     _ensureLayout: (menuLayout) ->
       # TODO: This can be moved into the initialize once the
       # WorkspaceLayout constructor does not trigger logging POST events
-      if not @layout
+      if not @layout or not @layout.menu
         @layout = new WorkspaceLayout()
         @main.show(@layout)
 
