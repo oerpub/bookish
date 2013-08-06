@@ -52,6 +52,7 @@ define ['jquery'], ($) ->
         'oer/overlay'
         'oer/math'
         'oer/assorted'
+        'ghbook/image'
         'oer/note'
       ]
 
