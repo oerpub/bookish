@@ -14,7 +14,8 @@ define [
       'click #sign-out': 'signOut'
       'click #save-content': 'saveContent'
       'click #fork-content': 'forkContent'
-
+      'click #edit-settings': 'editSettingsModal'
+      'click #edit-settings-ok': 'editSettings'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
@@ -22,6 +23,10 @@ define [
       # Update the Save button when new Folder/Book/Module is created (added to `allContent`)
       @listenTo allContent, 'add remove', (model, collection, options) =>
         @setDirty() if not (options.loading or options.parse)
+
+      @listenTo allContent, 'reset', (collection, options) =>
+        # Clear the dirty bit since allContent has been reparsed
+        @isDirty = allContent.some (model) -> model.isDirty()
 
 
       @listenTo @model, 'change', () => @render()
@@ -97,3 +102,25 @@ define [
       allContent.save().done () =>
         @isDirty = false
         @render()
+
+    # Show the "Edit Settings" modal
+    editSettingsModal: () ->
+      $modal = @$el.find('#edit-settings-modal')
+
+      # Show the modal
+      $modal.modal {show:true}
+
+    # Edit the current repo settings
+    editSettings: () ->
+      # Silently clear the settings first.
+      # This way listeners are **forced** to update and reload when
+      # "Save Settings" is clicked.
+      #
+      # The reason for **forcing** a reload is because this modal is also shown
+      # when there is a connection problem loading the workspace.
+      @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+
+      @model.set
+        repoUser: @$el.find('#repo-user').val()
+        repoName: @$el.find('#repo-name').val()
+        branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch

@@ -1,8 +1,9 @@
 define [
   'underscore'
   'backbone'
+  'cs!gh-book/uuid'
   'cs!models/content/module'
-], (_, Backbone, ModuleModel) ->
+], (_, Backbone, uuid, ModuleModel) ->
 
   return class BinaryFileModel extends ModuleModel
     mediaType: 'application/octet-stream'
@@ -11,6 +12,10 @@ define [
     initialize: (options) ->
       @mediaType = options.mediaType if options.mediaType
       super()
+
+      # Give the resource an id if it does not already have one
+      @id ?= "resources/#{uuid()}"
+
 
     parse: (json) ->
 
@@ -28,3 +33,5 @@ define [
 
       return {body: bytes, base64Encoded: base64Encoded}
 
+
+    serialize: () -> @get('base64Encoded')
