@@ -37,6 +37,9 @@ define ['jquery'], ($) ->
         '*':
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
 
+    bundles:
+      ghbook: '../../../../scripts/aloha'
+
     plugins:
       # All the plugins we use in Aloha
       load: [
