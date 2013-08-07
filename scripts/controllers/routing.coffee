@@ -121,3 +121,14 @@ define [
 
             # Update the URL without triggering the router
             @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
+
+    goDefault: () ->
+      require ['cs!gh-book/opf-file', 'cs!gh-book/xhtml-file'], (OpfFile, XhtmlFile) =>
+        # Find the first opf file
+        opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
+        if opf
+          # Find the first xhtml file
+          xh = opf.manifest.findWhere({mediaType: XhtmlFile.prototype.mediaType})
+          @goEdit(xh)
+        else
+          @goWorkspace()
