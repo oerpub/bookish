@@ -20,7 +20,7 @@
     "moment": "timrwood/moment#2.0.0",
     "backbone": "1.0.0",
     "backbone.marionette": "v1.0.3",
-    "aloha-editor": "oerpub/Aloha-Editor#testing",
+    "aloha-editor": "oerpub/Aloha-Editor#master",
     "bootstrap": "v2.3.2"
   },
   "ignore": [
