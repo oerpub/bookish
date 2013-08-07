@@ -179,7 +179,7 @@ define [
             'repo/:repoUser/:repoName':         'configRepo'
             'repo/:repoUser/:repoName/:branch': 'configRepo'
 
-            '':             'goWorkspace' # Show the workspace list of content
+            '':             'goDefault'
             'workspace':    'goWorkspace'
             'edit/:id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
 
@@ -198,7 +198,7 @@ define [
               repoName: repoName
               branch:   branch
 
-            # The app listens to session onChange events and will call .goWorkspace
+            # The app listens to session onChange events and will call .goDefault
             # It listens to 'change' because the auth view may also change the session
 
 
@@ -208,13 +208,15 @@ define [
             @_loadFirst().done () => controller.goWorkspace()
           goEdit: (id)    ->
             @_loadFirst().done () => controller.goEdit(id)
+          goDefault: () ->
+            @_loadFirst().done () => controller.goDefault()
 
 
         session.on 'change', () =>
           if not _.isEmpty _.pick(session.changed, ['repoUser', 'repoName', 'branch'])
             remoteUpdater.stop()
             onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
-            router.goWorkspace()
+            router.goDefault()
 
 
         Backbone.history.start
