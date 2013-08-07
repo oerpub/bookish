@@ -123,12 +123,13 @@ define [
             @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
 
     goDefault: () ->
-      require ['cs!gh-book/opf-file', 'cs!gh-book/xhtml-file'], (OpfFile, XhtmlFile) =>
+      require ['underscore', 'cs!gh-book/opf-file', 'cs!gh-book/xhtml-file'], (_, OpfFile, XhtmlFile) =>
         # Find the first opf file
         opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
         if opf
-          # Find the first xhtml file
-          xh = opf.manifest.findWhere({mediaType: XhtmlFile.prototype.mediaType})
-          @goEdit(xh)
+          # Find the first xhtml file which is not the navmodel
+          files = opf.manifest.where {mediaType: XhtmlFile.prototype.mediaType}
+          files = _.reject files, (o) -> o == opf.navModel
+          @goEdit _.first(files)
         else
           @goWorkspace()
