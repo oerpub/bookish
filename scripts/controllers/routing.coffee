@@ -123,13 +123,18 @@ define [
        @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
 
     goDefault: () ->
-      require ['underscore', 'cs!gh-book/opf-file', 'cs!gh-book/xhtml-file'], (_, OpfFile, XhtmlFile) =>
-        # Find the first opf file
-        opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
-        if opf
-          # Find the first xhtml file which is not the navmodel
-          files = opf.manifest.where {mediaType: XhtmlFile.prototype.mediaType}
-          files = _.reject files, (o) -> o == opf.navModel
-          @goEdit _.first(files)
-        else
-          @goWorkspace()
+      require [ 'cs!views/layouts/workspace/menu' ], (menuLayout) =>
+        @_ensureLayout(menuLayout)
+        allContent.load()
+        .fail(() => alert 'Problem loading workspace. Please refresh and try again')
+        .done () =>
+          # Find the first opf file. This is gh-book specific, I suspect we
+          # want a more agnostic method of finding the first item and
+          # editing it?
+          opf = allContent.findWhere({mediaType: 'application/oebps-package+xml'})
+          if opf
+            # The first item in the toc is always the opf file, followed by the
+            # TOC nodes.
+            @_goEdit opf.tocNodes.at(1)
+          else
+            @goWorkspace()
