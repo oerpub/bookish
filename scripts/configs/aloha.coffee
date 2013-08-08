@@ -57,6 +57,7 @@ define ['jquery'], ($) ->
         'oer/assorted'
         'ghbook/image'
         'oer/note'
+        'oer/copy'
       ]
 
       # This whole thing is what's needed to:
