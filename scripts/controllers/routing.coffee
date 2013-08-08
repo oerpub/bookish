@@ -70,7 +70,10 @@ define [
     # Also, the route is updated to include this context.
     goEdit: (model, contextModel=null) ->
       # To prevent cyclic dependencies, load the views once the app has loaded.
-      require [ 'cs!views/layouts/workspace/menu' ], (menuLayout) =>
+      require [
+        'cs!views/layouts/workspace/menu'
+        'cs!views/workspace/sidebar/toc'
+        ], (menuLayout, TocView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -89,38 +92,35 @@ define [
               contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
-          if model
-            @_goEdit(model, contextModel)
-          else
+          if not model
             @goWorkspace()
+          else
 
-    _goEdit: (model, contextModel=null) ->
-      require [ 'cs!views/workspace/sidebar/toc' ], (TocView) =>
-       # Always show the workspace pane
-       @_showWorkspacePane(TocView)
+            # Always show the workspace pane
+            @_showWorkspacePane(TocView)
 
-       # load editor views
+            # load editor views
 
-       # Force the sidebar if a contextModel is passed in
-       if contextModel
-         contextModel.sidebarView((view) => if view then @layout.sidebar.show(view))
-       else if model.sidebarView
-         # Some models do not change the sidebar (like Module)
-         model.sidebarView((view) => if view then @layout.sidebar.show(view))
+            # Force the sidebar if a contextModel is passed in
+            if contextModel
+              contextModel.sidebarView((view) => if view then @layout.sidebar.show(view))
+            else if model.sidebarView
+              # Some models do not change the sidebar (like Module)
+              model.sidebarView((view) => if view then @layout.sidebar.show(view))
 
-       model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
+            model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 
-       # Load the menu's toolbar
-       if model.toolbarView
-         model.toolbarView((view) => if view then @layout.menu.currentView.showToolbar(view))
-       else @layout.menu.currentView.showToolbar()
+            # Load the menu's toolbar
+            if model.toolbarView
+              model.toolbarView((view) => if view then @layout.menu.currentView.showToolbar(view))
+            else @layout.menu.currentView.showToolbar()
 
-       # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-       contextPath = ''
-       contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
+            # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
+            contextPath = ''
+            contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
 
-       # Update the URL without triggering the router
-       @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
+            # Update the URL without triggering the router
+            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
 
     goDefault: () ->
       require [ 'cs!views/layouts/workspace/menu' ], (menuLayout) =>
