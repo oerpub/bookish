@@ -1,7 +1,7 @@
 define [
   'jquery'
   'marionette'
-  'hbs!templates/workspace/menu/toolbar-search'
+  'hbs!templates/workspace/menu/toolbar-aloha'
 ], ($, Marionette, toolbarTemplate) ->
 
   _rendered = false

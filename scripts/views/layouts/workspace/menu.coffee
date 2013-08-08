@@ -5,7 +5,7 @@ define [
   'cs!session'
   'cs!views/workspace/menu/auth'
   'cs!views/workspace/menu/add'
-  'cs!views/workspace/menu/toolbar-search'
+  'cs!views/workspace/menu/toolbar-aloha'
   'hbs!templates/layouts/workspace/menu'
 ], (Marionette, mediaTypes, controller, session, AuthView, AddView, toolbarView, menuTemplate) ->
 
