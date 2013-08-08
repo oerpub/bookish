@@ -15,6 +15,11 @@
   <!-- ================= -->
   <!--  Toolbar Buttons  -->
   <!-- ================= -->
+  <div class="btn-group">
+    <button class="btn action undo" rel="tooltip" title="Undo"><i class="icon-undo"></i></button>
+    <button class="btn action redo" rel="tooltip" title="Redo"><i class="icon-repeat"></i></button>
+  </div>
+
   <div class="btn-group headings">
     <button class="btn currentHeading" rel="tooltip" title="Text Heading">Nothing</button>
     <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Change Heading">
@@ -32,15 +37,12 @@
     <button class="btn action strong" rel="tooltip" title="Bold"><i class="icon-bold"></i></button>
     <button class="btn action emphasis" rel="tooltip" title="Italics"><i class="icon-italic"></i></button>
     <button class="btn action underline" rel="tooltip" title="Underline"><i class="icon-underline"></i></button>
+    <button class="btn action superscript" rel="tooltip" title="Superscript"><i class="icon-superscript"></i></button>
+    <button class="btn action subscript" rel="tooltip" title="Subscript"><i class="icon-subscript"></i></button>    
   </div>
 
   <div class="btn-group">
-<!--
     <button class="btn action insertLink" rel="tooltip" title="Insert Link"><i class="icon-link"></i></button>
--->
-    <button class="btn action insertImage-oer" rel="tooltip" title="Insert Figure"><i class="icon-picture"></i></button>
-    <button class="btn action insertMath" rel="tooltip" title="Insert Math">x<sup>2</sup></button>
-    <button class="btn action insertNote" rel="tooltip" title="Insert Note">Note</button>
   </div>
 
   <div class="btn-group">
@@ -50,18 +52,27 @@
     <button class="btn action indentList" rel="tooltip" title="Outdent List"><i class="icon-indent-right"></i></button>
   </div>
 
-<!--
   <div class="btn-group">
+    <button class="btn action insertImage-oer" rel="tooltip" title="Insert Figure"><i class="icon-picture"></i></button>
+    <!--
+    <button class="btn action insertNote" rel="tooltip" title="Insert Note">Note</button>
+    -->
     <button class="btn action createTable" rel="tooltip" title="Create Table"><i class="icon-table"></i></button>
     <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Table Operations">
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-      <li><button class="action addrowbefore">Add Row Before</button></li>
-      <li><button class="action addrowafter">Add Row After</button></li>
+      <li class="disabled"><a href="#" class="action addrowbefore">Add Row Before</a></li>
+      <li class="disabled"><a href="#" class="action addrowafter">Add Row After</a></li>
+      <li class="disabled"><a href="#" class="action addcolumnbefore">Add Column Before</a></li>
+      <li class="disabled"><a href="#" class="action addcolumnafter">Add Column After</a></li>
+      <li class="disabled"><a href="#" class="action addheaderrow">Add Header Row</a></li>
+      <li class="disabled"><a href="#" class="action deleterow">Delete Row</a></li>
+      <li class="disabled"><a href="#" class="action deletecolumn">Delete Column</a></li>
+      <li class="disabled"><a href="#" class="action deletetable">Delete Table</a></li>
     </ul>
+    <button class="btn action insertMath" rel="tooltip" title="Insert Math">x<sup>2</sup></button>
   </div>
--->
 
 <!-- / ".btn-toolbar" -->
 </span>
