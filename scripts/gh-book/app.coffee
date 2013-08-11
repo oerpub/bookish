@@ -209,7 +209,17 @@ define [
           goEdit: (id)    ->
             @_loadFirst().done () => controller.goEdit(id)
           goDefault: () ->
-            @_loadFirst().done () => controller.goDefault()
+            _controller = @ # Explicit is better than confusing
+            @_loadFirst().done () ->
+              require ['cs!gh-book/opf-file'], (OpfFile) ->
+                # Find the first opf file.
+                opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
+                if opf
+                  # The first item in the toc is always the opf file, followed by the
+                  # TOC nodes.
+                  controller.goEdit opf.tocNodes.at(1), opf
+                else
+                  _controller.goWorkspace()
 
 
         session.on 'change', () =>

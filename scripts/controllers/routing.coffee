@@ -119,22 +119,5 @@ define [
             contextPath = ''
             contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
 
-            # Update the URL without triggering the router
-            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
-
-    goDefault: () ->
-      require [ 'cs!views/layouts/workspace/menu' ], (menuLayout) =>
-        @_ensureLayout(menuLayout)
-        allContent.load()
-        .fail(() => alert 'Problem loading workspace. Please refresh and try again')
-        .done () =>
-          # Find the first opf file. This is gh-book specific, I suspect we
-          # want a more agnostic method of finding the first item and
-          # editing it?
-          opf = allContent.findWhere({mediaType: 'application/oebps-package+xml'})
-          if opf
-            # The first item in the toc is always the opf file, followed by the
-            # TOC nodes.
-            @_goEdit opf.tocNodes.at(1)
-          else
-            @goWorkspace()
+       # Update the URL without triggering the router
+       @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
