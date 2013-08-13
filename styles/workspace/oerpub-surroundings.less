@@ -38,7 +38,6 @@
   width: 125px;
   height: 31px;
   left: 0px;
-  color: white;
   background-color: #0E807D;
   border-bottom: 1px solid #124947;
   overflow: hidden;
@@ -47,23 +46,27 @@
         float: right;
         margin: .4em .4em 0;
     }
+}
 
-    #toc-title-text {
-        display: block;
-        padding: .4em 1em .4em 30px;
-        display: block;
-        font-family: Verdana, 'DejaVu Sans', Tahoma;
-        font-size: 13px;
-        font-weight: bold;
-        background-image: url(book-04.png);
-        background-repeat: no-repeat;
-        background-position: 6px center;
+#toc-title-text {
+  background-image: url(book-04.png);
+}
 
-        #edit-toc-link, #edit-toc-metadata {
-            font-weight: normal;
-            color: #D3E8E7;
-            a { text-decoration: underline; }
-        }
+#toc-title-text, #editor-title-text {
+    display: block;
+    padding: .4em 1em .4em 30px;
+    display: block;
+    font-family: Verdana, 'DejaVu Sans', Tahoma;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    background-repeat: no-repeat;
+    background-position: 6px center;
+
+    #edit-toc-link, #edit-toc-metadata {
+        font-weight: normal;
+        color: #D3E8E7;
+        a { text-decoration: underline; }
     }
 }
 
