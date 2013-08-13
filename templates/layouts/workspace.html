@@ -1,26 +1,28 @@
 <div id="{{layout}}">
   <section id="container">
-    <div id="greentoolbar">
-      <a href="#workspace" onclick="return false;" title="Return to the main dashboard" id="to-dashboard-icon">&nbsp;</a>
-    </div>
     <div id="workspace-container" class="minimized">
+      <div id="greentoolbar">
+        <a href="#workspace" onclick="return false;" title="Return to the main dashboard" id="to-dashboard-icon">&nbsp;</a>
+      </div>    
       <button type="button" class="close" data-dismiss="alert">&#x00d7;<!-- X --></button>
       <div id="workspace"></div>
     </div>
-    <div id="bluetoolbar">
-      <a href="#" id="toc-collapse" title="Hide the Table of Contents"><img src="styles/workspace/collapse-box-silver-02.png"></a>
-      <a href="#" id="toc-expand" title="Open the Table of Contents back up" style=""><img src="styles/workspace/expand-box-silver-02.png"></a>
-      <span id="toc-title-text">
-            Table of Contents
-            <span id="edit-toc-link">
-            (<a href="#" onclick="return false;" title="Edit and organize the contents of this book.  Add materials, rearrange modules, etc.">edit</a>)
-            </span>
-            <span id="edit-toc-metadata" style="display: none;">
-            (<a href="#" onclick="return false;">edit description/authors</a>)
-            </span>
-      </span>
-    </div>
     <div id="sidebar-container" class="minimized">
+      <div id="bluetoolbar">
+        <a href="#" id="toc-collapse" title="Hide the Table of Contents"><img src="styles/workspace/collapse-box-silver-02.png"></a>
+        <a href="#" id="toc-expand" title="Open the Table of Contents back up" style=""><img src="styles/workspace/expand-box-silver-02.png"></a>
+        <span id="toc-title-text">
+              TOC
+              <!--
+              <span id="edit-toc-link">
+              (<a href="#" onclick="return false;" title="Edit and organize the contents of this book.  Add materials, rearrange modules, etc.">edit</a>)
+              </span>
+              <span id="edit-toc-metadata" style="display: none;">
+              (<a href="#" onclick="return false;">edit description/authors</a>)
+              </span>
+            -->
+        </span>
+      </div>
       <button type="button" class="close" data-dismiss="alert">&#x00d7;<!-- X --></button>
       <div id="sidebar"></div>
     </div>
