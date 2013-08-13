@@ -1,5 +1,78 @@
 @import "../variables.less";
 
+#greentoolbar {
+  position: absolute;
+  top: 0;
+  width: 125px;
+  height: 31px;
+  left: 0px;
+  background-color: #1FB04C;
+  border-bottom: 1px solid #137139;
+  overflow: hidden;    
+
+    #to-dashboard-icon {
+        height: 32px;
+        width: 32px;
+        display: block;
+        float: left;
+        background-image: url(house-02.png);
+        background-repeat: no-repeat;
+        background-position: 5px center;
+        text-decoration: none;
+    }
+}
+
+#toc-collapse {
+    visibility: hidden;
+    display: none;
+}
+
+#bluetoolbar {
+  position: absolute;
+  top: 0;
+  width: 125px;
+  height: 31px;
+  left: 125px;
+  color: white;
+  background-color: #0E807D;
+  border-bottom: 1px solid #124947;
+  overflow: hidden;
+
+    #toc-collapse, #toc-expand {
+        float: right;
+        margin: .4em .4em 0;
+    }
+
+    #toc-title-text {
+        display: block;
+        padding: .4em 1em .4em 30px;
+        display: block;
+        font-family: Verdana, 'DejaVu Sans', Tahoma;
+        font-size: 13px;
+        font-weight: bold;
+        background-image: url(book-04.png);
+        background-repeat: no-repeat;
+        background-position: 6px center;
+
+        #edit-toc-link, #edit-toc-metadata {
+            font-weight: normal;
+            color: #D3E8E7;
+            a { text-decoration: underline; }
+        }
+    }
+}
+
+#orangetoolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 31px;
+  left: 250px;
+  background-color: #E16C26;
+  border-bottom: 1px solid #9E4626;
+  overflow: hidden;
+}
+
 #menu {
   .navbar-inner {
     padding-left: 2em;
