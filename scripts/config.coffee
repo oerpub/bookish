@@ -6,7 +6,7 @@ require.config
 
     # Change some of the models for the Application to use github and EPUB
     app: 'gh-book/app'
-    github: '../node_modules/github-client/github'
+    github: "#{BOWER}/octokit/octokit"
     'collections/content': 'gh-book/content'
     'views/workspace/menu/auth': 'gh-book/auth'
     session: 'gh-book/session'
