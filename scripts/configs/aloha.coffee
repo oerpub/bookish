@@ -58,6 +58,10 @@ define ['jquery'], ($) ->
         'oer/assorted'
         'ghbook/image'
         'oer/note'
+        'oer/example'
+        'oer/exercise'
+        'oer/quotation'
+        'oer/equation'
         'oer/copy'
       ]
 

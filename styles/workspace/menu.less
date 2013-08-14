@@ -2,7 +2,9 @@
 
 #menu {
   position: absolute;
+  z-index: 1000;
   top: 32px;
+  height: 78px;
   right: 0;
   bottom: 73px;
   left: 250px;
@@ -40,4 +42,16 @@
   .name {
     margin-left: 10px;
   }
+
+  .semantic-drag-source > * {
+    margin-left: 0;
+    width: auto;
+    display: inline-block;
+    padding-right: 10px; 
+  }
+
+}
+
+.semantic-drag-helper {
+  z-index: 1000;
 }
