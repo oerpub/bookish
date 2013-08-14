@@ -20,6 +20,8 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
 
       # When the title changes on the XhtmlModel update it in the ToC as well
       @model.on 'change:title', () => @set('title', @model.get('title'))
+      # Set the title on the model now
+      @set('title', @model.get('title'))
 
       options.title = options.title or @model.get 'title'
       super(options)
