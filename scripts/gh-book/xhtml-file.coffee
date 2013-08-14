@@ -66,6 +66,7 @@ define [
       super()
 
       # Give the content an id if it does not already have one
+      @setNew() if not @id
       @id ?= "content/#{uuid()}"
 
       # Clear that the title on the model has changed
