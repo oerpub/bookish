@@ -36,6 +36,7 @@ define ['jquery'], ($) ->
       map:
         '*':
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
+          'ui/ui': 'toolbar/toolbar-plugin'
 
     bundles:
       ghbook: '../../../../scripts/aloha'
