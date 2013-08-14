@@ -24,4 +24,8 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
       options.title = options.title or @model.get 'title'
       super(options)
 
+    # Returns the model this points to.
+    # Existence of this method means this is a pointer node
+    dereferencePointer: () -> @model
+
     contentView: (callback) -> @model.contentView(callback)
