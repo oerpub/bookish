@@ -18,7 +18,6 @@
   left: 125px;
   top: 0px;
   width: 125px;
-  border-left: 1px solid #999;
 }
 
 #workspace {
@@ -35,6 +34,7 @@
   left: 0px;
   top: 32px;
   width: 125px;
+  border-left: 1px solid #999;
 }
 
 #container > #workspace-container.minimized {
@@ -91,11 +91,12 @@
 }
 
 // Use for the workspace picker and the sidebar
-#container > aside.minimized {
-  min-width: 1em;
-  > div { display: none; }
-}
-#container > aside:not(.minimized) {
+// #container > aside.minimized {
+//   min-width: 1em;
+//   > div { display: none; }
+// }
+// #container > aside:not(.minimized) {
+#container {
   ol ol a {
     color: @grayDark;
   }
