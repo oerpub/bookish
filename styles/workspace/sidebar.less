@@ -1,11 +1,15 @@
 @import "../variables.less";
 
+.close {
+  float: left;
+}
+
 #workspace-container {
   position: absolute;
   bottom: 0px;
   left: 0px;
   top: 0px;
-  width: 125px;
+  right: 0px;
 }
 
 #sidebar-container {
@@ -21,7 +25,7 @@
   bottom: 0px;
   left: 0px;
   top: 32px;
-  width: 125px;
+  width: 250px;
 }
 
 #sidebar {
@@ -30,6 +34,59 @@
   left: 0px;
   top: 32px;
   width: 125px;
+}
+
+#container > #workspace-container.minimized {
+
+    -webkit-transition: 0.5s ease-in-out;
+
+    @picker-left: 30px;
+    @sidebar-width: 300px;
+    
+    #greentoolbar {
+      width: @picker-left;
+    }
+
+    #workspace {
+      width: @picker-left;
+      display: none;
+    }
+
+    #sidebar-container {
+      left: @picker-left;
+      width: @sidebar-width;
+      #bluetoolbar, #sidebar {
+        width: @sidebar-width;
+      }
+    }
+
+    > #content, .orange {
+      left: @picker-left+@sidebar-width;
+    }
+}
+
+#container > #workspace-container:not(.minimized) {
+
+  -webkit-transition: 0.5s ease-in-out;
+
+    @picker-left: 250px;
+    @sidebar-width: 250px;
+    
+    #workspace, #greentoolbar {
+      width: @picker-left;
+    }
+
+    #sidebar-container {
+      left: @picker-left;
+      width: @sidebar-width;
+      #bluetoolbar, #sidebar {
+        width: @sidebar-width;
+      }
+    }
+
+    > #content, .orange {
+      left: @picker-left+@sidebar-width;
+    }
 }
 
 // Use for the workspace picker and the sidebar
