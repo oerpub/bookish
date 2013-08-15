@@ -33,6 +33,11 @@
   border-left: 1px solid #999;
 }
 
+#workspace > *,
+#sidebar > * {
+  height: 100%;
+}
+
 #greenpicker {
   position: absolute;
   left: 0;
@@ -185,6 +190,10 @@
   #workspace-sidebar-toc {
     // Root nodes in the sidebar should have no left margin
     > ol { margin: 0; }
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
 
     li { white-space: nowrap; }
 
