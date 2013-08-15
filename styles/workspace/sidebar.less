@@ -70,6 +70,10 @@
         transition: all 0.5s ease-in-out;
     }
 
+    #pickertext {
+      visibility: hidden;
+    }
+
     #greenpicker {
         display: block;
         visibility: visible;
@@ -86,12 +90,17 @@
         border-radius: 0px 7px 7px 0px; 
         -moz-border-radius: 0px 7px 7px 0px; 
         -webkit-border-radius: 0px 7px 7px 0px;
+        // #pickerhover {
+        //   display: block;
+        //   visibility: visible;
+        // }
       };
     }
 
     #workspace {
       width: @picker-left;
       display: none;
+      opacity: 0;
     }
 
     #sidebar-container {
@@ -127,6 +136,7 @@
     
     #workspace, #greentoolbar {
       width: @picker-left;
+      opacity: 1;
     }
 
     #sidebar-container {

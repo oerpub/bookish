@@ -53,7 +53,7 @@
   background-image: url(book-04.png);
 }
 
-#toc-title-text, #editor-title-text {
+#toc-title-text, #editor-title-text, #pickerhover, #pickertext {
     display: block;
     padding: .4em 1em .4em 30px;
     display: block;
@@ -61,6 +61,7 @@
     font-size: 13px;
     font-weight: bold;
     color: white;
+    width: 140px;
     background-repeat: no-repeat;
     background-position: 6px center;
 
@@ -69,6 +70,11 @@
         color: #D3E8E7;
         a { text-decoration: underline; }
     }
+}
+
+#pickerhover {
+  display: none;
+  visibility: hidden;
 }
 
 #orangetoolbar {
