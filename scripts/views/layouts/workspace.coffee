@@ -35,11 +35,8 @@ define [
 
     events:
       'click #workspace-container > .close': 'minimizeWorkspace'
-      'click #sidebar-container > .close':   'minimizeSidebar'
 
     initialize: () ->
       @workspace.on 'show', => @$('#workspace-container').removeClass('minimized')
-      @sidebar.on   'show', => @$('#sidebar-container').removeClass('minimized')
 
     minimizeWorkspace: () -> @$('#workspace-container').toggleClass('minimized')
-    minimizeSidebar: () -> @$('#sidebar-container').toggleClass('minimized')
