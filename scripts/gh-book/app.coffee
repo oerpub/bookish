@@ -89,7 +89,7 @@ define [
 
 
     # Views use anchors with hrefs so catch the click and send it to Backbone
-    $(document).on 'click', 'a:not([data-bypass])', (e) ->
+    $(document).on 'click', 'a:not([data-bypass]):not([href="#"])', (e) ->
       external = new RegExp('^((f|ht)tps?:)?//')
       href = $(@).attr('href')
 
