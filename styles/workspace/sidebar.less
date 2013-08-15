@@ -37,15 +37,51 @@
   border-left: 1px solid #999;
 }
 
+#greenpicker {
+  position: absolute;
+  left: 0;
+  top: 32px;
+  width: 30px;
+  bottom: 0;
+  background-color: white;
+  background-position: center center;
+  background-repeat: no-repeat;
+  &:hover {
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+    background-color: #1FB04C;
+    background-image: url(td-open-01.png);
+  }
+  z-index:1000;
+  display: none;
+  visibility: hidden;
+}
+
 #container > #workspace-container.minimized {
 
-    -webkit-transition: 0.5s ease-in-out;
+    * {
+        -webkit-transition: all 0.5s ease-in-out;
+        -moz-transition: all 0.5s ease-in-out;
+        -o-transition: all 0.5s ease-in-out;
+        transition: all 0.5s ease-in-out;
+    }
+
+    #greenpicker {
+        display: block;
+        visibility: visible;
+    }
 
     @picker-left: 30px;
     @sidebar-width: 300px;
     
     #greentoolbar {
       width: @picker-left;
+      &:hover {
+        width: 100px;
+        z-index: 1000;
+      };
     }
 
     #workspace {
@@ -69,7 +105,17 @@
 
 #container > #workspace-container:not(.minimized) {
 
-  -webkit-transition: 0.5s ease-in-out;
+    #greenpicker {
+        display: none;
+        visibility: hidden;
+    }
+
+    * {
+        -webkit-transition: all 0.5s ease-in-out;
+        -moz-transition: all 0.5s ease-in-out;
+        -o-transition: all 0.5s ease-in-out;
+        transition: all 0.5s ease-in-out;
+    } 
 
     @picker-left: 250px;
     @sidebar-width: 250px;
@@ -116,7 +162,7 @@
   border-right: 1px solid #ccc;
 
   /* Slide the sidebar off screen when hiding it */
-  -webkit-transition: 0.5s ease-in-out;
+  // -webkit-transition: 3s ease-in-out;
 
   background: white;
 
