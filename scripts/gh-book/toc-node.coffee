@@ -50,22 +50,32 @@ define [
         title = model.get('title')
         realModel = model.dereferencePointer?() or model
 
-        # To clone the content, load it first
-        realModel.load()
-        .fail(() => alert "ERROR: Problem loading #{realModel.id}. Try again later or refresh.")
-        .done () =>
-          newTitle = "Copy of #{title}"
-          json = realModel.toJSON()
-          json.title = newTitle
-          delete json.id
+        # At this point realModel can be a XhtmlFile or a TocNode (section).
+        # If it is a Loadable (XhtmlFile) then load it and make a copy.
+        # Otherwise, just move it.
 
-          clone = allContent.model(json)
-          allContent.add(clone)
+        if realModel.load
+          # To clone the content, load it first
+          realModel.load()
+          .fail(() => alert "ERROR: Problem loading #{realModel.id}. Try again later or refresh.")
+          .done () =>
+            newTitle = "Copy of #{title}"
+            json = realModel.toJSON()
+            json.title = newTitle
+            delete json.id
 
-          pointerNode = root.newNode {title:newTitle, model:clone}
-          pointerNode.set('title', newTitle)
+            clone = allContent.model(json)
+            allContent.add(clone)
 
-          super(pointerNode, at)
+            pointerNode = root.newNode {title:newTitle, model:clone}
+            pointerNode.set('title', newTitle)
+
+            super(pointerNode, at)
+
+        else
+          # It is a TocNode and cannot be loaded so instead of
+          # recursively cloning it (more code to write) just move it.
+          super(model, at)
 
       else
         super(model, at)
