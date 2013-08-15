@@ -35,8 +35,11 @@ define [
 
     events:
       'click #workspace-container > .pickerswitch': 'minimizeWorkspace'
+      'click #sidebar-container > .pickerswitch': 'minimizeToc'
 
     initialize: () ->
-      @workspace.on 'show', => @$('#workspace-container').removeClass('minimized')
+      @workspace.on 'show', =>
+        @$('#workspace-container').removeClass('wsminimized').addClass('tocminimized')
 
-    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('minimized')
+    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('wsminimized')
+    minimizeToc: () -> @$('#workspace-container').toggleClass('tocminimized')

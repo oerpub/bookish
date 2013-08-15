@@ -61,104 +61,147 @@
   cursor:pointer;
 }
 
-#container > #workspace-container.minimized {
+#bluepicker {
+  position: absolute;
+  width: 30px;
+  left: 0;
+  top: 32px;
+  bottom: 0;
+  background-color: white;
+  background-position: center center;
+  background-repeat: no-repeat;
+  &:hover {
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+    background-color: #0E807D;
+    background-image: url(td-open-01.png);
+  }
+  z-index:1000;
+  display: none;
+}
 
-    .blue, .green, .orange {
-        -webkit-transition: all 0.5s ease-in-out;
-        -moz-transition: all 0.5s ease-in-out;
-        -o-transition: all 0.5s ease-in-out;
-        transition: all 0.5s ease-in-out;
+#container > #workspace-container .blue:not(.edit-settings),
+#container > #workspace-container .green:not(.edit-settings),
+#container > #workspace-container .orange:not(.edit-settings) {
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+
+#container > #workspace-container {
+    &.wsminimized {
+        #pickertext {
+            visibility: hidden;
+        }
+        #greenpicker {
+            display: block;
+            visibility: visible;
+        }
+
+        @sidebar-left: 30px;
+        #greentoolbar {
+          width: @sidebar-left;
+          &:hover {
+            width: 100px;
+            z-index: 1000;
+          };
+        }
+
+        #workspace {
+          width: @sidebar-left;
+          display: none;
+        }
+
+        @sidebar-width: 300px;
+        #sidebar-container {
+          left: @sidebar-left;
+          width: @sidebar-width;
+          #bluetoolbar, #sidebar {
+            width: @sidebar-width;
+          }
+        }
+
+        > #content, .orange {
+          left: @sidebar-left+@sidebar-width;
+          right: 0;
+        }
+
+        &.tocminimized {
+            // Both workspace and toc minimised
+            @sidebar-width: 30px;
+            #sidebar-container {
+              left: @sidebar-left;
+              width: @sidebar-width;
+              #bluetoolbar, #sidebar {
+                width: @sidebar-width;
+              }
+            }
+
+            > #content, .orange {
+              left: @sidebar-left+@sidebar-width;
+            }
+
+            #sidebar {
+                display: none;
+            }
+            
+            #bluepicker {
+                display: block;
+            }
+        }
     }
 
-    #pickertext {
-      visibility: hidden;
-    }
+    &:not(.wsminimized) {
+        @sidebar-left: 250px;
+        @sidebar-width: 250px;
+        
+        #workspace, #greentoolbar {
+          width: @sidebar-left;
+        }
 
-    #greenpicker {
-        display: block;
-        visibility: visible;
-    }
+        #sidebar-container {
+          left: @sidebar-left;
+          width: @sidebar-width;
+          #bluetoolbar, #sidebar {
+            width: @sidebar-width;
+          }
+        }
 
-    @picker-left: 30px;
-    @sidebar-width: 300px;
-    
-    #greentoolbar {
-      width: @picker-left;
-      &:hover {
-        width: 100px;
-        z-index: 1000;
-        border-radius: 0px 7px 7px 0px; 
-        -moz-border-radius: 0px 7px 7px 0px; 
-        -webkit-border-radius: 0px 7px 7px 0px;
-        // #pickerhover {
-        //   display: block;
-        //   visibility: visible;
-        // }
-      };
-    }
+        > #content, .orange {
+          left: @sidebar-left+@sidebar-width;
+          right: -@sidebar-width;
+        }
 
-    #workspace {
-      width: @picker-left;
-      display: none;
-      opacity: 0;
-    }
+        &.tocminimized {
+            // Both workspace and toc minimised
+            // Both workspace and toc minimised
+            @sidebar-width: 30px;
+            #sidebar-container {
+              left: @sidebar-left;
+              width: @sidebar-width;
+              #bluetoolbar, #sidebar {
+                width: @sidebar-width;
+              }
+            }
 
-    #sidebar-container {
-      left: @picker-left;
-      width: @sidebar-width;
-      #bluetoolbar, #sidebar {
-        width: @sidebar-width;
-      }
-    }
+            > #content, .orange {
+              left: @sidebar-left+@sidebar-width;
+            }
 
-    > #content, .orange {
-      left: @picker-left+@sidebar-width;
-      right: 0;
+            #sidebar {
+                display: none;
+            }
+
+            #bluepicker {
+                display: block;
+            }
+        }
     }
 }
 
-#container > #workspace-container:not(.minimized) {
-
-    #greenpicker {
-        display: none;
-        visibility: hidden;
-    }
-
-    .blue, .green, .orange {
-        -webkit-transition: all 0.5s ease-in-out;
-        -moz-transition: all 0.5s ease-in-out;
-        -o-transition: all 0.5s ease-in-out;
-        transition: all 0.5s ease-in-out;
-    }
-
-    @picker-left: 250px;
-    @sidebar-width: 250px;
-    
-    #workspace, #greentoolbar {
-      width: @picker-left;
-      opacity: 1;
-    }
-
-    #sidebar-container {
-      left: @picker-left;
-      width: @sidebar-width;
-      #bluetoolbar, #sidebar {
-        width: @sidebar-width;
-      }
-    }
-
-    > #content, .orange {
-      left: @picker-left+@sidebar-width;
-      right: -@sidebar-width;
-    }
-}
-
-// Use for the workspace picker and the sidebar
-// #container > aside.minimized {
-//   min-width: 1em;
-//   > div { display: none; }
-// }
-// #container > aside:not(.minimized) {
 #container {
   ol ol a {
     color: @grayDark;
@@ -260,4 +303,8 @@
 #workspace .edit-settings, .body-above {
   display:none;
   visibility: visible;
+}
+
+#menu, #content {
+    border-left: 1px solid #999;
 }
