@@ -6,6 +6,12 @@
 define ['jquery'], ($) ->
 
   loadableMixin =
+
+    # Since `load` checks isNew and the presence of an `id` may not be enough
+    # allow a way to set `isNew()` to be true
+    isNew: () -> return @_isNew or !@id
+    setNew: () -> @_isNew = true
+
     # Returns a promise.
     # If this has not been fully populated it will be fetched exactly once
     load: () ->

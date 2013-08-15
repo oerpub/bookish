@@ -119,5 +119,5 @@ define [
             contextPath = ''
             contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
 
-       # Update the URL without triggering the router
-       @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
+            # Update the URL without triggering the router
+            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
