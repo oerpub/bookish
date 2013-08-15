@@ -226,7 +226,6 @@ define [
         #@tocNodes.add node
       return node
 
-
     # Do not change the contentView when the book opens
     contentView: null
 

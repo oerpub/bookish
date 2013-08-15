@@ -66,18 +66,22 @@ define [
       super()
 
       # Give the content an id if it does not already have one
+      @setNew() if not @id
       @id ?= "content/#{uuid()}"
 
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
       # The title of the XhtmlFile is not stored inside the file;
       # it is stored in the navigation file
-      @on 'change:title', (model, value, options) =>
-        head = @get 'head'
-        $head = jQuery("<div class='unwrap-me'>#{head}</div>")
 
-        $head.children('title').text(value)
-        @set 'head', $head[0].innerHTML, options
+      # Ignore Title changes for now. The canonical title is in the ToC
+      # TODO: Re-enable after the sprint
+      # @on 'change:title', (model, value, options) =>
+      #   head = @get 'head'
+      #   $head = jQuery("<div class='unwrap-me'>#{head}</div>")
+
+      #   $head.children('title').text(value)
+      #   @set 'head', $head[0].innerHTML, options
 
       @on 'change:body', (model, value, options) =>
         $body = jQuery("<div class='unwrap-me'></div>")
@@ -107,6 +111,13 @@ define [
           # $img.attr('data-src', attrs.id) TODO: Aloha keeps stripping this attribute off.
 
         @set('body', $body[0].innerHTML)
+
+
+    # Since the titles are purely cosmetic do not mark the model as dirty
+    # TODO: Remove this after the sprint
+    _markDirty: (options, force=false) ->
+      changed = _.omit @changedAttributes(), 'title'
+      super(options, force) if not _.isEmpty(changed)
 
 
 
@@ -201,8 +212,9 @@ define [
       attributes = {head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
 
       # Set the title that is in the `<head>`
-      title = $head.children('title').text()
-      attributes.title = title if title
+      # TODO: Re-enable after the sprint
+      # title = $head.children('title').text()
+      # attributes.title = title if title
 
       return attributes
 
