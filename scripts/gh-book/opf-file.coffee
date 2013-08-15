@@ -262,7 +262,6 @@ define [
       else
         super(model, at)
 
-
     # Do not change the contentView when the book opens
     contentView: null
 
