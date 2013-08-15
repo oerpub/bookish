@@ -34,7 +34,7 @@ define [
       workspace: '#workspace'
 
     events:
-      'click #workspace-container > .close': 'minimizeWorkspace'
+      'click #workspace-container > .pickerswitcher': 'minimizeWorkspace'
 
     initialize: () ->
       @workspace.on 'show', => @$('#workspace-container').removeClass('minimized')
