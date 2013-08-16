@@ -100,7 +100,8 @@ require.config
     aloha:
       deps: ['jquery', 'mathjax', 'cs!configs/aloha', 'bootstrapModal', 'bootstrapPopover']
       exports: 'Aloha'
-      init: ($, mathjaxConfig) ->
+      init: ($) ->
+        # FIXME: replace global 'jQuery' below with local '$' defined above
         jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
 
         return Aloha
