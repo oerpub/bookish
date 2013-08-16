@@ -1,5 +1,9 @@
 @import "../variables.less";
 
+.pickerswitch {
+  cursor:pointer;
+}
+
 #workspace-container {
   position: absolute;
   bottom: 0px;
@@ -58,7 +62,6 @@
   z-index:1000;
   display: none;
   visibility: hidden;
-  cursor:pointer;
 }
 
 #bluepicker {
@@ -106,6 +109,9 @@
           width: @sidebar-left;
           &:hover {
             width: 100px;
+            border-radius: 0px 7px 7px 0px;
+            -moz-border-radius: 0px 7px 7px 0px;
+            -webkit-border-radius: 0px 7px 7px 0px;
             z-index: 1000;
           };
         }
