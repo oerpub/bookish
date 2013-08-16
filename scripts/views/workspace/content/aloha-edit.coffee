@@ -26,6 +26,17 @@ define [
         @render()
 
     onRender: () ->
+      # update model after the user has stopped making changes
+      updateModel = =>
+        alohaId = @$el.attr('id')
+        alohaEditable = Aloha.getEditableById(alohaId)
+
+        if alohaEditable
+          editableBody = alohaEditable.getContents()
+          # Change the contents but do not update the Aloha editable area
+          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+
+      @$el.on('blur', updateModel)
 
       # Once Aloha has finished loading enable
       @$el.addClass('disabled')
