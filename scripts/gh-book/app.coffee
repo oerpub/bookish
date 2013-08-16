@@ -92,11 +92,13 @@ define [
     $(document).on 'click', 'a:not([data-bypass]):not([href="#"])', (e) ->
       external = new RegExp('^((f|ht)tps?:)?//')
       href = $(@).attr('href')
+      defaultPrevented = e.isDefaultPrevented()
 
       e.preventDefault()
 
       if external.test(href)
-        window.open(href, '_blank')
+        if not defaultPrevented
+          window.open(href, '_blank')
       else
         if href then Backbone.history.navigate(href, {trigger: true})
 
