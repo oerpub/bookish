@@ -9,6 +9,7 @@ define [
     template: () -> throw 'BUG: You need to specify a template, modelKey, and optionally alohaOptions'
     modelKey: null
     alohaOptions: null
+    content: null
 
     templateHelpers: () ->
       return {isLoaded: @isLoaded}
@@ -17,27 +18,14 @@ define [
       @isLoaded = false
       @model.load().done () =>
         @isLoaded = true
+        @render()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
-
-        # if aloha is on then disable it 
-        @$el.mahalo() if @$el.mahalo
-
-        #poke in the contents
-        @$el.empty().append(value).aloha(@alohaOptions)
+        @content = value
+        @render()
 
     onRender: () ->
-      # Auto save after the user has stopped making changes
-      updateModelAndSave = =>
-        alohaId = @$el.attr('id')
-        # Sometimes Aloha hasn't loaded up yet
-        # Only save when the editable has changed
-        if alohaId
-          alohaEditable = Aloha.getEditableById(alohaId)
-          editableBody = alohaEditable.getContents()
-          # Change the contents but do not update the Aloha editable area
-          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
       # Once Aloha has finished loading enable
       @$el.addClass('disabled')
@@ -45,11 +33,12 @@ define [
         # Wait until Aloha is started before loading MathJax.
         MathJax?.Hub.Configured()
 
-        @$el.removeClass('disabled')
+        # if aloha is on then disable it 
+        @$el.mahalo() if @$el.mahalo
 
-        # Grr, the `aloha-smart-content-changed` can only be listened to globally
-        # (via `Aloha.bind`) instead of on each editable.
-        #
-        # This is problematic when we have multiple Aloha editors on a page.
-        # Instead, autosave after some period of inactivity.
-        @$el.on('blur', updateModelAndSave)
+        # reset the contents if necessary
+        @$el.empty().append(@content) if @content
+
+        # reenable everything
+        @$el.aloha(@alohaOptions)
+          .removeClass('disabled')
