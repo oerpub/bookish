@@ -17,20 +17,15 @@ define [
       @isLoaded = false
       @model.load().done () =>
         @isLoaded = true
-        @render()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
 
-        alohaId = @$el.attr('id')
-        # Sometimes Aloha hasn't loaded up yet
-        if alohaId and @$el.parents().get(0)
-          alohaEditable = Aloha.getEditableById(alohaId)
-          editableBody = alohaEditable.getContents()
-          if value isnt editableBody then alohaEditable.setContents(value)
-        else
-          @$el.empty().append(value)
+        # if aloha is on then disable it 
+        @$el.mahalo() if @$el.mahalo
 
+        #poke in the contents
+        @$el.empty().append(value).aloha(@alohaOptions)
 
     onRender: () ->
       # Auto save after the user has stopped making changes
@@ -50,7 +45,6 @@ define [
         # Wait until Aloha is started before loading MathJax.
         MathJax?.Hub.Configured()
 
-        @$el.aloha(@alohaOptions)
         @$el.removeClass('disabled')
 
         # Grr, the `aloha-smart-content-changed` can only be listened to globally
