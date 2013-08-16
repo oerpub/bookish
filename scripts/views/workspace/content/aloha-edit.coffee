@@ -10,6 +10,7 @@ define [
     modelKey: null
     alohaOptions: null
     content: null
+    saveInterval: null
 
     templateHelpers: () ->
       return {isLoaded: @isLoaded}
@@ -36,7 +37,7 @@ define [
           # Change the contents but do not update the Aloha editable area
           @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-      @$el.on('blur', updateModel)
+      @saveInterval = setInterval(updateModel, 250) if not @saveInterval
 
       # Once Aloha has finished loading enable
       @$el.addClass('disabled')
