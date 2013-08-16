@@ -13,6 +13,8 @@ require.config
     jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
 
 
+    mathjax: 'http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
+
     # ## Template and Style paths
     templates: '../templates'
     styles: '../styles'
@@ -109,18 +111,20 @@ require.config
       exports: 'Select2'
 
     aloha:
-      deps: ['jquery', 'bootstrapModal', 'bootstrapPopover', 'cs!configs/aloha', 'cs!configs/mathjax']
+      deps: ['jquery', 'mathjax', 'cs!configs/aloha', 'bootstrapModal', 'bootstrapPopover']
       exports: 'Aloha'
-      init: ($, alohaConfig, mathjaxConfig) ->
-        script = document.createElement("script")
-        script.src = "http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
-        script.text = 'MathJax.Hub.Config(' + JSON.stringify(mathjaxConfig) + ');' + 'MathJax.Hub.Startup.onload();'
-
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+      init: () ->
         jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
-
         return Aloha
+
+    mathjax:
+      deps: ['cs!configs/mathjax']
+      exports: 'MathJax'
+      init: (mathjaxConfig) ->
+        MathJax.Hub.Config(mathjaxConfig)
+        MathJax.Hub.Startup.onload()
+        return MathJax
+
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).
