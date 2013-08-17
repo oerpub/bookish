@@ -39,7 +39,7 @@ define [
             # Change the contents but do not update the Aloha editable area
             @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
        
-        #@saveInterval = setInterval(updateModel, 250) if not @saveInterval
+        @saveInterval = setInterval(updateModel, 250) if not @saveInterval
        
 
         # Once Aloha has finished loading enable
