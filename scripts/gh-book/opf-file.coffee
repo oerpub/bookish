@@ -228,42 +228,6 @@ define [
         #@tocNodes.add node
       return node
 
-    # Defined in `mixins/tree`
-    addChild: (model, at) ->
-      # Clone if moving between two books
-      # If `model` is a pointer (probably) then
-      #
-      # 1. Clone the underlying Content model (XHTMLFile)
-      # 2. Create a new PointerNode
-      # 3. Set the title of the new PointerNode to be "Copy of #{title}"
-
-      root = @getRoot() or @
-      modelRoot = model.getRoot?() # Case of dropping a book onto a folder... `or model`
-
-      if root and modelRoot and root != modelRoot
-        # If it is a pointer then dereference it
-        title = model.get('title')
-        realModel = model.dereferencePointer?() or model
-
-        # To clone the content, load it first
-        realModel.load()
-        .fail(() => alert "ERROR: Problem loading #{realModel.id}. Try again later or refresh.")
-        .done () =>
-          json = realModel.toJSON()
-          delete json.id
-
-          clone = allContent.model(json)
-          allContent.add(clone)
-
-          newTitle = "Copy of #{title}"
-          pointerNode = @newNode {title:newTitle, model:clone}
-          pointerNode.set('title', newTitle)
-
-          super(pointerNode, at)
-
-      else
-        super(model, at)
-
     # Do not change the contentView when the book opens
     contentView: null
 
