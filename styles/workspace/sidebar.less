@@ -249,10 +249,7 @@
     }
   }
 
-  #workspace-sidebar-toc {
-    // Root nodes in the sidebar should have no left margin
-    > ol { margin: 0; }
-
+  .workspace-sidebar {
     h3 {
       font-family: Verdana, "DejaVu Sans", Tahoma;
       font-size: 1.15em;  
@@ -261,6 +258,11 @@
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
+  }
+
+  #workspace-sidebar-toc {
+    // Root nodes in the sidebar should have no left margin
+    > ol { margin: 0; }
 
     li {
       white-space: nowrap;
