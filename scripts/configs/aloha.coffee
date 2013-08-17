@@ -107,6 +107,8 @@ define ['jquery'], ($) ->
               console.log 'Updated Image src as a result of upload'
 
       block:
+        dragdrop: "1"
+        rootTags: ['span', 'div', 'figure']
         defaults:
           '.default-block': {}
           figure:
