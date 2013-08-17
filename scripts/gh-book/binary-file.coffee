@@ -34,4 +34,6 @@ define [
       return {body: bytes, base64Encoded: base64Encoded}
 
 
-    serialize: () -> @get('base64Encoded')
+    serialize: () ->
+      decode = atob or @Base64?.decode
+      return decode(@get('base64Encoded'))
