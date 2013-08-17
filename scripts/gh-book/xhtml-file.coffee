@@ -136,34 +136,36 @@ define [
       html = "<body>#{html}</body>" if not /<body/.test html
       html = "<html>#{html}</html>" if not /<html/.test html
 
-      html = html.replace(/html>/g, "prefix-html>")
-      html = html.replace(/<\/head>/g, "</prefix-head>")
+      # Do **not** use dashes in element names because browsers will ignore the '/'
+      # in "<*-img/>" and stuff the rest of the HTML into the "<prefix-img>" element.
+      html = html.replace(/html>/g, "prefixhtml>")
+      html = html.replace(/<\/head>/g, "</prefixhead>")
 
       # **Note:** There is a `<tbody>` element so we have to match start of the tag
-      html = html.replace(/<body/g, "<prefix-body")
-      html = html.replace(/<\/body/g, "</prefix-body")
+      html = html.replace(/<body/g, "<prefixbody")
+      html = html.replace(/<\/body/g, "</prefixbody")
 
-      html = html.replace(/<html/g, "<prefix-html")
+      html = html.replace(/<html/g, "<prefixhtml")
       # Search for the exact element `<head>` since otherwise it could be
       # confused with `<header>`.
-      html = html.replace(/<head>/g, "<prefix-head>")
-      html = html.replace(/<body/g, "<prefix-body")
+      html = html.replace(/<head>/g, "<prefixhead>")
+      html = html.replace(/<body/g, "<prefixbody")
 
       # When an `<img src="...">` is parsed by jQuery the src attribute is fetched
       # even if the image hasn't been added to the DOM yet.
       # Instead of letting that silently fail,
       # replace the `img` tag with another element until the bytes are retrieved
       # via the github API.
-      html = html.replace(/<img/g, '<prefix-img')
-      html = html.replace(/<\/img>/g, '</prefix-img>')
+      html = html.replace(/<img/g, '<prefiximg')
+      html = html.replace(/<\/img>/g, '</prefiximg>')
 
       $html = jQuery(html)
 
-      $head = $html.find('prefix-head')
-      $body = $html.find('prefix-body')
+      $head = $html.find('prefixhead')
+      $body = $html.find('prefixbody')
 
       # Change the `src` attribute to be a `data-src` attribute if the URL is relative
-      $html.find('prefix-img').each (i, img) ->
+      $html.find('prefiximg').each (i, img) ->
         $imgHolder = jQuery(img)
         src = $imgHolder.attr 'src'
 
@@ -171,7 +173,7 @@ define [
 
         $imgHolder.removeAttr 'src' if not keepSrc
 
-        # Replace the `<prefix-img>` with a real `<img>` and set the `src` attribute
+        # Replace the `<prefiximg>` with a real `<img>` and set the `src` attribute
         $img = jQuery('<img></img>')
         $img.attr 'data-src', src if not keepSrc
         # Transfer all the attributes to `$img`
@@ -229,6 +231,9 @@ define [
       $body = jQuery("<div class='unwrap-me'>#{body}</div>")
 
 
+      # Do **not** use dashes in element names because browsers will ignore the '/'
+      # in "<*-img/>" and stuff the rest of the HTML into the "<prefix-img>" element.
+
       # "2. When the model is serialized" (see above)
       # -------------
       $body.find('img[src^="data:"]:not([data-src])').each (i, img) =>
@@ -242,7 +247,7 @@ define [
         # To prevent a 404 and trying to load a bunch of images, do not
         # change the image source.
         # Instead, use a dummy element and then replace it from the resulting HTML
-        $imgHolder = jQuery('<prefix-img></prefix-img>')
+        $imgHolder = jQuery('<prefiximg></prefiximg>')
         $imgHolder.attr(Utils.elementAttributes $img)
         $imgHolder.attr 'src', src
 
@@ -258,7 +263,7 @@ define [
         # To prevent a 404 and trying to load a bunch of images, do not
         # change the image source.
         # Instead, use a dummy element and then replace it from the resulting HTML
-        $imgHolder = jQuery('<prefix-img></prefix-img>')
+        $imgHolder = jQuery('<prefiximg></prefiximg>')
         $imgHolder.attr(Utils.elementAttributes $img)
         $imgHolder.attr 'src', src
 
@@ -267,11 +272,11 @@ define [
       headHtml = $head[0].innerHTML
       bodyHtml = $body[0].innerHTML
 
-      # The text currently contains `<prefix-img ... ></prefix-img>`
+      # The text currently contains `<prefiximg ... ></prefiximg>`
       # To make the `<img>` valid XHTML (self-closing like `<img/>`)
-      # replace "></prefix-img" with "/". Note the missing '>' ; )
-      bodyHtml = bodyHtml.replace(/><\/prefix-img/g, '/')
-      bodyHtml = bodyHtml.replace(/<prefix-img/g, '<img')
+      # replace "></prefiximg" with "/". Note the missing '>' ; )
+      bodyHtml = bodyHtml.replace(/><\/prefiximg/g, '/')
+      bodyHtml = bodyHtml.replace(/<prefiximg/g, '<img')
 
       # HACK: For Collaborative edits of the ToC encourage elements to be on multiple lines
       # by inserting newlines between tags
