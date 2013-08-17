@@ -30,6 +30,7 @@ define [
 
       if @model.attributes.body
         @$el.empty().append(@model.attributes.body) if @$el.find('.progress').length
+
         updateModel = =>
           alohaId = @$el.attr('id')
           alohaEditable = Aloha.getEditableById(alohaId)
