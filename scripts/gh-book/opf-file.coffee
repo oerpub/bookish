@@ -47,15 +47,17 @@ define [
       @manifest.on 'add', (model, collection, options) =>
         $manifest = @$xml.find('manifest')
 
+        relPath = Utils.relativePath(@id, model.id)
+
         # Check if the item is not already in the manifest
-        return if $manifest.find("item[href='#{model.id}']")[0]
+        return if $manifest.find("item[href='#{relPath}']")[0]
 
         # Create a new `<item>` in the manifest
         item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
         $item = $(item)
         $item.attr
-          href:         model.id
-          id:           model.id # TODO: escape the slashes so it is a valid id
+          href:         relPath
+          id:           relPath # TODO: escape the slashes so it is a valid id
           'media-type': model.mediaType
 
         $manifest.append($item)
