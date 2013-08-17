@@ -25,21 +25,6 @@ define [
     itemViewOptions: () ->
       return {container: @collection}
 
-    # Override Marionette's showCollection()
-    showCollection: () ->
-      if @collection.branches
-        data = @collection.branches()
-      else
-        data = @collection.models
-
-      _.each data, (item, index) =>
-        @addItemView(item, TocBranchView, index)
-
-    # We also need to override addItemView()
-    addItemView: (item, ItemView, index) ->
-      if item.branch or @showNodes
-        super(item, ItemView, index)
-
     # Override internal Marionette method.
     # This method adds a child list item at a given index.
     appendHtml: (cv, iv, index)->

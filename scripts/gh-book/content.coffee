@@ -29,9 +29,6 @@ define [
 
       throw 'You must pass in the model or set its mediaType when adding to the content collection.'
 
-    branches: () ->
-      return _.where(@models, {branch: true})
-
     # Save serially.
     save: (options) ->
       # save returns a promise.

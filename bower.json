@@ -22,7 +22,8 @@
     "backbone": "1.0.0",
     "backbone.marionette": "v1.0.3",
     "aloha-editor": "oerpub/Aloha-Editor#testing",
-    "bootstrap": "v2.3.2"
+    "bootstrap": "v2.3.2",
+    "filtered-collection": "dlikhten/filtered-collection"
   },
   "ignore": [
     "**/.*",

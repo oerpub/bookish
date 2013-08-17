@@ -11,6 +11,7 @@ require.config
     'views/workspace/menu/auth': 'gh-book/auth'
     session: 'gh-book/session'
     jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
+    'filtered-collection': "#{BOWER}/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection"
 
 
     mathjax: 'http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
