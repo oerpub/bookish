@@ -236,26 +236,56 @@ define [
         src = $img.attr('src')
         attrs = imgDataSrcToAttributes(src)
         imgAbsolutePath = attrs.id
-        path = Utils.relativePath(@id, imgAbsolutePath)
-        $img.attr('src', path)
+        # Create a relative path to src
+        src = Utils.relativePath(@id, imgAbsolutePath)
 
-      # FIXME: The following is DEAD CODE because Aloha always strips off the data-src attribute.
-      #
+        # To prevent a 404 and trying to load a bunch of images, do not
+        # change the image source.
+        # Instead, use a dummy element and then replace it from the resulting HTML
+        $imgHolder = jQuery('<prefix-img></prefix-img>')
+        $imgHolder.attr(Utils.elementAttributes $img)
+        $imgHolder.attr 'src', src
+
+        $img.replaceWith $imgHolder
+
       # Replace all the `img[data-src]` attributes with `img[src]`
-      # $body.find('img[data-src]').each (i, img) ->
-      #   $img = jQuery(img)
-      #   src = $img.attr('data-src')
-      #   $img.removeAttr('data-src')
-      #   $img.attr 'src', src
+      $body.find('img[data-src]').each (i, img) ->
+        $img = jQuery(img)
+        src = $img.attr('data-src')
+        $img.removeAttr('data-src')
+        $img.removeAttr('src')
+
+        # To prevent a 404 and trying to load a bunch of images, do not
+        # change the image source.
+        # Instead, use a dummy element and then replace it from the resulting HTML
+        $imgHolder = jQuery('<prefix-img></prefix-img>')
+        $imgHolder.attr(Utils.elementAttributes $img)
+        $imgHolder.attr 'src', src
+
+        $img.replaceWith $imgHolder
+
+      headHtml = $head[0].innerHTML
+      bodyHtml = $body[0].innerHTML
+
+      # The text currently contains `<prefix-img ... ></prefix-img>`
+      # To make the `<img>` valid XHTML (self-closing like `<img/>`)
+      # replace "></prefix-img" with "/". Note the missing '>' ; )
+      bodyHtml = bodyHtml.replace(/><\/prefix-img/g, '/')
+      bodyHtml = bodyHtml.replace(/<prefix-img/g, '<img')
+
+      # HACK: For Collaborative edits of the ToC encourage elements to be on multiple lines
+      # by inserting newlines between tags
+      headHtml = headHtml.replace(/></g, '>\n<')
+      bodyHtml = bodyHtml.replace(/></g, '>\n<')
 
       return """
         <?xml version="1.0" encoding="UTF-8"?>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
           <head>
-            #{$head[0].innerHTML}
+            #{headHtml}
           </head>
           <body>
-            #{$body[0].innerHTML}
+            #{bodyHtml}
           </body>
         </html>
         """
