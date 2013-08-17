@@ -6,10 +6,9 @@ define [
 
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
-    template: () -> throw 'BUG: You need to specify a template, modelKey, and optionally alohaOptions'
+    template: () -> throw 'BUG: You need to specify a template, modelKey'
     modelKey: null
-    alohaOptions: null
-    content: null
+    changed: false
     saveInterval: null
 
     templateHelpers: () ->
@@ -17,40 +16,44 @@ define [
 
     initialize: () ->
       @isLoaded = false
+
       @model.load().done () =>
         @isLoaded = true
-        @render()
+        @render() if @changed
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
-        @content = value
-        @render()
+        @changed = true
 
     onRender: () ->
       # update model after the user has stopped making changes
-      updateModel = =>
-        alohaId = @$el.attr('id')
-        alohaEditable = Aloha.getEditableById(alohaId)
 
-        if alohaEditable
-          editableBody = alohaEditable.getContents()
-          # Change the contents but do not update the Aloha editable area
-          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+      if @model.attributes.body
+        @$el.empty().append(@model.attributes.body) if @$el.find('.progress').length
+        updateModel = =>
+          alohaId = @$el.attr('id')
+          alohaEditable = Aloha.getEditableById(alohaId)
+       
+          if alohaEditable
+            editableBody = alohaEditable.getContents()
+            # Change the contents but do not update the Aloha editable area
+            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+       
+        #@saveInterval = setInterval(updateModel, 250) if not @saveInterval
+       
 
-      @saveInterval = setInterval(updateModel, 250) if not @saveInterval
+        # Once Aloha has finished loading enable
+        @$el.addClass('disabled')
+       
+        Aloha.ready =>
 
-      # Once Aloha has finished loading enable
-      @$el.addClass('disabled')
-      Aloha.ready =>
-        # Wait until Aloha is started before loading MathJax.
-        MathJax?.Hub.Configured()
+          @$el.mahalo() if @$el.mahalo
+          @$el.aloha()
 
-        # if aloha is on then disable it 
-        @$el.mahalo() if @$el.mahalo
+          # Wait until Aloha is started before loading MathJax.
+          MathJax?.Hub.Configured()
+       
+          # reenable everything
+          @$el.removeClass('disabled')
 
-        # reset the contents if necessary
-        @$el.empty().append(@content) if @content
 
-        # reenable everything
-        @$el.aloha(@alohaOptions)
-          .removeClass('disabled')
