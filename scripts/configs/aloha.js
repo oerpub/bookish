@@ -32,7 +32,7 @@
         ghbook: '../../../../scripts/aloha'
       },
       plugins: {
-        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'common/table', 'extra/draganddropfiles', 'common/image', 'oer/overlay', 'oer/math', 'oer/assorted', 'ghbook/image', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/copy'],
+        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'oer/table', 'extra/draganddropfiles', 'common/image', 'oer/overlay', 'oer/math', 'oer/assorted', 'ghbook/image', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/copy'],
         draganddropfiles: {
           upload: {
             config: {
@@ -54,7 +54,36 @@
             }
           }
         },
+        note: [
+          {
+            label: 'Note',
+            cls: 'note',
+            hasTitle: true
+          }, {
+            label: 'Aside',
+            cls: 'note',
+            hasTitle: true,
+            type: 'aside'
+          }, {
+            label: 'Warning',
+            cls: 'note',
+            hasTitle: true,
+            type: 'warning'
+          }, {
+            label: 'Tip',
+            cls: 'note',
+            hasTitle: true,
+            type: 'tip'
+          }, {
+            label: 'Important',
+            cls: 'note',
+            hasTitle: true,
+            type: 'important'
+          }
+        ],
         block: {
+          dragdrop: "1",
+          rootTags: ['span', 'div', 'figure'],
           defaults: {
             '.default-block': {},
             figure: {

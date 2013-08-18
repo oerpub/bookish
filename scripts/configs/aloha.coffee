@@ -106,6 +106,13 @@ define ['jquery'], ($) ->
               $img.removeClass 'aloha-image-uploading'
               console.log 'Updated Image src as a result of upload'
 
+      note: [
+        { label: 'Note',      cls: 'note', hasTitle: true }
+        { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' }
+        { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
+        { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
+        { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
+      ]
       block:
         dragdrop: "1"
         rootTags: ['span', 'div', 'figure']
