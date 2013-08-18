@@ -4,6 +4,8 @@ define [
   #'mathjax'
 ], (Marionette, Aloha) ->
 
+  AUTOSAVE_INTERVAL = 500 # ms
+
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
     template: () -> throw 'BUG: You need to specify a template, modelKey'
@@ -19,42 +21,44 @@ define [
 
       @model.load().done () =>
         @isLoaded = true
-        @render() if @changed
+        @render()
 
-      @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
-        return if options.internalAlohaUpdate
-        @changed = true
+        @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
+          return if options.internalAlohaUpdate
+          @render()
+
+    # Stop auto-setting when the view closes
+    onClose: () ->
+      clearInterval(@saveInterval)
+      @saveInterval = null
 
     onRender: () ->
       # update model after the user has stopped making changes
 
-      if @model.attributes.body
-        @$el.empty().append(@model.attributes.body) if @$el.find('.progress').length
+      updateModel = =>
+        alohaId = @$el.attr('id')
+        alohaEditable = Aloha.getEditableById(alohaId)
 
-        updateModel = =>
-          alohaId = @$el.attr('id')
-          alohaEditable = Aloha.getEditableById(alohaId)
-       
-          if alohaEditable
-            editableBody = alohaEditable.getContents()
-            # Change the contents but do not update the Aloha editable area
-            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
-       
-        @saveInterval = setInterval(updateModel, 250) if not @saveInterval
-       
+        if alohaEditable
+          editableBody = alohaEditable.getContents()
+          # Change the contents but do not update the Aloha editable area
+          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-        # Once Aloha has finished loading enable
-        @$el.addClass('disabled')
-       
-        Aloha.ready =>
+      @saveInterval = setInterval(updateModel, AUTOSAVE_INTERVAL) if not @saveInterval
 
-          @$el.mahalo() if @$el.mahalo
-          @$el.aloha()
 
-          # Wait until Aloha is started before loading MathJax.
-          MathJax?.Hub.Configured()
-       
-          # reenable everything
-          @$el.removeClass('disabled')
+      # Once Aloha has finished loading enable
+      @$el.addClass('disabled')
+
+      Aloha.ready =>
+
+        @$el.mahalo?()
+        @$el.aloha()
+
+        # Wait until Aloha is started before loading MathJax.
+        MathJax?.Hub.Configured()
+
+        # reenable everything
+        @$el.removeClass('disabled')
 
 
