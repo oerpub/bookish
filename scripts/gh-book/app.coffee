@@ -10,13 +10,14 @@ define [
   'cs!gh-book/epub-container'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
+  'cs!gh-book/toc-node'
   'cs!gh-book/binary-file'
   'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
   'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
@@ -84,6 +85,7 @@ define [
     mediaTypes.add EpubContainer
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
+    mediaTypes.add TocNode
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 

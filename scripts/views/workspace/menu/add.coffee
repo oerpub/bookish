@@ -6,6 +6,8 @@ define [
   'bootstrapDropdown'
 ], (Marionette, allContent, addTemplate, addItemTemplate) ->
 
+  UNTITLED = 'Untitled'
+
   class AddItemView extends Marionette.ItemView
     tagName: 'li'
 
@@ -26,9 +28,16 @@ define [
         if not (@model.id in @context.accept) # @model.id is a mediaType
           throw new Error 'BUG: Trying to add a type of content that is not allowed to be in this thing'
 
-      model = new (@model.get('modelType'))()
-      model.set('title', 'Untitled Content')
-      allContent.add(model)
+      # The options passed to the constructor are mostly for TocNode
+      model = new (@model.get('modelType')) {title: UNTITLED, root: @context}
+      model.set('title', UNTITLED)
+
+      # Only add Models to `allContent` if they can be saved.
+      #
+      # ToC Sections, for example, cannot be saved but do implement Saveable because OpfFile extends TocNode
+      # So we use `.id` instead.
+      if model.id
+        allContent.add(model)
 
       # Add the model to the context
       if @context
