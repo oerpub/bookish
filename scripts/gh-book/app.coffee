@@ -141,12 +141,8 @@ define [
       ret = null
       switch method
         when 'read' then ret = readFile(path, model.isBinary)
-        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save', model.isBinary)
-        when 'create'
-          # Create an id if this model has not been saved yet
-          id = _uuid()
-          model.set 'id', id
-          ret = writeFile(path, model.serialize(), model.isBinary)
+        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Update', model.isBinary)
+        when 'create' then ret = writeFile(path, model.serialize(), 'Editor Create', model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
