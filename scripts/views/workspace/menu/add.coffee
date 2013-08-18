@@ -27,6 +27,7 @@ define [
           throw new Error 'BUG: Trying to add a type of content that is not allowed to be in this thing'
 
       model = new (@model.get('modelType'))()
+      model.set('title', 'Untitled Content')
       allContent.add(model)
 
       # Add the model to the context
