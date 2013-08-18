@@ -79,6 +79,11 @@
             cls: 'note',
             hasTitle: true,
             type: 'important'
+          }, {
+            label: 'Teacher\'s Guide',
+            cls: 'note',
+            hasTitle: true,
+            type: 'teachers-guide'
           }
         ],
         block: {

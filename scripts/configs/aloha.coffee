@@ -112,6 +112,7 @@ define ['jquery'], ($) ->
         { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
         { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
         { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
+        { label: 'Teacher\'s Guide', cls: 'note', hasTitle: true, type: 'teachers-guide' }
       ]
       block:
         dragdrop: "1"
