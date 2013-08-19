@@ -41,6 +41,7 @@ define [
 
         if alohaEditable
           editableBody = alohaEditable.getContents()
+          editableBody = editableBody.trim() # Trim for idempotence
           # Change the contents but do not update the Aloha editable area
           @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 

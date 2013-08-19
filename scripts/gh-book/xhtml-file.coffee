@@ -110,7 +110,7 @@ define [
 
           # $img.attr('data-src', attrs.id) TODO: Aloha keeps stripping this attribute off.
 
-        @set('body', $body[0].innerHTML)
+        @set('body', $body[0].innerHTML.trim())
 
 
     # Since the titles are purely cosmetic do not mark the model as dirty
@@ -184,7 +184,7 @@ define [
 
       @loadImages($body)
 
-      attributes = {head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
+      attributes = {head:$head[0]?.innerHTML.trim(), body:$body[0]?.innerHTML.trim()}
 
       # Set the title that is in the `<head>`
       # TODO: Re-enable after the sprint
@@ -213,7 +213,7 @@ define [
           console.error "ERROR: Manifest missing image file #{path}"
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML, {parse:true, loading:true} if counter == 0
+          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
           return
 
         # Load the image file somehow (see below for my github.js changes)
@@ -227,7 +227,7 @@ define [
 
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML, {parse:true, loading:true} if counter == 0
+          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
 
         .fail ->
           counter--
@@ -279,8 +279,8 @@ define [
 
         $img.replaceWith $imgHolder
 
-      headHtml = $head[0].innerHTML
-      bodyHtml = $body[0].innerHTML
+      headHtml = $head[0].innerHTML.trim()
+      bodyHtml = $body[0].innerHTML.trim()
 
       # The text currently contains `<prefiximg ... ></prefiximg>`
       # To make the `<img>` valid XHTML (self-closing like `<img/>`)
@@ -290,17 +290,13 @@ define [
 
       # HACK: For Collaborative edits of the ToC encourage elements to be on multiple lines
       # by inserting newlines between tags
-      headHtml = headHtml.replace(/></g, '>\n<')
-      bodyHtml = bodyHtml.replace(/></g, '>\n<')
+      # headHtml = headHtml.replace(/></g, '>\n<')
+      # bodyHtml = bodyHtml.replace(/></g, '>\n<')
 
       return """
         <?xml version="1.0" encoding="UTF-8"?>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-          <head>
-            #{headHtml}
-          </head>
-          <body>
-            #{bodyHtml}
-          </body>
+          <head>#{headHtml?.trim() or ''}</head>
+          <body>#{bodyHtml?.trim() or ''}</body>
         </html>
         """
