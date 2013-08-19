@@ -164,7 +164,11 @@ define [
 
       @getChildren().forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
-      $wrapper[0].innerHTML
+      # Trim the HTML and put newlines between elements
+      html =  $wrapper[0].innerHTML
+      html = html.replace(/></g, '>\n<')
+      return html
+
 
     parse: (json) ->
       # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
