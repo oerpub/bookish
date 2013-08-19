@@ -32,7 +32,7 @@
         ghbook: '../../../../scripts/aloha'
       },
       plugins: {
-        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'oer/table', 'extra/draganddropfiles', 'common/image', 'oer/overlay', 'oer/math', 'oer/assorted', 'ghbook/image', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/copy'],
+        load: ['oer/toolbar', 'common/ui', 'common/format', 'common/paste', 'common/block', 'common/list', 'oer/table', 'extra/draganddropfiles', 'common/image', 'oer/overlay', 'oer/math', 'oer/assorted', 'ghbook/image', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/definition', 'oer/copy'],
         draganddropfiles: {
           upload: {
             config: {
