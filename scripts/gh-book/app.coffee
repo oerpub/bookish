@@ -10,13 +10,14 @@ define [
   'cs!gh-book/epub-container'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/opf-file'
+  'cs!gh-book/toc-node'
   'cs!gh-book/binary-file'
   'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
   'cs!gh-book/loading'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
 
   # Stop logging.
   logger.stop()
@@ -84,6 +85,7 @@ define [
     mediaTypes.add EpubContainer
     mediaTypes.add XhtmlFile
     mediaTypes.add OpfFile
+    mediaTypes.add TocNode
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
@@ -141,12 +143,8 @@ define [
       ret = null
       switch method
         when 'read' then ret = readFile(path, model.isBinary)
-        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Save', model.isBinary)
-        when 'create'
-          # Create an id if this model has not been saved yet
-          id = _uuid()
-          model.set 'id', id
-          ret = writeFile(path, model.serialize(), model.isBinary)
+        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Update', model.isBinary)
+        when 'create' then ret = writeFile(path, model.serialize(), 'Editor Create', model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
