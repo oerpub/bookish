@@ -165,7 +165,7 @@ define [
       $body = $html.find('prefixbody')
 
       # Change the `src` attribute to be a `data-src` attribute if the URL is relative
-      $html.find('prefiximg').each (i, img) ->
+      $body.find('prefiximg').each (i, img) ->
         $imgHolder = jQuery(img)
         src = $imgHolder.attr 'src'
 
@@ -182,7 +182,26 @@ define [
         $imgHolder.replaceWith $img
 
 
-      $images = $html.find('img[data-src]')
+      @loadImages($body)
+
+      attributes = {head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
+
+      # Set the title that is in the `<head>`
+      # TODO: Re-enable after the sprint
+      # title = $head.children('title').text()
+      # attributes.title = title if title
+
+      return attributes
+
+    # Called both by `.parse()` and when making a clone.
+    # Done when making a clone because the clone `isNew` so it will not fetch
+    # the images.
+    loadImages: ($body=null) ->
+      if not $body
+        $body = $('<div class="unwrap-me"></div>')
+        $body.append(@get('body'))
+
+      $images = $body.find('img[data-src]')
       counter = $images.length
 
       $images.each (i, img) =>
@@ -213,15 +232,6 @@ define [
         .fail ->
           counter--
           $img.attr('src', 'path/to/failure.png')
-
-      attributes = {head:$head[0]?.innerHTML, body:$body[0]?.innerHTML}
-
-      # Set the title that is in the `<head>`
-      # TODO: Re-enable after the sprint
-      # title = $head.children('title').text()
-      # attributes.title = title if title
-
-      return attributes
 
 
     serialize: ->
