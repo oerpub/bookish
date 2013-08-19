@@ -34,12 +34,12 @@ define [
       workspace: '#workspace'
 
     events:
-      'click #workspace-container > .pickerswitch': 'minimizeWorkspace'
-      'click #sidebar-container > .pickerswitch': 'minimizeToc'
+      'click #workspace-container > .pickerswitch': 'toggleWorkspace'
+      'click #sidebar-container > .pickerswitch': 'toggleToc'
 
     initialize: () ->
       @workspace.on 'show', =>
-        @$('#workspace-container').removeClass('wsminimized').addClass('tocminimized')
+        @$('#workspace-container').removeClass('tocminimized').addClass('wsminimized')
 
-    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('wsminimized')
-    minimizeToc: () -> @$('#workspace-container').toggleClass('tocminimized')
+    toggleWorkspace: () -> @$('#workspace-container').toggleClass('wsminimized')
+    toggleToc: () -> @$('#workspace-container').toggleClass('tocminimized')
