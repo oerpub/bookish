@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'marionette'
   'cs!controllers/routing'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], (Marionette, controller, EnableDnD, tocBranchTemplate) ->
+], ($, arionette, controller, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
     tagName: 'li'
@@ -29,20 +30,29 @@ define [
     itemViewOptions: () -> {container: @collection}
 
     renderModelOnly: () ->
+      # **DO NOT** just detach children. They (and descendants) will
+      # lose their draggable events.
+      #
+      # Instead, reconstruct around the DOM tree
+
       # Detach the children
       $children = @$el.find(@itemViewContainer).children()
 
       @triggerBeforeRender()
-      html = @renderModel()
-      @$el.html(html)
+
+      $html = $('<div></div>').append(@renderModel())
+      # Reattach everything but the children
+      # Remove the itemViewContainer
+      $html.find(@itemViewContainer).remove()
+      $modelNodes = $html.children()
+      @$el.children().not(@$el.find(@itemViewContainer)).remove()
+      @$el.prepend($modelNodes)
+
       # the ui bindings is done here and not at the end of render since they
       # will not be available until after the model is rendered, but should be
       # available before the collection is rendered.
       @bindUIElements()
       @triggerMethod('composite:model:rendered')
-
-      # Reattach the children
-      @$el.find(@itemViewContainer).append($children)
 
       @triggerMethod('composite:rendered')
       @triggerRendered()
