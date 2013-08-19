@@ -4,7 +4,7 @@ define [
   'cs!controllers/routing'
   'cs!helpers/enable-dnd'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, arionette, controller, EnableDnD, tocBranchTemplate) ->
+], ($, Marionette, controller, EnableDnD, tocBranchTemplate) ->
 
   return class TocBranchView extends Marionette.CompositeView
     tagName: 'li'
