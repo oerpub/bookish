@@ -74,6 +74,8 @@ define [
             clone = allContent.model(json)
             clone.setNew?()
             allContent.add(clone)
+            # Fetch all the images since it is marked as new (already loaded)
+            clone.loadImages?() # HACK. SHould make it a promise...
 
             pointerNode = root.newNode {title:newTitle, model:clone}
             pointerNode.set('title', newTitle)
