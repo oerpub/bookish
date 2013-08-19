@@ -10,7 +10,6 @@ define [
     # **NOTE:** This template is not wrapped in an element
     template: () -> throw 'BUG: You need to specify a template, modelKey'
     modelKey: null
-    changed: false
     saveInterval: null
 
     templateHelpers: () ->
@@ -35,30 +34,31 @@ define [
     onRender: () ->
       # update model after the user has stopped making changes
 
-      updateModel = =>
-        alohaId = @$el.attr('id')
-        alohaEditable = Aloha.getEditableById(alohaId)
-
-        if alohaEditable
-          editableBody = alohaEditable.getContents()
-          # Change the contents but do not update the Aloha editable area
-          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
-
-      @saveInterval = setInterval(updateModel, AUTOSAVE_INTERVAL) if not @saveInterval
-
-
-      # Once Aloha has finished loading enable
-      @$el.addClass('disabled')
-
-      Aloha.ready =>
-
-        @$el.mahalo?()
-        @$el.aloha()
-
-        # Wait until Aloha is started before loading MathJax.
-        MathJax?.Hub.Configured()
-
-        # reenable everything
-        @$el.removeClass('disabled')
+      if @model.attributes.body
+        updateModel = =>
+          alohaId = @$el.attr('id')
+          alohaEditable = Aloha.getEditableById(alohaId)
+       
+          if alohaEditable
+            editableBody = alohaEditable.getContents()
+            # Change the contents but do not update the Aloha editable area
+            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+       
+        @saveInterval = setInterval(updateModel, AUTOSAVE_INTERVAL) if not @saveInterval
+       
+       
+        # Once Aloha has finished loading enable
+        @$el.addClass('disabled')
+       
+        Aloha.ready =>
+       
+          @$el.mahalo?()
+          @$el.aloha()
+       
+          # Wait until Aloha is started before loading MathJax.
+          MathJax?.Hub.Configured()
+       
+          # reenable everything
+          @$el.removeClass('disabled')
 
 
