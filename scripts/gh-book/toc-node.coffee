@@ -2,9 +2,10 @@ define [
   'backbone'
   'cs!collections/content'
   'cs!gh-book/xhtml-file'
+  'cs!gh-book/uuid'
   'cs!models/content/inherits/saveable'
   'cs!mixins/tree'
-], (Backbone, allContent, XhtmlFile, SaveableModel, treeMixin) ->
+], (Backbone, allContent, XhtmlFile, uuid, SaveableModel, treeMixin) ->
 
   mediaType = 'application/vnd.org.cnx.section'
 
@@ -62,9 +63,16 @@ define [
             newTitle = "Copy of #{title}"
             json = realModel.toJSON()
             json.title = newTitle
-            delete json.id
+
+            # The id of the new Content should contain the same path as the original content.
+            # This is so we do not have to rewrite all the links and images in the HTML
+            pathParts = realModel.id.split('/')
+            pathParts.pop()
+            pathParts.push(uuid())
+            json.id = pathParts.join('/')
 
             clone = allContent.model(json)
+            clone.setNew?()
             allContent.add(clone)
 
             pointerNode = root.newNode {title:newTitle, model:clone}
