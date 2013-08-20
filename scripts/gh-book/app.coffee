@@ -128,8 +128,21 @@ define [
     # Github read/write and repo configuration
 
     writeFile = (path, text, commitText, isBase64) ->
+      promise = $.Deferred()
       # .write expects the text to be base64 encoded so no need to convert it
-      session.getBranch().write path, text, commitText, isBase64
+      session.getBranch().write(path, text, commitText, isBase64)
+      .done((sha) => promise.resolve(sha))
+      .fail((err) =>
+        # Probably a patch/cache problem.
+        # Clear the cache and try again
+        session.getClient().clearCache?()
+        session.getBranch().write(path, text, commitText, isBase64)
+        .done((val) => promise.resolve(val))
+        .fail((err) => promise.reject(err))
+      )
+      return promise
+
+
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
     readDir =        (path) -> session.getBranch().contents   path

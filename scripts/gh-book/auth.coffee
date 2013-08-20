@@ -3,6 +3,7 @@ define [
   'cs!collections/content'
   'hbs!gh-book/auth-template'
   'bootstrapModal'
+  'bootstrapCollapse'
 ], (Marionette, allContent, authTemplate) ->
 
   return class GithubAuthView extends Marionette.ItemView
@@ -16,6 +17,7 @@ define [
       'click #fork-content': 'forkContent'
       'click #edit-settings': 'editSettingsModal'
       'click #edit-settings-ok': 'editSettings'
+      'submit #login-form': 'signIn'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
@@ -52,6 +54,9 @@ define [
 
     signInModal: () ->
       $modal = @$el.find('#sign-in-modal')
+
+      # The hidden event on #login-advanced should not propagate
+      $modal.find('#login-advanced').on 'hidden', (e) => e.stopPropagation()
 
       # attach a close listener
       $modal.on 'hidden', () => @trigger 'close'

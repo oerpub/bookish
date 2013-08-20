@@ -3,16 +3,16 @@
   <i class="icon-save"></i> Save
 </button>
 {{else}}
-<button id="fork-content" type="button" class="btn btn-success" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
+<!-- <button id="fork-content" type="button" class="btn btn-success" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
   <i class="icon-code-fork"></i> Fork This Book!
 </button>
-
+ -->
 {{/if}}
 
-<button id="edit-settings" type="button" class="btn" data-placement="bottom" data-toggle="tooltip" title="Change the Current book that is being edited">
+<!-- <button id="edit-settings" type="button" class="btn" data-placement="bottom" data-toggle="tooltip" title="Change the Current book that is being edited">
   <i class="icon-cogs"></i>
 </button>
-
+ -->
 
 {{#if isAuthenticated}}
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
@@ -25,32 +25,41 @@
   <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
        and instead go to the login page directly.
     -->
-  <button id="sign-in" class="btn btn-primary">Sign In</button>
+<!--   <button id="sign-in" class="btn btn-primary">Sign In</button>
+ -->
 {{/if}}
 
 
 <!-- Sign in Modal -->
 <div id="sign-in-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sign-in-modal-label" aria-hidden="true">
   <div class="modal-header">
-    <h3 id="sign-in-modal-label">Sign in to Github!</h3>
+    <h3 id="sign-in-modal-label">Sign in to Book Editor</h3>
   </div>
+  <form class="modal-form" action="#" id="login-form">
   <div class="modal-body">
-    <p>To edit a book you must provide a username and password or an OAuth token.</p>
+    <p>To edit a book you must provide a username and password</p>
 
     <p>If you refresh this page you may need to re-enter this information.</p>
     <div class="form-inline">
       <input id="github-id" class="input-small" type="text" required="true" placeholder="Username" value="{{id}}"/>
       <input id="github-password" type="password" required="true" class="input-small" placeholder="Password"/>
     </div>
-    <p>Or, if you do not want to provide your username and password, you can <a target="_window" href="https://github.com/settings/applications">Create a new OAuth Token</a> and provide it below. You can revoke the token at any point later</p>
-    <div class="form">
-      <input id="github-token" type="text" placeholder="OAuth Token" value="{{token}}"/>
+    <div id="login-advanced-wrapper">
+      <a data-toggle="collapse" data-target="#login-advanced"
+        class="login-advanced-toggle">Advanced login options</a>
+      <div class="collapse" id="login-advanced">
+        <p>If you do not want to provide your username and password, you can <a target="_window" href="https://github.com/settings/applications">Create a new OAuth Token</a> and provide it below. You can revoke the token at any point later</p>
+        <div class="form">
+          <input id="github-token" type="text" placeholder="OAuth Token" value="{{token}}"/>
+        </div>
+        <p><strong>Note:</strong> To save changes on Github you may still need to click <button type="button" class="btn btn-mini" data-target="#settings-modal" data-toggle="modal"><i class="icon-cogs"></i> Settings</button>  and change to a repository you have access to.</p>
+      </div>
     </div>
-    <p><strong>Note:</strong> To save changes on Github you may still need to click <button type="button" class="btn btn-mini" data-target="#settings-modal" data-toggle="modal"><i class="icon-cogs"></i> Settings</button>  and change to a repository you have access to.</p>
   </div>
   <div class="modal-footer">
     <button id="sign-in-ok" type="submit" class="btn btn-primary">Sign In</button>
   </div>
+  </form>
 </div>
 
 

@@ -54,7 +54,7 @@ define [
         Aloha.ready =>
        
           @$el.mahalo?()
-          @$el.aloha()
+          setTimeout((=>@$el.aloha()), 200)
        
           # Wait until Aloha is started before loading MathJax.
           MathJax?.Hub.Configured()
