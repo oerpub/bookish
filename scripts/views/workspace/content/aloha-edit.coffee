@@ -11,20 +11,26 @@ define [
     template: () -> throw 'BUG: You need to specify a template, modelKey'
     modelKey: null
     saveInterval: null
+    aloha: null
 
     templateHelpers: () ->
       return {isLoaded: @isLoaded}
 
     initialize: () ->
       @isLoaded = false
+      @imagesLoaded = new $.Deferred()
+      @modelLoaded = @model.load()
+      @contentLoaded = new $.Deferred()
 
-      @model.load().done () =>
+      $(window).bind 'oer.images.loaded', =>
+        @imagesLoaded.resolve()
+
+      @listenTo @model, "change:#{@modelKey}", =>
+        @contentLoaded.resolve() if @model.attributes.body.length
+
+      $.when(@imagesLoaded, @modelLoaded, @contentLoaded).done =>
         @isLoaded = true
         @render()
-
-        @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
-          return if options.internalAlohaUpdate
-          @render()
 
     # Stop auto-setting when the view closes
     onClose: () ->
@@ -34,7 +40,7 @@ define [
     onRender: () ->
       # update model after the user has stopped making changes
 
-      if @model.attributes.body
+      if @isLoaded
         updateModel = =>
           alohaId = @$el.attr('id')
           alohaEditable = Aloha.getEditableById(alohaId)
@@ -47,14 +53,12 @@ define [
        
         @saveInterval = setInterval(updateModel, AUTOSAVE_INTERVAL) if not @saveInterval
        
-       
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
        
         Aloha.ready =>
-       
           @$el.mahalo?()
-          setTimeout((=>@$el.aloha()), 200)
+          @$el.aloha()
        
           # Wait until Aloha is started before loading MathJax.
           MathJax?.Hub.Configured()

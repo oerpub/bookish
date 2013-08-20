@@ -202,9 +202,12 @@ define [
 
       $images = $body.find('img[data-src]')
       counter = $images.length
+      allImages = []
 
       $images.each (i, img) =>
         $img = jQuery(img)
+        deferred = $.Deferred()
+        allImages.push(deferred)
         src = $img.attr 'data-src'
         path = Utils.resolvePath @id, src
         imageModel = allContent.get(path)
@@ -213,6 +216,7 @@ define [
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
           @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          deferred.resolve()
           return
 
         # Load the image file somehow (see below for my github.js changes)
@@ -227,10 +231,13 @@ define [
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
           @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
-
+          deferred.resolve()
         .fail ->
           counter--
           $img.attr('src', 'path/to/failure.png')
+          deferred.resolve()
+
+      $.when.apply(@, allImages).done -> $(window).trigger('oer.images.loaded')
 
 
     serialize: ->
