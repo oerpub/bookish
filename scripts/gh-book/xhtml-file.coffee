@@ -156,8 +156,7 @@ define [
       # Instead of letting that silently fail,
       # replace the `img` tag with another element until the bytes are retrieved
       # via the github API.
-      html = html.replace(/<img/g, '<prefiximg')
-      html = html.replace(/<\/img>/g, '</prefiximg>')
+      html = html.replace(/<img([^>]*)>/g, '<prefiximg$1 />')
 
       $html = jQuery(html)
 
