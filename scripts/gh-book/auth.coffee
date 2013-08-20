@@ -3,6 +3,7 @@ define [
   'cs!collections/content'
   'hbs!gh-book/auth-template'
   'bootstrapModal'
+  'bootstrapCollapse'
 ], (Marionette, allContent, authTemplate) ->
 
   return class GithubAuthView extends Marionette.ItemView
@@ -52,6 +53,9 @@ define [
 
     signInModal: () ->
       $modal = @$el.find('#sign-in-modal')
+
+      # The hidden event on #login-advanced should not propagate
+      $modal.find('#login-advanced').on 'hidden', (e) => e.stopPropagation()
 
       # attach a close listener
       $modal.on 'hidden', () => @trigger 'close'
