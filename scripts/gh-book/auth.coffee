@@ -17,6 +17,7 @@ define [
       'click #fork-content': 'forkContent'
       'click #edit-settings': 'editSettingsModal'
       'click #edit-settings-ok': 'editSettings'
+      'submit #login-form': 'signIn'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
