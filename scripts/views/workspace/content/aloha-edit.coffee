@@ -18,17 +18,31 @@ define [
 
     initialize: () ->
       @isLoaded = false
-      @imagesLoaded = new $.Deferred()
-      @modelLoaded = @model.load()
+
+      # images only have to be loaded the first time
+      if @model.attributes.body?.length
+        @imagesLoaded = (new $.Deferred()).resolve()
+      else
+        @imagesLoaded = new $.Deferred()
+
+      @initalRender = new $.Deferred()
       @contentLoaded = new $.Deferred()
+      @modelLoaded = @model.load()
 
       $(window).bind 'oer.images.loaded', =>
+        $(window).unbind 'oer.images.loaded'
         @imagesLoaded.resolve()
 
       @listenTo @model, "change:#{@modelKey}", =>
         @contentLoaded.resolve() if @model.attributes.body.length
 
-      $.when(@imagesLoaded, @modelLoaded, @contentLoaded).done =>
+      # if content is already present change will never fire
+      # so check that and conditionally finish the content loading as well
+      @modelLoaded.done =>
+        @contentLoaded.resolve() if @model.attributes.body.length
+     
+      # this is the trigger for actually showing content and enabling editing 
+      $.when(@imagesLoaded, @modelLoaded, @contentLoaded, @initalRender).done =>
         @isLoaded = true
         @render()
 
@@ -39,7 +53,7 @@ define [
 
     onRender: () ->
       # update model after the user has stopped making changes
-
+      
       if @isLoaded
         updateModel = =>
           alohaId = @$el.attr('id')
@@ -65,3 +79,5 @@ define [
        
           # reenable everything
           @$el.removeClass('disabled')
+
+      @initalRender.resolve()
