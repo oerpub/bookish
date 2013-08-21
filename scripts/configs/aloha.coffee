@@ -47,7 +47,6 @@ define ['jquery'], ($) ->
         'oer/toolbar'
         'common/ui'
         'common/format'
-        'common/paste'
         'common/block'
         'common/list'
         'oer/table'
