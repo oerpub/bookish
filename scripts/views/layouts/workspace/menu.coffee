@@ -32,7 +32,8 @@ define [
 
       @add.show(new AddView {collection:mediaTypes})
       @auth.show(new AuthView {model: session})
-      @toolbar.show(_toolbar)
+      if _toolbar != @toolbar.currentView
+        @toolbar.show(_toolbar)
 
     showToolbar: (view) ->
       @showView(view or toolbarView)
