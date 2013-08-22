@@ -62,6 +62,7 @@ define ['jquery'], ($) ->
         'oer/quotation'
         'oer/equation'
         'oer/definition'
+        'oer/multipart'
         'oer/copy'
       ]
 
