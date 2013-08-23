@@ -44,26 +44,43 @@ define [
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel(options)
 
-      @manifest.on 'add', (model, collection, options) =>
-        $manifest = @$xml.find('manifest')
+      @manifest.on 'add', (model, collection, options) => @_addItem(model, options)
 
-        relPath = Utils.relativePath(@id, model.id)
+      # These store the added items since last successful save.
+      # If this file was remotely updated then, when resolving conflicts,
+      # these items will be added back into the newly-updated OPF manifest
+      @_addedItems = {}
 
-        # Check if the item is not already in the manifest
-        return if $manifest.find("item[href='#{relPath}']")[0]
+    # Add an `<item>` to the OPF.
+    # Called from `@manifest.add` and `@resolveSaveConflict`
+    _addItem: (model, options={}, force=true) ->
+      $manifest = @$xml.find('manifest')
 
-        # Create a new `<item>` in the manifest
-        item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
-        $item = $(item)
-        $item.attr
-          href:         relPath
-          id:           relPath # TODO: escape the slashes so it is a valid id
-          'media-type': model.mediaType
+      relPath = Utils.relativePath(@id, model.id)
 
-        $manifest.append($item)
-        # TODO: Depending on the type add it to the spine for EPUB2
+      # Check if the item is not already in the manifest
+      return if $manifest.find("item[href='#{relPath}']")[0]
 
-        @_markDirty(options, true) # true == force because hasChanged == false
+      # Create a new `<item>` in the manifest
+      item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
+      $item = $(item)
+      $item.attr
+        href:         relPath
+        id:           relPath # TODO: escape the slashes so it is a valid id
+        'media-type': model.mediaType
+
+      # Randomly add the item into the manifest.
+      # Always appending results in commit conflicts at the bottom of the file
+      $manifestChildren = $manifest.children()
+      index = $manifestChildren.length * Math.random()
+      $item.insertBefore($manifestChildren.eq(index))
+      # TODO: Depending on the type add it to the spine for EPUB2
+
+      @_markDirty(options, force)
+
+      # Push it to the set of items that were added since last save.
+      # This is useful when the OPF file was remotely updated
+      @_addedItems[model.id] = model
 
 
     _loadComplex: (fetchPromise) ->
@@ -103,6 +120,7 @@ define [
 
             path = Utils.resolvePath(contextPath, href)
             contentModel = allContent.get path
+            throw new Error 'ERROR: File in nav missing in OPF' if not contentModel
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
@@ -222,7 +240,14 @@ define [
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
       return {title: title, bookId: bookId}
 
-    serialize: () -> serializer.serializeToString(@$xml[0])
+    serialize: () ->
+      serializer.serializeToString(@$xml[0])
+
+    resolveSaveConflict: () ->
+      @_addItem(model, {}, false) for model in _.values(@_addedItems)
+
+    onSaved: () ->
+      @_addedItems = {}
 
     newNode: (options) ->
       model = options.model
@@ -242,7 +267,6 @@ define [
           collection: @getChildren()
           model: @
         callback(view)
-
 
   # Mix in the loadable
   PackageFile = PackageFile.extend loadable
