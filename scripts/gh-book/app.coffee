@@ -127,21 +127,34 @@ define [
 
     # Github read/write and repo configuration
 
-    writeFile = (path, text, commitText, isBase64) ->
+    writeFile = (path, model, commitText, isBase64) ->
+      text = model.serialize()
+      lastSeenSha = remoteUpdater.lastSeenSha
       promise = $.Deferred()
       # .write expects the text to be base64 encoded so no need to convert it
-      session.getBranch().write(path, text, commitText, isBase64)
-      .done((sha) => promise.resolve(sha))
-      .fail((err) =>
+      session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
+      .done((val) => model.onSaved?(); remoteUpdater.lastSeenSha = val.sha; promise.resolve(val))
+      .fail (err) =>
         # Probably a patch/cache problem.
         # Clear the cache and try again
         session.getClient().clearCache?()
-        session.getBranch().write(path, text, commitText, isBase64)
-        .done((val) => promise.resolve(val))
-        .fail((err) => promise.reject(err))
-      )
-      return promise
+        session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
+        .done((val) => model.onSaved?(); remoteUpdater.lastSeenSha = val.sha; promise.resolve(val))
+        .fail (err) =>
+          # Probably a conflict because of a remote change.
+          # Resolve the changes and save again
+          remoteUpdater.pollUpdates()
+          .fail((err) => promise.reject(err))
+          .done () =>
+            model.resolveSaveConflict?()
+            writeFile(path, model, commitText, isBase64)
+            .done (val) =>
+              model.onSaved?()
+              remoteUpdater.lastSeenSha = val.sha
+              promise.resolve(val)
 
+
+      return promise
 
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
@@ -156,8 +169,8 @@ define [
       ret = null
       switch method
         when 'read' then ret = readFile(path, model.isBinary)
-        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Update', model.isBinary)
-        when 'create' then ret = writeFile(path, model.serialize(), 'Editor Create', model.isBinary)
+        when 'update' then ret = writeFile(path, model, 'Editor Update', model.isBinary)
+        when 'create' then ret = writeFile(path, model, 'Editor Create', model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
