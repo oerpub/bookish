@@ -219,8 +219,8 @@ define [
           # TODO: Move this into the controller
           goWorkspace: () ->
             @_loadFirst().done () => controller.goWorkspace()
-          goEdit: (id)    ->
-            @_loadFirst().done () => controller.goEdit(id)
+          goEdit: (id, contextModel=null)    ->
+            @_loadFirst().done () => controller.goEdit(id, contextModel)
           goDefault: () ->
             _controller = @ # Explicit is better than confusing
             @_loadFirst().done () ->
