@@ -133,25 +133,21 @@ define [
       promise = $.Deferred()
       # .write expects the text to be base64 encoded so no need to convert it
       session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
-      .done((val) => model.onSaved?(); remoteUpdater.lastSeenSha = val.sha; promise.resolve(val))
+      .done((val) => model.onSaved?(); promise.resolve(val))
       .fail (err) =>
-        # Probably a patch/cache problem.
-        # Clear the cache and try again
-        session.getClient().clearCache?()
-        session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
-        .done((val) => model.onSaved?(); remoteUpdater.lastSeenSha = val.sha; promise.resolve(val))
-        .fail (err) =>
-          # Probably a conflict because of a remote change.
-          # Resolve the changes and save again
-          remoteUpdater.pollUpdates()
-          .fail((err) => promise.reject(err))
-          .done () =>
-            model.resolveSaveConflict?()
-            writeFile(path, model, commitText, isBase64)
-            .done (val) =>
-              model.onSaved?()
-              remoteUpdater.lastSeenSha = val.sha
-              promise.resolve(val)
+        # Get the new lastSeenSha
+        remoteUpdater.pollUpdates().then () =>
+            # Probably a conflict because of a remote change.
+            # Resolve the changes and save again
+            model.reload()
+            .fail((err) => promise.reject(err))
+            .done () =>
+              # Probably a patch/cache problem.
+              # Clear the cache and try again
+              session.getClient().clearCache?()
+              writeFile(path, model, commitText, isBase64)
+              .fail((err) => promise.reject(err))
+              .done (val) => promise.resolve(val)
 
 
       return promise
