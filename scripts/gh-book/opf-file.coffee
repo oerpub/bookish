@@ -9,7 +9,8 @@ define [
   'cs!gh-book/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
-  class PackageFile extends TocNode
+  # Mix in the loadable
+  return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
 
     mediaType: 'application/oebps-package+xml'
@@ -246,7 +247,9 @@ define [
     serialize: () ->
       serializer.serializeToString(@$xml[0])
 
-    resolveSaveConflict: () ->
+    # Resolves conflicts between changes to this model and the remotely-changed
+    # new attributes on this model.
+    onReloaded: () ->
       @_addItem(model, {}, false) for model in _.values(@_addedItems)
 
     onSaved: () ->
@@ -270,6 +273,3 @@ define [
           collection: @getChildren()
           model: @
         callback(view)
-
-  # Mix in the loadable
-  PackageFile = PackageFile.extend loadable
