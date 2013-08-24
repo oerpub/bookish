@@ -22,6 +22,10 @@ define [
   # Stop logging.
   logger.stop()
 
+  # Returns a promise that is resolved once all promises in the array `promises`
+  # are resolved.
+  onceAll = (promises) -> return $.when.apply($, promises)
+
   # Singleton that gets reloaded when the repo changes
   epubContainer = new EpubContainer()
 
@@ -152,6 +156,44 @@ define [
 
       return promise
 
+    writeFiles = (models, commitText) ->
+      parentCommitSha = remoteUpdater.lastSeenSha
+      promise = $.Deferred()
+
+      # For each model, build a map of changed Content
+      changedFiles = {}
+      _.each models, (model) ->
+        changedFiles[model.id] =
+          isBase64: model.isBinary
+          content: model.serialize()
+
+
+      session.getBranch().writeMany(changedFiles, commitText, parentCommitSha)
+      .done((val) =>
+        # Fire the onSave event on all the changed models
+        _.map models, (model) -> model.onSaved?()
+        promise.resolve(val)
+      )
+      .fail (err) =>
+        # Get the new lastSeenSha
+        remoteUpdater.pollUpdates().then () =>
+          # Probably a conflict because of a remote change.
+          # Resolve the changes and save again
+          #
+          # Reload all the models (merging local changes along the way)
+          promises = model.reload() for model in models
+          onceAll(promises)
+          .fail((err) => promise.reject(err))
+          .done () =>
+            # Probably a patch/cache problem.
+            # Clear the cache and try again
+            session.getClient().clearCache?()
+            writeFiles(models, commitText)
+            .fail((err) => promise.reject(err))
+            .done (val) => promise.resolve(val)
+
+      return promise
+
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
     readDir =        (path) -> session.getBranch().contents   path
@@ -173,6 +215,14 @@ define [
       ret.fail (error) => options?.error?(ret, error)
       return ret
 
+    allContent_save = (options) ->
+      # Save all the models that have changes
+      changedModels = @filter (model) -> model.isDirty()
+
+      writeFiles(changedModels)
+
+
+    allContent.save = allContent_save.bind(allContent)
 
   App.on 'start', () ->
 
