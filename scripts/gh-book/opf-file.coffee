@@ -36,6 +36,12 @@ define [
           options.doNotReparse = true
           @navModel.set 'body', @_serializeNavModel(), options
 
+      @tocNodes.on 'add', (model, collection, options) =>
+        if not options.doNotReparse
+          # Keep track of local changes if there is a remote conflict
+          @_localNavAdded[model.id] = model
+
+
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
@@ -50,7 +56,8 @@ define [
       # These store the added items since last successful save.
       # If this file was remotely updated then, when resolving conflicts,
       # these items will be added back into the newly-updated OPF manifest
-      @_addedItems = {}
+      @_localAddedItems = {}
+      @_localNavAdded = {}
 
     # Add an `<item>` to the OPF.
     # Called from `@manifest.add` and `@resolveSaveConflict`
@@ -81,7 +88,7 @@ define [
 
       # Push it to the set of items that were added since last save.
       # This is useful when the OPF file was remotely updated
-      @_addedItems[model.id] = model
+      @_localAddedItems[model.id] = model
 
 
     _loadComplex: (fetchPromise) ->
@@ -125,7 +132,7 @@ define [
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
-            contentModel.set 'title', title, {parse:true} if not contentModel.get('title')
+            contentModel.set 'title', title, {parse:true} # if not contentModel.get('title')
 
             model = @newNode {title: title, htmlAttributes: attributes, model: contentModel}
 
@@ -236,6 +243,7 @@ define [
         # then remember it.
         if 'nav' == $item.attr('properties')
           @navModel = model
+          @_monkeypatch_navModel(@navModel)
 
       # Add all the models in one batch so views do not re-sort on every add.
       allContent.add @manifest.models, {loading:true}
@@ -250,10 +258,30 @@ define [
     # Resolves conflicts between changes to this model and the remotely-changed
     # new attributes on this model.
     onReloaded: () ->
-      @_addItem(model, {}, false) for model in _.values(@_addedItems)
+      @_addItem(model, {}, false) for model in _.values(@_localAddedItems)
 
     onSaved: () ->
-      @_addedItems = {}
+      @_localAddedItems = {}
+
+    # FIXME HACK, horrible Hack.
+    # When a remote commit occurs, all models that were changed are reloaded.
+    # The order they are reloaded is non-deterministic and a "Book"
+    # is actually represented by 2 files: the OPF and the navigation HTML.
+    # This patch ensures the navigation file is updated.
+    _monkeypatch_navModel: () ->
+
+      # Resolves conflicts between changes to this model and the remotely-changed
+      # new attributes on this model.
+      onReloaded = () =>
+        @_parseNavModel()
+        _.each @_localNavAdded, (model, path) => @addChild(model)
+
+      onSaved = () =>
+        @_localNavAdded = {}
+
+      @navModel.onReloaded = onReloaded
+      @navModel.onSaved = onSaved
+
 
     newNode: (options) ->
       model = options.model
