@@ -175,22 +175,18 @@ define [
         promise.resolve(val)
       )
       .fail (err) =>
-        # Get the new lastSeenSha
+        # Probably a conflict because of a remote change.
+        # Resolve the changes and save again
+        #
+        # Reload all the models (merging local changes along the way)
+        # and, at the same time get the new lastSeenSha
         remoteUpdater.pollUpdates().then () =>
-          # Probably a conflict because of a remote change.
-          # Resolve the changes and save again
-          #
-          # Reload all the models (merging local changes along the way)
-          promises = model.reload() for model in models
-          onceAll(promises)
+          # Probably a patch/cache problem.
+          # Clear the cache and try again
+          session.getClient().clearCache?()
+          writeFiles(models, commitText)
           .fail((err) => promise.reject(err))
-          .done () =>
-            # Probably a patch/cache problem.
-            # Clear the cache and try again
-            session.getClient().clearCache?()
-            writeFiles(models, commitText)
-            .fail((err) => promise.reject(err))
-            .done (val) => promise.resolve(val)
+          .done (val) => promise.resolve(val)
 
       return promise
 
