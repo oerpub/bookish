@@ -71,6 +71,7 @@ define [
         @$el.addClass('disabled')
        
         Aloha.ready =>
+          @$el.addClass('aloha-root-editable')
           @$el.mahalo?()
           @$el.aloha()
        
