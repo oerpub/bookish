@@ -15,9 +15,10 @@ define [
   'cs!gh-book/auth'
   'cs!gh-book/remote-updater'
   'cs!gh-book/loading'
+  'cs!configs/github.coffee'
   'less!styles/main'
   'less!gh-book/gh-book'
-], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView) ->
+], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView, config) ->
 
   # Stop logging.
   logger.stop()
@@ -179,13 +180,9 @@ define [
 
           setDefaultRepo = () ->
             if not session.get('repoName')
-              DEFAULT_CONFIG =
-                'repoUser': 'Connexions'
-                'repoName': 'atc'
-                'branch'  : 'sample-book'
               options = {}
               options.silent = true if not 'id' and not 'token'
-              session.set DEFAULT_CONFIG, options
+              session.set config.defaultRepo, options
 
 
           routes:
@@ -254,20 +251,14 @@ define [
     if session.get('password') or session.get('token')
       # Use the default book if one is not already set
       if not session.get 'repoName'
-        session.set
-          'repoUser': 'Connexions'
-          'repoName': 'atc'
-          'branch'  : 'sample-book'
+        session.set config.defaultRepo
       startRouting()
     else
       # The user has not logged in yet so pop up the modal
       welcomeView.once 'close', () =>
         # Use the default book if one is not already set
         if not session.get 'repoName'
-          session.set
-            'repoUser': 'Connexions'
-            'repoName': 'atc'
-            'branch'  : 'sample-book'
+          session.set config.defaultRepo
         startRouting()
       App.main.show(welcomeView)
       welcomeView.signInModal()
