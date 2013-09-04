@@ -63,7 +63,3 @@ define [
                           lastEditedBy: commit.author.login
 
                         model.set attributes, {parse:true}
-
-
-
-
