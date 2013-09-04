@@ -1,10 +1,11 @@
 define [
   'marionette'
   'cs!collections/content'
+  'cs!session'
   'hbs!gh-book/auth-template'
   'bootstrapModal'
   'bootstrapCollapse'
-], (Marionette, allContent, authTemplate) ->
+], (Marionette, allContent, session, authTemplate) ->
 
   return class GithubAuthView extends Marionette.ItemView
     template: authTemplate
@@ -88,12 +89,15 @@ define [
       if not attrs.password or attrs.token
         alert 'We are terribly sorry but github recently changed so you must login to use their API.\nPlease refresh and provide a password or an OAuth token.'
       else
-        @model.set(attrs)
-        @render()
+        # Test login first, this also updates login details on the session
+        session.authenticate(attrs).done () =>
+          @render()
 
-        # The 1st time the editor loads up it waits for the modal to close
-        # but `render` will hide the modal without triggering 'close'
-        @trigger 'close'
+          # The 1st time the editor loads up it waits for the modal to close
+          # but `render` will hide the modal without triggering 'close'
+          @trigger 'close'
+        .fail (err) =>
+          alert 'Login failed. Did you use the correct credentials?'
 
     signOut: () ->
       settings =
