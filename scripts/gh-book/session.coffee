@@ -13,6 +13,22 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
         else if not _.isEmpty _.pick @.changed, ['repoUser', 'repoName']
           @checkCanCollaborate()
 
+    authenticate: (config) ->
+      # This works pretty similar to _reloadClient, except that it tests the
+      # login details first and only replaces the client if it succeeds. The
+      # promise is returned so more actions can be hung off it.
+      client = new Github
+        auth: (if config.token then 'oauth' else 'basic')
+        token:    config.token
+        username: config.id
+        password: config.password
+        
+      promise = client.getLogin()
+      promise.done () =>
+        @set config, {silent:true}
+        @_client = client
+      return promise
+        
     _reloadClient: () ->
       config =
         auth: (if @get('token') then 'oauth' else 'basic')

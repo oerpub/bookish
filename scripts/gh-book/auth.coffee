@@ -1,9 +1,11 @@
 define [
   'marionette'
   'cs!collections/content'
+  'cs!session'
   'hbs!gh-book/auth-template'
   'bootstrapModal'
-], (Marionette, allContent, authTemplate) ->
+  'bootstrapCollapse'
+], (Marionette, allContent, session, authTemplate) ->
 
   return class GithubAuthView extends Marionette.ItemView
     template: authTemplate
@@ -16,6 +18,7 @@ define [
       'click #fork-content': 'forkContent'
       'click #edit-settings': 'editSettingsModal'
       'click #edit-settings-ok': 'editSettings'
+      'submit #login-form': 'signIn'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
@@ -53,6 +56,9 @@ define [
     signInModal: () ->
       $modal = @$el.find('#sign-in-modal')
 
+      # The hidden event on #login-advanced should not propagate
+      $modal.find('#login-advanced').on 'hidden', (e) => e.stopPropagation()
+
       # attach a close listener
       $modal.on 'hidden', () => @trigger 'close'
 
@@ -70,7 +76,10 @@ define [
         @model.getRepo()?.fork().done () =>
           @model.set 'repoUser', login
 
-    signIn: () ->
+    signIn: (e) ->
+      # Prevent form submission
+      e.preventDefault()
+
       # Set the username and password in the `Auth` model
       attrs =
         id:       @$el.find('#github-id').val()
@@ -80,12 +89,15 @@ define [
       if not attrs.password or attrs.token
         alert 'We are terribly sorry but github recently changed so you must login to use their API.\nPlease refresh and provide a password or an OAuth token.'
       else
-        @model.set(attrs)
-        @render()
+        # Test login first, this also updates login details on the session
+        session.authenticate(attrs).done () =>
+          @render()
 
-        # The 1st time the editor loads up it waits for the modal to close
-        # but `render` will hide the modal without triggering 'close'
-        @trigger 'close'
+          # The 1st time the editor loads up it waits for the modal to close
+          # but `render` will hide the modal without triggering 'close'
+          @trigger 'close'
+        .fail (err) =>
+          alert 'Login failed. Did you use the correct credentials?'
 
     signOut: () ->
       settings =

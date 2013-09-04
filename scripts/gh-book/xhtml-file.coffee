@@ -159,8 +159,7 @@ define [
       # Instead of letting that silently fail,
       # replace the `img` tag with another element until the bytes are retrieved
       # via the github API.
-      html = html.replace(/<img/g, '<prefiximg')
-      html = html.replace(/<\/img>/g, '</prefiximg>')
+      html = html.replace(/<img([^>]*)>/g, '<prefiximg$1 />')
 
       $html = jQuery(html)
 
@@ -206,9 +205,12 @@ define [
 
       $images = $body.find('img[data-src]')
       counter = $images.length
+      allImages = []
 
       $images.each (i, img) =>
         $img = jQuery(img)
+        deferred = $.Deferred()
+        allImages.push(deferred)
         src = $img.attr 'data-src'
         path = Utils.resolvePath @id, src
         imageModel = allContent.get(path)
@@ -217,6 +219,7 @@ define [
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
           @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          deferred.resolve()
           return
 
         # Load the image file somehow (see below for my github.js changes)
@@ -231,10 +234,13 @@ define [
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
           @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
-
+          deferred.resolve()
         .fail ->
           counter--
           $img.attr('src', 'path/to/failure.png')
+          deferred.resolve()
+
+      $.when.apply(@, allImages).done -> $(window).trigger('oer.images.loaded')
 
 
     serialize: ->

@@ -47,7 +47,6 @@ define ['jquery'], ($) ->
         'oer/toolbar'
         'common/ui'
         'common/format'
-        'common/paste'
         'common/block'
         'common/list'
         'oer/table'
@@ -62,6 +61,8 @@ define ['jquery'], ($) ->
         'oer/exercise'
         'oer/quotation'
         'oer/equation'
+        'oer/definition'
+        'oer/multipart'
         'oer/copy'
       ]
 
@@ -119,8 +120,6 @@ define ['jquery'], ($) ->
         rootTags: ['span', 'div', 'figure']
         defaults:
           '.default-block': {}
-          figure:
-            'aloha-block-type': 'EditableImageBlock'
 
   # In case some module wants the config object return it.
   return @Aloha

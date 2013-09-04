@@ -43,3 +43,13 @@ define [
 
     toggleWorkspace: () -> @$('#workspace-container').toggleClass('wsminimized')
     toggleToc: () -> @$('#workspace-container').toggleClass('tocminimized')
+    showWorkspace: (b) ->
+      if b
+        @$('#workspace-container').removeClass('wsminimized')
+      else
+        @$('#workspace-container').addClass('wsminimized')
+    showToc: (b) ->
+      if b
+        @$('#workspace-container').removeClass('tocminimized')
+      else
+        @$('#workspace-container').addClass('tocminimized')

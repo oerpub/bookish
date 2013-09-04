@@ -11,6 +11,7 @@ define [
     template: () -> throw 'BUG: You need to specify a template, modelKey'
     modelKey: null
     saveInterval: null
+    aloha: null
 
     templateHelpers: () ->
       return {isLoaded: @isLoaded}
@@ -18,13 +19,32 @@ define [
     initialize: () ->
       @isLoaded = false
 
-      @model.load().done () =>
+      # images only have to be loaded the first time
+      if @model.attributes.body?.length
+        @imagesLoaded = (new $.Deferred()).resolve()
+      else
+        @imagesLoaded = new $.Deferred()
+
+      @initalRender = new $.Deferred()
+      @contentLoaded = new $.Deferred()
+      @modelLoaded = @model.load()
+
+      $(window).bind 'oer.images.loaded', =>
+        $(window).unbind 'oer.images.loaded'
+        @imagesLoaded.resolve()
+
+      @listenTo @model, "change:#{@modelKey}", =>
+        @contentLoaded.resolve() if @model.attributes.body.length
+
+      # if content is already present change will never fire
+      # so check that and conditionally finish the content loading as well
+      @modelLoaded.done =>
+        @contentLoaded.resolve() if @model.attributes.body.length
+     
+      # this is the trigger for actually showing content and enabling editing 
+      $.when(@imagesLoaded, @modelLoaded, @contentLoaded, @initalRender).done =>
         @isLoaded = true
         @render()
-
-        @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
-          return if options.internalAlohaUpdate
-          @render()
 
     # Stop auto-setting when the view closes
     onClose: () ->
@@ -33,8 +53,8 @@ define [
 
     onRender: () ->
       # update model after the user has stopped making changes
-
-      if @model.attributes.body
+      
+      if @isLoaded
         updateModel = =>
           alohaId = @$el.attr('id')
           alohaEditable = Aloha.getEditableById(alohaId)
@@ -47,12 +67,11 @@ define [
        
         @saveInterval = setInterval(updateModel, AUTOSAVE_INTERVAL) if not @saveInterval
        
-       
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
        
         Aloha.ready =>
-       
+          @$el.addClass('aloha-root-editable')
           @$el.mahalo?()
           @$el.aloha()
        
@@ -61,3 +80,5 @@ define [
        
           # reenable everything
           @$el.removeClass('disabled')
+
+      @initalRender.resolve()
