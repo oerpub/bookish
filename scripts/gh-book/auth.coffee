@@ -75,7 +75,10 @@ define [
         @model.getRepo()?.fork().done () =>
           @model.set 'repoUser', login
 
-    signIn: () ->
+    signIn: (e) ->
+      # Prevent form submission
+      e.preventDefault()
+
       # Set the username and password in the `Auth` model
       attrs =
         id:       @$el.find('#github-id').val()
