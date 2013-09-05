@@ -168,6 +168,8 @@ define [
           isBase64: model.isBinary
           content: model.serialize()
 
+      promise.done -> _.map models, (model) -> console.log 'saved', model.id
+      promise.fail -> _.map models, (model) -> console.log 'failed saving', model.id
 
       session.getBranch().writeMany(changedFiles, commitText, parentCommitSha)
       .done((val) =>
