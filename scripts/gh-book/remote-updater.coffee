@@ -1,11 +1,19 @@
 define [
+  'jquery'
   'cs!session'
   'cs!collections/content'
-], (session, allContent) ->
+], ($, session, allContent) ->
 
   UPDATE_TIMEOUT = 60 * 1000 # Update every minute
 
+  # Returns a promise that is resolved once all promises in the array `promises`
+  # are resolved.
+  onceAll = (promises) -> return $.when.apply($, promises)
+
   return new class RemoteUpdater
+    # This is updated every time the Remote Updater fetches
+    lastSeenSha: null
+
     start: () ->
       # Get the current repo and last commit
       # Periodically check the commits list
@@ -17,49 +25,60 @@ define [
 
       # Return a promise that is resolved once a start hash has been recorded
       # Note: This promise may still fail
-      return @_pollUpdates()
+      return @pollUpdates()
 
     stop: () -> @keepUpdating = false
 
 
     # Returns a promise that is resolved when `@lastSeenSha` has been set.
-    _pollUpdates: () ->
+    pollUpdates: () ->
       return if not @keepUpdating
 
-      branch = session.getBranch()
+      return allContent.load().then () =>
+        branch = session.getBranch()
 
-      return branch.getCommits().done (commits) =>
-        lastUpdatedSha = @lastSeenSha
+        return branch.getCommits().then (commits) =>
+          lastUpdatedSha = @lastSeenSha
 
-        @lastSeenSha = commits[0].sha
+          lastSeenSha = commits[0].sha
 
-        setTimeout (() => @_pollUpdates()), UPDATE_TIMEOUT
+          setTimeout (() => @pollUpdates()), UPDATE_TIMEOUT
 
-        return if not lastUpdatedSha
+          if not lastUpdatedSha
+            @lastSeenSha = lastSeenSha
+            return
 
-        # If the commit sha's differ then someone has committed (maybe us)
-        if lastUpdatedSha != @lastSeenSha
+          # If the commit sha's differ then someone has committed (maybe us)
+          if lastUpdatedSha == lastSeenSha
+            @lastSeenSha = lastSeenSha
+          else
 
-          for commitItem in commits
-            # Stop updating once we hit the lastUpdatedSha (everything after has old)
-            break if lastUpdatedSha == commitItem.sha
+            commitsPromises = for commitItem in commits
+              # Stop updating once we hit the lastUpdatedSha (everything after has old)
+              break if lastUpdatedSha == commitItem.sha
 
-            branch.getCommit(commitItem.sha).done (commit) =>
+              branch.getCommit(commitItem.sha).then (commit) =>
 
-              commitSha = commit.sha
-              dateCommittedUTC = commit.commit.author.date
+                commitSha = commit.sha
+                dateCommittedUTC = commit.commit.author.date
 
-              for file in commit.files
-                filePath = file.filename
-                allContent.load().done () =>
-                  model = allContent.get(filePath)
-                  if model
-                    modelSha = model.commitSha
-                    if modelSha and commitSha and modelSha != commitSha
-                      # TODO: Just invalidate the model by clearing `isLoaded`
-                      model.reload().done () =>
-                        attributes =
-                          dateLastModifiedUTC: dateCommittedUTC
-                          lastEditedBy: commit.author.login
+                return allContent.load().then () =>
+                  # Collect all the model load (and update) promises
+                  # so the `lastSeenSha` is updated after they have been updated
+                  promises = _.compact _.map commit.files, (file) =>
+                    filePath = file.filename
+                    model = allContent.get(filePath)
 
-                        model.set attributes, {parse:true}
+                    if model
+                      modelSha = model.commitSha
+                      if modelSha and commitSha and modelSha != commitSha
+                        # TODO: Just invalidate the model by clearing `isLoaded`
+                        return model.reload().then () =>
+                          attributes =
+                            dateLastModifiedUTC: dateCommittedUTC
+                            lastEditedBy: commit.author.login
+
+                          return model.set attributes, {parse:true}
+
+                  return onceAll(promises)
+            return onceAll(commitsPromises).then () => @lastSeenSha = lastSeenSha

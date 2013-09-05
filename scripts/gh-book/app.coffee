@@ -23,6 +23,10 @@ define [
   # Stop logging.
   logger.stop()
 
+  # Returns a promise that is resolved once all promises in the array `promises`
+  # are resolved.
+  onceAll = (promises) -> return $.when.apply($, promises)
+
   # Singleton that gets reloaded when the repo changes
   epubContainer = new EpubContainer()
 
@@ -128,21 +132,64 @@ define [
 
     # Github read/write and repo configuration
 
-    writeFile = (path, text, commitText, isBase64) ->
+    writeFile = (path, model, commitText, isBase64) ->
+      text = model.serialize()
+      lastSeenSha = remoteUpdater.lastSeenSha
       promise = $.Deferred()
       # .write expects the text to be base64 encoded so no need to convert it
-      session.getBranch().write(path, text, commitText, isBase64)
-      .done((sha) => promise.resolve(sha))
-      .fail((err) =>
-        # Probably a patch/cache problem.
-        # Clear the cache and try again
-        session.getClient().clearCache?()
-        session.getBranch().write(path, text, commitText, isBase64)
-        .done((val) => promise.resolve(val))
-        .fail((err) => promise.reject(err))
-      )
+      session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
+      .done((val) => model.onSaved?(); promise.resolve(val))
+      .fail (err) =>
+        # Get the new lastSeenSha
+        remoteUpdater.pollUpdates().then () =>
+            # Probably a conflict because of a remote change.
+            # Resolve the changes and save again
+            model.reload()
+            .fail((err) => promise.reject(err))
+            .done () =>
+              # Probably a patch/cache problem.
+              # Clear the cache and try again
+              session.getClient().clearCache?()
+              writeFile(path, model, commitText, isBase64)
+              .fail((err) => promise.reject(err))
+              .done (val) => promise.resolve(val)
+
+
       return promise
 
+    writeFiles = (models, commitText) ->
+      parentCommitSha = remoteUpdater.lastSeenSha
+      promise = $.Deferred()
+
+      # For each model, build a map of changed Content
+      changedFiles = {}
+      _.each models, (model) ->
+        changedFiles[model.id] =
+          isBase64: model.isBinary
+          content: model.serialize()
+
+
+      session.getBranch().writeMany(changedFiles, commitText, parentCommitSha)
+      .done((val) =>
+        # Fire the onSave event on all the changed models
+        _.map models, (model) -> model.onSaved?()
+        promise.resolve(val)
+      )
+      .fail (err) =>
+        # Probably a conflict because of a remote change.
+        # Resolve the changes and save again
+        #
+        # Reload all the models (merging local changes along the way)
+        # and, at the same time get the new lastSeenSha
+        remoteUpdater.pollUpdates().then () =>
+          # Probably a patch/cache problem.
+          # Clear the cache and try again
+          session.getClient().clearCache?()
+          writeFiles(models, commitText)
+          .fail((err) => promise.reject(err))
+          .done (val) => promise.resolve(val)
+
+      return promise
 
 
     readFile = (path, isBinary) -> session.getBranch().read path, isBinary
@@ -157,14 +204,22 @@ define [
       ret = null
       switch method
         when 'read' then ret = readFile(path, model.isBinary)
-        when 'update' then ret = writeFile(path, model.serialize(), 'Editor Update', model.isBinary)
-        when 'create' then ret = writeFile(path, model.serialize(), 'Editor Create', model.isBinary)
+        when 'update' then ret = writeFile(path, model, 'Editor Update', model.isBinary)
+        when 'create' then ret = writeFile(path, model, 'Editor Create', model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
       ret.fail (error) => options?.error?(ret, error)
       return ret
 
+    allContent_save = (options) ->
+      # Save all the models that have changes
+      changedModels = @filter (model) -> model.isDirty()
+
+      writeFiles(changedModels)
+
+
+    allContent.save = allContent_save.bind(allContent)
 
   App.on 'start', () ->
 

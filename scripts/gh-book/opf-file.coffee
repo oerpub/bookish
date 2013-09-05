@@ -9,7 +9,8 @@ define [
   'cs!gh-book/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
-  class PackageFile extends TocNode
+  # Mix in the loadable
+  return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
 
     mediaType: 'application/oebps-package+xml'
@@ -35,6 +36,12 @@ define [
           options.doNotReparse = true
           @navModel.set 'body', @_serializeNavModel(), options
 
+      @tocNodes.on 'add', (model, collection, options) =>
+        if not options.doNotReparse
+          # Keep track of local changes if there is a remote conflict
+          @_localNavAdded[model.id] = model
+
+
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
@@ -44,26 +51,44 @@ define [
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
         setNavModel(options)
 
-      @manifest.on 'add', (model, collection, options) =>
-        $manifest = @$xml.find('manifest')
+      @manifest.on 'add', (model, collection, options) => @_addItem(model, options)
 
-        relPath = Utils.relativePath(@id, model.id)
+      # These store the added items since last successful save.
+      # If this file was remotely updated then, when resolving conflicts,
+      # these items will be added back into the newly-updated OPF manifest
+      @_localAddedItems = {}
+      @_localNavAdded = {}
 
-        # Check if the item is not already in the manifest
-        return if $manifest.find("item[href='#{relPath}']")[0]
+    # Add an `<item>` to the OPF.
+    # Called from `@manifest.add` and `@resolveSaveConflict`
+    _addItem: (model, options={}, force=true) ->
+      $manifest = @$xml.find('manifest')
 
-        # Create a new `<item>` in the manifest
-        item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
-        $item = $(item)
-        $item.attr
-          href:         relPath
-          id:           relPath # TODO: escape the slashes so it is a valid id
-          'media-type': model.mediaType
+      relPath = Utils.relativePath(@id, model.id)
 
-        $manifest.append($item)
-        # TODO: Depending on the type add it to the spine for EPUB2
+      # Check if the item is not already in the manifest
+      return if $manifest.find("item[href='#{relPath}']")[0]
 
-        @_markDirty(options, true) # true == force because hasChanged == false
+      # Create a new `<item>` in the manifest
+      item = @$xml[0].createElementNS('http://www.idpf.org/2007/opf', 'item')
+      $item = $(item)
+      $item.attr
+        href:         relPath
+        id:           relPath # TODO: escape the slashes so it is a valid id
+        'media-type': model.mediaType
+
+      # Randomly add the item into the manifest.
+      # Always appending results in commit conflicts at the bottom of the file
+      $manifestChildren = $manifest.children()
+      index = $manifestChildren.length * Math.random()
+      $item.insertBefore($manifestChildren.eq(index))
+      # TODO: Depending on the type add it to the spine for EPUB2
+
+      @_markDirty(options, force)
+
+      # Push it to the set of items that were added since last save.
+      # This is useful when the OPF file was remotely updated
+      @_localAddedItems[model.id] = model
 
 
     _loadComplex: (fetchPromise) ->
@@ -103,10 +128,11 @@ define [
 
             path = Utils.resolvePath(contextPath, href)
             contentModel = allContent.get path
+            throw new Error 'ERROR: File in nav missing in OPF' if not contentModel
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
-            contentModel.set 'title', title, {parse:true} if not contentModel.get('title')
+            contentModel.set 'title', title, {parse:true} # if not contentModel.get('title')
 
             model = @newNode {title: title, htmlAttributes: attributes, model: contentModel}
 
@@ -171,6 +197,9 @@ define [
 
 
     parse: (json) ->
+      # Shortcut to not override local changes if remote model did not change
+      return if @commitSha == json.sha
+
       # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
       # Save the commit sha so we can compare when a remote update occurs
       @commitSha = json.sha
@@ -214,6 +243,7 @@ define [
         # then remember it.
         if 'nav' == $item.attr('properties')
           @navModel = model
+          @_monkeypatch_navModel(@navModel)
 
       # Add all the models in one batch so views do not re-sort on every add.
       allContent.add @manifest.models, {loading:true}
@@ -222,7 +252,36 @@ define [
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
       return {title: title, bookId: bookId}
 
-    serialize: () -> serializer.serializeToString(@$xml[0])
+    serialize: () ->
+      serializer.serializeToString(@$xml[0])
+
+    # Resolves conflicts between changes to this model and the remotely-changed
+    # new attributes on this model.
+    onReloaded: () ->
+      @_addItem(model, {}, false) for model in _.values(@_localAddedItems)
+
+    onSaved: () ->
+      @_localAddedItems = {}
+
+    # FIXME HACK, horrible Hack.
+    # When a remote commit occurs, all models that were changed are reloaded.
+    # The order they are reloaded is non-deterministic and a "Book"
+    # is actually represented by 2 files: the OPF and the navigation HTML.
+    # This patch ensures the navigation file is updated.
+    _monkeypatch_navModel: () ->
+
+      # Resolves conflicts between changes to this model and the remotely-changed
+      # new attributes on this model.
+      onReloaded = () =>
+        @_parseNavModel()
+        _.each @_localNavAdded, (model, path) => @addChild(model)
+
+      onSaved = () =>
+        @_localNavAdded = {}
+
+      @navModel.onReloaded = onReloaded
+      @navModel.onSaved = onSaved
+
 
     newNode: (options) ->
       model = options.model
@@ -242,7 +301,3 @@ define [
           collection: @getChildren()
           model: @
         callback(view)
-
-
-  # Mix in the loadable
-  PackageFile = PackageFile.extend loadable

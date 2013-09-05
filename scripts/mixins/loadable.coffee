@@ -42,7 +42,7 @@ define ['jquery'], ($) ->
 
     # Force a `Backbone.Collection` or `Backbone.Model` to reload its contents.
     # If in the middle of a `load` it waits until the load completes.
-    # Returns a Promise when the reload complates.
+    # Returns a Promise when the reload completes.
     reload: () ->
       # Finish reloading if loading has already started
       if @_loading
@@ -53,6 +53,9 @@ define ['jquery'], ($) ->
       else
         # For collections reset the contents to nothing
         @reset?()
-        return @load()
+        return @load().then () => @onReloaded()
+
+    # Hook to merge local unsaved changes into the remotely-updated model
+    onReloaded: () -> console.warn 'BUG: onReload SHOULD be implemented by subclasses'
 
   return loadableMixin
