@@ -42,7 +42,7 @@ define [
 
     shaObj = new jsSHA(bits, 'TEXT')
     hash = shaObj.getHash('SHA-1', 'HEX')
-    id = "resources/#{hash}#{extension}" # TODO: Make this a hash instead of a UUID
+    id = "resources/#{hash}#{extension}"
     return {
       id: id
       mediaType: mediaType
