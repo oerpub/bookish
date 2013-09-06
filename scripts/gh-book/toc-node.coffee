@@ -1,11 +1,14 @@
 define [
   'backbone'
+  'underscore'
+  'jquery'
   'cs!collections/content'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/uuid'
   'cs!models/content/inherits/saveable'
   'cs!mixins/tree'
-], (Backbone, allContent, XhtmlFile, uuid, SaveableModel, treeMixin) ->
+  'gh-book/path'
+], (Backbone, _, $, allContent, XhtmlFile, uuid, SaveableModel, treeMixin, Path) ->
 
   mediaType = 'application/vnd.org.cnx.section'
 
@@ -64,12 +67,38 @@ define [
             json = realModel.toJSON()
             json.title = newTitle
 
-            # The id of the new Content should contain the same path as the original content.
-            # This is so we do not have to rewrite all the links and images in the HTML
-            pathParts = realModel.id.split('/')
-            pathParts.pop()
-            pathParts.push(uuid())
-            json.id = pathParts.join('/')
+            # In order to place the new content in the same "book", we name it
+            # relative to the navmodel. That is, the new content will be
+            # dropped next to whatever document is the navmodel.
+            srcPath = Path.dirname(realModel.id)
+            dstPath = Path.dirname(root.navModel.id)
+            json.id = Path.normpath(dstPath + '/' + uuid())
+
+            if json.body and srcPath != dstPath
+              $elements = $(json.body)
+              changed = false
+
+              # Look for images in json.body, and rewrite them as
+              # appropriate.
+              $elements.find('img').each (idx, img) =>
+                imgpath = $(img).attr('data-src')
+                if not (/^https?:\/\//.test(imgpath) or Path.isabs imgpath)
+                  uri = Path.normpath srcPath + '/' + imgpath
+                  newuri = Path.relpath(uri, dstPath)
+                  $(img).attr('data-src', newuri)
+                  changed = true
+
+              # Look for links in json.body and rewrite them
+              $elements.find('a').each (idx, link) =>
+                linkpath = $(link).attr('href')
+                if not (/^https?:\/\//.test(linkpath) or Path.isabs linkpath)
+                  uri = Path.normpath srcPath + '/' + linkpath
+                  newuri = Path.relpath(uri, dstPath)
+                  $(link).attr('href', newuri)
+                  changed = true
+
+              if changed
+                json.body = _.pluck($elements, (ob) -> ob.outerHTML or '').join('')
 
             clone = allContent.model(json)
             clone.setNew?()
