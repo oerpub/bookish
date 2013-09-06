@@ -250,7 +250,12 @@ define [
 
       # Ignore the spine because it is defined by the navTree in EPUB3.
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
-      return {title: title, bookId: bookId}
+      return {
+        title: title
+        bookId: bookId
+        # Include original for visual diffing later
+        _original: json.content
+      }
 
     serialize: () ->
       serializer.serializeToString(@$xml[0])
