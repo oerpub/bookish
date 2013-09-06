@@ -127,8 +127,19 @@ define [
             href = $a.attr('href')
 
             path = Utils.resolvePath(contextPath, href)
-            contentModel = allContent.get path
-            throw new Error 'ERROR: File in nav missing in OPF' if not contentModel
+            contentModel = allContent.get(path)
+            # Because of remotely adding a new file and reloading files async
+            # it may be the case that the navigation document
+            # (containing a link to the new XhtmlFile)
+            # reloads before the OPF file reloads (containing the <item> which updates allContent)
+            # so we cannot assume the model is already in `allContent`
+            #
+            # In that case, just add a "shallow" model to allContent
+            if not contentModel
+              contentModel = allContent.model
+                mediaType: XhtmlFile::mediaType
+                id: path
+              allContent.add(contentModel)
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
@@ -269,7 +280,13 @@ define [
     # Resolves conflicts between changes to this model and the remotely-changed
     # new attributes on this model.
     onReloaded: () ->
-      @_addItem(model, {}, false) for model in _.values(@_localAddedItems)
+      for model in _.values(@_localAddedItems)
+        @_addItem(model, {}, false)
+        # Uggh, the dirty bit is not set because for some reason the `@$xml` still
+        # contains the locally-added <item>
+        #
+        # So, set the isDirty() bit manually
+        @_markDirty({}, true) # true == force
 
     onSaved: () ->
       @_localAddedItems = {}
