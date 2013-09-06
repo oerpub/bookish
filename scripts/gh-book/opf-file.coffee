@@ -127,8 +127,19 @@ define [
             href = $a.attr('href')
 
             path = Utils.resolvePath(contextPath, href)
-            contentModel = allContent.get path
-            throw new Error 'ERROR: File in nav missing in OPF' if not contentModel
+            contentModel = allContent.get(path)
+            # Because of remotely adding a new file and reloading files async
+            # it may be the case that the navigation document
+            # (containing a link to the new XhtmlFile)
+            # reloads before the OPF file reloads (containing the <item> which updates allContent)
+            # so we cannot assume the model is already in `allContent`
+            #
+            # In that case, just add a "shallow" model to allContent
+            if not contentModel
+              contentModel = allContent.model
+                mediaType: XhtmlFile::mediaType
+                id: path
+              allContent.add(contentModel)
 
             # Set all the titles of models in the workspace based on the nav tree
             # XhtmlModel titles are not saved anyway.
@@ -228,12 +239,18 @@ define [
 
         # Add it to the set of all content and construct the correct model based on the mimetype
         mediaType = $item.attr 'media-type'
-        path = $item.attr 'href'
-        model = allContent.model
-          # Set the path to the file to be relative to the OPF file
-          id: Utils.resolvePath(@id, path)
-          mediaType: mediaType
-          properties: $item.attr 'properties'
+        relPath = $item.attr 'href'
+        absPath = Utils.resolvePath(@id, relPath)
+
+        # Try to get the navModel if it already exists in `allContent`.
+        # Otherwise create it
+        model = allContent.get(absPath)
+        if not model
+          model = allContent.model
+            # Set the path to the file to be relative to the OPF file
+            id: absPath
+            mediaType: mediaType
+            properties: $item.attr 'properties'
 
         # Add it to the manifest and then do a batch add to `allContent`
         # at the end so the views do not re-sort on every add.
@@ -250,7 +267,12 @@ define [
 
       # Ignore the spine because it is defined by the navTree in EPUB3.
       # **TODO:** Fall back on `toc.ncx` and then the `spine` to create a navTree if one does not exist
-      return {title: title, bookId: bookId}
+      return {
+        title: title
+        bookId: bookId
+        # Include original for visual diffing later
+        _original: json.content
+      }
 
     serialize: () ->
       serializer.serializeToString(@$xml[0])
@@ -258,7 +280,13 @@ define [
     # Resolves conflicts between changes to this model and the remotely-changed
     # new attributes on this model.
     onReloaded: () ->
-      @_addItem(model, {}, false) for model in _.values(@_localAddedItems)
+      for model in _.values(@_localAddedItems)
+        @_addItem(model, {}, false)
+        # Uggh, the dirty bit is not set because for some reason the `@$xml` still
+        # contains the locally-added <item>
+        #
+        # So, set the isDirty() bit manually
+        @_markDirty({}, true) # true == force
 
     onSaved: () ->
       @_localAddedItems = {}

@@ -13,6 +13,10 @@ require.config
     jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
     'filtered-collection': "#{BOWER}/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection"
 
+    # Include the diff library
+    difflib: "#{BOWER}/jsdifflib/difflib"
+    diffview: "#{BOWER}/jsdifflib/diffview"
+
 
     mathjax: 'http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
 
@@ -126,6 +130,11 @@ require.config
         MathJax.Hub.Startup.onload()
         return MathJax
 
+    # Configure the diff library
+    difflib:  {exports:'difflib'}
+    diffview:
+      deps: ["css!#{BOWER}/jsdifflib/diffview"]
+      exports:'diffview'
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).

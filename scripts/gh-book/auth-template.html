@@ -1,7 +1,19 @@
 {{#if canCollaborate}}
-<button id="save-content" type="button" class="btn {{#if isDirty}}btn-primary{{else}}disabled{{/if}}" data-placement="bottom" data-toggle="tooltip" title="Save all changes">
-  <i class="icon-save"></i> Save
-</button>
+<div class="btn-group">
+  <button id="save-content" type="button" class="btn {{#if isDirty}}btn-primary{{else}}disabled{{/if}}" data-placement="bottom" data-toggle="tooltip" title="Save all changes">
+    <i class="icon-save"></i> Save
+  </button>
+  <button class="btn dropdown-toggle {{#if isDirty}}btn-primary{{else}}disabled{{/if}}" data-toggle="dropdown">
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li>
+      <button id="show-diffs" type="button" class="btn btn-link" data-placement="bottom" data-toggle="tooltip" title="Show Changes that will be Saved">
+        <i class="icon-"></i> Show Unsaved Changes
+      </button>
+    </li>
+  </ul>
+</div>
 {{else}}
 <!-- <button id="fork-content" type="button" class="btn btn-success" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
   <i class="icon-code-fork"></i> Fork This Book!
@@ -105,3 +117,18 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
   </div>
 </div>
+
+
+<!-- Diffs Modal -->
+<div id="diffs-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="diffs-modal-label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="diffs-modal-label">Unsaved Changes</h3>
+  </div>
+  <div class="modal-body" style="font-size: x-small;">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
+

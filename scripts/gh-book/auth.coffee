@@ -1,11 +1,14 @@
 define [
+  'jquery'
   'marionette'
   'cs!collections/content'
   'cs!session'
   'hbs!gh-book/auth-template'
+  'difflib'
+  'diffview'
   'bootstrapModal'
   'bootstrapCollapse'
-], (Marionette, allContent, session, authTemplate) ->
+], ($, Marionette, allContent, session, authTemplate, difflib, diffview) ->
 
   return class GithubAuthView extends Marionette.ItemView
     template: authTemplate
@@ -19,6 +22,7 @@ define [
       'click #edit-settings': 'editSettingsModal'
       'click #edit-settings-ok': 'editSettings'
       'submit #login-form': 'signIn'
+      'click #show-diffs': 'showDiffsModal'
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
@@ -63,6 +67,50 @@ define [
       $modal.on 'hidden', () => @trigger 'close'
 
       # Show the modal
+      $modal.modal {show:true}
+
+    # Show a diff of all unsaved models
+    showDiffsModal: () ->
+      $modal = @$el.find('#diffs-modal')
+
+      $body = $modal.find('.modal-body').empty()
+
+      changedModels = allContent.filter (model) -> model.isDirty()
+
+      for model in changedModels
+
+        if model.isBinary
+          $body.append("<div>Binary File: #{model.id}</div>")
+
+        else
+
+          # get the baseText and newText values from the two textboxes, and split them into lines
+          base = difflib.stringAsLines(model.get('_original') or '')
+          newtxt = difflib.stringAsLines(model.serialize())
+
+          # create a SequenceMatcher instance that diffs the two sets of lines
+          sm = new difflib.SequenceMatcher(base, newtxt)
+
+          # get the opcodes from the SequenceMatcher instance
+          # opcodes is a list of 3-tuples describing what changes should be made to the base text
+          # in order to yield the new text
+          opcodes = sm.get_opcodes()
+
+          diffoutputdiv = $('<div></div>').appendTo($body)
+          contextSize = 3
+
+          # build the diff view and add it to the current DOM
+          diffoutputdiv.append diffview.buildView
+            baseTextLines: base
+            newTextLines: newtxt
+            opcodes: opcodes
+
+            # set the display titles for each resource
+            baseTextName: "#{model.get('title') or ''} #{model.id}"
+            newTextName: 'changes'
+            contextSize: contextSize
+            viewType: 1 # inline
+
       $modal.modal {show:true}
 
 
