@@ -20,6 +20,7 @@ define [
       @isLoaded = @model.isNew()
 
       # images only have to be loaded the first time
+      # FIXME: This mess of Deferreds needs to be cleaned up. `XhtmlModel._loadComplex` comes to mind.
       if @model.get(@modelKey)?.length
         @imagesLoaded = (new $.Deferred()).resolve()
       else
@@ -33,8 +34,20 @@ define [
         $(window).unbind 'oer.images.loaded'
         @imagesLoaded.resolve()
 
-      @listenTo @model, "change:#{@modelKey}", =>
-        @contentLoaded.resolve() if @model.get(@modelKey)?.length
+      @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
+        return if options.internalAlohaUpdate
+
+        if @model.get(@modelKey)?.length
+          # FIXME: SHould **not** depend on the state of the promise.
+          if 'resolved' == @contentLoaded.state()
+            if @model.isDirty()
+              console.log('Discarding local changes because of remote commit')
+            else
+              console.log('Updating local content because of remote changes (but there were no local changes)')
+            @render()
+          else
+            @contentLoaded.resolve()
+
 
       # if content is already present change will never fire
       # so check that and conditionally finish the content loading as well
