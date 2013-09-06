@@ -228,12 +228,18 @@ define [
 
         # Add it to the set of all content and construct the correct model based on the mimetype
         mediaType = $item.attr 'media-type'
-        path = $item.attr 'href'
-        model = allContent.model
-          # Set the path to the file to be relative to the OPF file
-          id: Utils.resolvePath(@id, path)
-          mediaType: mediaType
-          properties: $item.attr 'properties'
+        relPath = $item.attr 'href'
+        absPath = Utils.resolvePath(@id, relPath)
+
+        # Try to get the navModel if it already exists in `allContent`.
+        # Otherwise create it
+        model = allContent.get(absPath)
+        if not model
+          model = allContent.model
+            # Set the path to the file to be relative to the OPF file
+            id: absPath
+            mediaType: mediaType
+            properties: $item.attr 'properties'
 
         # Add it to the manifest and then do a batch add to `allContent`
         # at the end so the views do not re-sort on every add.
