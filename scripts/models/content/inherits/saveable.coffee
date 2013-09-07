@@ -13,14 +13,27 @@
 #   when items are added/removed/reset.
 define ['backbone'], (Backbone) ->
 
+  INTERNAL_ATTRIBUTES = [
+    '_original'
+  ]
+
   return class Saveable extends Backbone.Model
     initialize: () ->
-      @on 'sync',   (model, options) => @_isDirty = false
-
       # FIXME: To reduce the number of change events (view render), either:
       # - include the `dateLastModified` in the set of changes by wrapping `Backbone.set`
       # - update view code so it does not have to re-render; it would change the rendered DOM directly
-      @on 'change', (model, options) => @_markDirty(options)
+      @on 'change', (model, options) =>
+        # Do not mark dirty if only "_*" attributes are changed
+        if _.isEmpty _.omit model.changedAttributes(), INTERNAL_ATTRIBUTES
+          # Pass because only internal attributes were changed
+        else if options.parse
+          # Pass because this model is being set by `parse()`
+        else
+          @_markDirty(options)
+
+      # When fetching, save the original content **before**
+      # it has gone through `parse()` and `serialize()`
+      @on 'sync', (model, resp, options) => @set('_original', resp.content)
 
       if @isNew()
         @loaded = true
@@ -48,3 +61,8 @@ define ['backbone'], (Backbone) ->
 
         @set 'dateLastModifiedUTC', (new Date()).toJSON(), options
 
+    onSaved: () ->
+      # If the content was just added, squirrel away the content into _ooriginal for visual Diffing later
+      @set('_original', @serialize?())
+      @_isDirty = false
+      @_isNew = false # Set in loadable
