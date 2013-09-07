@@ -280,11 +280,10 @@ define [
     onReloaded: () ->
       for model in _.values(@_localAddedItems)
         @_addItem(model, {}, false)
-        # Uggh, the dirty bit is not set because for some reason the `@$xml` still
-        # contains the locally-added <item>
-        #
-        # So, set the isDirty() bit manually
-        @_markDirty({}, true) # true == force
+
+      isDirty = not _.isEmpty(@_localAddedItems)
+      return isDirty
+
 
     onSaved: () ->
       super()
@@ -302,6 +301,9 @@ define [
       onReloaded = () =>
         @_parseNavModel()
         _.each @_localNavAdded, (model, path) => @addChild(model)
+
+        isDirty = not _.isEmpty(@_localNavAdded)
+        return isDirty
 
       onSaved = () =>
         # Call 'Saveable.onSave' (super)

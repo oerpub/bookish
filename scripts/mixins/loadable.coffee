@@ -53,9 +53,16 @@ define ['jquery'], ($) ->
       else
         # For collections reset the contents to nothing
         @reset?()
-        return @load().then () => @onReloaded()
+        return @load().then () =>
+          isDirty = @onReloaded()
+          @set
+            _hasRemoteChanges: true
+            _isDirty: isDirty
+
 
     # Hook to merge local unsaved changes into the remotely-updated model
-    onReloaded: () -> console.warn 'BUG: onReload SHOULD be implemented by subclasses'
+    onReloaded: () ->
+      console.warn 'BUG: onReload SHOULD be implemented by subclasses'
+      return false # Does **not** have local changes
 
   return loadableMixin

@@ -26,6 +26,14 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
       options.title = options.title or @model.get 'title'
       super(options)
 
+    # Pass through all model attributes except the title (if it is set)
+    toJSON: () ->
+      json = @model.toJSON()
+      # If the title is overridden, change it in the json
+      title = @get('title')
+      json.title = title if title
+      return json
+
     # Returns the model this points to.
     # Existence of this method means this is a pointer node
     dereferencePointer: () -> @model
