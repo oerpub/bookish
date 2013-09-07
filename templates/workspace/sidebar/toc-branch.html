@@ -23,14 +23,18 @@
 
 
     {{#if _isDirty}}
-      <span class="is-dirty" title="This has unsaved changes">
-        <i class="icon-asterisk"></i>
-      </span>
+      <small class="toc-badge">
+        <span class="is-dirty" title="This has unsaved changes">
+          <i class="icon-asterisk"></i>
+        </span>
+      </small>
     {{/if}}
     {{#if _hasRemoteChanges}}
-      <span class="has-remote-changes" title="This has been changed by someone else">
-        <i class="icon-refresh"></i>
-      </span>
+      <small class="toc-badge">
+        <span class="has-remote-changes" title="This has been changed by someone else">
+          <i class="icon-refresh"></i>
+        </span>
+      </small>
     {{/if}}
 
 
@@ -48,14 +52,18 @@
       </span>
 
       {{#if _isDirty}}
-        <span class="is-dirty" title="This has unsaved changes">
-          <i class="icon-asterisk"></i>
-        </span>
+        <small class="toc-badge">
+          <span class="is-dirty" title="This has unsaved changes">
+            <i class="icon-asterisk"></i>
+          </span>
+        </small>
       {{/if}}
       {{#if _hasRemoteChanges}}
-        <span class="has-remote-changes" title="This has been changed by someone else">
-          <i class="icon-refresh"></i>
-        </span>
+        <small class="toc-badge">
+          <span class="has-remote-changes" title="This has been changed by someone else">
+            <i class="icon-refresh"></i>
+          </span>
+        </small>
       {{/if}}
     </span>
   </span>

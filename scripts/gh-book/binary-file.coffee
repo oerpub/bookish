@@ -19,7 +19,7 @@ define [
 
     parse: (json) ->
 
-      @sha = json.sha
+      @blobSha = json.sha
       bytes = json.content
 
       # The result of a Github PUT is an object instead of the new state of the model.

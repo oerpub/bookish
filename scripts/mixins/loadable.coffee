@@ -51,13 +51,23 @@ define ['jquery'], ($) ->
           return @reload()
 
       else
+        oldContent = @serialize()
         # For collections reset the contents to nothing
         @reset?()
         return @load().then () =>
-          isDirty = @onReloaded()
-          @set
-            _hasRemoteChanges: true
-            _isDirty: isDirty
+
+          if oldContent != @serialize()
+
+            isDirty = @onReloaded()
+            @set
+              _hasRemoteChanges: true
+              _isDirty: isDirty
+
+          else
+            # Otherwise, clear the bits just to be safe
+            @set
+              _hasRemoteChanges: false
+              _isDirty: false
 
 
     # Hook to merge local unsaved changes into the remotely-updated model

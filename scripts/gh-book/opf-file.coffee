@@ -209,11 +209,11 @@ define [
 
     parse: (json) ->
       # Shortcut to not override local changes if remote model did not change
-      return if @commitSha == json.sha
+      return if @blobSha == json.sha
 
       # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
       # Save the commit sha so we can compare when a remote update occurs
-      @commitSha = json.sha
+      @blobSha = json.sha
 
       xmlStr = json.content
 
