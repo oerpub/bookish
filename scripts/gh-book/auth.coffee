@@ -26,7 +26,12 @@ define [
 
     initialize: () ->
       # When a model has changed (triggered `dirty`) update the Save button
-      @listenTo allContent, 'change:_isDirty', (model, options) => @setDirty()
+      @listenTo allContent, 'change:_isDirty', (model, value, options) =>
+        if value
+          @setDirty()
+        else
+          # This element may have been the only one to have the dirty bit set, and it was just cleared
+          @render()
       # Update the Save button when new Folder/Book/Module is created (added to `allContent`)
       @listenTo allContent, 'add remove', (model, collection, options) =>
         @setDirty() if not (options.loading or options.parse)

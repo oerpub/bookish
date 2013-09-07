@@ -30,6 +30,10 @@ define [
 
       @_initializeTreeHandlers(options)
 
+    # Prevent the asterisk since TocNode elements are not actually Saveable (but OPF is)
+    # TODO: Fix this once the editor can create new OPF files
+    isNew: () -> false
+
     # Views rely on the mediaType to be set in here
     # TODO: Fix it in the view's `templateHelpers`
     toJSON: () ->
