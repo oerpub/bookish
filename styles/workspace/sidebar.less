@@ -242,10 +242,10 @@
     .editor-node-body {
       &:hover {
         background-color: #eee;
-        .edit-settings { visibility: visible; }
+        .edit-settings { display: inherit; }
       }
 
-      .edit-settings { visibility: hidden; }
+      .edit-settings { display: none; }
     }
   }
 
@@ -255,9 +255,9 @@
       font-size: 1.15em;
     }
 
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    height: 100%;
   }
 
   #workspace-sidebar-toc {
@@ -299,8 +299,6 @@
       // Make the icon a collapsed arrow (if it contains children)
       > .editor-node-body > .editor-expand-collapse > .icon-content::before {
         content: "\f0da"; /* icon-caret-right */
-        font-size: 22px;
-        color: #0e807d;
       }
       // Hide the children
       > ol { display: none; }
@@ -311,8 +309,6 @@
       // Make the icon a collapsed arrow (if it contains children)
       > .editor-node-body > .editor-expand-collapse > .icon-content::before {
         content: "\f0d7"; /* icon-caret-down */
-        font-size: 22px;
-        color: #0e807d;
       }
       // Show the children
       > ol { display: block; }
@@ -340,3 +336,212 @@
 #menu, #content {
     border-left: 1px solid #999;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+aside {
+  // Allow vertical scrolling
+  height: 100%;
+
+
+  //.boxed-group {
+  position: relative;
+  background: #efefef;
+  padding: 3px;
+  border-radius: 3px;
+  margin: 0 0 15px 0;
+  //}
+
+
+  // Indent nested lists in this way so:
+  // 1. the horizontal bars stretch across the whole width
+  // 2. edit buttons on the right are still lined up
+  nav > ol ol { padding: 0; margin: 0; }
+  nav > ol ol > li > *:first-child { padding-left: 20px; }
+  nav > ol ol ol > li > *:first-child { padding-left: 40px; }
+
+  // for each level in the tree decrease the size of allowable text by how much is indented
+  // so the ellipsis show up in the right place
+  nav > ol > li .editor-node-title { max-width: 230px; }
+  nav > ol ol > li .editor-node-title { max-width: 215px; }
+  nav > ol ol ol ol > li .editor-node-title { max-width: 200px; }
+  nav > ol ol ol ol ol > li .editor-node-title { max-width: 185px; }
+
+
+  // When a list item is expanded there is no dropzone just below it to add padding
+  // so manually add in some padding
+  li.editor-node-expanded > .editor-node-body {
+    margin-bottom: 6px;
+  }
+
+
+  .add-content,
+  .boxed-group>h3, .boxed-group .heading {
+    background-color: #e0e0e0;
+    background-image: -moz-linear-gradient(#fafafa, #e0e0e0);
+    background-image: -webkit-linear-gradient(#fafafa, #e0e0e0);
+    background-image: linear-gradient(#fafafa, #e0e0e0);
+    background-repeat: repeat-x;
+    margin: 0;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border: 1px solid #d8d8d8;
+    border-bottom: none;
+    padding: 10px 10px 11px 10px;
+    font-size: 14px;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .workspace-sidebar,
+  .boxed-group .boxed-group-inner {
+    padding: 1px 10px;
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    border-top: 1px solid #ccc;
+    border-bottom-left-radius: 1px;
+    border-bottom-right-radius: 1px;
+    color: #666;
+    font-size: 13px;
+  }
+
+  nav > ol,
+  .boxed-group-list {
+    list-style: none;
+    margin: 0;
+
+    padding: 0;
+  }
+
+
+  nav ol > li,
+  .boxed-group-list>li {
+    display: block;
+    margin-left: -10px;
+    width: 100%;
+    padding: 5px 10px 0;
+    line-height: 23px;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  .editor-node-body {
+    white-space: nowrap;
+  }
+  nav ol > li a,
+  .editor-node-title {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* Max width is set based on the <li> nesting depth */
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .boxed-group-list>li .minibutton {
+    float: right;
+    margin: -1px 0 0 10px;
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .context-button {
+    position: relative;
+    //width: 12px;
+    //height: 22px;
+    line-height: 23px;
+    //font: normal normal 16px "octicons";
+    line-height: 1;
+    display: inline-block;
+    text-decoration: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .minibutton {
+    padding: 0 10px;
+    line-height: 24px;
+    box-shadow: none;
+
+    outline: none;
+  }
+
+  nav li .btn-mini.pull-right,
+  .button, .minibutton {
+    position: relative;
+    display: inline-block;
+    //padding: 7px 15px;
+    //font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    white-space: nowrap;
+    background-color: #eaeaea;
+    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+    background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+    background-image: linear-gradient(#fafafa, #eaeaea);
+    background-repeat: repeat-x;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    border-bottom-color: #c5c5c5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+  }
+
+
+  nav li .btn-mini.pull-right:before,
+  .context-button:before {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    /*content: "\f02f";*/
+    display: block;
+    padding: 0;
+    font-size: 16px;
+    line-height: 16px;
+  }
+
+  /*
+  nav li .btn-mini.pull-right:after,
+  .context-button:after {
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border: 3px solid #000;
+  border-color: #000 transparent transparent;
+  }
+  */
+
+  .add-content:before {
+    content: "Table of contents";
+  }
+
+  .btn-group {
+    float: right;
+  }
+
+
+}
+
+
