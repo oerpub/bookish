@@ -32,7 +32,7 @@ define [
       @listenTo(session, 'login logout', @render)
 
       # When a model has changed (triggered `dirty`) update the Save button
-      @listenTo content, 'dirty', (model, options) => @changed()
+      @listenTo content, 'change:_isDirty', (model, options) => @changed()
       # Update the Save button when new Folder/Book/Module is created (added to `content`)
       @listenTo content, 'add remove', (model, collection, options) =>
         @changed() if not (options.loading or options.parse)

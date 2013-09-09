@@ -15,6 +15,8 @@ define ['backbone'], (Backbone) ->
 
   INTERNAL_ATTRIBUTES = [
     '_original'
+    '_isDirty'
+    '_hasRemoteChanges'
   ]
 
   return class Saveable extends Backbone.Model
@@ -41,7 +43,7 @@ define ['backbone'], (Backbone) ->
 
 
     isDirty: () ->
-      return @isNew() or @_isDirty
+      return @isNew() or @get('_isDirty')
 
     _markDirty: (options, force=false) ->
       throw 'BUG: markDirty takes 1 argument' if not options
@@ -52,8 +54,7 @@ define ['backbone'], (Backbone) ->
       # In both cases, do not set the lastModified time.
       if (not options.parse and @hasChanged()) or force
         # Mark this model as dirty and trigger an event
-        @_isDirty = true
-        @trigger 'dirty'
+        @set('_isDirty', true)
 
         # Prevent the next set from triggering this event handler indefinitely.
         # This hack can be removed if FIXME #1 is used.
@@ -63,6 +64,9 @@ define ['backbone'], (Backbone) ->
 
     onSaved: () ->
       # If the content was just added, squirrel away the content into _ooriginal for visual Diffing later
-      @set('_original', @serialize?())
-      @_isDirty = false
+      @set
+        _original: @serialize?()
+        _hasRemoteChanges: false
+        _isDirty: false
+
       @_isNew = false # Set in loadable

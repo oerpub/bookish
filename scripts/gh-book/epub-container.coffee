@@ -58,6 +58,8 @@ define [
 
       return @children.reset(ret, {loading:true})
 
+    serialize: () -> console.warn('BUG: Do not know how to serialize EPUBContainer yet')
+
     # Called by `loadableMixin.reload` when the repo settings change
     reset: () -> @children.reset()
 
