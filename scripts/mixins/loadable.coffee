@@ -58,7 +58,7 @@ define ['jquery'], ($) ->
 
           if oldContent != @serialize()
 
-            isDirty = @onReloaded()
+            isDirty = @onReloaded(oldContent)
             @set
               _hasRemoteChanges: true
               _isDirty: isDirty
@@ -71,7 +71,8 @@ define ['jquery'], ($) ->
 
 
     # Hook to merge local unsaved changes into the remotely-updated model
-    onReloaded: () ->
+    # `oldContent` the serialized content before remote content was fetched
+    onReloaded: (oldContent) ->
       console.warn 'BUG: onReload SHOULD be implemented by subclasses'
       return false # Does **not** have local changes
 
