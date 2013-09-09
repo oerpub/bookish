@@ -75,6 +75,9 @@ define [
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
 
     templateHelpers: () ->
+      # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
+      model = @model.navModel or @model
+
       return {
         mediaType: @model.mediaType
         hasParent: !! @model.getParent?()
@@ -82,6 +85,9 @@ define [
         isExpanded: @expanded
         # Look up the overridden title
         title: @container?.getTitle?(@model) or @model.get('title')
+        # Possibly delegate to the navModel for dirty bits
+        _isDirty: model.get('_isDirty')
+        _hasRemoteChanges: model.get('_hasRemoteChanges')
       }
 
     # Override internal Marionette method.

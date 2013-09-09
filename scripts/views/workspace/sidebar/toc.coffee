@@ -18,8 +18,28 @@ define [
       else
         @collection = allContent
 
+
+      # When the model updates, re-render the view
+      if @model
+        if @model.navModel
+          @listenTo @model.navModel, 'change', (model, options) =>
+            model.changedAttributes()
+            if model.changedAttributes ['_isDirty', '_hasRemoteChanges']
+              @render() # FIXME: Copypasta renderModelOnly from toc-branch
+
+        @listenTo @model, 'change:title', (model, value, options) =>
+          @render() # FIXME: Copypasta renderModelOnly from toc-branch
+
+
     templateHelpers: () ->
-      return {mediaType: @model?.mediaType}
+      # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
+      model = @model?.navModel or @model
+
+      return {
+        mediaType: @model?.mediaType
+        _isDirty: model?.get('_isDirty')
+        _hasRemoteChanges: model?.get('_hasRemoteChanges')
+      }
 
     # Used by TocBranchView to know which collection to ask for an overridden title
     itemViewOptions: () ->
