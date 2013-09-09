@@ -126,7 +126,7 @@ define [
       return if @blobSha == json.sha
 
       # Save the commit sha so we can compare when a remote update occurs
-      @blobSha = json.sha
+      @blobSha = json.sha or @blobSha # `json.sha` may be null (see onReloaded calling parse)
       html = json.content
 
       # If the parse is a result of a write then update the sha.
@@ -311,3 +311,19 @@ define [
           <body>#{bodyHtml?.trim() or ''}</body>
         </html>
         """
+
+    # Hook to merge local unsaved changes into the remotely-updated model
+    onReloaded: (oldContent) ->
+      if @get('_isDirty')
+        useRemote = confirm("#{@get('title') or @id} was changed by someone else and by you. Do you want to change to the version saved by someone else?")
+        if useRemote
+          # All the work has already been done
+          return false
+        else
+          # Reparse using the original content plus the new blob sha (leave it unchanged)
+          # The {} matches what octokit would return.
+          # Send a special null sha to tell parse to continue parsing but keep the remotely-updated sha as the blobSha
+          @set @parse({sha:null, content:oldContent})
+          return true
+      else
+        return false # Does **not** have local changes

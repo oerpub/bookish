@@ -31,6 +31,10 @@ define [
           @setDirty()
         else
           # This element may have been the only one to have the dirty bit set, and it was just cleared
+
+          # Recalculate the dirty bit
+          @isDirty = allContent.some (model) -> model.isDirty()
+
           @render()
       # Update the Save button when new Folder/Book/Module is created (added to `allContent`)
       @listenTo allContent, 'add remove', (model, collection, options) =>
@@ -49,7 +53,7 @@ define [
 
       # Since this View is reloaded all the time (whenever a route change occurs)
       # re-set the `isDirty` bit.
-      @isDirty = true if allContent.some (model) -> model.isDirty()
+      @isDirty = allContent.some (model) -> model.isDirty()
 
     templateHelpers: () ->
       return {
