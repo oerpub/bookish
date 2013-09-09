@@ -189,8 +189,6 @@ define [
       attributes =
         head: $head[0]?.innerHTML.trim()
         body: $body[0]?.innerHTML.trim()
-        # Include original for visual diffing later
-        _original: json.content
 
       # Set the title that is in the `<head>`
       # TODO: Re-enable after the sprint

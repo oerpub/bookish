@@ -270,8 +270,6 @@ define [
       return {
         title: title
         bookId: bookId
-        # Include original for visual diffing later
-        _original: json.content
       }
 
     serialize: () ->
@@ -289,6 +287,7 @@ define [
         @_markDirty({}, true) # true == force
 
     onSaved: () ->
+      super()
       @_localAddedItems = {}
 
     # FIXME HACK, horrible Hack.
@@ -305,6 +304,9 @@ define [
         _.each @_localNavAdded, (model, path) => @addChild(model)
 
       onSaved = () =>
+        # Call 'Saveable.onSave' (super)
+        XhtmlFile::onSaved.bind(@navModel)()
+
         @_localNavAdded = {}
 
       @navModel.onReloaded = onReloaded
