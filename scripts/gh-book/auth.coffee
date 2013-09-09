@@ -168,9 +168,15 @@ define [
 
     # Save the collection of media in a single batch
     saveContent: () ->
-      allContent.save().done () =>
+      $saveBtn = @$('#save-content')
+      $saveBtn.addClass('disabled saving')
+      promise = allContent.save()
+      promise.always () =>
+        $saveBtn.removeClass('disabled saving')
+      promise.done () =>
         @isDirty = false
         @render()
+
 
     # Show the "Edit Settings" modal
     editSettingsModal: () ->
