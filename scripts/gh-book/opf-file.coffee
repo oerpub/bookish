@@ -47,7 +47,7 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
-      @getChildren().on 'tree:change add remove', (model, collection, options) =>
+      @getChildren().on 'change add remove tree:change tree:add tree:remove', (model, collection, options) =>
         setNavModel(options)
       @getChildren().on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
