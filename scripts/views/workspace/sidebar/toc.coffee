@@ -21,14 +21,10 @@ define [
 
       # When the model updates, re-render the view
       if @model
-        if @model.navModel
-          @listenTo @model.navModel, 'change', (model, options) =>
-            model.changedAttributes()
-            if model.changedAttributes ['_isDirty', '_hasRemoteChanges']
-              @render() # FIXME: Copypasta renderModelOnly from toc-branch
-
         @listenTo @model, 'change:title', (model, value, options) =>
-          @render() # FIXME: Copypasta renderModelOnly from toc-branch
+          @render() # FIXME: reimplement renderModelOnly() from toc-branch
+
+      super(options)
 
 
     templateHelpers: () ->
@@ -61,4 +57,4 @@ define [
     changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
-      @render()
+      @render() # FIXME: reimplement renderModelOnly() from toc-branch
