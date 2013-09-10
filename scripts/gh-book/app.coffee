@@ -173,6 +173,9 @@ define [
 
       session.getBranch().writeMany(changedFiles, commitText, parentCommitSha)
       .done((val) =>
+        # Update the lastSeenSha so we do not load the commit we just made
+        remoteUpdater.lastSeenSha = val.sha
+
         # Fire the onSave event on all the changed models
         _.map models, (model) -> model.onSaved?()
         promise.resolve(val)
