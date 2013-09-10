@@ -9,6 +9,8 @@ define [
   'cs!gh-book/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
+  SAVE_DELAY = 10 # ms
+
   # Mix in the loadable
   return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
@@ -101,6 +103,18 @@ define [
         @_parseNavModel()
         @listenTo @navModel, 'change:body', (model, value, options) =>
           @_parseNavModel() if not options.doNotReparse
+
+        # Autosave whenever something in the ToC changes (not the dirty bits)
+        @listenTo @navModel, 'change', (model, options) =>
+          return if options.parse
+          if not _.isEmpty _.omit model.changedAttributes(), ['_isDirty', '_hasRemoteChanges', '_original', 'dateLastModifiedUTC']
+            # Delay the save a little bit because a move is a remove + add
+            # which would otherwise cause 2 saves
+            clearTimeout(@_savingTimeout)
+            @_savingTimeout = setTimeout (() =>
+              allContent.save(@navModel, false, true) # include-resources, include-new-files
+              delete @_savingTimeout
+            ), SAVE_DELAY
 
 
     _parseNavModel: () ->
@@ -208,13 +222,6 @@ define [
 
 
     parse: (json) ->
-      # Shortcut to not override local changes if remote model did not change
-      return if @blobSha == json.sha
-
-      # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
-      # Save the commit sha so we can compare when a remote update occurs
-      @blobSha = json.sha
-
       xmlStr = json.content
 
       # If the parse is a result of a write then update the sha.
