@@ -59,15 +59,11 @@ define ['jquery'], ($) ->
           if oldContent != @serialize()
 
             isDirty = @onReloaded(oldContent)
-            @set
-              _hasRemoteChanges: true
-              _isDirty: isDirty
+            @set {_hasRemoteChanges: true, _isDirty: isDirty} , {parse:true}
 
           else
             # Otherwise, clear the bits just to be safe
-            @set
-              _hasRemoteChanges: false
-              _isDirty: false
+            @set {_hasRemoteChanges: false, _isDirty: false} , {parse:true}
 
 
     # Hook to merge local unsaved changes into the remotely-updated model
