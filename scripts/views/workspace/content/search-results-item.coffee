@@ -30,11 +30,10 @@ define [
         id: @model.id or @model.cid
         mediaType: @model.mediaType
         isLoaded: @isLoaded
-        isDirty: @model.isDirty()
       }
 
     initialize: () ->
-      @listenTo(@model, 'dirty change sync', @render)
+      @listenTo(@model, 'change sync', @render)
       @listenTo(@, 'render show', @startUpdateTimer)
 
     onRender: () ->

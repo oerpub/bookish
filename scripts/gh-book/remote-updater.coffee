@@ -4,7 +4,7 @@ define [
   'cs!collections/content'
 ], ($, session, allContent) ->
 
-  UPDATE_TIMEOUT = 60 * 1000 # Update every minute
+  UPDATE_TIMEOUT = 15 * 1000 # Update 15 seconds
 
   # Returns a promise that is resolved once all promises in the array `promises`
   # are resolved.
@@ -62,23 +62,21 @@ define [
                 commitSha = commit.sha
                 dateCommittedUTC = commit.commit.author.date
 
-                return allContent.load().then () =>
-                  # Collect all the model load (and update) promises
-                  # so the `lastSeenSha` is updated after they have been updated
-                  promises = _.compact _.map commit.files, (file) =>
-                    filePath = file.filename
-                    model = allContent.get(filePath)
+                # Collect all the model load (and update) promises
+                # so the `lastSeenSha` is updated after they have been updated
+                promises = _.compact _.map commit.files, (file) =>
+                  filePath = file.filename
+                  model = allContent.get(filePath)
 
-                    if model
-                      modelSha = model.commitSha
-                      if modelSha and commitSha and modelSha != commitSha
-                        # TODO: Just invalidate the model by clearing `isLoaded`
-                        return model.reload().then () =>
-                          attributes =
-                            dateLastModifiedUTC: dateCommittedUTC
-                            lastEditedBy: commit.author.login
+                  if model
+                    # TODO: Just invalidate the model by clearing `isLoaded`
+                    return model.reload().then () =>
+                      attributes =
+                        dateLastModifiedUTC: dateCommittedUTC
+                        lastEditedBy: commit.author.login
 
-                          return model.set attributes, {parse:true}
+                      return model.set attributes, {parse:true}
 
-                  return onceAll(promises)
+                return onceAll(promises)
+
             return onceAll(commitsPromises).then () => @lastSeenSha = lastSeenSha

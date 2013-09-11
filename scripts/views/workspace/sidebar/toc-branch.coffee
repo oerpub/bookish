@@ -6,28 +6,21 @@ define [
   'hbs!templates/workspace/sidebar/toc-branch'
 ], ($, Marionette, controller, EnableDnD, tocBranchTemplate) ->
 
-  return class TocBranchView extends Marionette.CompositeView
-    tagName: 'li'
-    itemViewContainer: '> ol'
-
+  # This class introduces a `renderModelOnly()` method that will
+  # re-render only the Model part of the CompositeView.
+  #
+  # **NOTE**: It requires that the `itemViewContainer` be a child (**not descendant**)
+  # in order to work!
+  class SmartCompositeView extends Marionette.CompositeView
     initialize: (options) ->
-      @template = (data) =>
-        data.id = @model.id or @model.cid
-        return tocBranchTemplate(data)
 
-      @collection = @model.getChildren?()
-      # Brought in by either toc's itemViewOptions or tocBranch's itemViewOptions
-      @container = options.container
-
-      @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
+      if @model
+        @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
 
       if @collection
         # Figure out if the expanded state has changed (see if we need to re-render the model)
         @listenTo @collection, 'add', (model, collection, options) => @renderModelOnly() if @collection.length == 1
         @listenTo @collection, 'remove', (model, collection, options) => @renderModelOnly() if @collection.length == 0
-
-    # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> {container: @collection}
 
     renderModelOnly: () ->
       # **DO NOT** just detach children. They (and descendants) will
@@ -67,23 +60,6 @@ define [
         @$el.removeClass('editor-node-expanded')
       return result
 
-    onRender: () ->
-      # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
-
-      if @model.getParent?()
-        EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
-
-    templateHelpers: () ->
-      return {
-        mediaType: @model.mediaType
-        hasParent: !! @model.getParent?()
-        hasChildren: !! @model.getChildren?()?.length
-        isExpanded: @expanded
-        # Look up the overridden title
-        title: @container?.getTitle?(@model) or @model.get('title')
-      }
-
     # Override internal Marionette method.
     # This method adds a child list item at a given index.
     appendHtml: (cv, iv, index)->
@@ -93,22 +69,6 @@ define [
         iv.$el.insertBefore($prevChild)
       else
         $container.append(iv.el)
-
-    events:
-      # The `.editor-node-body` is needed because `li` elements render differently
-      # when there is a space between `<li>` and the first child.
-      # `.editor-node-body` ensures there is never a space.
-      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
-      'click > .editor-node-body > .edit-settings': 'editSettings'
-      'click > .editor-node-body .go-edit': 'goEdit'
-
-    goEdit: () ->
-      # Edit the model in the context of this folder/book. Explicitly close
-      # the picker. This is initiated from here because at this point we're
-      # certain that the request to edit was initiated by a click in the
-      # toc/picker.
-      controller.layout.showWorkspace(false)
-      controller.goEdit(@model, @model.getRoot?())
 
     # Toggle expanded/collapsed in the View
     # -------
@@ -149,8 +109,72 @@ define [
       @model.expanded = expanded
       @render()
 
+
+  return class TocBranchView extends SmartCompositeView
+    tagName: 'li'
+    itemViewContainer: '> ol'
+
+    initialize: (options) ->
+      @template = (data) =>
+        data.id = @model.id or @model.cid
+        return tocBranchTemplate(data)
+
+      @collection = @model.getChildren?()
+      # Brought in by either toc's itemViewOptions or tocBranch's itemViewOptions
+      @container = options.container
+
+      super(options)
+
+    # Pass down the Book so we can look up the overridden title
+    itemViewOptions: () -> {container: @collection}
+
+
+    onRender: () ->
+      # Add DnD options to content
+      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+
+      if @model.getParent?()
+        EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
+
+    templateHelpers: () ->
+      # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
+      # The cases below are:
+      #
+      # 1. TocPointerNode
+      # 2. OpfFile
+      model = @model.dereferencePointer?() or @model.navModel or @model
+
+      return {
+        mediaType: @model.mediaType
+        hasParent: !! @model.getParent?()
+        hasChildren: !! @model.getChildren?()?.length
+        isExpanded: @expanded
+        # Look up the overridden title
+        title: @container?.getTitle?(@model) or @model.get('title')
+        # Possibly delegate to the navModel for dirty bits
+        _isDirty: model.get('_isDirty')
+        _hasRemoteChanges: model.get('_hasRemoteChanges')
+      }
+
+    events:
+      # The `.editor-node-body` is needed because `li` elements render differently
+      # when there is a space between `<li>` and the first child.
+      # `.editor-node-body` ensures there is never a space.
+      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
+      'click > .editor-node-body > .edit-settings': 'editSettings'
+      'click > .editor-node-body .go-edit': 'goEdit'
+
+    goEdit: () ->
+      # Edit the model in the context of this folder/book. Explicitly close
+      # the picker. This is initiated from here because at this point we're
+      # certain that the request to edit was initiated by a click in the
+      # toc/picker.
+      controller.layout.showWorkspace(false)
+      controller.goEdit(@model, @model.getRoot?())
+
+
     editSettings: ->
       title = prompt('Edit Title:', @model.getTitle?(@container) or @model.get('title'))
       if title then @model.setTitle?(@container, title) or @model.set('title', title)
 
-      @render()
+      @renderModelOnly()

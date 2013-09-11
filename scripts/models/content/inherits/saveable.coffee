@@ -15,6 +15,8 @@ define ['backbone'], (Backbone) ->
 
   INTERNAL_ATTRIBUTES = [
     '_original'
+    '_isDirty'
+    '_hasRemoteChanges'
   ]
 
   return class Saveable extends Backbone.Model
@@ -33,7 +35,7 @@ define ['backbone'], (Backbone) ->
 
       # When fetching, save the original content **before**
       # it has gone through `parse()` and `serialize()`
-      @on 'sync', (model, resp, options) => @set('_original', resp.content)
+      @on 'sync', (model, resp, options) => @set('_original', resp.content, {parse:true})
 
       if @isNew()
         @loaded = true
@@ -41,7 +43,7 @@ define ['backbone'], (Backbone) ->
 
 
     isDirty: () ->
-      return @isNew() or @_isDirty
+      return @isNew() or @get('_isDirty')
 
     _markDirty: (options, force=false) ->
       throw 'BUG: markDirty takes 1 argument' if not options
@@ -51,18 +53,18 @@ define ['backbone'], (Backbone) ->
       #
       # In both cases, do not set the lastModified time.
       if (not options.parse and @hasChanged()) or force
-        # Mark this model as dirty and trigger an event
-        @_isDirty = true
-        @trigger 'dirty'
-
-        # Prevent the next set from triggering this event handler indefinitely.
-        # This hack can be removed if FIXME #1 is used.
-        options.parse = true
-
-        @set 'dateLastModifiedUTC', (new Date()).toJSON(), options
+        if !@get('_isDirty') # This needs to be checked for some reason to get ToC autosave to work so it does not loop indefinitely
+          attrs =
+            _isDirty: true
+            dateLastModifiedUTC: (new Date()).toJSON()
+          # Mark this model as dirty and trigger an event
+          @set(attrs)
 
     onSaved: () ->
       # If the content was just added, squirrel away the content into _ooriginal for visual Diffing later
-      @set('_original', @serialize?())
-      @_isDirty = false
+      @set
+        _original: @serialize?()
+        _hasRemoteChanges: false
+        _isDirty: false
+
       @_isNew = false # Set in loadable

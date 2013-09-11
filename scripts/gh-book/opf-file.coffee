@@ -9,6 +9,8 @@ define [
   'cs!gh-book/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
+  SAVE_DELAY = 10 # ms
+
   # Mix in the loadable
   return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
@@ -45,7 +47,7 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
-      @getChildren().on 'tree:change add remove', (model, collection, options) =>
+      @getChildren().on 'add remove tree:change tree:add tree:remove', (model, collection, options) =>
         setNavModel(options)
       @getChildren().on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
@@ -101,6 +103,18 @@ define [
         @_parseNavModel()
         @listenTo @navModel, 'change:body', (model, value, options) =>
           @_parseNavModel() if not options.doNotReparse
+
+        # Autosave whenever something in the ToC changes (not the dirty bits)
+        @listenTo @navModel, 'change', (model, options) =>
+          return if options.parse
+          if not _.isEmpty _.omit model.changedAttributes(), ['_isDirty', '_hasRemoteChanges', '_original', 'dateLastModifiedUTC']
+            # Delay the save a little bit because a move is a remove + add
+            # which would otherwise cause 2 saves
+            clearTimeout(@_savingTimeout)
+            @_savingTimeout = setTimeout (() =>
+              allContent.save(@navModel, false, true) # include-resources, include-new-files
+              delete @_savingTimeout
+            ), SAVE_DELAY
 
 
     _parseNavModel: () ->
@@ -208,13 +222,6 @@ define [
 
 
     parse: (json) ->
-      # Shortcut to not override local changes if remote model did not change
-      return if @commitSha == json.sha
-
-      # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
-      # Save the commit sha so we can compare when a remote update occurs
-      @commitSha = json.sha
-
       xmlStr = json.content
 
       # If the parse is a result of a write then update the sha.
@@ -280,11 +287,10 @@ define [
     onReloaded: () ->
       for model in _.values(@_localAddedItems)
         @_addItem(model, {}, false)
-        # Uggh, the dirty bit is not set because for some reason the `@$xml` still
-        # contains the locally-added <item>
-        #
-        # So, set the isDirty() bit manually
-        @_markDirty({}, true) # true == force
+
+      isDirty = not _.isEmpty(@_localAddedItems)
+      return isDirty
+
 
     onSaved: () ->
       super()
@@ -302,6 +308,9 @@ define [
       onReloaded = () =>
         @_parseNavModel()
         _.each @_localNavAdded, (model, path) => @addChild(model)
+
+        isDirty = not _.isEmpty(@_localNavAdded)
+        return isDirty
 
       onSaved = () =>
         # Call 'Saveable.onSave' (super)

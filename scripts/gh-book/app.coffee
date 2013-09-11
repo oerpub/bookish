@@ -173,6 +173,9 @@ define [
 
       session.getBranch().writeMany(changedFiles, commitText, parentCommitSha)
       .done((val) =>
+        # Update the lastSeenSha so we do not load the commit we just made
+        remoteUpdater.lastSeenSha = val.sha
+
         # Fire the onSave event on all the changed models
         _.map models, (model) -> model.onSaved?()
         promise.resolve(val)
@@ -214,12 +217,24 @@ define [
       ret.fail (error) => options?.error?(ret, error)
       return ret
 
-    allContent_save = (options) ->
-      # Save all the models that have changes
-      changedModels = @filter (model) -> model.isDirty()
+    allContent_save = (contextModel=null, includeResources, includeNewContent) ->
+      if contextModel
+        # Save all the models that have changes EXCEPT other HTML files
+        changedModels = @filter (model) ->
+          if contextModel && model != contextModel
+            switch model.mediaType
+              when OpfFile::mediaType then return model.isDirty() # Always add OPF files
+              when XhtmlFile::mediaType
+                return includeNewContent and model.isNew()
+              else
+                return includeResources
+          return model.isDirty()
+
+      else
+        # Save all the models that have changes
+        changedModels = @filter (model) -> model.isDirty()
 
       writeFiles(changedModels)
-
 
     allContent.save = allContent_save.bind(allContent)
 
