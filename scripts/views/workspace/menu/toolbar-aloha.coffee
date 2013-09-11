@@ -9,6 +9,7 @@ define [
     tagName: 'span'
 
     onRender: ->
+      @$el.find('.btn.currentHeading').on 'click', (e) -> e.preventDefault()
       # Wait until Aloha is started before enabling the toolbar
       @$el.addClass('disabled')
       Aloha.ready => @$el.removeClass('disabled')
