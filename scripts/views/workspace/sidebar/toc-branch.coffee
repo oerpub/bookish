@@ -146,6 +146,7 @@ define [
 
       return {
         mediaType: @model.mediaType
+        isGroup: @model.mediaType == 'application/vnd.org.cnx.section'
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
