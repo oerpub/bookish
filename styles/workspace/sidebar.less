@@ -4,11 +4,13 @@
  * New Styles
  *****************************/
 
+@color-blue: @blue; //#0e807d;
+
 .x-filter-gradient(@orient, @start-color, @end-color) {
   background-color: @end-color;
-  background-image: -moz-linear-gradient(@orient, @start-color, @end-color);
   background-image: -webkit-linear-gradient(@orient, @start-color, @end-color);
-  background-image: linear-gradient(@orient, @start-color, @end-color);
+  background-image:    -moz-linear-gradient(@orient, @start-color, @end-color);
+  background-image:         linear-gradient(@orient, @start-color, @end-color);
 }
 
 .x-rotate(@degrees, @origin) {
@@ -25,33 +27,110 @@
   transform-origin:         @origin;
 }
 
-#sidebar-container {
-  // Set so the internal list is scrollable
-  height: 100%;
+.x-slide-sidebar(@left) {
+  position: relative;
+  left: @left;
+  -webkit-transition: left 0.1s ease-out;
+  -moz-transition:    left 0.1s ease-out;
+  -o-transition:      left 0.1s ease-out;
+  transition:         left 0.1s ease-out;
 }
 
 
-#sidebar {
-  height: 100%;
+.x-sidebar-handle-hover(@normal-width, @hover-width) {
+    .x-helper(@width) {
+      width: @width;
+      text-shadow: 2px 2px 4px #000;
+
+      -webkit-transition: width, text-shadow 0.1s ease-out;
+      -moz-transition:    width, text-shadow 0.1s ease-out;
+      -o-transition:      width, text-shadow 0.1s ease-out;
+      transition:         width, text-shadow 0.1s ease-out;
+    }
+
+
+    // Animate a change in handle width and text shadow when hover state is removed
+    .x-helper(@normal-width);
+
+    // Animate a change in handle width and text shadow when hovering
+    &:hover { .x-helper(@hover-width); }
+}
+
+
+
+.sidebar-container {
+  // Placeholder just so I can tweak css
   display: inline-block;
+
+  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
+  // Other sidebars may actually be to the left so clip to the left
+  overflow-x: hidden;
 }
+
+// All the height:inherit to be able to scroll inside the ToC
+#main {
+  height: inherit;
+  > div {
+    height: inherit;
+    > div {
+      height: inherit;
+      > #container { // a <section>
+        height: inherit;
+        > #workspace-container { // a <div>
+          height: inherit;
+          > div.sidebar-container {  // alternatively, set this to height:100%;
+            height: inherit;
+            > aside { // #sidebar .     alternatively, set this to height:100%;
+              height: inherit;
+              > div { // Marionette view div
+                height: inherit;
+                > .boxed-group {
+                  height: inherit;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
 
 
 @aside-width: 300px;
 @aside-handle-width: 20px;
+@aside-handle-width-expanded: 25px;
 @boxed-group-header-height: 42px;
 
 aside > div {
-  // Allow vertical scrolling inside .boxed-group-inner
-  height: 100%;
+  background-color: @color-blue;
 
-  &.minimized .boxed-group { display: none; }
+  // Animate the sidebar to slide right (open) when minimized handle is clicked
+  .x-slide-sidebar(0);
 
-  &:not(.minimized) .boxed-group {
+  &.minimized {
+    // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
+    .boxed-group {
+/*      width: 0;
+      visibility: hidden;
+*/      overflow-x: hidden;
+    }
+
+    // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
+    .x-slide-sidebar(-3px - @aside-width);
+
+    // Animate a change in handle width and text shadow when hover state is removed
+    > .handle { .x-sidebar-handle-hover(@aside-handle-width, @aside-handle-width-expanded); }
+  }
+
+  .boxed-group {
     //So the vertical bar shows up to the right of this box
     display: inline;
     float: left;
 
+    background-color: inherit; // GitHub makes this gray by default.
     width: @aside-width;
 
     // So boxed-group-inner is scrollable, this height needs to be set
@@ -82,10 +161,7 @@ aside > div {
     height: 100%;
     white-space: nowrap;
     cursor: pointer;
-
-    .x-filter-gradient(right, #0000fa, #0000e0);
-    background-repeat: repeat-x;
-
+    position: relative;
 
     // So it shows up to the left of the .boxed-group
     display: inline;
@@ -97,15 +173,14 @@ aside > div {
 
       // After rotating the text line it up to be above the vertical bar
       display: block;
-      font-size: @aside-handle-width;
-      right: @aside-handle-width;
+      font-size: (@aside-handle-width - 2px);
+      right: (@aside-handle-width + 1px);
       position: relative;
-
+      font-weight: normal;
+      color: #fff;
     }
 
-    &:hover {
-      background-color: #ddd;
-    }
+    .x-sidebar-handle-hover(@aside-handle-width-expanded, @aside-handle-width);
 
   }
 
@@ -347,20 +422,6 @@ aside > div {
   cursor:pointer;
 }
 
-#workspace-container {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  top: 0px;
-  right: 0px;
-}
-
-#workspace {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  width: 250px;
-}
 
 
 #greenpicker {
@@ -400,106 +461,13 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: #0E807D;
+    background-color: @color-blue;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
   display: none;
 }
 
-#container > #workspace-container .blue:not(.edit-settings),
-#container > #workspace-container .green:not(.edit-settings),
-#container > #workspace-container .orange:not(.edit-settings) {
-    -webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
-}
-
-#container > #workspace-container {
-    &.wsminimized {
-        #pickertext {
-            visibility: hidden;
-        }
-        #greenpicker {
-            display: block;
-            visibility: visible;
-        }
-
-        @sidebar-left: 30px;
-        #greentoolbar {
-          width: @sidebar-left;
-          &:hover {
-            width: 100px;
-            border-radius: 0px 7px 7px 0px;
-            -moz-border-radius: 0px 7px 7px 0px;
-            -webkit-border-radius: 0px 7px 7px 0px;
-            z-index: 1000;
-          };
-        }
-
-        #workspace {
-          width: @sidebar-left;
-          display: none;
-        }
-
-        @sidebar-width: 300px;
-
-        > #content, .orange {
-          left: @sidebar-left+@sidebar-width;
-          right: 0;
-        }
-
-        &.tocminimized {
-            // Both workspace and toc minimised
-            @sidebar-width: 30px;
-
-            > #content, .orange {
-              left: @sidebar-left+@sidebar-width;
-            }
-
-            #sidebar {
-                display: none;
-            }
-
-            #bluepicker {
-                display: block;
-            }
-        }
-    }
-
-    &:not(.wsminimized) {
-        @sidebar-left: 250px;
-        @sidebar-width: 250px;
-
-        #workspace, #greentoolbar {
-          width: @sidebar-left;
-        }
-
-        > #content, .orange {
-          left: @sidebar-left+@sidebar-width;
-          right: -@sidebar-width;
-        }
-
-        &.tocminimized {
-            // Both workspace and toc minimised
-            // Both workspace and toc minimised
-            @sidebar-width: 30px;
-
-            > #content, .orange {
-              left: @sidebar-left+@sidebar-width;
-            }
-
-            #sidebar {
-                display: none;
-            }
-
-            #bluepicker {
-                display: block;
-            }
-        }
-    }
-}
 
 #container {
   ol ol a {
