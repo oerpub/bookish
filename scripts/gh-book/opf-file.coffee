@@ -47,9 +47,20 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
-      @tocNodes.on 'change:title', (model, collection, options) =>
-        if model.get('title') != @$xml.find('title').text()
-          @$xml.find('title').text(model.get('title'))
+
+      @on 'change:title', (model, value, options) =>
+        $title = @$xml.find('title')
+        if value != $title.text()
+          $title.text(value)
+          @_save()
+
+      @tocNodes.on 'change:title', (model, value, options) =>
+        return if not model.previousAttributes()['title'] # skip if we are parsing the file
+        return if @ == model # Ignore if changing the OPF title
+        # the `change:title` event "trickles up" through the nodes (probably should not)
+        # so only save once.
+        if @_localTitlesChanged[model.id] != value
+          @_localTitlesChanged[model.id] = value
           @_save()
 
       @getChildren().on 'add remove tree:change tree:add tree:remove', (model, collection, options) =>
@@ -65,6 +76,7 @@ define [
       # these items will be added back into the newly-updated OPF manifest
       @_localAddedItems = {}
       @_localNavAdded = {}
+      @_localTitlesChanged = {}
 
     # Add an `<item>` to the OPF.
     # Called from `@manifest.add` and `@resolveSaveConflict`
@@ -97,13 +109,13 @@ define [
       # This is useful when the OPF file was remotely updated
       @_localAddedItems[model.id] = model
 
-    _save: =>
+    _save: ->
       clearTimeout(@_savingTimeout)
       @_savingTimeout = setTimeout (() =>
         allContent.save(@navModel, false, true) # include-resources, include-new-files
         delete @_savingTimeout
       ), SAVE_DELAY
-        
+
 
     _loadComplex: (fetchPromise) ->
       fetchPromise
@@ -303,6 +315,7 @@ define [
     onSaved: () ->
       super()
       @_localAddedItems = {}
+      @_localTitlesChanged = {}
 
     # FIXME HACK, horrible Hack.
     # When a remote commit occurs, all models that were changed are reloaded.
@@ -318,6 +331,14 @@ define [
         _.each @_localNavAdded, (model, path) => @addChild(model)
 
         isDirty = not _.isEmpty(@_localNavAdded)
+
+        # Merge in the local title changes for items still in the ToC
+        _.each @_localTitlesChanged, (title, id) =>
+          model = @tocNodes.get(id)
+          model?.set('title', title, {parse:true})
+
+        isDirty = isDirty or not _.isEmpty(@_localTitlesChanged)
+
         return isDirty
 
       onSaved = () =>
@@ -325,6 +346,7 @@ define [
         XhtmlFile::onSaved.bind(@navModel)()
 
         @_localNavAdded = {}
+        @_localTitlesChanged = {}
 
       @navModel.onReloaded = onReloaded
       @navModel.onSaved = onSaved
