@@ -47,6 +47,11 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
+      @tocNodes.on 'change:title', (model, collection, options) =>
+        if model.get('title') != @$xml.find('title').text()
+          @$xml.find('title').text(model.get('title'))
+          @_save()
+
       @getChildren().on 'add remove tree:change tree:add tree:remove', (model, collection, options) =>
         setNavModel(options)
       @getChildren().on 'change reset', (collection, options) =>
@@ -92,6 +97,13 @@ define [
       # This is useful when the OPF file was remotely updated
       @_localAddedItems[model.id] = model
 
+    _save: =>
+      clearTimeout(@_savingTimeout)
+      @_savingTimeout = setTimeout (() =>
+        allContent.save(@navModel, false, true) # include-resources, include-new-files
+        delete @_savingTimeout
+      ), SAVE_DELAY
+        
 
     _loadComplex: (fetchPromise) ->
       fetchPromise
@@ -110,11 +122,7 @@ define [
           if not _.isEmpty _.omit model.changedAttributes(), ['_isDirty', '_hasRemoteChanges', '_original', 'dateLastModifiedUTC']
             # Delay the save a little bit because a move is a remove + add
             # which would otherwise cause 2 saves
-            clearTimeout(@_savingTimeout)
-            @_savingTimeout = setTimeout (() =>
-              allContent.save(@navModel, false, true) # include-resources, include-new-files
-              delete @_savingTimeout
-            ), SAVE_DELAY
+            @_save()
 
 
     _parseNavModel: () ->
