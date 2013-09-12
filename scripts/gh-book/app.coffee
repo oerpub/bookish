@@ -225,6 +225,15 @@ define [
 
   App.on 'start', () ->
 
+    # Update the width/height of main so we can have CSS that uses `bottom: 0` or `right: 0`
+    $window = $(window)
+    onWindowResize = () =>
+      App.main.$el.css
+        width: $window.width()
+        height: $window.height()
+
+    $window.resize onWindowResize
+
     startRouting = () ->
       # Remove cyclic dependency. Controller depends on `App.main` region
       require ['cs!controllers/routing'], (controller) =>
