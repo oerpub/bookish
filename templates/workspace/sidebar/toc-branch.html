@@ -3,7 +3,7 @@
 {{! Includes drop zones and supports nodes that point to content (with ids) and containers (chapter/unit)}}
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
-{{#if isGroup}}
+{{#if hasChildren}}
   <span class="editor-expand-collapse" title="Click to expand/collapse"><i class="icon-content"></i></span>
 {{/if}}
 
