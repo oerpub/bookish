@@ -17,6 +17,9 @@ define [
       addContent: '.add-content'
       toc: '.workspace-sidebar'
 
+    events:
+      'click .handle': () -> @$el.toggleClass('minimized')
+
     onShow: () ->
       model = @model
       collection = @collection or model.getChildren()
