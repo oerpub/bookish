@@ -27,13 +27,12 @@
   transform-origin:         @origin;
 }
 
-.x-slide-sidebar(@left) {
-  position: relative;
-  left: @left;
-  -webkit-transition: left 0.1s ease-out;
-  -moz-transition:    left 0.1s ease-out;
-  -o-transition:      left 0.1s ease-out;
-  transition:         left 0.1s ease-out;
+.x-slide-sidebar(@width) {
+  width: @width;
+  -webkit-transition: width 0.1s ease-out;
+  -moz-transition:    width 0.1s ease-out;
+  -o-transition:      width 0.1s ease-out;
+  transition:         width 0.1s ease-out;
 }
 
 
@@ -65,6 +64,9 @@
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
   overflow-x: hidden;
+
+  // Float sidebars and then the main content so it all lines up on the top
+  float: left;
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -86,6 +88,9 @@
                 height: inherit;
                 > .boxed-group {
                   height: inherit;
+                  > .boxed-group-inner {
+                    height: inherit;
+                  }
                 }
               }
             }
@@ -107,19 +112,24 @@
 aside > div {
   background-color: @color-blue;
 
+  // Do not scroll. instead let javascript in sidebar.coffee set the height
+  // of the sidebar element to scroll
+  overflow-y: hidden;
+  overflow-x: hidden;
+
   // Animate the sidebar to slide right (open) when minimized handle is clicked
-  .x-slide-sidebar(0);
+  .x-slide-sidebar(@aside-width);
 
   &.minimized {
     // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
     .boxed-group {
-/*      width: 0;
+      width: 0;
       visibility: hidden;
-*/      overflow-x: hidden;
+      overflow-x: hidden;
     }
 
     // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
-    .x-slide-sidebar(-3px - @aside-width);
+    .x-slide-sidebar(inherit);
 
     // Animate a change in handle width and text shadow when hover state is removed
     > .handle { .x-sidebar-handle-hover(@aside-handle-width, @aside-handle-width-expanded); }
@@ -131,25 +141,14 @@ aside > div {
     float: left;
 
     background-color: inherit; // GitHub makes this gray by default.
-    width: @aside-width;
-
-    // So boxed-group-inner is scrollable, this height needs to be set
-    height: 100%;
+    width: (@aside-width - @aside-handle-width-expanded - 6);
 
     // Make the Add button float right
     > h3 .add-content { float: right; }
 
     > .boxed-group-inner {
-      // So boxed-group-inner is scrollable, this height needs to be set
-      height: 100%;
+      // So boxed-group-inner is scrollable, set the overflow-y
       overflow-y: auto;
-
-      > :last-child {
-        // The height of this element **should** be window.height - boxed-group_HEADER-HEIGHT
-        // but instead, set it to 100% and then add some padding to the element
-        // to make sure you can scroll to the bottom.
-        margin-bottom: @boxed-group-header-height * 2; // (give it a little more padding so the user sees it is the bottom)
-      }
     }
 
 
@@ -483,7 +482,6 @@ aside > div {
 
   min-width: 100px;
 
-  padding: 1em;
   border-right: 1px solid #ccc;
 
   /* Slide the sidebar off screen when hiding it */
