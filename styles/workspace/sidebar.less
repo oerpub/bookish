@@ -4,7 +4,21 @@
  * New Styles
  *****************************/
 
-@color-blue: @blue; //#0e807d;
+@color-green: @green; // Bootstrap green
+@color-blue: @blue; // Bootstrap blue
+
+.sidebar-container.sidebar-workspace aside > div {
+  background-color: @color-green;
+  > .handle > .handle-text::before          { content: 'Book Picker'; }
+  > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+}
+.sidebar-container.sidebar-toc aside > div {
+  background-color: @color-blue;
+  > .handle > .handle-text::before          { content: 'Table of Contents'; }
+  > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
+}
+
+
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
   background-color: @end-color;
@@ -52,8 +66,9 @@
   // Float sidebars and then the main content so it all lines up on the top
   float: left;
 
-  // margin-left:  10px;
-  margin-right: 20px;
+  // Add a little spacing between the sidebars so they appear to float
+  margin-left:  10px;
+  margin-right: 10px;
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -97,7 +112,6 @@
 @boxed-group-header-height: 42px;
 
 aside > div {
-  background-color: @color-blue;
 
   // Do not scroll. instead let javascript in sidebar.coffee set the height
   // of the sidebar element to scroll
