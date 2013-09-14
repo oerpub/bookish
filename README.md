@@ -6,9 +6,9 @@ of how the code is organized.
 ## Building Yourself
 
 1. Download and extract (if necessary)
-2. Run `npm install` or `bower install` in the directory to download and install dependencies
-3. Configure your server to point /workspace, /login, and /logout at index.html
-4. (optional) Build a minified Javascript file by running `r.js` (see https://github.com/jrburke/r.js)
+2. Run `npm install` or just `bower install` in the directory to download and install dependencies
+3. Start up a webserver
+
 
 ## Building Documentation
 
