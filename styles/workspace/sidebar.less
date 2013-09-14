@@ -37,24 +37,8 @@
 
 
 .x-sidebar-handle-hover(@normal-width, @hover-width) {
-    .x-helper(@width) {
-      width: @width;
-      text-shadow: 2px 2px 4px #000;
-
-      -webkit-transition: width, text-shadow 0.1s ease-out;
-      -moz-transition:    width, text-shadow 0.1s ease-out;
-      -o-transition:      width, text-shadow 0.1s ease-out;
-      transition:         width, text-shadow 0.1s ease-out;
-    }
-
-
-    // Animate a change in handle width and text shadow when hover state is removed
-    .x-helper(@normal-width);
-
-    // Animate a change in handle width and text shadow when hovering
-    &:hover { .x-helper(@hover-width); }
+  text-shadow: 2px 2px 4px #000;
 }
-
 
 
 .sidebar-container {
@@ -67,6 +51,9 @@
 
   // Float sidebars and then the main content so it all lines up on the top
   float: left;
+
+  // margin-left:  10px;
+  margin-right: 20px;
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -120,20 +107,8 @@ aside > div {
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
 
-  &.minimized {
-    // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
-    .boxed-group {
-      width: 0;
-      visibility: hidden;
-      overflow-x: hidden;
-    }
 
-    // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
-    .x-slide-sidebar(inherit);
-
-    // Animate a change in handle width and text shadow when hover state is removed
-    > .handle { .x-sidebar-handle-hover(@aside-handle-width, @aside-handle-width-expanded); }
-  }
+  > .handle { text-shadow: 2px 2px 4px #000; }
 
   .boxed-group {
     //So the vertical bar shows up to the right of this box
@@ -150,8 +125,41 @@ aside > div {
       // So boxed-group-inner is scrollable, set the overflow-y
       overflow-y: auto;
     }
+  }
 
+  &.minimized {
+    // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
+    .boxed-group {
+      width: 0;
+      visibility: hidden;
+      overflow-x: hidden;
+    }
 
+    // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
+    .x-slide-sidebar(inherit);
+  }
+
+  // Change the expand/collapse icon for the handle
+  > .handle > i.expand-collapse {
+    position: relative;
+  }
+  &:not(.minimized) {
+    > .handle {
+      > i.expand-collapse { left: 25px; }
+      &:hover > i.expand-collapse {
+        left: 20px;
+      }
+      > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+    }
+  }
+  &.minimized {
+    > .handle {
+      > i.expand-collapse { left: 19px; }
+      &:hover > i.expand-collapse {
+        left: 24px;
+      }
+      > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+    }
   }
 
   // The vertical bar to pull-in/out the sidebar
@@ -166,20 +174,24 @@ aside > div {
     display: inline;
     float: left;
 
+    font-size: (@aside-handle-width - 2px);
+    right: (@aside-handle-width + 1px);
+    position: relative;
+    font-weight: normal;
+    color: white;
+
+
     > .handle-text {
 
       .x-rotate(90deg, bottom);
 
       // After rotating the text line it up to be above the vertical bar
       display: block;
-      font-size: (@aside-handle-width - 2px);
-      right: (@aside-handle-width + 1px);
-      position: relative;
-      font-weight: normal;
-      color: #fff;
-    }
 
-    .x-sidebar-handle-hover(@aside-handle-width-expanded, @aside-handle-width);
+      // Move the start of text just below the expand/collapse icon
+      position: relative;
+      top: -25px;
+    }
 
   }
 
