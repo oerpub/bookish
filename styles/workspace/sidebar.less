@@ -104,7 +104,7 @@
 
 
 
-@aside-width: 300px;
+@aside-width: 320px;
 @aside-handle-width: 20px;
 @aside-handle-width-expanded: 25px;
 @boxed-group-header-height: 42px;
@@ -187,7 +187,7 @@ aside > div {
   nav {
     @indent-width: 20px;
     @compensate-width: 15px;
-    @compensate-start: @aside-width - 70; // Not sure why it is 70...
+    @compensate-start: @aside-width - 110; // Not sure why it is 70...
 
     .x-indent-compensate(@level) {
       > li {
@@ -211,6 +211,9 @@ aside > div {
     > ol ol ol ol     { .x-indent-compensate(3); }
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
+
+    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
+    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
