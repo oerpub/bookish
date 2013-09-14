@@ -32,24 +32,3 @@ define [
       menu: '#menu'
       sidebar: '#sidebar'
       workspace: '#workspace'
-
-    events:
-      'click #workspace-container > .pickerswitch': 'toggleWorkspace'
-      'click #sidebar-container > .pickerswitch': 'toggleToc'
-
-    initialize: () ->
-      @workspace.on 'show', =>
-        @$('#workspace-container').removeClass('tocminimized').addClass('wsminimized')
-
-    toggleWorkspace: () -> @$('#workspace-container').toggleClass('wsminimized')
-    toggleToc: () -> @$('#workspace-container').toggleClass('tocminimized')
-    showWorkspace: (b) ->
-      if b
-        @$('#workspace-container').removeClass('wsminimized')
-      else
-        @$('#workspace-container').addClass('wsminimized')
-    showToc: (b) ->
-      if b
-        @$('#workspace-container').removeClass('tocminimized')
-      else
-        @$('#workspace-container').addClass('tocminimized')
