@@ -15,32 +15,31 @@
   </ul>
 </div>
 {{else}}
-<!-- <button id="fork-content" type="button" class="btn btn-success" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
+<button id="fork-content" type="button" class="btn btn-info" data-placement="bottom" data-toggle="tooltip" title="Fork This book before saving changes">
   <i class="icon-code-fork"></i> Fork This Book!
 </button>
- -->
 {{/if}}
 
-<!-- <button id="edit-settings" type="button" class="btn" data-placement="bottom" data-toggle="tooltip" title="Change the Current book that is being edited">
-  <i class="icon-cogs"></i>
-</button>
- -->
+<div class="pull-right">
+  <!-- <button id="edit-settings" type="button" class="btn" data-placement="bottom" data-toggle="tooltip" title="Change the Current book that is being edited">
+    <i class="icon-cogs"></i>
+  </button>
+   -->
 
-{{#if isAuthenticated}}
-  <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
-       and instead go to the login page directly.
-    -->
-  <button id="sign-out" class="btn">Sign Out</button>
+  {{#if isAuthenticated}}
+    <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
+         and instead go to the login page directly.
+      -->
+    <button id="sign-out" class="btn">Sign Out</button>
 
-  <span class="name navbar-text">{{id}}</span>
-{{else}}
-  <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
-       and instead go to the login page directly.
-    -->
-<!--   <button id="sign-in" class="btn btn-primary">Sign In</button>
- -->
-{{/if}}
-
+    <span class="name navbar-text">{{id}}</span>
+  {{else}}
+    <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
+         and instead go to the login page directly.
+      -->
+     <button id="sign-in" class="btn btn-primary">Sign In</button>
+  {{/if}}
+</div>
 
 <!-- Sign in Modal -->
 <div id="sign-in-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sign-in-modal-label" aria-hidden="true">

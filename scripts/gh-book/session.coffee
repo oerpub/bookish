@@ -1,5 +1,7 @@
 define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
+  ROOT_URL = undefined # 'http://localhost:3000'
+
   class GithubSession extends Backbone.Model
     initialize: () ->
       @_reloadClient()
@@ -10,7 +12,7 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
           @_reloadClient()
 
         # If any of the repo settings change then check if the user can still collaborate
-        else if not _.isEmpty _.pick @.changed, ['repoUser', 'repoName']
+        else if not _.isEmpty _.pick @.changed, ['repoUser', 'repoName', 'id', 'token', 'password']
           @checkCanCollaborate()
 
     authenticate: (config) ->
@@ -22,28 +24,35 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
         token:    config.token
         username: config.id
         password: config.password
-        
+        rootURL: ROOT_URL
+
       promise = client.getLogin()
       promise.done () =>
-        @set config, {silent:true}
+        @set config
         @_client = client
       return promise
-        
+
     _reloadClient: () ->
       config =
         auth: (if @get('token') then 'oauth' else 'basic')
         token:    @get('token')
         username: @get('id')
         password: @get('password')
+        rootURL: ROOT_URL
       @_client = new Github(config)
 
       # Check if the user can collaborate on the current repo (if one is set)
       @checkCanCollaborate()
 
     checkCanCollaborate: () ->
-      # See if this user can collaborate
-      return @getRepo()?.canCollaborate().done (canCollaborate) =>
-        @set 'canCollaborate', canCollaborate
+      # Shortcut to false if no token or password is provided
+      if not (@get('token') or @get('password'))
+        @set('canCollaborate', false)
+
+      else
+        # See if this user can collaborate
+        @getRepo()?.canCollaborate().done (canCollaborate) =>
+          @set('canCollaborate', canCollaborate)
 
     getClient: () ->
       return @_client or throw 'BUG: Client was not loaded yet'

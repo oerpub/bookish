@@ -121,6 +121,14 @@ aside > div {
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
 
+  // Round the corners so the handle looks nice
+  -webkit-border-top-right-radius:  20px;
+  -moz-border-radius-topright:      20px;
+  border-top-right-radius:          20px;
+  -webkit-border-bottom-right-radius:  20px;
+  -moz-border-radius-bottomright:      20px;
+  border-bottom-right-radius:          20px;
+
 
   > .handle { text-shadow: 2px 2px 4px #000; }
 
@@ -133,7 +141,15 @@ aside > div {
     width: (@aside-width - @aside-handle-width-expanded - 6);
 
     // Make the Add button float right
-    > h3 .add-content { float: right; }
+    > h3 .add-content {
+      float: right;
+
+      // Also, make it right-align so it does not bleed to the right of the sidebar
+      .btn-group ul.dropdown-menu {
+        left: inherit; // Bootstrap aligns it left:0; by default
+        right: 0;
+      }
+    }
 
     > .boxed-group-inner {
       // So boxed-group-inner is scrollable, set the overflow-y
