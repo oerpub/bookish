@@ -9,6 +9,8 @@ define [
   'cs!gh-book/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
+  SAVE_DELAY = 10 # ms
+
   # Mix in the loadable
   return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
@@ -45,7 +47,23 @@ define [
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
-      @getChildren().on 'tree:change add remove', (model, collection, options) =>
+
+      @on 'change:title', (model, value, options) =>
+        $title = @$xml.find('title')
+        if value != $title.text()
+          $title.text(value)
+          @_save()
+
+      @tocNodes.on 'change:title', (model, value, options) =>
+        return if not model.previousAttributes()['title'] # skip if we are parsing the file
+        return if @ == model # Ignore if changing the OPF title
+        # the `change:title` event "trickles up" through the nodes (probably should not)
+        # so only save once.
+        if @_localTitlesChanged[model.id] != value
+          @_localTitlesChanged[model.id] = value
+          @_save()
+
+      @getChildren().on 'add remove tree:change tree:add tree:remove', (model, collection, options) =>
         setNavModel(options)
       @getChildren().on 'change reset', (collection, options) =>
         # HACK: `?` is because `inherits/container.add` calls `trigger('change')`
@@ -58,6 +76,7 @@ define [
       # these items will be added back into the newly-updated OPF manifest
       @_localAddedItems = {}
       @_localNavAdded = {}
+      @_localTitlesChanged = {}
 
     # Add an `<item>` to the OPF.
     # Called from `@manifest.add` and `@resolveSaveConflict`
@@ -90,6 +109,13 @@ define [
       # This is useful when the OPF file was remotely updated
       @_localAddedItems[model.id] = model
 
+    _save: ->
+      clearTimeout(@_savingTimeout)
+      @_savingTimeout = setTimeout (() =>
+        allContent.save(@navModel, false, true) # include-resources, include-new-files
+        delete @_savingTimeout
+      ), SAVE_DELAY
+
 
     _loadComplex: (fetchPromise) ->
       fetchPromise
@@ -101,6 +127,14 @@ define [
         @_parseNavModel()
         @listenTo @navModel, 'change:body', (model, value, options) =>
           @_parseNavModel() if not options.doNotReparse
+
+        # Autosave whenever something in the ToC changes (not the dirty bits)
+        @listenTo @navModel, 'change', (model, options) =>
+          return if options.parse
+          if not _.isEmpty _.omit model.changedAttributes(), ['_isDirty', '_hasRemoteChanges', '_original', 'dateLastModifiedUTC']
+            # Delay the save a little bit because a move is a remove + add
+            # which would otherwise cause 2 saves
+            @_save()
 
 
     _parseNavModel: () ->
@@ -208,13 +242,6 @@ define [
 
 
     parse: (json) ->
-      # Shortcut to not override local changes if remote model did not change
-      return if @blobSha == json.sha
-
-      # Github.read returns a JSON with `{sha: "12345", content: "<rootfiles>...</rootfiles>"}
-      # Save the commit sha so we can compare when a remote update occurs
-      @blobSha = json.sha
-
       xmlStr = json.content
 
       # If the parse is a result of a write then update the sha.
@@ -288,6 +315,7 @@ define [
     onSaved: () ->
       super()
       @_localAddedItems = {}
+      @_localTitlesChanged = {}
 
     # FIXME HACK, horrible Hack.
     # When a remote commit occurs, all models that were changed are reloaded.
@@ -303,6 +331,14 @@ define [
         _.each @_localNavAdded, (model, path) => @addChild(model)
 
         isDirty = not _.isEmpty(@_localNavAdded)
+
+        # Merge in the local title changes for items still in the ToC
+        _.each @_localTitlesChanged, (title, id) =>
+          model = @tocNodes.get(id)
+          model?.set('title', title, {parse:true})
+
+        isDirty = isDirty or not _.isEmpty(@_localTitlesChanged)
+
         return isDirty
 
       onSaved = () =>
@@ -310,6 +346,7 @@ define [
         XhtmlFile::onSaved.bind(@navModel)()
 
         @_localNavAdded = {}
+        @_localTitlesChanged = {}
 
       @navModel.onReloaded = onReloaded
       @navModel.onSaved = onSaved

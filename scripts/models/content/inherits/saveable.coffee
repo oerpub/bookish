@@ -35,7 +35,7 @@ define ['backbone'], (Backbone) ->
 
       # When fetching, save the original content **before**
       # it has gone through `parse()` and `serialize()`
-      @on 'sync', (model, resp, options) => @set('_original', resp.content)
+      @on 'sync', (model, resp, options) => @set('_original', resp.content, {parse:true})
 
       if @isNew()
         @loaded = true
@@ -53,14 +53,12 @@ define ['backbone'], (Backbone) ->
       #
       # In both cases, do not set the lastModified time.
       if (not options.parse and @hasChanged()) or force
-        # Mark this model as dirty and trigger an event
-        @set('_isDirty', true)
-
-        # Prevent the next set from triggering this event handler indefinitely.
-        # This hack can be removed if FIXME #1 is used.
-        options.parse = true
-
-        @set 'dateLastModifiedUTC', (new Date()).toJSON(), options
+        if !@get('_isDirty') # This needs to be checked for some reason to get ToC autosave to work so it does not loop indefinitely
+          attrs =
+            _isDirty: true
+            dateLastModifiedUTC: (new Date()).toJSON()
+          # Mark this model as dirty and trigger an event
+          @set(attrs)
 
     onSaved: () ->
       # If the content was just added, squirrel away the content into _ooriginal for visual Diffing later

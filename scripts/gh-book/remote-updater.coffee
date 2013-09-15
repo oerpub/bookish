@@ -69,15 +69,13 @@ define [
                   model = allContent.get(filePath)
 
                   if model
-                    modelSha = model.blobSha
-                    if modelSha and commitSha and modelSha != commitSha
-                      # TODO: Just invalidate the model by clearing `isLoaded`
-                      return model.reload().then () =>
-                        attributes =
-                          dateLastModifiedUTC: dateCommittedUTC
-                          lastEditedBy: commit.author.login
+                    # TODO: Just invalidate the model by clearing `isLoaded`
+                    return model.reload().then () =>
+                      attributes =
+                        dateLastModifiedUTC: dateCommittedUTC
+                        lastEditedBy: commit.author.login
 
-                        return model.set attributes, {parse:true}
+                      return model.set attributes, {parse:true}
 
                 return onceAll(promises)
 
