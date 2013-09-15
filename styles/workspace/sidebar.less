@@ -76,6 +76,9 @@
   height: inherit;
   > div {
     height: inherit;
+    // If this node is the signin modal then do not stretch it vertically
+    #sign-in-modal { height: initial; }
+
     > div {
       height: inherit;
       > #container { // a <section>
