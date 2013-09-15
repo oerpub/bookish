@@ -47,5 +47,40 @@
 #menu-and-content {
   // Float so the div lines up vertically with the sidebars
   float: left;
-  width: 800px;
+  width: 850px;
+
+  .content-panel {
+    background-color: @orange;
+
+    // Round the corners so the handle looks nice
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-topleft:     20px;
+    border-top-left-radius:         20px;
+    -webkit-border-top-right-radius:  20px;
+    -moz-border-radius-topright:      20px;
+    border-top-right-radius:          20px;
+
+    > .content-title {
+      color: white;
+      // same as sidebar handle
+      font-size: 18px;
+      text-shadow: 2px 2px 4px black;
+    }
+
+  }
+
+/*        <div class="content-panel">
+          <div class="content-title">
+            <span id="editor-title-text">
+              Editor
+              <span id="module-title-indicator"></span>
+            </span>
+          </div>
+          <div id="menu" class="content-toolbar"></div>
+          <div id="content" class="content"></div>
+        </div>
+*/
+
 }
+
+
