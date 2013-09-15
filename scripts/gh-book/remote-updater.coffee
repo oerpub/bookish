@@ -14,6 +14,11 @@ define [
     # This is updated every time the Remote Updater fetches
     lastSeenSha: null
 
+    initialize: () ->
+      # If the session config changes then clear the lastSeenSha because it may point to a different repo
+      session.on 'change', () =>
+        @lastSeenSha = null
+
     start: () ->
       # Get the current repo and last commit
       # Periodically check the commits list
@@ -25,24 +30,29 @@ define [
 
       # Return a promise that is resolved once a start hash has been recorded
       # Note: This promise may still fail
-      return @pollUpdates()
+      @_runningPromise = @pollUpdates()
+      return @_runningPromise
 
-    stop: () -> @keepUpdating = false
+    stop: () ->
+      promise = @_runningPromise or (new $.Deferred()).resolve(@)
+
+      return promise.always () =>
+        @keepUpdating = false
+        @lastSeenSha = null
 
 
     # Returns a promise that is resolved when `@lastSeenSha` has been set.
     pollUpdates: () ->
       return if not @keepUpdating
 
-      return allContent.load().then () =>
+      throw new Error('BUG! remoteUpdater seems to be running twice. did you change repos?') if @_runningPromise
+      @_runningPromise = allContent.load().then () =>
         branch = session.getBranch()
 
         return branch.getCommits().then (commits) =>
           lastUpdatedSha = @lastSeenSha
 
           lastSeenSha = commits[0].sha
-
-          setTimeout (() => @pollUpdates()), UPDATE_TIMEOUT
 
           if not lastUpdatedSha
             @lastSeenSha = lastSeenSha
@@ -68,7 +78,7 @@ define [
                   filePath = file.filename
                   model = allContent.get(filePath)
 
-                  if model
+                  if model?._loading
                     # TODO: Just invalidate the model by clearing `isLoaded`
                     return model.reload().then () =>
                       attributes =
@@ -80,3 +90,8 @@ define [
                 return onceAll(promises)
 
             return onceAll(commitsPromises).then () => @lastSeenSha = lastSeenSha
+
+      return @_runningPromise.then () =>
+        @_runningPromise = false
+        setTimeout (() => @pollUpdates()), UPDATE_TIMEOUT if @keepUpdating
+
