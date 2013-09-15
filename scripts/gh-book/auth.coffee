@@ -3,12 +3,13 @@ define [
   'marionette'
   'cs!collections/content'
   'cs!session'
+  'cs!gh-book/remote-updater'
   'hbs!gh-book/auth-template'
   'difflib'
   'diffview'
   'bootstrapModal'
   'bootstrapCollapse'
-], ($, Marionette, allContent, session, authTemplate, difflib, diffview) ->
+], ($, Marionette, allContent, session, remoteUpdater, authTemplate, difflib, diffview) ->
 
   return class GithubAuthView extends Marionette.ItemView
     template: authTemplate
@@ -187,15 +188,22 @@ define [
 
     # Edit the current repo settings
     editSettings: () ->
-      # Silently clear the settings first.
-      # This way listeners are **forced** to update and reload when
-      # "Save Settings" is clicked.
-      #
-      # The reason for **forcing** a reload is because this modal is also shown
-      # when there is a connection problem loading the workspace.
-      @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
 
-      @model.set
-        repoUser: @$el.find('#repo-user').val()
-        repoName: @$el.find('#repo-name').val()
-        branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
+      # Wait until the remoteUpdater has stopped so the settings object does not
+      # switch mid-way while updating
+      remoteUpdater.stop().always () =>
+
+        # Silently clear the settings first.
+        # This way listeners are **forced** to update and reload when
+        # "Save Settings" is clicked.
+        #
+        # The reason for **forcing** a reload is because this modal is also shown
+        # when there is a connection problem loading the workspace.
+        @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+
+        @model.set
+          repoUser: @$el.find('#repo-user').val()
+          repoName: @$el.find('#repo-name').val()
+          branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
+
+        remoteUpdater.start()
