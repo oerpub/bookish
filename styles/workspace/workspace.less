@@ -47,10 +47,12 @@
 #menu-and-content {
   // Float so the div lines up vertically with the sidebars
   float: left;
-  width: 850px;
+  // Long enough so "Copy Section" inside a Subheading with something already copied to the clipboard will all show up on one line
+  width: 930px;
 
   .content-panel {
     background-color: @orange;
+
 
     // Round the corners so the handle looks nice
     -webkit-border-top-left-radius: 20px;
@@ -67,20 +69,9 @@
       text-shadow: 2px 2px 4px black;
     }
 
+    // By default, boxed-group is grey
+    > .boxed-group { background-color: inherit; }
   }
-
-/*        <div class="content-panel">
-          <div class="content-title">
-            <span id="editor-title-text">
-              Editor
-              <span id="module-title-indicator"></span>
-            </span>
-          </div>
-          <div id="menu" class="content-toolbar"></div>
-          <div id="content" class="content"></div>
-        </div>
-*/
-
 }
 
 
