@@ -38,6 +38,8 @@ define ['jquery'], ($) ->
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
           'ui/ui': 'toolbar/toolbar-plugin'
 
+      waitSeconds: 42
+
     bundles:
       ghbook: '../../../../scripts/aloha'
 
