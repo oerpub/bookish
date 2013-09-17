@@ -291,7 +291,6 @@ define [
           goEdit: (id, contextModel=null)    ->
             @_loadFirst().done () => controller.goEdit(id, contextModel)
           goDefault: () ->
-            _controller = @ # Explicit is better than confusing
             @_loadFirst().done () ->
               require ['cs!gh-book/opf-file'], (OpfFile) ->
                 # Find the first opf file.
@@ -301,7 +300,7 @@ define [
                   # TOC nodes.
                   controller.goEdit opf.tocNodes.at(1), opf
                 else
-                  _controller.goWorkspace()
+                  controller.goWorkspace()
 
 
         session.on 'change', () =>
