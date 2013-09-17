@@ -54,21 +54,28 @@
   text-shadow: 2px 2px 4px #000;
 }
 
+#workspace-container {
+  display: table-row;
+
+  #menu-and-content,
+  > .sidebar-container {
+    display: table-cell;
+    vertical-align: top;
+  }
+
+  #menu-and-content { min-width: 810px; }
+}
 
 .sidebar-container {
-  // Placeholder just so I can tweak css
-  display: inline-block;
-
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
   overflow-x: hidden;
 
-  // Float sidebars and then the main content so it all lines up on the top
-  float: left;
-
   // Add a little spacing between the sidebars so they appear to float
   margin-left:  10px;
   margin-right: 10px;
+
+  max-width: 310px;
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -124,6 +131,8 @@ aside > div {
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
 
+  display: table-row;
+
   // Round the corners so the handle looks nice
   -webkit-border-top-right-radius:  20px;
   -moz-border-radius-topright:      20px;
@@ -137,11 +146,11 @@ aside > div {
 
   .boxed-group {
     //So the vertical bar shows up to the right of this box
-    display: inline;
-    float: left;
+    display: table-cell;
 
     background-color: inherit; // GitHub makes this gray by default.
-    width: (@aside-width - @aside-handle-width-expanded - 6);
+    width:      (@aside-width - @aside-handle-width-expanded - 6);
+    max-width:  (@aside-width - @aside-handle-width-expanded - 6);
 
     // Make the Add button float right
     > h3 .add-content {
@@ -163,7 +172,7 @@ aside > div {
   &.minimized {
     // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
     .boxed-group {
-      width: 0;
+      max-width: 0;
       visibility: hidden;
       overflow-x: hidden;
     }
@@ -173,23 +182,27 @@ aside > div {
   }
 
   // Change the expand/collapse icon for the handle
-  > .handle > i.expand-collapse {
-    position: relative;
+  > .handle {
+    max-width: 25px;
+
+    > i.expand-collapse {
+      position: relative;
+    }
   }
   &:not(.minimized) {
     > .handle {
-      > i.expand-collapse { left: 25px; }
+      > i.expand-collapse { left: 5px; }
       &:hover > i.expand-collapse {
-        left: 20px;
+        left: 0px;
       }
       > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
     }
   }
   &.minimized {
     > .handle {
-      > i.expand-collapse { left: 19px; }
+      > i.expand-collapse { left: 5px; }
       &:hover > i.expand-collapse {
-        left: 24px;
+        left: 10px;
       }
       > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
     }
@@ -198,17 +211,15 @@ aside > div {
   // The vertical bar to pull-in/out the sidebar
   > .handle {
     width: @aside-handle-width;
-    height: 100%;
     white-space: nowrap;
     cursor: pointer;
     position: relative;
 
     // So it shows up to the left of the .boxed-group
-    display: inline;
-    float: left;
+    display: table-cell;
+    vertical-align: top;
 
     font-size: (@aside-handle-width - 2px);
-    right: (@aside-handle-width + 1px);
     position: relative;
     font-weight: normal;
     color: white;
@@ -216,7 +227,7 @@ aside > div {
 
     > .handle-text {
 
-      .x-rotate(90deg, bottom);
+      .x-rotate(90deg, left);
 
       // After rotating the text line it up to be above the vertical bar
       display: block;
@@ -224,6 +235,7 @@ aside > div {
       // Move the start of text just below the expand/collapse icon
       position: relative;
       top: -25px;
+      left: 10px;
     }
 
   }
