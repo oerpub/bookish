@@ -1,8 +1,9 @@
 define [
   'underscore'
   'backbone'
+  'cs!collections/content'
   'cs!models/content/inherits/container'
-], (_, Backbone, BaseContainerModel) ->
+], (_, Backbone, allContent, BaseContainerModel) ->
 
   return class Book extends BaseContainerModel
     defaults:
@@ -11,6 +12,23 @@ define [
     mediaType: 'application/vnd.org.cnx.collection'
     accept: ['application/vnd.org.cnx.module'] # Module
 
+
+    initialize: (options) ->
+      super(options)
+
+      setBody = (options) =>
+        if !options.parse
+          @set('body', @toHTML(), options)
+
+      children = @getChildren()
+      # When new content gets an id, reserialize the ToC
+      children.on 'change:id',  (model, value, options) => setBody({}) # Do not send options because parse:true will be set since the POST returned the id causing this event to fire
+      # When new content is added make sure allContent has the new model. TODO: move this into the constructor in mediaTypes or something
+      children.on 'add',        (model, collection, options)  => allContent.add(model)
+      # Update the ToC when elements are added or removed
+      children.on 'add remove', (model, collection, options)  => setBody(options)
+      # Update the ToC when the overridden title is changed (only a 'change' event is fired ;(
+      children.on 'change reset', (model, options)            => setBody(options)
 
     # Helper function to parse html-encoded data.
     #
@@ -86,5 +104,4 @@ define [
     toJSON: () ->
       json = super()
       delete json.contents
-      json.body = @toHTML()
       return json
