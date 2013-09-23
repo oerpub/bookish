@@ -38,10 +38,6 @@ define [
       @toc.show(new TocView {model:model, collection:collection})
 
     onWindowResize: () ->
-      $window = $(window)
-      $scrollable = @$el.find('> .boxed-group > .boxed-group-inner')
-      height = $window.height() - $scrollable.offset().top
-      $scrollable.css {height:height}
 
     onRender: () ->
       # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page

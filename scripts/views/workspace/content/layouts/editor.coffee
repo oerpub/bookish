@@ -12,10 +12,6 @@ define [
       edit: '#layout-body'
 
     onWindowResize: () ->
-      $window = $(window)
-      $scrollable = @$el
-      height = $window.height() - $scrollable.offset().top
-      $scrollable.css {height:height}
 
     onRender: () ->
       @edit.show(new ContentEditView({model: @model}))

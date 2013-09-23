@@ -7,18 +7,38 @@
 @color-green: @green; // Bootstrap green
 @color-blue: @blue; // Bootstrap blue
 
-.sidebar-container.sidebar-workspace aside > div {
-  background-color: @color-green;
-  > .handle > .handle-text::before          { content: 'Book Picker'; }
-  > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
-}
-.sidebar-container.sidebar-toc aside > div {
-  background-color: @color-blue;
-  > .handle > .handle-text::before          { content: 'Table of Contents'; }
-  > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
-}
+.sidebar-container {
+  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
+  // Other sidebars may actually be to the left so clip to the left
+  overflow-x: hidden;
+  float: left;
+  position: relative;
+  margin-right: -310px;
 
+  // Add a little spacing between the sidebars so they appear to float
 
+  max-width: 310px;
+
+  &.sidebar-workspace {
+    left: -620px;
+
+    aside > div {
+      background-color: @color-green;
+      > .handle > .handle-text::before          { content: 'Book Picker'; }
+      > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+    }
+  }
+
+  &.sidebar-toc { 
+    left: -310px;
+
+    aside > div {
+      background-color: @color-blue;
+      > .handle > .handle-text::before          { content: 'Table of Contents'; }
+      > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
+    }
+  }
+}
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
   background-color: @end-color;
@@ -55,31 +75,18 @@
 }
 
 #workspace-container {
-  display: table-row;
+  padding-left: 620px;
   width: 100%;
+  box-sizing: border-box;
 
   #menu-and-content,
   > .sidebar-container {
-    display: table-cell;
     vertical-align: top;
   }
 
   #menu-and-content {
-    width: 100%;
     min-width: 810px;
   }
-}
-
-.sidebar-container {
-  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
-  // Other sidebars may actually be to the left so clip to the left
-  overflow-x: hidden;
-
-  // Add a little spacing between the sidebars so they appear to float
-  margin-left:  10px;
-  margin-right: 10px;
-
-  max-width: 310px;
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -154,7 +161,7 @@
 
 
 
-@aside-width: 320px;
+@aside-width: 310px;
 @aside-handle-width: 20px;
 @aside-handle-width-expanded: 25px;
 @boxed-group-header-height: 42px;
@@ -169,8 +176,6 @@ aside > div {
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
 
-  display: table-row;
-
   // Round the corners so the handle looks nice
   -webkit-border-top-right-radius:  20px;
   -moz-border-radius-topright:      20px;
@@ -184,11 +189,9 @@ aside > div {
 
   .boxed-group {
     //So the vertical bar shows up to the right of this box
-    display: table-cell;
 
     background-color: inherit; // GitHub makes this gray by default.
-    width:      (@aside-width - @aside-handle-width-expanded - 6);
-    max-width:  (@aside-width - @aside-handle-width-expanded - 6);
+    width:      (@aside-width - @aside-handle-width-expanded - 8);
 
     // Make the Add button float right
     > h3 .add-content {
@@ -215,22 +218,22 @@ aside > div {
       position: relative;
     }
   }
+
   // The vertical bar to pull-in/out the sidebar
   > .handle {
     width: @aside-handle-width;
     white-space: nowrap;
     cursor: pointer;
-    position: relative;
+    position: absolute;
+    top: 0px;
+    right: 5px;
 
     // So it shows up to the left of the .boxed-group
-    display: table-cell;
     vertical-align: top;
 
     font-size: (@aside-handle-width - 2px);
-    position: relative;
     font-weight: normal;
     color: white;
-
 
     > .handle-text {
 
@@ -305,7 +308,8 @@ aside > div {
   padding: 3px;
   border-radius: 3px;
   margin: 0 0 15px 0;
-
+  height: 100%;
+  box-sizing: border-box;
 
   >h3 { line-height: 20px; }
 
@@ -326,6 +330,8 @@ aside > div {
   }
 
   .boxed-group-inner {
+    overflow: auto;
+    height: 100%;
     padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
