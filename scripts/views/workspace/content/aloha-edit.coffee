@@ -19,20 +19,9 @@ define [
     initialize: () ->
       @isLoaded = @model.isNew()
 
-      # images only have to be loaded the first time
-      # FIXME: This mess of Deferreds needs to be cleaned up. `XhtmlModel._loadComplex` comes to mind.
-      if @model.get(@modelKey)?.length
-        @imagesLoaded = (new $.Deferred()).resolve()
-      else
-        @imagesLoaded = new $.Deferred()
-
       @initalRender = new $.Deferred()
       @contentLoaded = new $.Deferred()
       @modelLoaded = @model.load()
-
-      $(window).bind 'oer.images.loaded', =>
-        $(window).unbind 'oer.images.loaded'
-        @imagesLoaded.resolve()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
@@ -55,7 +44,7 @@ define [
         @contentLoaded.resolve() if @model.get(@modelKey)?.length
 
       # this is the trigger for actually showing content and enabling editing
-      $.when(@imagesLoaded, @modelLoaded, @contentLoaded, @initalRender).done =>
+      $.when(@modelLoaded, @contentLoaded, @initalRender).done =>
         @isLoaded = true
         @render()
 
