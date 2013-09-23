@@ -19,7 +19,7 @@ define [
       toc: '.workspace-sidebar'
 
     events:
-      'click .handle': () -> @$el.toggleClass('minimized')
+      'click .handle': () -> @$el.parent().toggleClass('minimized')
 
     onShow: () ->
       model = @model

@@ -101,6 +101,39 @@
             > aside { // #sidebar .     alternatively, set this to height:100%;
               width: 310px;
               height: inherit;
+
+              &.minimized {
+                width: 40px;
+                // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
+                .boxed-group {
+                  max-width: 0;
+                  visibility: hidden;
+                  overflow-x: hidden;
+                }
+
+                // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
+                .x-slide-sidebar(inherit);
+              }
+
+              &:not(.minimized) {
+                > div > .handle {
+                  > i.expand-collapse { left: 5px; }
+                  &:hover > i.expand-collapse {
+                    left: 0px;
+                  }
+                  > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+                }
+              }
+              &.minimized {
+                > div > .handle {
+                  > i.expand-collapse { left: 5px; }
+                  &:hover > i.expand-collapse {
+                    left: 10px;
+                  }
+                  > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+                }
+              }
+
               > div { // Marionette view div
                 height: inherit;
                 > .boxed-group {
@@ -174,18 +207,6 @@ aside > div {
     }
   }
 
-  &.minimized {
-    // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
-    .boxed-group {
-      max-width: 0;
-      visibility: hidden;
-      overflow-x: hidden;
-    }
-
-    // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
-    .x-slide-sidebar(inherit);
-  }
-
   // Change the expand/collapse icon for the handle
   > .handle {
     max-width: 25px;
@@ -194,25 +215,6 @@ aside > div {
       position: relative;
     }
   }
-  &:not(.minimized) {
-    > .handle {
-      > i.expand-collapse { left: 5px; }
-      &:hover > i.expand-collapse {
-        left: 0px;
-      }
-      > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
-    }
-  }
-  &.minimized {
-    > .handle {
-      > i.expand-collapse { left: 5px; }
-      &:hover > i.expand-collapse {
-        left: 10px;
-      }
-      > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
-    }
-  }
-
   // The vertical bar to pull-in/out the sidebar
   > .handle {
     width: @aside-handle-width;
