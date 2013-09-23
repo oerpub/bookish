@@ -127,5 +127,8 @@ define ['jquery'], ($) ->
           # The path of the current document can be determined from the hash
           decodeURIComponent /^#edit(\/[^|]+)/.exec(window.location.hash)[1]
 
+    smartContentChange:
+      idle: 2000
+
   # In case some module wants the config object return it.
   return @Aloha
