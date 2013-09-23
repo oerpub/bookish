@@ -240,7 +240,7 @@ define [
           $img.attr('src', 'path/to/failure.png')
           deferred.resolve()
 
-      return $.when.apply(@, allImages).done -> @_imagesLoaded.resolve()
+      return $.when.apply(@, allImages).done => @_imagesLoaded.resolve()
 
 
     serialize: ->
