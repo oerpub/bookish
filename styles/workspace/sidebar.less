@@ -56,6 +56,7 @@
 
 #workspace-container {
   display: table-row;
+  width: 100%;
 
   #menu-and-content,
   > .sidebar-container {
@@ -63,7 +64,10 @@
     vertical-align: top;
   }
 
-  #menu-and-content { min-width: 810px; }
+  #menu-and-content {
+    width: 100%;
+    min-width: 810px;
+  }
 }
 
 .sidebar-container {
@@ -95,6 +99,7 @@
           > div.sidebar-container {  // alternatively, set this to height:100%;
             height: inherit;
             > aside { // #sidebar .     alternatively, set this to height:100%;
+              width: 310px;
               height: inherit;
               > div { // Marionette view div
                 height: inherit;
