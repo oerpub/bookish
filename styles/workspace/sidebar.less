@@ -13,11 +13,18 @@
   overflow-x: hidden;
   float: left;
   position: relative;
-  margin-right: -310px;
 
   // Add a little spacing between the sidebars so they appear to float
 
   max-width: 310px;
+
+  .handle {
+    > i.expand-collapse { left: 3px; }
+    &:hover > i.expand-collapse {
+      left: 2px;
+    }
+    > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+  }
 
   &.sidebar-workspace aside > div {
     background-color: @color-green;
@@ -70,77 +77,41 @@
 
 #workspace-container {
   width: 100%;
-  box-sizing: border-box;
-
-  // all panels open
-  padding-left: 620px;
-
-  .sidebar-workspace {
-    width: 310px;
-    left: -620px;
-  }
-  .sidebar-toc {
-    width: 310px;
-    left: -310px;
-  }
-  .sidebar-workspace .handle,
-  .sidebar-toc .handle {
-    > i.expand-collapse { left: 5px; }
-    &:hover > i.expand-collapse {
-      left: 0px;
-    }
-    > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
-  }
-  
-  #menu-and-content {
-    min-width: 810px;
-  }
 
   // workspace minimized
   &.workspace-minimized {
-    padding-left: 350px;
+    #menu-and-content {
+      width: calc(~"100% - 350px");
+    }
 
     .sidebar-workspace {
       width: 40px;
-      left: -350px;
       .boxed-group {
         max-width: 0;
         visibility: hidden;
         overflow-x: hidden;
       }
       .handle {
-        > i.expand-collapse { left: 5px; }
-        &:hover > i.expand-collapse {
-          left: 10px;
-        }
         > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
       }
-    }
-    .sidebar-toc {
-      left: -310px;
     }
   }
 
   // sidebar minimized (#sidebar is the table of contents
   &.sidebar-minimized {
-    padding-left: 350px;
-
-    .sidebar-workspace {
-      left: -350px;
+    #menu-and-content {
+      width: calc(~"100% - 350px");
     }
+
     .sidebar-toc {
       width: 40px;
-      left: -40px;
       .boxed-group {
         max-width: 0;
         visibility: hidden;
         overflow-x: hidden;
       }
+
       .handle {
-        > i.expand-collapse { left: 5px; }
-        &:hover > i.expand-collapse {
-          left: 10px;
-        }
         > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
       }
     }
@@ -148,7 +119,9 @@
 
   // workspace minimized
   &.workspace-minimized.sidebar-minimized {
-    padding-left: 80px;
+    #menu-and-content {
+      width: calc(~"100% - 80px");
+    }
 
     .sidebar-workspace,
     .sidebar-toc {
@@ -158,19 +131,6 @@
         visibility: hidden;
         overflow-x: hidden;
       }
-      .handle {
-        > i.expand-collapse { left: 5px; }
-        &:hover > i.expand-collapse {
-          left: 10px;
-        }
-        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
-      }
-    }
-    .sidebar-workspace {
-      left: -80px;
-    }
-    .sidebar-toc {
-      left: -40px;
     }
   }
 }
@@ -255,11 +215,6 @@ aside > div {
         left: inherit; // Bootstrap aligns it left:0; by default
         right: 0;
       }
-    }
-
-    > .boxed-group-inner {
-      // So boxed-group-inner is scrollable, set the overflow-y
-      overflow-y: auto;
     }
   }
 
@@ -384,7 +339,7 @@ aside > div {
 
   .boxed-group-inner {
     overflow: auto;
-    height: 100%;
+    height: calc(~"100% - 82px");
     padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
@@ -437,10 +392,7 @@ aside > div {
   nav li .btn-mini.pull-right,
   .context-button {
     position: relative;
-    //width: 12px;
-    //height: 22px;
     line-height: 23px;
-    //font: normal normal 16px "octicons";
     line-height: 1;
     display: inline-block;
     text-decoration: none;
