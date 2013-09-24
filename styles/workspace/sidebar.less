@@ -19,25 +19,19 @@
 
   max-width: 310px;
 
-  &.sidebar-workspace {
-    left: -620px;
-
-    aside > div {
-      background-color: @color-green;
-      > .handle > .handle-text::before          { content: 'Book Picker'; }
-      > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
-    }
+  &.sidebar-workspace aside > div {
+    background-color: @color-green;
+    > .handle > .handle-text::before          { content: 'Book Picker'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
+  
 
-  &.sidebar-toc { 
-    left: -310px;
-
-    aside > div {
-      background-color: @color-blue;
-      > .handle > .handle-text::before          { content: 'Table of Contents'; }
-      > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
-    }
+  &.sidebar-toc aside > div {
+    background-color: @color-blue;
+    > .handle > .handle-text::before          { content: 'Table of Contents'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
+  
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
@@ -75,17 +69,109 @@
 }
 
 #workspace-container {
-  padding-left: 620px;
   width: 100%;
   box-sizing: border-box;
 
-  #menu-and-content,
-  > .sidebar-container {
-    vertical-align: top;
-  }
+  // all panels open
+  padding-left: 620px;
 
+  .sidebar-workspace {
+    width: 310px;
+    left: -620px;
+  }
+  .sidebar-toc {
+    width: 310px;
+    left: -310px;
+  }
+  .sidebar-workspace .handle,
+  .sidebar-toc .handle {
+    > i.expand-collapse { left: 5px; }
+    &:hover > i.expand-collapse {
+      left: 0px;
+    }
+    > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+  }
+  
   #menu-and-content {
     min-width: 810px;
+  }
+
+  // workspace minimized
+  &.workspace-minimized {
+    padding-left: 350px;
+
+    .sidebar-workspace {
+      width: 40px;
+      left: -350px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+      .handle {
+        > i.expand-collapse { left: 5px; }
+        &:hover > i.expand-collapse {
+          left: 10px;
+        }
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+    .sidebar-toc {
+      left: -310px;
+    }
+  }
+
+  // sidebar minimized (#sidebar is the table of contents
+  &.sidebar-minimized {
+    padding-left: 350px;
+
+    .sidebar-workspace {
+      left: -350px;
+    }
+    .sidebar-toc {
+      width: 40px;
+      left: -40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+      .handle {
+        > i.expand-collapse { left: 5px; }
+        &:hover > i.expand-collapse {
+          left: 10px;
+        }
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+  }
+
+  // workspace minimized
+  &.workspace-minimized.sidebar-minimized {
+    padding-left: 80px;
+
+    .sidebar-workspace,
+    .sidebar-toc {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+      .handle {
+        > i.expand-collapse { left: 5px; }
+        &:hover > i.expand-collapse {
+          left: 10px;
+        }
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+    .sidebar-workspace {
+      left: -80px;
+    }
+    .sidebar-toc {
+      left: -40px;
+    }
   }
 }
 
@@ -106,40 +192,7 @@
           > div.sidebar-container {  // alternatively, set this to height:100%;
             height: inherit;
             > aside { // #sidebar .     alternatively, set this to height:100%;
-              width: 310px;
               height: inherit;
-
-              &.minimized {
-                width: 40px;
-                // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
-                .boxed-group {
-                  max-width: 0;
-                  visibility: hidden;
-                  overflow-x: hidden;
-                }
-
-                // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
-                .x-slide-sidebar(inherit);
-              }
-
-              &:not(.minimized) {
-                > div > .handle {
-                  > i.expand-collapse { left: 5px; }
-                  &:hover > i.expand-collapse {
-                    left: 0px;
-                  }
-                  > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
-                }
-              }
-              &.minimized {
-                > div > .handle {
-                  > i.expand-collapse { left: 5px; }
-                  &:hover > i.expand-collapse {
-                    left: 10px;
-                  }
-                  > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
-                }
-              }
 
               > div { // Marionette view div
                 height: inherit;
