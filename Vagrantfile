@@ -1,6 +1,7 @@
 Vagrant.configure("2") do |config|
     config.vm.box = "precise64"
     config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+    config.vm.synced_folder "./", "/vagrant"
     config.vm.provision :shell, :path => "node-bootstrap.sh"
     config.vm.network :private_network, ip: '33.33.33.10'
 
@@ -9,7 +10,5 @@ Vagrant.configure("2") do |config|
         # vb.customize ["modifyvm", :id, "--memory", "2048"]
         # vb.customize ["modifyvm", :id, "--cpus", "4"]
     end
-    
-    config.vm.synced_folder "./", "/vagrant/www/default"
 end
 

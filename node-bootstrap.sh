@@ -8,10 +8,7 @@ if [ ! -d "/var/www" ]
 then
     # Update and begin installing some utility tools
     apt-get -y update
-    apt-get install -y python-software-properties
-    apt-get install -y vim git subversion curl
-    apt-get install -y memcached build-essential
-    apt-get install -y apache2
+    apt-get install -y python-software-properties git curl build-essential apache2
 
     # Build latest node.js from source
     cd /tmp
@@ -21,8 +18,12 @@ then
     make
     make install
 
+    cd /vagrant
+    npm install
+
     # Symlink our host www to the guest /var/www folder
-    ln -s /vagrant/www /var/www
+    sudo rm -rf /var/www
+    sudo ln -s /vagrant/ /var/www
 fi
 
 
