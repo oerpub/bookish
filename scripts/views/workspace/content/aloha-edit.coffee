@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'marionette'
   'aloha'
   #'mathjax'
-], (Marionette, Aloha) ->
+], ($, Marionette, Aloha) ->
 
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
@@ -71,8 +72,7 @@ define [
             @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
         Aloha.bind 'aloha-smart-content-changed', (evt, d) =>
-          updateModel() if d.editable.obj.is(@$el)
-
+          updateModel() if d.editable.obj.is(@$el) or $.contains _this.$el[0], d.editable.obj[0]
 
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
