@@ -72,7 +72,7 @@ define [
             @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
         Aloha.bind 'aloha-smart-content-changed', (evt, d) =>
-          updateModel() if d.editable.obj.is(@$el) or $.contains _this.$el[0], d.editable.obj[0]
+          updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
 
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
