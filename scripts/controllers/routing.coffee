@@ -57,7 +57,7 @@ define [
           @layout.content.show(new SearchResultsView {collection:allContent})
 
           # Update the URL
-          @.trigger 'navigate', 'workspace'
+          @trigger 'navigate', 'workspace'
 
 
     # Edit existing content
@@ -128,5 +128,5 @@ define [
             contextPath = ''
             contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
 
-            # Update the URL without triggering the router
-            @.trigger 'navigate', "edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}"
+            # Update the URL
+            @trigger 'navigate', "edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}"
