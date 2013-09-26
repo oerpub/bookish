@@ -49,3 +49,9 @@ define [
       $window = $(window)
       $window.on('resize', @onWindowResize.bind(@))
       @onWindowResize()
+
+    # Sticking to American spelling here
+    maximize: () ->
+      name = @$el.parent().attr('id')
+      @$el.parents('#workspace-container').removeClass(name+'-minimized')
+      return @

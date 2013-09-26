@@ -109,6 +109,7 @@ define [
                   model: contextModel
 
                 @layout.sidebar.show(contextView)
+                contextView.maximize()
             # Some models do not change the sidebar because they cannot contain children (like Module)
             else if model.getChildren
               # Only change the view if there is nothing there or if the model differs
@@ -116,6 +117,7 @@ define [
                 modelView = new SidebarView
                   model: model
                 @layout.sidebar.show(modelView)
+                modelView.maximize()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 
