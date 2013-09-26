@@ -215,14 +215,6 @@ define [
   App.on 'start', () ->
 
     # Update the width/height of main so we can have CSS that uses `bottom: 0` or `right: 0`
-    $window = $(window)
-    onWindowResize = () =>
-      $('#main').css  # For some reason App.main.$el is not instantiated yet
-        width: $window.width()
-        height: $window.height()
-
-    $window.resize onWindowResize
-    onWindowResize()
 
     startRouting = () ->
       # Remove cyclic dependency. Controller depends on `App.main` region
@@ -275,7 +267,6 @@ define [
           goEdit: (id, contextModel=null)    ->
             @_loadFirst().done () => controller.goEdit(id, contextModel)
           goDefault: () ->
-            _controller = @ # Explicit is better than confusing
             @_loadFirst().done () ->
               require ['cs!gh-book/opf-file'], (OpfFile) ->
                 # Find the first opf file.
@@ -285,7 +276,7 @@ define [
                   # TOC nodes.
                   controller.goEdit opf.tocNodes.at(1), opf
                 else
-                  _controller.goWorkspace()
+                  controller.goWorkspace()
 
 
         session.on 'change', () =>

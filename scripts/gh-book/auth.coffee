@@ -49,7 +49,7 @@ define [
       @listenTo @model, 'change', () => @render()
 
       # Bind a function to the window if the user tries to navigate away from this page
-      $(window).on 'beforeunload', () ->
+      $(window).on 'beforeunload', () =>
         return 'You have unsaved changes. Are you sure you want to leave this page?' if @isDirty
 
       # Since this View is reloaded all the time (whenever a route change occurs)
@@ -144,7 +144,7 @@ define [
         token:    @$el.find('#github-token').val()
         password: @$el.find('#github-password').val()
 
-      if not attrs.password or attrs.token
+      if not (attrs.password or attrs.token)
         alert 'We are terribly sorry but github recently changed so you must login to use their API.\nPlease refresh and provide a password or an OAuth token.'
       else
         # Test login first, this also updates login details on the session

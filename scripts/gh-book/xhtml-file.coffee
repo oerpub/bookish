@@ -120,7 +120,7 @@ define [
       super(options, force) if not _.isEmpty(changed)
 
     # This promise is resolved once the file is parsed so we know which images to load
-    _imagesLoaded = new $.Deferred()
+    _imagesLoaded: new $.Deferred()
     _loadComplex: (originalPromise) ->
       return @_imagesLoaded
 
@@ -240,7 +240,7 @@ define [
           $img.attr('src', 'path/to/failure.png')
           deferred.resolve()
 
-      return $.when.apply(@, allImages).done -> @_imagesLoaded.resolve()
+      return $.when.apply(@, allImages).done => @_imagesLoaded.resolve()
 
 
     serialize: ->

@@ -38,6 +38,8 @@ define ['jquery'], ($) ->
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
           'ui/ui': 'toolbar/toolbar-plugin'
 
+      waitSeconds: 42
+
     bundles:
       ghbook: '../../../../scripts/aloha'
 
@@ -124,6 +126,9 @@ define ['jquery'], ($) ->
         path: () ->
           # The path of the current document can be determined from the hash
           decodeURIComponent /^#edit(\/[^|]+)/.exec(window.location.hash)[1]
+
+    smartContentChange:
+      idle: 2000
 
   # In case some module wants the config object return it.
   return @Aloha

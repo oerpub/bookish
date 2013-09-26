@@ -7,18 +7,39 @@
 @color-green: @green; // Bootstrap green
 @color-blue: @blue; // Bootstrap blue
 
-.sidebar-container.sidebar-workspace aside > div {
-  background-color: @color-green;
-  > .handle > .handle-text::before          { content: 'Book Picker'; }
-  > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
-}
-.sidebar-container.sidebar-toc aside > div {
-  background-color: @color-blue;
-  > .handle > .handle-text::before          { content: 'Table of Contents'; }
-  > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
-}
+.sidebar-container {
+  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
+  // Other sidebars may actually be to the left so clip to the left
+  overflow-x: hidden;
+  float: left;
+  position: relative;
 
+  // Add a little spacing between the sidebars so they appear to float
 
+  max-width: 310px;
+
+  .handle {
+    > i.expand-collapse { left: 3px; }
+    &:hover > i.expand-collapse {
+      left: 2px;
+    }
+    > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+  }
+
+  &.sidebar-workspace aside > div {
+    background-color: @color-green;
+    > .handle > .handle-text::before          { content: 'Book Picker'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+  }
+  
+
+  &.sidebar-toc aside > div {
+    background-color: @color-blue;
+    > .handle > .handle-text::before          { content: 'Table of Contents'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
+  }
+  
+}
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
   background-color: @end-color;
@@ -55,27 +76,63 @@
 }
 
 #workspace-container {
-  display: table-row;
+  width: 100%;
 
-  #menu-and-content,
-  > .sidebar-container {
-    display: table-cell;
-    vertical-align: top;
+  // workspace minimized
+  &.workspace-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 350px");
+    }
+
+    .sidebar-workspace {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+      .handle {
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
   }
 
-  #menu-and-content { min-width: 810px; }
-}
+  // sidebar minimized (#sidebar is the table of contents
+  &.sidebar-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 350px");
+    }
 
-.sidebar-container {
-  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
-  // Other sidebars may actually be to the left so clip to the left
-  overflow-x: hidden;
+    .sidebar-toc {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
 
-  // Add a little spacing between the sidebars so they appear to float
-  margin-left:  10px;
-  margin-right: 10px;
+      .handle {
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+  }
 
-  max-width: 310px;
+  // workspace minimized
+  &.workspace-minimized.sidebar-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 80px");
+    }
+
+    .sidebar-workspace,
+    .sidebar-toc {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+    }
+  }
 }
 
 // All the height:inherit to be able to scroll inside the ToC
@@ -96,6 +153,7 @@
             height: inherit;
             > aside { // #sidebar .     alternatively, set this to height:100%;
               height: inherit;
+
               > div { // Marionette view div
                 height: inherit;
                 > .boxed-group {
@@ -116,7 +174,7 @@
 
 
 
-@aside-width: 320px;
+@aside-width: 310px;
 @aside-handle-width: 20px;
 @aside-handle-width-expanded: 25px;
 @boxed-group-header-height: 42px;
@@ -131,8 +189,6 @@ aside > div {
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
 
-  display: table-row;
-
   // Round the corners so the handle looks nice
   -webkit-border-top-right-radius:  20px;
   -moz-border-radius-topright:      20px;
@@ -146,11 +202,9 @@ aside > div {
 
   .boxed-group {
     //So the vertical bar shows up to the right of this box
-    display: table-cell;
 
     background-color: inherit; // GitHub makes this gray by default.
-    width:      (@aside-width - @aside-handle-width-expanded - 6);
-    max-width:  (@aside-width - @aside-handle-width-expanded - 6);
+    width:      (@aside-width - @aside-handle-width-expanded - 8);
 
     // Make the Add button float right
     > h3 .add-content {
@@ -162,23 +216,6 @@ aside > div {
         right: 0;
       }
     }
-
-    > .boxed-group-inner {
-      // So boxed-group-inner is scrollable, set the overflow-y
-      overflow-y: auto;
-    }
-  }
-
-  &.minimized {
-    // Hide the boxed-group but instead of display:none; use width:0; and visibility:hidden; so CSS transitions
-    .boxed-group {
-      max-width: 0;
-      visibility: hidden;
-      overflow-x: hidden;
-    }
-
-    // Animate the sidebar to slide left (closed) when non-minimized handle is clicked
-    .x-slide-sidebar(inherit);
   }
 
   // Change the expand/collapse icon for the handle
@@ -189,41 +226,22 @@ aside > div {
       position: relative;
     }
   }
-  &:not(.minimized) {
-    > .handle {
-      > i.expand-collapse { left: 5px; }
-      &:hover > i.expand-collapse {
-        left: 0px;
-      }
-      > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
-    }
-  }
-  &.minimized {
-    > .handle {
-      > i.expand-collapse { left: 5px; }
-      &:hover > i.expand-collapse {
-        left: 10px;
-      }
-      > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
-    }
-  }
 
   // The vertical bar to pull-in/out the sidebar
   > .handle {
     width: @aside-handle-width;
     white-space: nowrap;
     cursor: pointer;
-    position: relative;
+    position: absolute;
+    top: 0px;
+    right: 5px;
 
     // So it shows up to the left of the .boxed-group
-    display: table-cell;
     vertical-align: top;
 
     font-size: (@aside-handle-width - 2px);
-    position: relative;
     font-weight: normal;
     color: white;
-
 
     > .handle-text {
 
@@ -298,7 +316,8 @@ aside > div {
   padding: 3px;
   border-radius: 3px;
   margin: 0 0 15px 0;
-
+  height: 100%;
+  box-sizing: border-box;
 
   >h3 { line-height: 20px; }
 
@@ -319,6 +338,8 @@ aside > div {
   }
 
   .boxed-group-inner {
+    overflow: auto;
+    height: calc(~"100% - 82px");
     padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
@@ -371,10 +392,7 @@ aside > div {
   nav li .btn-mini.pull-right,
   .context-button {
     position: relative;
-    //width: 12px;
-    //height: 22px;
     line-height: 23px;
-    //font: normal normal 16px "octicons";
     line-height: 1;
     display: inline-block;
     text-decoration: none;
