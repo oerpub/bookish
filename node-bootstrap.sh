@@ -10,6 +10,9 @@ then
     apt-get -y update
     apt-get install -y python-software-properties git curl build-essential apache2
 
+    # vboxfs doesn't support sendfile, turn that off
+    echo "EnableSendfile off" >> /etc/apache2/apache2.conf
+
     # Build latest node.js from source
     cd /tmp
     git clone -b v0.10.11-release https://github.com/joyent/node.git
