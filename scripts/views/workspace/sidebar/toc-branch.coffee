@@ -133,7 +133,9 @@ define [
 
     onRender: () ->
       # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+      $dropNode = @$el.find('> .editor-node-body')
+      $dragNode = $dropNode.find('> *[data-media-type]')
+      EnableDnD.enableContentDnD(@model, $dragNode, $dropNode)
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
