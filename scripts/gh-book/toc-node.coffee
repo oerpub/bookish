@@ -22,7 +22,9 @@ define [
 
     initialize: (options) ->
       super(options)
-      @set 'title', options.title, {parse:true}
+      # Chapter nodes have their title passed in as an option (TODO: should be an attribute.... grr)
+      if options.title
+        @set('title', options.title, {parse:true})
       @htmlAttributes = options.htmlAttributes or {}
 
       @on 'change:title', (model, value, options) =>
