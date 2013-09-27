@@ -5,11 +5,10 @@
 # There is a cyclic dependency between this and various views (`->` means "depends on"):
 # controller -> layout -> WorkspaceView -> WorkspaceItemView -> controller (because clicking an item will begin editing)
 define [
-  'underscore'
   'marionette'
   'cs!collections/content'
   'cs!views/layouts/workspace'
-  ], (_, Marionette, allContent, WorkspaceLayout) ->
+  ], (Marionette, allContent, WorkspaceLayout) ->
 
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
