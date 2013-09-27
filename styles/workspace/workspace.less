@@ -27,14 +27,12 @@
 .x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
 .x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
 
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
 #container {
-  display: -webkit-flex;
-  display: flex;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
   -webkit-box-orient: horizontal;
   box-orient: horizontal;
   overflow: hidden;
@@ -42,3 +40,42 @@
 
 // Hide the floating toolbar
 .aloha-toolbar { display: none !important; }
+
+#menu-and-content {
+  float: left;
+  width: calc(~"100% - 620px");
+  height: 100%;
+  min-width: 810px;
+
+  .content-panel {
+    height: calc(~"100% - 75px");
+    background-color: @orange;
+
+    // Round the corners so the handle looks nice
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-topleft:     20px;
+    border-top-left-radius:         20px;
+    -webkit-border-top-right-radius:  20px;
+    -moz-border-radius-topright:      20px;
+    border-top-right-radius:          20px;
+
+    .content-title {
+      color: white;
+      // same as sidebar handle
+      font-size: 18px;
+      text-shadow: 2px 2px 4px black;
+    }
+
+    // By default, boxed-group is grey
+    .boxed-group {
+      background-color: inherit;
+      height: 100%;
+
+      .boxed-group-inner {
+        // So boxed-group-inner is scrollable, set the overflow-y
+        overflow-y: auto;
+      }
+    }
+
+  }
+}

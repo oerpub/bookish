@@ -360,8 +360,13 @@ define [
         #@tocNodes.add node
       return node
 
-    # Do not change the contentView when the book opens
-    contentView: null
+    # When the book opens, find the first non-toc element in the toc and
+    # open its contentView, if it has one.
+    contentView: (callback) ->
+      first = @tocNodes.at(1) # First item is always the toc/nav, we pick the second
+      if first and first.contentView
+        return first.contentView(callback)
+      return null
 
     # Change the sidebar view when editing this
     sidebarView: (callback) ->

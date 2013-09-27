@@ -119,7 +119,10 @@ define [
       changed = _.omit @changedAttributes(), 'title'
       super(options, force) if not _.isEmpty(changed)
 
-
+    # This promise is resolved once the file is parsed so we know which images to load
+    _imagesLoaded: new $.Deferred()
+    _loadComplex: (originalPromise) ->
+      return @_imagesLoaded
 
     parse: (json) ->
       html = json.content
@@ -237,7 +240,7 @@ define [
           $img.attr('src', 'path/to/failure.png')
           deferred.resolve()
 
-      $.when.apply(@, allImages).done -> $(window).trigger('oer.images.loaded')
+      return $.when.apply(@, allImages).done => @_imagesLoaded.resolve()
 
 
     serialize: ->

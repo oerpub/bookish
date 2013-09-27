@@ -11,6 +11,8 @@ define [
     regions:
       edit: '#layout-body'
 
+    onWindowResize: () ->
+
     onRender: () ->
       @edit.show(new ContentEditView({model: @model}))
 
@@ -19,3 +21,8 @@ define [
       # also in @title above, but presently this is being hidden in css pending
       # other changes, so we need this feedback here.
       $('#module-title-indicator').text(@model.get('title'))
+
+      # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page
+      $window = $(window)
+      $window.on('resize', @onWindowResize.bind(@))
+      @onWindowResize()

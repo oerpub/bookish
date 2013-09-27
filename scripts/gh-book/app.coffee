@@ -58,11 +58,11 @@ define [
     complete = 0
     total = 0
 
-    promise.progress (msg) =>
-      switch msg.type
-        when 'start'  then total++
-        when 'end'    then complete++
-      console.log "Progress: #{complete}/#{total}: ", msg
+    # promise.progress (msg) =>
+    #   switch msg.type
+    #     when 'start'  then total++
+    #     when 'end'    then complete++
+    #   console.log "Progress: #{complete}/#{total}: ", msg
 
     return promise.fail (err) =>
       repoUser = session.get('repoUser')
@@ -131,32 +131,6 @@ define [
 
 
     # Github read/write and repo configuration
-
-    writeFile = (path, model, commitText, isBase64) ->
-      text = model.serialize()
-      lastSeenSha = remoteUpdater.lastSeenSha
-      promise = $.Deferred()
-      # .write expects the text to be base64 encoded so no need to convert it
-      session.getBranch().write(path, text, commitText, isBase64, lastSeenSha)
-      .done((val) => model.onSaved?(); promise.resolve(val))
-      .fail (err) =>
-        # Get the new lastSeenSha
-        remoteUpdater.pollUpdates().then () =>
-            # Probably a conflict because of a remote change.
-            # Resolve the changes and save again
-            model.reload()
-            .fail((err) => promise.reject(err))
-            .done () =>
-              # Probably a patch/cache problem.
-              # Clear the cache and try again
-              session.getClient().clearCache?()
-              writeFile(path, model, commitText, isBase64)
-              .fail((err) => promise.reject(err))
-              .done (val) => promise.resolve(val)
-
-
-      return promise
-
     writeFiles = (models, commitText) ->
       parentCommitSha = remoteUpdater.lastSeenSha
       promise = $.Deferred()
@@ -201,6 +175,8 @@ define [
     readDir =        (path) -> session.getBranch().contents   path
 
 
+    # Only support reading 1 file at a time.
+    # Writing is done in batch by save (for multifile commits and conflict resolution).
     Backbone.sync = (method, model, options) ->
 
       path = model.id or model.url?() or model.url
@@ -209,8 +185,6 @@ define [
       ret = null
       switch method
         when 'read' then ret = readFile(path, model.isBinary)
-        when 'update' then ret = writeFile(path, model, 'Editor Update', model.isBinary)
-        when 'create' then ret = writeFile(path, model, 'Editor Create', model.isBinary)
         else throw "Model sync method not supported: #{method}"
 
       ret.done (value) => options?.success?(value)
@@ -239,6 +213,8 @@ define [
     allContent.save = allContent_save.bind(allContent)
 
   App.on 'start', () ->
+
+    # Update the width/height of main so we can have CSS that uses `bottom: 0` or `right: 0`
 
     startRouting = () ->
       # Remove cyclic dependency. Controller depends on `App.main` region

@@ -1,45 +1,35 @@
 <div id="{{layout}}">
   <section id="container">
-    <div id="workspace-container" class="wsminimized green">
-      <div id="greentoolbar" class="green pickerswitch">
-        <div id="to-dashboard-icon" class="pickerswitch"></div>
-        <span id="pickerhover">Open...</span>
-        <span id="pickertext">Book picker</span>
-      </div>    
-      <aside id="greenpicker" class="pickerswitch" class="green"></aside>
-      <aside id="workspace" class="green"></aside>
-    <div id="sidebar-container" class="minimized blue">
-      <div id="bluetoolbar" class="blue pickerswitch">
-        <!--
-        <a href="#" id="toc-collapse" title="Hide the Table of Contents"><img src="styles/workspace/collapse-box-silver-02.png"></a>
-        <a href="#" id="toc-expand" title="Open the Table of Contents back up" style=""><img src="styles/workspace/expand-box-silver-02.png"></a>
-        -->
-        <span id="toc-title-text">
-              Table of contents
-              <!--
-              <span id="edit-toc-link">
-              (<a href="#" onclick="return false;" title="Edit and organize the contents of this book.  Add materials, rearrange modules, etc." class="pickerswitcher">edit</a>)
-              </span>
-              <span id="edit-toc-metadata" style="display: none;">
-              (<a href="#" onclick="return false;">edit description/authors</a>)
-              </span>
-              -->
-        </span>
+    <div id="workspace-container">
+      <div class="sidebar-container sidebar-workspace">
+        <aside id="workspace" class="green"></aside>
       </div>
-      <aside id="bluepicker" class="pickerswitch"></aside>
-      <aside id="sidebar" class="blue"></aside>
-    </div>
-    <div id="menu-and-content" class="orange">
-      <div id="greyout-overlay" class="orange"></div>
-      <div id="orangetoolbar" class="orange">
-        <span id="editor-title-text">
-          Editor
-          <span id="module-title-indicator"></span>
-        </span>
+      <div class="sidebar-container sidebar-toc">
+        <aside id="sidebar" class="blue"></aside>
       </div>
-      <div id="menu" class="orange"></div>
-      <div id="content" class="orange"></div>
-    </div>
+      <div id="menu-and-content" class="orange">
+        <div>
+          <div id="workspace-auth" style="margin-bottom: 10px;">
+            {{! Auth View }}
+          </div>
+        </div>
+
+        <div class="content-panel">
+          <div class="content-title">
+            <span id="editor-title-text">
+              Editor:
+              <span id="module-title-indicator"></span>
+            </span>
+          </div>
+          <div class="boxed-group">
+
+            <div id="menu" class="content-toolbar"></div>
+            <div class="boxed-group-inner">
+              <div id="content" class="content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </div>

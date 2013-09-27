@@ -170,7 +170,6 @@ define [
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
-      controller.layout.showWorkspace(false)
       controller.goEdit(@model, @model.getRoot?())
 
 

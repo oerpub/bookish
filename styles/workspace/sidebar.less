@@ -1,48 +1,505 @@
 @import "../variables.less";
 
+/*****************************
+ * New Styles
+ *****************************/
+
+@color-green: @green; // Bootstrap green
+@color-blue: @blue; // Bootstrap blue
+
+.sidebar-container {
+  // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
+  // Other sidebars may actually be to the left so clip to the left
+  overflow-x: hidden;
+  float: left;
+  position: relative;
+
+  // Add a little spacing between the sidebars so they appear to float
+
+  max-width: 310px;
+
+  .handle {
+    > i.expand-collapse { left: 3px; }
+    &:hover > i.expand-collapse {
+      left: 2px;
+    }
+    > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
+  }
+
+  &.sidebar-workspace aside > div {
+    background-color: @color-green;
+    > .handle > .handle-text::before          { content: 'Book Picker'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+  }
+  
+
+  &.sidebar-toc aside > div {
+    background-color: @color-blue;
+    > .handle > .handle-text::before          { content: 'Table of Contents'; }
+    > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
+  }
+  
+}
+
+.x-filter-gradient(@orient, @start-color, @end-color) {
+  background-color: @end-color;
+  background-image: -webkit-linear-gradient(@orient, @start-color, @end-color);
+  background-image:    -moz-linear-gradient(@orient, @start-color, @end-color);
+  background-image:         linear-gradient(@orient, @start-color, @end-color);
+}
+
+.x-rotate(@degrees, @origin) {
+  -webkit-transform:  rotate(@degrees);
+  -moz-transform:     rotate(@degrees);
+  -ms-transform:      rotate(@degrees);
+  -o-transform:       rotate(@degrees);
+  transform:          rotate(@degrees);
+
+  -webkit-transform-origin: @origin;
+  -moz-transform-origin:    @origin;
+  -ms-transform-origin:     @origin;
+  -o-transform-origin:      @origin;
+  transform-origin:         @origin;
+}
+
+.x-slide-sidebar(@width) {
+  width: @width;
+  -webkit-transition: width 0.1s ease-out;
+  -moz-transition:    width 0.1s ease-out;
+  -o-transition:      width 0.1s ease-out;
+  transition:         width 0.1s ease-out;
+}
+
+
+.x-sidebar-handle-hover(@normal-width, @hover-width) {
+  text-shadow: 2px 2px 4px #000;
+}
+
+#workspace-container {
+  width: 100%;
+
+  // workspace minimized
+  &.workspace-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 350px");
+    }
+
+    .sidebar-workspace {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+      .handle {
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+  }
+
+  // sidebar minimized (#sidebar is the table of contents
+  &.sidebar-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 350px");
+    }
+
+    .sidebar-toc {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+
+      .handle {
+        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+      }
+    }
+  }
+
+  // workspace minimized
+  &.workspace-minimized.sidebar-minimized {
+    #menu-and-content {
+      width: calc(~"100% - 80px");
+    }
+
+    .sidebar-workspace,
+    .sidebar-toc {
+      width: 40px;
+      .boxed-group {
+        max-width: 0;
+        visibility: hidden;
+        overflow-x: hidden;
+      }
+    }
+  }
+}
+
+// All the height:inherit to be able to scroll inside the ToC
+#main {
+  height: inherit;
+  > div {
+    height: inherit;
+    // If this node is the signin modal then do not stretch it vertically
+    #sign-in-modal { height: initial; }
+
+    > div {
+      height: inherit;
+      > #container { // a <section>
+        height: inherit;
+        > #workspace-container { // a <div>
+          height: inherit;
+          > div.sidebar-container {  // alternatively, set this to height:100%;
+            height: inherit;
+            > aside { // #sidebar .     alternatively, set this to height:100%;
+              height: inherit;
+
+              > div { // Marionette view div
+                height: inherit;
+                > .boxed-group {
+                  height: inherit;
+                  > .boxed-group-inner {
+                    height: inherit;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+@aside-width: 310px;
+@aside-handle-width: 20px;
+@aside-handle-width-expanded: 25px;
+@boxed-group-header-height: 42px;
+
+aside > div {
+
+  // Do not scroll. instead let javascript in sidebar.coffee set the height
+  // of the sidebar element to scroll
+  overflow-y: hidden;
+  overflow-x: hidden;
+
+  // Animate the sidebar to slide right (open) when minimized handle is clicked
+  .x-slide-sidebar(@aside-width);
+
+  // Round the corners so the handle looks nice
+  -webkit-border-top-right-radius:  20px;
+  -moz-border-radius-topright:      20px;
+  border-top-right-radius:          20px;
+  -webkit-border-bottom-right-radius:  20px;
+  -moz-border-radius-bottomright:      20px;
+  border-bottom-right-radius:          20px;
+
+
+  > .handle { text-shadow: 2px 2px 4px #000; }
+
+  .boxed-group {
+    //So the vertical bar shows up to the right of this box
+
+    background-color: inherit; // GitHub makes this gray by default.
+    width:      (@aside-width - @aside-handle-width-expanded - 8);
+
+    // Make the Add button float right
+    > h3 .add-content {
+      float: right;
+
+      // Also, make it right-align so it does not bleed to the right of the sidebar
+      .btn-group ul.dropdown-menu {
+        left: inherit; // Bootstrap aligns it left:0; by default
+        right: 0;
+      }
+    }
+  }
+
+  // Change the expand/collapse icon for the handle
+  > .handle {
+    max-width: 25px;
+
+    > i.expand-collapse {
+      position: relative;
+    }
+  }
+
+  // The vertical bar to pull-in/out the sidebar
+  > .handle {
+    width: @aside-handle-width;
+    white-space: nowrap;
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 5px;
+
+    // So it shows up to the left of the .boxed-group
+    vertical-align: top;
+
+    font-size: (@aside-handle-width - 2px);
+    font-weight: normal;
+    color: white;
+
+    > .handle-text {
+
+      .x-rotate(90deg, left);
+
+      // After rotating the text line it up to be above the vertical bar
+      display: block;
+
+      // Move the start of text just below the expand/collapse icon
+      position: relative;
+      top: -25px;
+      left: 10px;
+    }
+
+  }
+
+  // The Tree (which looks like a list)
+  nav {
+    @indent-width: 20px;
+    @compensate-width: 15px;
+    @compensate-start: @aside-width - 110; // Not sure why it is 70...
+
+    .x-indent-compensate(@level) {
+      > li {
+        // Padding on the left
+        // Indent nested lists in this way so:
+        // 1. the horizontal bars stretch across the whole width
+        // 2. edit buttons on the right are still lined up
+        > .editor-node-body /*:first-child*/ { padding-left: (@indent-width * @level); }
+
+        // Compensate on the right (for ellipsis)
+        // for each level in the tree decrease the size of allowable text by how much is indented
+        // so the ellipsis show up in the right place
+        .editor-node-title { max-width: (@compensate-start - @compensate-width * @level); }
+      }
+    }
+
+    > ol ol { padding: 0; margin: 0; }
+    > ol              { .x-indent-compensate(0); }
+    > ol ol           { .x-indent-compensate(1); }
+    > ol ol ol        { .x-indent-compensate(2); }
+    > ol ol ol ol     { .x-indent-compensate(3); }
+    > ol ol ol ol ol  { .x-indent-compensate(4); }
+
+
+    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
+    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+
+    // When a list item is expanded there is no dropzone just below it to add padding
+    // so manually add in some padding
+    li.editor-node-expanded > .editor-node-body {
+      margin-bottom: 6px;
+    }
+
+    // TODO: Style the .edit-settings so it only shows up on hover
+
+  }
+
+}
+
+
+
+/*************************
+ * GitHub Styles
+ *************************/
+
+// GitHub styles with custom selectors "sprinkled in"
+// TODO: change to use the GitHub selectors only by adding classes
+.boxed-group {
+  position: relative;
+  background: #efefef;
+  padding: 3px;
+  border-radius: 3px;
+  margin: 0 0 15px 0;
+  height: 100%;
+  box-sizing: border-box;
+
+  >h3 { line-height: 20px; }
+
+  >h3, .heading {
+    background-color: #e0e0e0;
+    background-image: -moz-linear-gradient(#fafafa, #e0e0e0);
+    background-image: -webkit-linear-gradient(#fafafa, #e0e0e0);
+    background-image: linear-gradient(#fafafa, #e0e0e0);
+    background-repeat: repeat-x;
+    margin: 0;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border: 1px solid #d8d8d8;
+    border-bottom: none;
+    padding: 10px 10px 11px 10px;
+    font-size: 14px;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .boxed-group-inner {
+    overflow: auto;
+    height: calc(~"100% - 82px");
+    padding: 1px 10px;
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    border-top: 1px solid #ccc;
+    border-bottom-left-radius: 1px;
+    border-bottom-right-radius: 1px;
+    color: #666;
+    font-size: 13px;
+  }
+
+  nav > ol, // Added to the default style selector
+  .boxed-group-list {
+    list-style: none;
+    margin: 0;
+
+    padding: 0;
+  }
+
+
+  nav ol > li,
+  .boxed-group-list>li {
+    display: block;
+    margin-left: -10px;
+    width: 100%;
+    padding: 5px 10px 0;
+    line-height: 23px;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  .editor-node-body {
+    white-space: nowrap;
+  }
+  nav ol > li a,
+  .editor-node-title {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* Max width is set based on the <li> nesting depth */
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .boxed-group-list>li .minibutton {
+    float: right;
+    margin: -1px 0 0 10px;
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .context-button {
+    position: relative;
+    line-height: 23px;
+    line-height: 1;
+    display: inline-block;
+    text-decoration: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+
+  nav li .btn-mini.pull-right,
+  .minibutton {
+    padding: 0 10px;
+    line-height: 24px;
+    box-shadow: none;
+
+    outline: none;
+  }
+
+  nav li .btn-mini.pull-right,
+  .button, .minibutton {
+    position: relative;
+    display: inline-block;
+    //padding: 7px 15px;
+    //font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    white-space: nowrap;
+    background-color: #eaeaea;
+    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+    background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+    background-image: linear-gradient(#fafafa, #eaeaea);
+    background-repeat: repeat-x;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    border-bottom-color: #c5c5c5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+  }
+
+
+  nav li .btn-mini.pull-right:before,
+  .context-button:before {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    /*content: "\f02f";*/
+    display: block;
+    padding: 0;
+    font-size: 16px;
+    line-height: 16px;
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************
+ * OLD crufty stuff starts here
+ ****************************************/
+
+
 @sidebar-background: #f0f0f0;
 
 .pickerswitch {
   cursor:pointer;
 }
 
-#workspace-container {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  top: 0px;
-  right: 0px;
-}
 
-#sidebar-container {
-  position: absolute;
-  bottom: 0px;
-  left: 125px;
-  top: 0px;
-  width: 125px;
-}
-
-#workspace {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  top: 32px;
-  width: 250px;
-}
-
-#sidebar {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  top: 32px;
-  width: 125px;
-  border-left: 1px solid #999;
-}
-
-#workspace > *,
-#sidebar > * {
-  height: 100%;
-}
 
 #greenpicker {
   position: absolute;
@@ -81,135 +538,13 @@
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: #0E807D;
+    background-color: @color-blue;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
   display: none;
 }
 
-#container > #workspace-container .blue:not(.edit-settings),
-#container > #workspace-container .green:not(.edit-settings),
-#container > #workspace-container .orange:not(.edit-settings) {
-    -webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
-}
-
-#container > #workspace-container {
-    &.wsminimized {
-        #pickertext {
-            visibility: hidden;
-        }
-        #greenpicker {
-            display: block;
-            visibility: visible;
-        }
-
-        @sidebar-left: 30px;
-        #greentoolbar {
-          width: @sidebar-left;
-          &:hover {
-            width: 100px;
-            border-radius: 0px 7px 7px 0px;
-            -moz-border-radius: 0px 7px 7px 0px;
-            -webkit-border-radius: 0px 7px 7px 0px;
-            z-index: 1000;
-          };
-        }
-
-        #workspace {
-          width: @sidebar-left;
-          display: none;
-        }
-
-        @sidebar-width: 300px;
-        #sidebar-container {
-          left: @sidebar-left;
-          width: @sidebar-width;
-          #bluetoolbar, #sidebar {
-            width: @sidebar-width;
-          }
-        }
-
-        > #content, .orange {
-          left: @sidebar-left+@sidebar-width;
-          right: 0;
-        }
-
-        &.tocminimized {
-            // Both workspace and toc minimised
-            @sidebar-width: 30px;
-            #sidebar-container {
-              left: @sidebar-left;
-              width: @sidebar-width;
-              #bluetoolbar, #sidebar {
-                width: @sidebar-width;
-              }
-            }
-
-            > #content, .orange {
-              left: @sidebar-left+@sidebar-width;
-            }
-
-            #sidebar {
-                display: none;
-            }
-
-            #bluepicker {
-                display: block;
-            }
-        }
-    }
-
-    &:not(.wsminimized) {
-        @sidebar-left: 250px;
-        @sidebar-width: 250px;
-
-        #workspace, #greentoolbar {
-          width: @sidebar-left;
-        }
-
-        #sidebar-container {
-          left: @sidebar-left;
-          width: @sidebar-width;
-          #bluetoolbar, #sidebar {
-            width: @sidebar-width;
-          }
-        }
-
-        > #content, .orange {
-          left: @sidebar-left+@sidebar-width;
-          right: -@sidebar-width;
-        }
-
-        &.tocminimized {
-            // Both workspace and toc minimised
-            // Both workspace and toc minimised
-            @sidebar-width: 30px;
-            #sidebar-container {
-              left: @sidebar-left;
-              width: @sidebar-width;
-              #bluetoolbar, #sidebar {
-                width: @sidebar-width;
-              }
-            }
-
-            > #content, .orange {
-              left: @sidebar-left+@sidebar-width;
-            }
-
-            #sidebar {
-                display: none;
-            }
-
-            #bluepicker {
-                display: block;
-            }
-        }
-    }
-}
 
 #container {
   ol ol a {
@@ -225,44 +560,18 @@
 
   min-width: 100px;
 
-  padding: 1em;
   border-right: 1px solid #ccc;
 
   /* Slide the sidebar off screen when hiding it */
   // -webkit-transition: 3s ease-in-out;
 
-  background: #f0f0f0;
-
   overflow-y: auto;
   overflow-x: hidden;
 
-  #workspace.edit-settings { visibility: visible; }
-
-  #sidebar {
-    .editor-node-body {
-      &:hover {
-        background-color: #eee;
-        .edit-settings { visibility: visible; }
-      }
-
-      .edit-settings { visibility: hidden; }
-    }
-  }
-
-  .workspace-sidebar {
-    h3 {
-      font-family: Verdana, "DejaVu Sans", Tahoma;
-      font-size: 1.15em;
-    }
-
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
-  }
 
   #workspace-sidebar-toc {
     // Root nodes in the sidebar should have no left margin
-    > ol { 
+    > ol {
       margin: 0;
       padding-left: 5px;
     }
@@ -302,8 +611,6 @@
       // Make the icon a collapsed arrow (if it contains children)
       > .editor-node-body > .editor-expand-collapse > .icon-content::before {
         content: "\f0da"; /* icon-caret-right */
-        font-size: 22px;
-        color: #0e807d;
       }
       // Hide the children
       > ol { display: none; }
@@ -314,8 +621,6 @@
       // Make the icon a collapsed arrow (if it contains children)
       > .editor-node-body > .editor-expand-collapse > .icon-content::before {
         content: "\f0d7"; /* icon-caret-down */
-        font-size: 22px;
-        color: #0e807d;
       }
       // Show the children
       > ol { display: block; }
@@ -324,7 +629,6 @@
     .editor-node-after { min-height: 6px; }
 
     .editor-node-title {
-      overflow-x: ellipses;
       &.autogenerated-text { color: #666; }
 
       small.toc-badge {
@@ -338,8 +642,4 @@
       vertical-align: top;
     }
   }
-}
-
-#menu, #content {
-    border-left: 1px solid #999;
 }

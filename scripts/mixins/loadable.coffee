@@ -9,7 +9,12 @@ define ['jquery'], ($) ->
 
     # Since `load` checks isNew and the presence of an `id` may not be enough
     # allow a way to set `isNew()` to be true
-    isNew: () -> return @_isNew or !@id
+    isNew: () ->
+      # Something is new if _isNew == true/false or it does not have an id or url
+      return @_isNew if @_isNew?
+      # need to check if @url is a static string ('/workspace') and not a function (new Module)
+      hasStaticUrl = @url and typeof(@url) != 'function'
+      return !(@id or hasStaticUrl)
     setNew: () -> @_isNew = true
 
     # Returns a promise.
