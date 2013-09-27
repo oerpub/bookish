@@ -266,7 +266,7 @@ define [
             '':             'goDefault'
             'repo/:repoUser/:repoName(/branch/:branch)': 'goDefault'
             'repo/:repoUser/:repoName(/branch/:branch)/workspace': 'goWorkspace'
-            'repo/:repoUser/:repoName(/branch/:branch)/edit/:id': 'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
+            'repo/:repoUser/:repoName(/branch/:branch)/edit/*id': 'goEdit' # Edit an existing piece of content (id can be a path)
 
           _loadFirst: (repoUser, repoName, branch) ->
             if not repoName and not session.get('repoName')

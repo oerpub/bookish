@@ -5,11 +5,11 @@
 # There is a cyclic dependency between this and various views (`->` means "depends on"):
 # controller -> layout -> WorkspaceView -> WorkspaceItemView -> controller (because clicking an item will begin editing)
 define [
+  'underscore'
   'marionette'
   'cs!collections/content'
   'cs!views/layouts/workspace'
-  ], (Marionette, allContent, WorkspaceLayout) ->
-
+  ], (_, Marionette, allContent, WorkspaceLayout) ->
 
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
@@ -83,12 +83,12 @@ define [
           if typeof model is 'string'
             [model, contextModel] = model.split('|')
             # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-            model = decodeURIComponent(model)
+            model = decodeURI(model)
             model = allContent.get(model)
 
             if contextModel
               # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-              contextModel = decodeURIComponent(contextModel)
+              contextModel = decodeURI(contextModel)
               contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
@@ -126,7 +126,7 @@ define [
 
             # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
             contextPath = ''
-            contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
+            contextPath = "|#{encodeURI(contextModel.id or contextModel.cid)}" if contextModel
 
             # Update the URL
-            @trigger 'navigate', "edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}"
+            @trigger 'navigate', "edit/#{encodeURI(model.id or model.cid)}#{contextPath}"
