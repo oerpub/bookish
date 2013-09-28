@@ -1,0 +1,23 @@
+
+.x-media-type-icon(@media-type; @add-title; @color; @char) {
+  @mt-selector: ~"[data-media-type='@{media-type}']";
+  @{mt-selector} > .icon-content::before { color: @color; content: @char; }
+  @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
+}
+
+.x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/oebps-package+xml';      "Book";      #c00; "\f02d"); /* icon-book */
+.x-media-type-icon('application/vnd.org.cnx.section';    "Chapter";   #999; ""); /* icon-folder-open */
+
+
+// Hide the "Add Book" dropdown from the workspace
+#workspace {
+  .add-content { display: none; }
+}
+
+#login-advanced-wrapper {
+    margin-top: 1em;
+    #login-advanced {
+        margin-top: 1em;
+    }
+}

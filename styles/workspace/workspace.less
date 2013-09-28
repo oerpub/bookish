@@ -1,0 +1,81 @@
+@import "../variables.less";
+@import "menu.less";
+@import "sidebar.less";
+@import "content.less";
+@import "oerpub-content.less";
+@import "hide-atc-controls.less";
+@import "oerpub-surroundings.less";
+
+.x-media-type-icon(@media-type; @add-title; @color; @char) {
+  @mt-selector: ~"[data-media-type='@{media-type}']";
+  @{mt-selector} > .icon-content::before { color: @color; content: @char; }
+  @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
+}
+
+[data-media-type] {
+  cursor: pointer;
+  > .icon-content { margin-right: 0.25em; }
+}
+
+[data-media-type="application/vnd.org.cnx.section"] {
+  cursor: default;
+}
+
+.x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.module';     "Module";    #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.collection'; "Book";      #c00; "\f02d"); /* icon-book */
+.x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
+.x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
+#container {
+  -webkit-box-orient: horizontal;
+  box-orient: horizontal;
+  overflow: hidden;
+}
+
+// Hide the floating toolbar
+.aloha-toolbar { display: none !important; }
+
+#menu-and-content {
+  float: left;
+  width: calc(~"100% - 620px");
+  height: 100%;
+  min-width: 810px;
+
+  .content-panel {
+    height: calc(~"100% - 75px");
+    background-color: @orange;
+
+    // Round the corners so the handle looks nice
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-topleft:     20px;
+    border-top-left-radius:         20px;
+    -webkit-border-top-right-radius:  20px;
+    -moz-border-radius-topright:      20px;
+    border-top-right-radius:          20px;
+
+    .content-title {
+      color: white;
+      // same as sidebar handle
+      font-size: 18px;
+      text-shadow: 2px 2px 4px black;
+    }
+
+    // By default, boxed-group is grey
+    .boxed-group {
+      background-color: inherit;
+      height: 100%;
+
+      .boxed-group-inner {
+        // So boxed-group-inner is scrollable, set the overflow-y
+        overflow-y: auto;
+      }
+    }
+
+  }
+}

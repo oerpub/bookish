@@ -1,0 +1,43 @@
+{{! The initial context is an array so the 1st thing we do is loop over each item using '#.' }}
+
+{{! Clicking anywhere on this will begin editing. Not just the title }}
+<td data-media-type="{{mediaType}}" data-content-id="{{id}}" data-content-title="{{title}}" class="go-edit">
+  <i class="icon-content"></i>
+  <span class="btn-link">
+    <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
+    {{#if title}}
+      {{{title}}}
+    {{else}}
+      {{id}}
+    {{/if}}
+  </span>
+  {{#if _isDirty}}
+    <span class="has-changed" title="This has unsaved changes">
+      <i class="icon-asterisk"></i>
+    </span>
+  {{/if}}
+  {{#if _hasRemoteChanges}}
+    <span class="has-remote-changes" title="This has been changed by someone else">
+      <i class="icon-refresh"></i>
+    </span>
+  {{/if}}
+</td>
+
+{{! Last Modified }}
+<td>
+  {{! Display a progress bar if the file has not loaded yet }}
+  {{#if isLoading}}
+    <div class="progress progress-striped active" style="display: inline-block; width: 100px;">
+      <div class="bar" style="width: 100%;"></div>
+    </div>
+  {{else}}
+    {{#if dateLastModifiedUTC}}
+      <time datetime="{{dateLastModifiedUTC}}"></time>
+    {{else}}
+      <time datetime="{{dateCreatedUTC}}"></time>
+    {{/if}}
+    {{#if lastEditedBy}}
+      <span class="last-edited-by">by {{lastEditedBy}}</span>
+    {{/if}}
+  {{/if}}
+</td>

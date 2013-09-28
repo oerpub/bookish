@@ -1,0 +1,45 @@
+@import "../variables.less";
+
+#menu {
+  overflow: hidden;
+
+  .navbar {
+    margin-bottom: 0;
+  }
+
+  .nav-home {
+    font-size: 1.25em;
+    vertical-align: middle;
+    color: @linkColor;
+  }
+
+  .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar-form {
+    margin-left: 5px;
+  }
+
+  .nav-home:hover {
+    color: @linkColorHover;
+    text-decoration: underline;
+  }
+
+  .navbar-text {
+    vertical-align: top;
+  }
+
+  .name {
+    margin-left: 10px;
+  }
+
+  .semantic-drag-source > * {
+    margin-left: 0;
+    width: auto;
+    display: inline-block;
+    padding-right: 10px;
+  }
+
+}
