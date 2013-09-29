@@ -5,10 +5,11 @@ define [
   'cs!collections/content'
   'cs!collections/media-types'
   'cs!models/content/book'
+  'cs!models/content/book-toc-node'
   'cs!models/content/folder'
   'cs!models/content/module'
   'less!styles/main.less'
-], (Backbone, Marionette, session, allContent, mediaTypes, Book, Folder, Module) ->
+], (Backbone, Marionette, session, allContent, mediaTypes, Book, BookTocNode, Folder, Module) ->
 
   app = new Marionette.Application()
 
@@ -21,6 +22,7 @@ define [
 
     # Register all the mediaTypes used
     mediaTypes.add Book
+    mediaTypes.add BookTocNode
     mediaTypes.add Folder
     mediaTypes.add Module
 

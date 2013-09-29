@@ -7,7 +7,7 @@ define [
   'cs!gh-book/binary-file'
   'cs!models/content/module'
   'cs!collections/content'
-  'cs!gh-book/utils'
+  'cs!models/utils'
 ], (_, $, Backbone, jsSHA, uuid, BinaryFile, ModuleModel, allContent, Utils) ->
 
 

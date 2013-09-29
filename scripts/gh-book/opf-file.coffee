@@ -6,7 +6,7 @@ define [
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
-  'cs!gh-book/utils'
+  'cs!models/utils'
 ], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
 
   SAVE_DELAY = 10 # ms
@@ -173,7 +173,7 @@ define [
           $ol = $li.children('ol')
           if $a[0]
             # Look up the href and add the piece of content
-            title = $a.text()
+            title = $a.text().trim()
             href = $a.attr('href')
 
             path = Utils.resolvePath(contextPath, href)
