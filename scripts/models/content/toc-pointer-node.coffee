@@ -16,6 +16,9 @@ define ['cs!./toc-node'], (TocNode) ->
       # Should be used ONLY for serializing to HTML tree
       @id = @model.id
 
+      if options.passThroughChanges
+        @on 'change:title', (model, value, options) => @model.set('title', value, options)
+
       @model.on 'all', () => @trigger.apply @, arguments
 
       # Set the title on the model if an overridden one has not been set (github-book "shortcut")
