@@ -1,4 +1,4 @@
-define ['cs!gh-book/toc-node'], (TocNode) ->
+define ['cs!./toc-node'], (TocNode) ->
 
   class TocPointerNode extends TocNode
     mediaType: 'application/BUG-mediaType-not-set' # This will get overridden to be whatever this node points to
