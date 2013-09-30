@@ -23,7 +23,12 @@ define [
 
     # Used to fetch/save the content.
     # TODO: move the URL pattern to a separate file so it is configurable
-    url: () -> "/content/#{@id}"
+    # TODO: This is copy/pasta from BookModel; remove it
+    url: () ->
+      if @id
+        return "/content/#{@id}"
+      else
+        return '/content/'
 
     initialize: (options) ->
 
