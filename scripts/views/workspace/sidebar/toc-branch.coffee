@@ -170,8 +170,9 @@ define [
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
-      'click > .editor-node-body > .edit-settings': 'editSettings'
       'click > .editor-node-body .go-edit': 'goEdit'
+      'click > .editor-node-body .edit-settings-rename': 'editSettings'
+      'click > .editor-node-body .edit-settings-edit': 'goEdit'
 
     goEdit: () ->
       # Edit the model in the context of this folder/book. Explicitly close

@@ -287,10 +287,10 @@ aside > div {
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
 
-    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
-    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+    li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
+    li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
 
-    li > .editor-node-body > .btn-mini.pull-right.edit-settings {
+    li > .editor-node-body > div > .btn-mini.pull-right.edit-settings {
       border: none;
       box-shadow: none;
 
@@ -303,6 +303,10 @@ aside > div {
       .icon-pencil:before {
         content: "";
       }
+    }
+
+    li > .editor-node-body > div.open > .btn-mini.pull-right.edit-settings {
+        display: inline-block;
     }
   
 
