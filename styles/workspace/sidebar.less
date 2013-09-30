@@ -38,7 +38,7 @@
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
-  
+
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
@@ -289,6 +289,22 @@ aside > div {
 
     li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
     li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body > .btn-mini.pull-right.edit-settings {
+      border: none;
+      box-shadow: none;
+
+      // Override pencil
+      background-color: transparent;
+      background-image: url(pencil-03.png);
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+
+      .icon-pencil:before {
+        content: "";
+      }
+    }
+  
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
