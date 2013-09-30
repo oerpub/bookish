@@ -136,6 +136,13 @@ define [
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
 
+
+    prettyName: () ->
+      # Translate the mediaType attribute to something nice we can display.
+      # FIXME: If we ever need to translate this, is this a good idea?
+      return "book" if @model.mediaType == 'application/oebps-package+xml'
+      return 'module'
+
     templateHelpers: () ->
       # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
       # The cases below are:
@@ -155,6 +162,7 @@ define [
         # Possibly delegate to the navModel for dirty bits
         _isDirty: model.get('_isDirty')
         _hasRemoteChanges: model.get('_hasRemoteChanges')
+        prettyName: @prettyName()
       }
 
     events:
