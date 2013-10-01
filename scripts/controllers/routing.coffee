@@ -86,6 +86,7 @@ define [
             model = decodeURIComponent(model)
             model = allContent.get(model)
 
+
             if contextModel
               # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
               contextModel = decodeURIComponent(contextModel)
@@ -95,7 +96,6 @@ define [
           if not model
             @goWorkspace()
           else
-
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView)
 
@@ -103,21 +103,20 @@ define [
 
             # Force the sidebar if a contextModel is passed in
             if contextModel
-              # Only change the view if there is nothing there or if the model differs
-              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
-                contextView = new SidebarView
-                  model: contextModel
+              contextView = new SidebarView
+                model: contextModel
+                currentFile: model
 
-                @layout.sidebar.show(contextView)
-                contextView.maximize()
+              @layout.sidebar.show(contextView)
+              contextView.maximize()
             # Some models do not change the sidebar because they cannot contain children (like Module)
             else if model.getChildren
-              # Only change the view if there is nothing there or if the model differs
-              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != model
-                modelView = new SidebarView
-                  model: model
-                @layout.sidebar.show(modelView)
-                modelView.maximize()
+              modelView = new SidebarView
+                model: model
+                currentFile: model
+
+              @layout.sidebar.show(modelView)
+              modelView.maximize()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 

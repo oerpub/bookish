@@ -78,6 +78,14 @@
 #workspace-container {
   width: 100%;
 
+  .sidebar-toc li.active { 
+    color: #f89406;
+  }
+  
+  .sidebar-workspace li.active { 
+    color: #049cdb;
+  }
+
   // workspace minimized
   &.workspace-minimized {
     #menu-and-content {
@@ -578,7 +586,6 @@ aside > div {
 
     li {
       white-space: nowrap;
-      color: #333;
       font-size: 1em;
       font-family: Verdana, "DejaVu Sans",Tahoma;
     }
@@ -637,6 +644,19 @@ aside > div {
       }
     }
 
+    li.active {
+      .icon-content:before {
+        color: inherit;
+      }
+    
+      .editor-node-title {
+        font-weight: bold;
+    
+        small.toc-badge {
+          color: inherit;
+        }
+      }
+    }
 
     .btn-link {
       vertical-align: top;

@@ -39,7 +39,7 @@ define [
 
     # Used by TocBranchView to know which collection to ask for an overridden title
     itemViewOptions: () ->
-      return {container: @collection}
+      return {container: @collection, currentFile: @options.currentFile}
 
     # Override internal Marionette method.
     # This method adds a child list item at a given index.

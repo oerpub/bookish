@@ -58,6 +58,7 @@ define [
         @_renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
+
       return result
 
     # Override internal Marionette method.
@@ -126,10 +127,18 @@ define [
       super(options)
 
     # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> {container: @collection}
-
+    itemViewOptions: () -> {container: @collection, currentFile: @options.currentFile}
 
     onRender: () ->
+      if @options.currentFile && @options.currentFile.id is @model.id
+        @$el.addClass 'active'
+
+        @$el.addClass('active')
+        @$el.children('.editor-node-body').find('.btn-link')
+          .removeClass('btn-link')
+
+      @model.expanded = true if @options.currentFile && @model.hasChild(@options.currentFile.id)
+
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
