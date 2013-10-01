@@ -287,8 +287,13 @@ aside > div {
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
 
+
     li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
     li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body > div.open > .btn-mini.pull-right.edit-settings {
+        display: inline-block;
+    } 
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
