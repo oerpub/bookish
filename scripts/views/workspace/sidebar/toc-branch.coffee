@@ -179,6 +179,9 @@ define [
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
+      if not @model.getRoot?()
+        @model = @model.tocNodes.at(1)
+
       controller.goEdit(@model, @model.getRoot?())
 
 
