@@ -54,3 +54,9 @@ define [
       $window = $(window)
       $window.on('resize', @onWindowResize.bind(@))
       @onWindowResize()
+
+      # Add a class on the element so we can style it as a Folder or as a ToC
+      if @model
+        @$el.attr('data-media-type', @model.mediaType)
+      else
+        @$el.removeAttr('data-media-type')
