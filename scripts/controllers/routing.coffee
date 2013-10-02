@@ -30,9 +30,14 @@ define [
 
     # There is a cyclic dependency between the controller and the ToC tree because
     # the user can click an item in the ToC to `goEdit`.
-    _showWorkspacePane: (SidebarView) ->
-      if not @layout.workspace.currentView
-        @layout.workspace.show(new SidebarView {collection:allContent})
+    _showWorkspacePane: (SidebarView, currentFile) ->
+
+      focusBook = null
+      if currentFile
+        for book in allContent.models
+          focusBook = book if book.hasChild?(currentFile.id)
+
+      @layout.workspace.show(new SidebarView {collection:allContent, currentFile: focusBook})
 
 
     # Show Workspace
@@ -97,7 +102,7 @@ define [
             @goWorkspace()
           else
             # Always show the workspace pane
-            @_showWorkspacePane(SidebarView)
+            @_showWorkspacePane(SidebarView, model)
 
             # load editor views
 

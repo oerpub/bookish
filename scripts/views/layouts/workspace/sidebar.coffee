@@ -42,13 +42,9 @@ define [
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})
       @toc.show(new TocView {model:model, collection:collection, currentFile: @options.currentFile})
 
-    onWindowResize: () ->
-
     onRender: () ->
       # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page
       $window = $(window)
-      $window.on('resize', @onWindowResize.bind(@))
-      @onWindowResize()
 
     # Sticking to American spelling here
     maximize: () ->

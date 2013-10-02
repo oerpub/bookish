@@ -78,11 +78,11 @@
 #workspace-container {
   width: 100%;
 
-  .sidebar-toc li.active { 
+  .sidebar-toc li.active > .editor-node-body { 
     color: #f89406;
   }
   
-  .sidebar-workspace li.active { 
+  .sidebar-workspace li.active > .editor-node-body { 
     color: #049cdb;
   }
 
@@ -649,7 +649,7 @@ aside > div {
         color: inherit;
       }
     
-      .editor-node-title {
+      > .editor-node-body .editor-node-title {
         font-weight: bold;
     
         small.toc-badge {
