@@ -137,7 +137,9 @@ define [
         @$el.children('.editor-node-body').find('.btn-link')
           .removeClass('btn-link')
 
-      @model.expanded = true if @options.currentFile && @model.hasChild(@options.currentFile.id)
+      # if the user hasn't set the state yet make sure the active file is visible
+      if @model.expanded == undefined && @model.hasChild(@options?.currentFile.id)
+        @model.expanded = true
 
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
