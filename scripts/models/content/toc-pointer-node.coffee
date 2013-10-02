@@ -13,8 +13,19 @@ define ['cs!./toc-node'], (TocNode) ->
       @mediaType = @model.mediaType
       @accept = @model.accept
 
+      # When contentView is null then clicking on it will not open
+      # the content in the content pane.
+      # A Book has a null contentView but a Module has a contentView
+      # so, only set the contentView if one is set
+      if @model.contentView
+        @contentView = (callback) => @model.contentView(callback)
+
+
       # Should be used ONLY for serializing to HTML tree
       @id = @model.id
+
+      if options.passThroughChanges
+        @on 'change:title', (model, value, options) => @model.set('title', value, options)
 
       @model.on 'all', () => @trigger.apply @, arguments
 
@@ -35,4 +46,4 @@ define ['cs!./toc-node'], (TocNode) ->
     # Existence of this method means this is a pointer node
     dereferencePointer: () -> @model
 
-    contentView: (callback) -> @model.contentView(callback)
+    contentView: null

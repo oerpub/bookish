@@ -6,6 +6,7 @@
 
 @color-green: @green; // Bootstrap green
 @color-blue: @blue; // Bootstrap blue
+@color-gray: #999; // same as the folder icon
 
 .sidebar-container {
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
@@ -32,11 +33,15 @@
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
 
+  .x-sidebar-color-and-title(@color, @title) {
+    background-color: @color;
+    > .handle > .handle-text::before          { content: @title; }
+    > .boxed-group > h3 > .title-text::before { content: @title; }
+  }
 
   &.sidebar-toc aside > div {
-    background-color: @color-blue;
-    > .handle > .handle-text::before          { content: 'Table of Contents'; }
-    > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
+    &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title(@color-blue, 'Table of Contents'); }
+    &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title(@color-gray, 'Folder Contents'); }
   }
 
 }
@@ -159,7 +164,8 @@
                 > .boxed-group {
                   height: inherit;
                   > .boxed-group-inner {
-                    height: inherit;
+                    // The height is calculated elsewhere as 100% - headingLineHeight - sidebarPaddingTop
+                    // height: inherit;
                   }
                 }
               }
@@ -304,6 +310,19 @@ aside > div {
 
 
 
+.sidebar-container .boxed-group > .boxed-group-inner {
+  // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
+  // h3 = sidebar heading
+  height: calc(~"100% - 44px");
+}
+
+
+.content-panel .boxed-group > .boxed-group-inner {
+  // 90px = .auth:height + .orange-title:height + .toolbar:height
+  height: calc(~"100% - 90px");
+}
+
+
 /*************************
  * GitHub Styles
  *************************/
@@ -339,7 +358,10 @@ aside > div {
 
   .boxed-group-inner {
     overflow: auto;
-    height: calc(~"100% - 82px");
+    // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
+    // h3 = sidebar heading
+    // height: calc(~"100% - 44px");
+    // height needs to be special-cased for the sidebar box and the content box
     padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;

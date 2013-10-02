@@ -38,6 +38,11 @@ define [
         collection = new Backbone.FilteredCollection(null, {collection:collection})
         collection.setFilter (content)  -> return content.getChildren
 
+        @filteredMediaTypes.setFilter (type) ->
+          # Filter the types to exclude Chapters and other non-loadable content
+          return type.get('modelType')::load
+
+
       # TODO: Make the collection a FilteredCollection that only shows @model.accepts
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})
       @toc.show(new TocView {model:model, collection:collection})
@@ -49,3 +54,9 @@ define [
       $window = $(window)
       $window.on('resize', @onWindowResize.bind(@))
       @onWindowResize()
+
+      # Add a class on the element so we can style it as a Folder or as a ToC
+      if @model
+        @$el.attr('data-media-type', @model.mediaType)
+      else
+        @$el.removeAttr('data-media-type')

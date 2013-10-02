@@ -51,7 +51,12 @@ define [
         model = queue.shift()
         model.save()
         .fail((err) -> throw err)
-        .done () -> saveNextItem(queue)
+        .done () ->
+          # Fire the onSave event on all the saved model
+          # TODO: This code exists in multiple places; it should be consolidated
+          model.onSaved?()
+
+          saveNextItem(queue)
 
       # Save all the models that have changes
       changedModels = @filter (model) -> model.isDirty()

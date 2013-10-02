@@ -35,8 +35,8 @@ define [
       # Only add Models to `allContent` if they can be saved.
       #
       # ToC Sections, for example, cannot be saved but do implement Saveable because OpfFile extends TocNode
-      # So we use `.id` instead.
-      if model.id
+      # So we use `.load` instead.
+      if model.load
         allContent.add(model)
 
       # Add the model to the context
