@@ -40,8 +40,11 @@
   }
 
   &.sidebar-toc aside > div {
-    &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title(@color-blue, 'Table of Contents'); }
-    &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title(@color-gray, 'Folder Contents'); }
+    // Make "Table of Contents" the default styling
+    // since atc and github-book use different media-type for a book (collection)
+    .x-sidebar-color-and-title(@color-blue, 'Table of Contents');
+    //&[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title(@color-blue, 'Table of Contents'); }
+    &[data-media-type="application/vnd.org.cnx.folder"]       { .x-sidebar-color-and-title(@color-gray, 'Folder Contents'); }
   }
 
 }
