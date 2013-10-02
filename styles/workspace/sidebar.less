@@ -159,7 +159,8 @@
                 > .boxed-group {
                   height: inherit;
                   > .boxed-group-inner {
-                    height: inherit;
+                    // The height is calculated elsewhere as 100% - headingLineHeight - sidebarPaddingTop
+                    // height: inherit;
                   }
                 }
               }
@@ -304,6 +305,19 @@ aside > div {
 
 
 
+.sidebar-container .boxed-group > .boxed-group-inner {
+  // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
+  // h3 = sidebar heading
+  height: calc(~"100% - 44px");
+}
+
+
+.content-panel .boxed-group > .boxed-group-inner {
+  // 90px = .auth:height + .orange-title:height + .toolbar:height
+  height: calc(~"100% - 90px");
+}
+
+
 /*************************
  * GitHub Styles
  *************************/
@@ -339,7 +353,10 @@ aside > div {
 
   .boxed-group-inner {
     overflow: auto;
-    height: calc(~"100% - 82px");
+    // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
+    // h3 = sidebar heading
+    // height: calc(~"100% - 44px");
+    // height needs to be special-cased for the sidebar box and the content box
     padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
