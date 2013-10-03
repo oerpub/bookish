@@ -103,13 +103,13 @@ define [
             @_currentContext = contextModel
 
             # this is needed right now to render the workspace
-            contextModel.set('selected', 'context')
+            contextModel.set('selected', true)
 
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView)
 
             # set more granular file selected flags to be used in ToC
-            model.set('selected', 'file')
+            model.set('selected', true)
 
             if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
               contextView = new SidebarView

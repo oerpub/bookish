@@ -130,13 +130,10 @@ define [
     itemViewOptions: () -> {container: @collection}
 
     onRender: () ->
-      if type = (@model.get('selected') || @model.dereferencePointer?().get('selected'))
-        @$el.addClass('active-'+type)
+      if @model.dereferencePointer?().get('selected') || @model.get('selected')
+        @$el.addClass('active')
       else
-        element = @$el
-        _.forEach @$el.attr('class')?.split(' '), (className) ->
-          if className.match(/^active\-[a-z]+$/)
-            element.removeClass className
+        @$el.removeClass 'active'
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined

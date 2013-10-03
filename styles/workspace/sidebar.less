@@ -4,9 +4,6 @@
  * New Styles
  *****************************/
 
-@color-green: @green; // Bootstrap green
-@color-blue: @blue; // Bootstrap blue
-
 .sidebar-container {
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
@@ -27,14 +24,14 @@
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @color-green;
+    background-color: @green;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
   
 
   &.sidebar-toc aside > div {
-    background-color: @color-blue;
+    background-color: @blue;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
@@ -538,7 +535,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @color-blue;
+    background-color: @blue;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
@@ -636,24 +633,26 @@ aside > div {
       }
     }
 
-    li.active-file > .editor-node-body { 
-      color: #f89406;
-    }
-    
-    li.active-context > .editor-node-body { 
-      color: #049cdb;
-    }
-
-    li.active-file, li.active-context {
+    li.active {
       .icon-content:before {
         color: inherit;
       }
-    
-      > .editor-node-body .editor-node-title {
-        font-weight: bold;
-    
-        small.toc-badge {
-          color: inherit;
+
+      > .editor-node-body {
+
+        > [data-media-type=@{book-media-type}] {
+          color: @blue;
+        }   
+        > [data-media-type=@{page-media-type}] {
+          color: @orange;
+        }
+   
+        .editor-node-title {
+          font-weight: bold;
+         
+          small.toc-badge {
+            color: inherit;
+          }
         }
       }
     }
