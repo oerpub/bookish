@@ -137,10 +137,10 @@ define [
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined
-        hasChild = @model.hasChild (child) ->
+        hasDescendant = @model.hasDescendant (child) ->
           return child.get('selected') || child.dereferencePointer?().get('selected')
 
-        @model.expanded = true if hasChild
+        @model.expanded = true if hasDescendant
 
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
