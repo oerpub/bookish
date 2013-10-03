@@ -62,14 +62,14 @@ define ['backbone'], (Backbone) ->
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
 
-    hasChild: (targetId) ->
+    hasChild: (compare) ->
       # check first generation first
       for child in @getChildren().models
-        if child && child.id is targetId
+        if child && compare(child)
           return true
       # if none of our direct children have it then recurse
       for child in @getChildren().models
-        if child && child.hasChild(targetId)
+        if child && child.hasChild(compare)
           return true
       # default to false
       return false

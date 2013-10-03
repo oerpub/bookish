@@ -127,18 +127,18 @@ define [
       super(options)
 
     # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> {container: @collection, currentFile: @options.currentFile}
+    itemViewOptions: () -> {container: @collection}
 
     onRender: () ->
-      if @options.currentFile && @options.currentFile.id is @model.id
-        @$el.addClass 'active'
-
+      if @model.get('selected')
         @$el.addClass('active')
         @$el.children('.editor-node-body').find('.btn-link')
           .removeClass('btn-link')
+      else
+        @$el.removeClass 'active'
 
       # if the user hasn't set the state yet make sure the active file is visible
-      if @model.expanded == undefined && @model.hasChild(@options?.currentFile.id)
+      if @model.expanded == undefined && @model.hasChild((child) -> return child.get('selected'))
         @model.expanded = true
 
       # Add DnD options to content
@@ -184,7 +184,7 @@ define [
       if not @model.getRoot?()
         @model = @model.tocNodes.at(1)
 
-      controller.goEdit(@model, @model.getRoot?())
+      controller.goEdit(@model, @model.getRoot())
 
 
     editSettings: ->

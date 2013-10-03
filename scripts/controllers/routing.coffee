@@ -30,14 +30,8 @@ define [
 
     # There is a cyclic dependency between the controller and the ToC tree because
     # the user can click an item in the ToC to `goEdit`.
-    _showWorkspacePane: (SidebarView, currentFile) ->
-
-      focusBook = null
-      if currentFile
-        for book in allContent.models
-          focusBook = book if book.hasChild?(currentFile.id)
-
-      @layout.workspace.show(new SidebarView {collection:allContent, currentFile: focusBook})
+    _showWorkspacePane: (SidebarView) ->
+      @layout.workspace.show(new SidebarView {collection:allContent})
 
 
     # Show Workspace
@@ -101,27 +95,33 @@ define [
           if not model
             @goWorkspace()
           else
+
+            if not contextModel
+              console.log 'something has gone wonky'
+
+            # resset the old highligh state if there was one
+            @currentModel?.set('selected', false)
+            @currentContext?.set('selected', false)
+
+            # these are needed on the next render as a pointers to things 
+            @currentModel = model
+            @currentContext = contextModel
+
+            # this is needed right now to render the workspace
+            contextModel.set('selected', true)
+
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView, model)
 
-            # load editor views
+            # set more granular file selected flags to be used in ToC
+            model.set('selected', true)
 
-            # Force the sidebar if a contextModel is passed in
-            if contextModel
+            if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
               contextView = new SidebarView
                 model: contextModel
-                currentFile: model
 
               @layout.sidebar.show(contextView)
               contextView.maximize()
-            # Some models do not change the sidebar because they cannot contain children (like Module)
-            else if model.getChildren
-              modelView = new SidebarView
-                model: model
-                currentFile: model
-
-              @layout.sidebar.show(modelView)
-              modelView.maximize()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 
