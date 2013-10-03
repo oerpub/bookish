@@ -40,7 +40,7 @@ define [
 
       # TODO: Make the collection a FilteredCollection that only shows @model.accepts
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})
-      @toc.show(new TocView {model:model, collection:collection, currentFile: @options.currentFile})
+      @toc.show(new TocView {model:model, collection:collection})
 
     onRender: () ->
       # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page

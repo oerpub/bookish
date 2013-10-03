@@ -130,16 +130,22 @@ define [
     itemViewOptions: () -> {container: @collection}
 
     onRender: () ->
-      if @model.get('selected')
-        @$el.addClass('active')
+      if type = (@model.get('selected') || @model.dereferencePointer?().get('selected'))
+        @$el.addClass('active-'+type)
         @$el.children('.editor-node-body').find('.btn-link')
           .removeClass('btn-link')
       else
-        @$el.removeClass 'active'
+        element = @$el
+        _.forEach @$el.attr('class')?.split(' '), (className) ->
+          if className.match(/^active\-[a-z]+$/)
+            element.removeClass className
 
       # if the user hasn't set the state yet make sure the active file is visible
-      if @model.expanded == undefined && @model.hasChild((child) -> return child.get('selected'))
-        @model.expanded = true
+      if @model.expanded == undefined
+        hasChild = @model.hasChild (child) ->
+          return child.get('selected') || child.dereferencePointer?().get('selected')
+
+        @model.expanded = true if hasChild
 
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
@@ -181,10 +187,11 @@ define [
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
-      if not @model.getRoot?()
-        @model = @model.tocNodes.at(1)
+      model = @model
+      if not model.getRoot?()
+        model = model.tocNodes.at(1)
 
-      controller.goEdit(@model, @model.getRoot())
+      controller.goEdit(model, model.getRoot())
 
 
     editSettings: ->

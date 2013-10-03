@@ -78,14 +78,6 @@
 #workspace-container {
   width: 100%;
 
-  .sidebar-toc li.active > .editor-node-body { 
-    color: #f89406;
-  }
-  
-  .sidebar-workspace li.active > .editor-node-body { 
-    color: #049cdb;
-  }
-
   // workspace minimized
   &.workspace-minimized {
     #menu-and-content {
@@ -644,7 +636,15 @@ aside > div {
       }
     }
 
-    li.active {
+    li.active-file > .editor-node-body { 
+      color: #f89406;
+    }
+    
+    li.active-context > .editor-node-body { 
+      color: #049cdb;
+    }
+
+    li.active-file, li.active-context {
       .icon-content:before {
         color: inherit;
       }

@@ -31,7 +31,8 @@ define [
     # There is a cyclic dependency between the controller and the ToC tree because
     # the user can click an item in the ToC to `goEdit`.
     _showWorkspacePane: (SidebarView) ->
-      @layout.workspace.show(new SidebarView {collection:allContent})
+      if not @layout.workspace.currentView
+        @layout.workspace.show(new SidebarView {collection:allContent})
 
 
     # Show Workspace
@@ -85,20 +86,14 @@ define [
             model = decodeURIComponent(model)
             model = allContent.get(model)
 
-
-            if contextModel
-              # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-              contextModel = decodeURIComponent(contextModel)
-              contextModel = allContent.get(contextModel)
+            # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
+            contextModel = decodeURIComponent(contextModel)
+            contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
           if not model
             @goWorkspace()
           else
-
-            if not contextModel
-              console.log 'something has gone wonky'
-
             # resset the old highligh state if there was one
             @currentModel?.set('selected', false)
             @currentContext?.set('selected', false)
@@ -108,13 +103,13 @@ define [
             @currentContext = contextModel
 
             # this is needed right now to render the workspace
-            contextModel.set('selected', true)
+            contextModel.set('selected', 'context')
 
             # Always show the workspace pane
-            @_showWorkspacePane(SidebarView, model)
+            @_showWorkspacePane(SidebarView)
 
             # set more granular file selected flags to be used in ToC
-            model.set('selected', true)
+            model.set('selected', 'file')
 
             if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
               contextView = new SidebarView
