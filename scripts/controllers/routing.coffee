@@ -95,12 +95,12 @@ define [
             @goWorkspace()
           else
             # resset the old highligh state if there was one
-            @currentModel?.set('selected', false)
-            @currentContext?.set('selected', false)
+            @_currentModel?.set('selected', false)
+            @_currentContext?.set('selected', false)
 
             # these are needed on the next render as a pointers to things 
-            @currentModel = model
-            @currentContext = contextModel
+            @_currentModel = model
+            @_currentContext = contextModel
 
             # this is needed right now to render the workspace
             contextModel.set('selected', 'context')
