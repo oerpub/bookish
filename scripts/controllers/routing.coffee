@@ -86,9 +86,10 @@ define [
             model = decodeURIComponent(model)
             model = allContent.get(model)
 
-            # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-            contextModel = decodeURIComponent(contextModel)
-            contextModel = allContent.get(contextModel)
+            if contextModel
+              # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
+              contextModel = decodeURIComponent(contextModel)
+              contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
           if not model
@@ -103,7 +104,7 @@ define [
             @_currentContext = contextModel
 
             # this is needed right now to render the workspace
-            contextModel.set('selected', true)
+            contextModel?.set('selected', true)
 
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView)
@@ -111,12 +112,23 @@ define [
             # set more granular file selected flags to be used in ToC
             model.set('selected', true)
 
-            if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
-              contextView = new SidebarView
-                model: contextModel
+            # Force the sidebar if a contextModel is passed in
+            if contextModel
+              # Only change the view if there is nothing there or if the model differs
+              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
+                contextView = new SidebarView
+                  model: contextModel
 
-              @layout.sidebar.show(contextView)
-              contextView.maximize()
+                @layout.sidebar.show(contextView)
+                contextView.maximize()
+            # Some models do not change the sidebar because they cannot contain children (like Module)
+            else if model.getChildren
+              # Only change the view if there is nothing there or if the model differs
+              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != model
+                modelView = new SidebarView
+                  model: model
+                @layout.sidebar.show(modelView)
+                modelView.maximize()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 
