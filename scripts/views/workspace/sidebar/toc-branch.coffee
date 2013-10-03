@@ -132,8 +132,6 @@ define [
     onRender: () ->
       if type = (@model.get('selected') || @model.dereferencePointer?().get('selected'))
         @$el.addClass('active-'+type)
-        @$el.children('.editor-node-body').find('.btn-link')
-          .removeClass('btn-link')
       else
         element = @$el
         _.forEach @$el.attr('class')?.split(' '), (className) ->
@@ -162,6 +160,7 @@ define [
       model = @model.dereferencePointer?() or @model.navModel or @model
 
       return {
+        selected: @model.dereferencePointer?().get('selected') || @model.get('selected')
         mediaType: @model.mediaType
         isGroup: !!(@model.dereferencePointer?() or @model).getChildren
         hasParent: !! @model.getParent?()
