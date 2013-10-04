@@ -133,14 +133,14 @@ define [
       # Dereference if the model is a pointer-node
       model = @model.dereferencePointer?() or @model
 
-      @$el.toggleClass('active', !!model.get('selected'))
+      @$el.toggleClass('active', !!model.get('_selected'))
 
       # if the user hasn't set the state yet make sure the active file is visible
       if not @model.expanded
         hasDescendant = @model.findDescendantBFS (child) ->
           # Dereference if the child is a pointer-node
           child = child.dereferencePointer?() or child
-          return child.get('selected')
+          return child.get('_selected')
 
         @model.expanded = true if hasDescendant
 
@@ -160,7 +160,7 @@ define [
       model = @model.dereferencePointer?() or @model
 
       return {
-        selected: model.get('selected')
+        selected: model.get('_selected')
         mediaType: model.mediaType
         isGroup: !! model.getChildren
         hasParent: !! @model.getParent?()
