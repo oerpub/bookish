@@ -136,7 +136,7 @@ define [
       @$el.toggleClass('active', !!model.get('_selected'))
 
       # if the user hasn't set the state yet make sure the active file is visible
-      if not @model.expanded
+      if @model.expanded == undefined
         hasDescendant = @model.findDescendantBFS (child) ->
           # Dereference if the child is a pointer-node
           child = child.dereferencePointer?() or child
