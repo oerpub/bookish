@@ -62,9 +62,9 @@ define ['backbone'], (Backbone) ->
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
 
-    hasDescendant: (compare) ->
+    findDescendant: (compare) ->
       #Check children first and then descendants
-      return @getChildren().find(compare) or @getChildren().find (node) -> node.hasDescendant(compare)
+      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendant(compare)
 
     getRoot: () ->
       root = null

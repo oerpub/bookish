@@ -272,9 +272,12 @@ define [
                 # Find the first opf file.
                 opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
                 if opf
+                  # Find the 1st leaf node (editable model)
+                  model = opf.findDescendant (model) -> return 0 == opf.getChildren().length
+
                   # The first item in the toc is always the opf file, followed by the
                   # TOC nodes.
-                  controller.goEdit opf.tocNodes.at(1), opf
+                  controller.goEdit model, opf
                 else
                   controller.goWorkspace()
 

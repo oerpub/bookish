@@ -137,7 +137,7 @@ define [
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined
-        hasDescendant = @model.hasDescendant (child) ->
+        hasDescendant = @model.findDescendant (child) ->
           return child.get('selected') || child.dereferencePointer?().get('selected')
 
         @model.expanded = true if hasDescendant
@@ -185,7 +185,8 @@ define [
       # toc/picker.
       model = @model
       if not model.getRoot?()
-        model = model.tocNodes.at(1)
+        # Find the 1st leaf node (editable model)
+        model = model.findDescendant (model) -> return 0 == model.getChildren().length
 
       controller.goEdit(model, model.getRoot())
 
