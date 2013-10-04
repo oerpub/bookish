@@ -230,7 +230,7 @@ define [
             if session.get('repoUser') != repoUser or
                 session.get('repoName') != repoName or
                 session.get('branch') != branch
-            
+
               session.set
                 repoUser: repoUser
                 repoName: repoName
@@ -282,7 +282,7 @@ define [
                 opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
                 if opf
                   # Find the 1st leaf node (editable model)
-                  model = opf.findDescendantDFS (model) -> return opf.getChildren().isEmpty()
+                  model = opf.findDescendantDFS (model) -> return model.getChildren().isEmpty()
 
                   # The first item in the toc is always the opf file, followed by the
                   # TOC nodes.
