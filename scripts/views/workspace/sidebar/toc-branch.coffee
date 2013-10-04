@@ -130,15 +130,17 @@ define [
     itemViewOptions: () -> {container: @collection}
 
     onRender: () ->
-      if @model.dereferencePointer?().get('selected') || @model.get('selected')
-        @$el.addClass('active')
-      else
-        @$el.removeClass 'active'
+      # Dereference if the model is a pointer-node
+      model = @model.dereferencePointer?() or @model
+
+      @$el.toggleClass('active', !!model.get('_selected'))
 
       # if the user hasn't set the state yet make sure the active file is visible
-      if @model.expanded == undefined
-        hasDescendant = @model.hasDescendant (child) ->
-          return child.get('selected') || child.dereferencePointer?().get('selected')
+      if not @model.expanded
+        hasDescendant = @model.findDescendantBFS (child) ->
+          # Dereference if the child is a pointer-node
+          child = child.dereferencePointer?() or child
+          return child.get('_selected')
 
         @model.expanded = true if hasDescendant
 
@@ -154,20 +156,21 @@ define [
       #
       # 1. TocPointerNode
       # 2. OpfFile
-      model = @model.dereferencePointer?() or @model.navModel or @model
+      modelOrNav = @model.dereferencePointer?() or @model.navModel or @model
+      model = @model.dereferencePointer?() or @model
 
       return {
-        selected: @model.dereferencePointer?().get('selected') || @model.get('selected')
-        mediaType: @model.mediaType
-        isGroup: !!(@model.dereferencePointer?() or @model).getChildren
+        selected: model.get('_selected')
+        mediaType: model.mediaType
+        isGroup: !! model.getChildren
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
         # Look up the overridden title
         title: @container?.getTitle?(@model) or @model.get('title')
         # Possibly delegate to the navModel for dirty bits
-        _isDirty: model.get('_isDirty')
-        _hasRemoteChanges: model.get('_hasRemoteChanges')
+        _isDirty: modelOrNav.get('_isDirty')
+        _hasRemoteChanges: modelOrNav.get('_hasRemoteChanges')
       }
 
     events:
@@ -185,7 +188,8 @@ define [
       # toc/picker.
       model = @model
       if not model.getRoot?()
-        model = model.tocNodes.at(1)
+        # Find the 1st leaf node (editable model)
+        model = model.findDescendantDFS (model) -> return model.getChildren().isEmpty()
 
       controller.goEdit(model, model.getRoot())
 

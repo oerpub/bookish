@@ -95,22 +95,24 @@ define [
           if not model
             @goWorkspace()
           else
-            # resset the old highligh state if there was one
-            @_currentModel?.set('selected', false)
-            @_currentContext?.set('selected', false)
+            # reset the old highlight state if there was one
 
-            # these are needed on the next render as a pointers to things 
-            @_currentModel = model
-            @_currentContext = contextModel
+            @_currentModel?.set('_selected', false)
+            @_currentContext?.set('_selected', false)
+
+            # these are needed on the next render as a pointers to things
+            # Always use the dereferenced node because content can be in more than one book
+            @_currentModel = model.dereferencePointer?() or model
+            @_currentContext = contextModel.dereferencePointer?() or contextModel
 
             # this is needed right now to render the workspace
-            contextModel?.set('selected', true)
+            @_currentContext?.set('_selected', true)
 
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView)
 
             # set more granular file selected flags to be used in ToC
-            model.set('selected', true)
+            @_currentModel.set('_selected', true) # Need to set it on the dereferenced pointer
 
             # Force the sidebar if a contextModel is passed in
             if contextModel
