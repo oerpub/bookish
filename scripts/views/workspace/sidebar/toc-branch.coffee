@@ -150,6 +150,16 @@ define [
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
 
+      # Enable tooltips
+      @$el.find('button[title]').tooltip {container: '#workspace-container'}
+
+
+    prettyName: () ->
+      # Translate the mediaType attribute to something nice we can display.
+      # FIXME: If we ever need to translate this, is this a good idea?
+      return "book" if @model.mediaType == 'application/oebps-package+xml'
+      return 'module'
+
     templateHelpers: () ->
       # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
       # The cases below are:
@@ -171,6 +181,7 @@ define [
         # Possibly delegate to the navModel for dirty bits
         _isDirty: modelOrNav.get('_isDirty')
         _hasRemoteChanges: modelOrNav.get('_hasRemoteChanges')
+        prettyName: @prettyName()
       }
 
     events:
@@ -178,8 +189,9 @@ define [
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
-      'click > .editor-node-body > .edit-settings': 'editSettings'
       'click > .editor-node-body .go-edit': 'goEdit'
+      'click > .editor-node-body .edit-settings-rename': 'editSettings'
+      'click > .editor-node-body .edit-settings-edit': 'goEdit'
 
     goEdit: () ->
       # Edit the model in the context of this folder/book. Explicitly close

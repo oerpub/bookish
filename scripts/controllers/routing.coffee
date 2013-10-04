@@ -10,7 +10,6 @@ define [
   'cs!views/layouts/workspace'
   ], (Marionette, allContent, WorkspaceLayout) ->
 
-
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
 
@@ -56,8 +55,8 @@ define [
           @layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
-          # Update the URL without triggering the router
-          @navigate('workspace')
+          # Update the URL
+          @trigger 'navigate', 'workspace'
 
 
     # Edit existing content
@@ -83,12 +82,12 @@ define [
           if typeof model is 'string'
             [model, contextModel] = model.split('|')
             # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-            model = decodeURIComponent(model)
+            model = decodeURI(model)
             model = allContent.get(model)
 
             if contextModel
               # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-              contextModel = decodeURIComponent(contextModel)
+              contextModel = decodeURI(contextModel)
               contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
@@ -141,7 +140,7 @@ define [
 
             # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
             contextPath = ''
-            contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
+            contextPath = "|#{encodeURI(contextModel.id or contextModel.cid)}" if contextModel
 
-            # Update the URL without triggering the router
-            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
+            # Update the URL
+            @trigger 'navigate', "edit/#{encodeURI(model.id or model.cid)}#{contextPath}"

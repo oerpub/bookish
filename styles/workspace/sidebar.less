@@ -28,14 +28,14 @@
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
-  
+
 
   &.sidebar-toc aside > div {
     background-color: @blue;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
-  
+
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
@@ -284,8 +284,13 @@ aside > div {
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
 
-    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
-    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
+    li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body > div.open > .btn-mini.pull-right.edit-settings {
+        display: inline-block;
+    } 
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
