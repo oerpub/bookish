@@ -21,12 +21,10 @@ then
     make
     make install
 
-    cd /vagrant
-    npm install
-
     # Symlink our host www to the guest /var/www folder
     sudo rm -rf /var/www
     sudo ln -s /vagrant/ /var/www
 fi
 
-
+cd /vagrant
+npm install
