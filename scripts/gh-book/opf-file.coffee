@@ -21,6 +21,7 @@ define [
     branch: true # This element will show up in the sidebar listing
 
     initialize: () ->
+      # For TocNode, let it know this is the root
       super {root:@}
 
       # Contains all entries in the OPF file (including images)
@@ -43,15 +44,25 @@ define [
           # Keep track of local changes if there is a remote conflict
           @_localNavAdded[model.id] = model
 
+
+      # If a node was added-to/removed-from a TocNode ensure it is/is-not in the set of `tocNodes`
+      # TODO: This may be redundant and may be able to be removed
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
 
+      # When the book title changes update the OPF XML
+      # TODO: use the value of `@get('title')` when serializing instead.
       @on 'change:title', (model, value, options) =>
         $title = @$xml.find('title')
         if value != $title.text()
           $title.text(value)
           @_save()
 
+      # When a title changes on one of the nodes in the ToC:
+      #
+      # 1. remember the change
+      # 2. try to autosave
+      # 3. if a remote conflict occurse the remembered change will be replayed (see `onReloaded`)
       @tocNodes.on 'change:title', (model, value, options) =>
         return if not model.previousAttributes()['title'] # skip if we are parsing the file
         return if @ == model # Ignore if changing the OPF title
@@ -107,6 +118,12 @@ define [
       # This is useful when the OPF file was remotely updated
       @_localAddedItems[model.id] = model
 
+    # Called on "autosave".
+    # Only save the navModel and new files (and all the OPF files).
+    # Delay the save and if more than one thing changed during SAVE_DELAY
+    # only save once.
+    #
+    # Reason for SAVE_DELAY: a "move" is 2 operations, `remove` followed by `add`
     _save: ->
       clearTimeout(@_savingTimeout)
       @_savingTimeout = setTimeout (() =>
@@ -114,7 +131,8 @@ define [
         delete @_savingTimeout
       ), SAVE_DELAY
 
-
+    # A book is not loaded until the navModel is loaded.
+    # Once the navModel is loaded, "autosave" whenever it changes.
     _loadComplex: (fetchPromise) ->
       fetchPromise
       .then () =>
@@ -357,6 +375,9 @@ define [
         node = new TocPointerNode {root:@, model:model}
         #@tocNodes.add node
       return node
+
+    # Do not change the contentView when the book opens
+    contentView: null
 
     # Change the sidebar view when editing this
     sidebarView: (callback) ->
