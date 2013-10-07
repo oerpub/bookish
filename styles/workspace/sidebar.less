@@ -4,7 +4,6 @@
  * New Styles
  *****************************/
 
-
 .sidebar-container {
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
@@ -581,7 +580,6 @@ aside > div {
 
     li {
       white-space: nowrap;
-      color: #333;
       font-size: 1em;
       font-family: Verdana, "DejaVu Sans",Tahoma;
     }
@@ -601,9 +599,10 @@ aside > div {
 
     // Style the (+) or (-) Next to the node if it collapsed or expanded
     li {
-      > .editor-node-body > .editor-expand-collapse {
+      > .editor-node-body > .toggle-expand {
         cursor: pointer;
-
+      }
+      > .editor-node-body > .editor-expand-collapse {
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }
@@ -640,6 +639,29 @@ aside > div {
       }
     }
 
+    li.active {
+      .icon-content:before {
+        color: inherit;
+      }
+
+      > .editor-node-body {
+
+        > [data-media-type=@{book-media-type}] {
+          color: @blue;
+        }   
+        > [data-media-type=@{page-media-type}] {
+          color: @orange;
+        }
+   
+        .editor-node-title {
+          font-weight: bold;
+         
+          small.toc-badge {
+            color: inherit;
+          }
+        }
+      }
+    }
 
     .btn-link {
       vertical-align: top;
