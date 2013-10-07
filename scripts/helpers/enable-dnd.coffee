@@ -78,6 +78,11 @@ define [
             $drag = ui.draggable
             $drop = $(evt.target)
 
+            # drop is/can-be a child of the current element.
+            # If there is a child with `*[data-media-type]` then use it instead
+            if not $drop.is('*[data-media-type]')
+              $drop = $drop.children('*[data-media-type]')
+
             # Find the model representing the id that was dragged
             drag = $drag.data 'editor-model'
             drop = $drop.data 'editor-model'
