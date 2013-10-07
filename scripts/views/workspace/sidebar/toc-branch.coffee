@@ -150,10 +150,6 @@ define [
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
 
-      # Enable tooltips
-      @$el.find('button[title]').tooltip {container: '#workspace-container'}
-
-
     prettyName: () ->
       # Translate the mediaType attribute to something nice we can display.
       # FIXME: If we ever need to translate this, is this a good idea?
