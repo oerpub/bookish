@@ -599,9 +599,10 @@ aside > div {
 
     // Style the (+) or (-) Next to the node if it collapsed or expanded
     li {
-      > .editor-node-body > .editor-expand-collapse {
+      > .editor-node-body > .toggle-expand {
         cursor: pointer;
-
+      }
+      > .editor-node-body > .editor-expand-collapse {
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }
