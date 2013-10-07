@@ -18,12 +18,9 @@ define ['cs!gh-book/toc-node'], (TocNode) ->
 
       @model.on 'all', () => @trigger.apply @, arguments
 
-      # When the title changes on the XhtmlModel update it in the ToC as well
-      @model.on 'change:title', () => @set('title', @model.get('title'))
-      # Set the title on the model now
-      @set('title', @model.get('title'))
-
-      options.title = options.title or @model.get 'title'
+      # Set the title on the model if an overridden one has not been set (github-book "shortcut")
+      # TODO: see how the github-book works with these 2 lines commented: @set('title', @model.get('title')) if not options.title
+      # options.title = options.title or @model.get 'title'
       super(options)
 
     # Pass through all model attributes except the title (if it is set)
