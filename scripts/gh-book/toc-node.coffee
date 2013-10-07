@@ -56,8 +56,11 @@ define [
       modelRoot = model.getRoot?() # Case of dropping a book onto a folder... `or model`
 
       if root and modelRoot and root != modelRoot
+        # Use `.toJSON().title` instead of `.get('title')` to support
+        # TocPointerNodes which inherit their title if it is not overridden
+        title = model.toJSON().title or 'Untitled'
+
         # If it is a pointer then dereference it
-        title = model.get('title')
         realModel = model.dereferencePointer?() or model
 
         # At this point realModel can be a XhtmlFile or a TocNode (section).
