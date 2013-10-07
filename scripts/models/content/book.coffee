@@ -81,22 +81,9 @@ define [
       # but since the navModel is @ we can jsut listen now
       # TODO: This could also be implemented in the constructor as `@navModel?.on ...`
       @on 'change:body', (model, value, options) =>
-        return if options.parse
+        return if options.parse or options.doNotReparse
         @_parseNavModel(@get('body'))
       return fetchPromise
-
-    # Called on "autosave".
-    # Only save the navModel and new files (and all the OPF files).
-    # Delay the save and if more than one thing changed during SAVE_DELAY
-    # only save once.
-    #
-    # Reason for SAVE_DELAY: a "move" is 2 operations, `remove` followed by `add`
-    _save: ->
-      clearTimeout(@_savingTimeout)
-      @_savingTimeout = setTimeout (() =>
-        allContent.save(@navModel, false, true) # include-resources, include-new-files
-        delete @_savingTimeout
-      ), SAVE_DELAY
 
     # This specifies the mediaType of new Toc entries that do not exist in allContent yet.
     # It is used when the GitHub book Navigation file is updated before the OPF file is.
