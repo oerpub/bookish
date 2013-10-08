@@ -74,9 +74,12 @@
 
 #workspace-container {
   width: 100%;
+  min-width: 1500px;
 
   // workspace minimized
   &.workspace-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -96,6 +99,8 @@
 
   // sidebar minimized (#sidebar is the table of contents
   &.sidebar-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -114,8 +119,10 @@
     }
   }
 
-  // workspace minimized
+  // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
+    min-width: (1500-@aside-width*2+80);
+
     #menu-and-content {
       width: calc(~"100% - 80px");
     }
