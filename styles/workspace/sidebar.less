@@ -24,14 +24,14 @@
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @green;
+    background-color: @picker-color;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
 
 
   &.sidebar-toc aside > div {
-    background-color: @blue;
+    background-color: @toc-color;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
@@ -74,9 +74,12 @@
 
 #workspace-container {
   width: 100%;
+  min-width: 1500px;
 
   // workspace minimized
   &.workspace-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -96,6 +99,8 @@
 
   // sidebar minimized (#sidebar is the table of contents
   &.sidebar-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -114,8 +119,10 @@
     }
   }
 
-  // workspace minimized
+  // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
+    min-width: (1500-@aside-width*2+80);
+
     #menu-and-content {
       width: calc(~"100% - 80px");
     }
@@ -540,7 +547,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @blue;
+    background-color: @toc-color;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
@@ -599,9 +606,10 @@ aside > div {
 
     // Style the (+) or (-) Next to the node if it collapsed or expanded
     li {
-      > .editor-node-body > .editor-expand-collapse {
+      > .editor-node-body > .toggle-expand {
         cursor: pointer;
-
+      }
+      > .editor-node-body > .editor-expand-collapse {
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }

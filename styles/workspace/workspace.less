@@ -35,7 +35,8 @@ html, body {
 #container {
   -webkit-box-orient: horizontal;
   box-orient: horizontal;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 
 // Hide the floating toolbar
@@ -49,7 +50,7 @@ html, body {
 
   .content-panel {
     height: calc(~"100% - 38px");
-    background-color: @orange;
+    background-color: @module-editor-color;
 
     // Round the corners so the handle looks nice
     -webkit-border-top-left-radius: 20px;
