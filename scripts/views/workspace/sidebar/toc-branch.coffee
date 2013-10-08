@@ -145,7 +145,7 @@ define [
         @model.expanded = true if hasDescendant
 
       # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body'))
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))

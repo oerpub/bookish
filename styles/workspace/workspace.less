@@ -14,17 +14,29 @@
 
 [data-media-type] {
   display: block;
-  > .icon-content { margin-right: 0.25em; }
+  > .icon-content { margin-right: 0.2em; }
 }
 
-// Give the module or division a drag hand cursor ...
-[data-media-type="application/xhtml+xml"], 
-[data-media-type="application/xhtml+xml"] .btn-link {
+// The hook to show that you can drag contents.  Appears to left of content on hover.
+.drag-handle{
   cursor: url(openhand.cur);
   cursor: -moz-grab;
   cursor: -webkit-grab;
 }
-// ... while also making sure that it's linkiness is apparent
+.drag-handle:before {
+  content: url(drag-module.png);
+  visibility: hidden;
+  float: left;
+  padding: 0 5px;
+}
+.editor-node-body:hover > .drag-handle:before {
+  visibility: visible;
+}
+
+// Make the whole module or division line look linky 
+[data-media-type="application/xhtml+xml"]{
+  cursor: pointer;
+}
 [data-media-type="application/xhtml+xml"]:hover .btn-link {
   color: @linkColorHover;
   text-decoration: underline;

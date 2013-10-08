@@ -283,7 +283,9 @@ aside > div {
     > ol ol ol ol     { .x-indent-compensate(3); }
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
-
+    > h4 {
+      margin: 10px;
+    }
 
     li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
     li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
@@ -342,7 +344,6 @@ aside > div {
   .boxed-group-inner {
     overflow: auto;
     height: calc(~"100% - 82px");
-    padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
     border-top: 1px solid #ccc;
@@ -364,11 +365,10 @@ aside > div {
   nav ol > li,
   .boxed-group-list>li {
     display: block;
-    margin-left: -10px;
+    margin: 0;
     width: 100%;
-    padding: 5px 10px 0;
-    line-height: 23px;
-    border-top: 1px solid #e5e5e5;
+    padding: 0;
+    line-height: normal;
   }
 
   .editor-node-body {
@@ -380,6 +380,7 @@ aside > div {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: bottom;
     /* Max width is set based on the <li> nesting depth */
   }
 
@@ -394,8 +395,6 @@ aside > div {
   nav li .btn-mini.pull-right,
   .context-button {
     position: relative;
-    line-height: 23px;
-    line-height: 1;
     display: inline-block;
     text-decoration: none;
     -webkit-font-smoothing: antialiased;
@@ -575,7 +574,7 @@ aside > div {
     // Root nodes in the sidebar should have no left margin
     > ol {
       margin: 0;
-      padding-left: 5px;
+      padding: 0;
     }
 
     li {
