@@ -127,7 +127,7 @@ define [
       super(options)
 
     # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> {container: @collection}
+    itemViewOptions: () -> {container: @collection, isPicker: @options.isPicker}
 
     onRender: () ->
       # Dereference if the model is a pointer-node
@@ -170,6 +170,7 @@ define [
       model = @model.dereferencePointer?() or @model
 
       return {
+        isPicker: @options.isPicker
         selected: model.get('_selected')
         mediaType: model.mediaType
         isGroup: !! model.getChildren
