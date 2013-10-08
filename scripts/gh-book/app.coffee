@@ -16,7 +16,6 @@ define [
   'cs!gh-book/remote-updater'
   'cs!gh-book/loading'
   'cs!configs/github.coffee'
-  'less!styles/main'
   'less!gh-book/gh-book'
 ], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView, config) ->
 
