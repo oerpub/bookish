@@ -24,14 +24,14 @@
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @green;
+    background-color: @picker-color;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
 
 
   &.sidebar-toc aside > div {
-    background-color: @blue;
+    background-color: @toc-color;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
@@ -540,7 +540,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @blue;
+    background-color: @toc-color;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
