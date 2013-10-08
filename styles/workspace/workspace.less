@@ -29,8 +29,13 @@
   float: left;
   padding: 0 5px;
 }
-.editor-node-body:hover > .drag-handle:before {
-  visibility: visible;
+.editor-node-body:hover{
+  > .drag-handle:before {
+    visibility: visible;
+  }
+  &[data-media-type="application/oebps-package+xml"] > .drag-handle:before{
+    visibility: hidden;
+  }
 }
 
 // Make the whole module or division line look linky 
