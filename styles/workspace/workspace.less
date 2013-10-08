@@ -13,8 +13,21 @@
 }
 
 [data-media-type] {
-  cursor: pointer;
+  display: block;
   > .icon-content { margin-right: 0.25em; }
+}
+
+// Give the module or division a drag hand cursor ...
+[data-media-type="application/xhtml+xml"], 
+[data-media-type="application/xhtml+xml"] .btn-link {
+  cursor: url(openhand.cur);
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+// ... while also making sure that it's linkiness is apparent
+[data-media-type="application/xhtml+xml"]:hover .btn-link {
+  color: @linkColorHover;
+  text-decoration: underline;
 }
 
 [data-media-type="application/vnd.org.cnx.section"] {
