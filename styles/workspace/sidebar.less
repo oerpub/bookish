@@ -27,6 +27,11 @@
     background-color: @picker-color;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+    
+    .boxed-group-inner{
+      background-color: #f0f0f0; // Make picker background distinct from TOC background.
+    }
+    
   }
 
 
@@ -641,12 +646,20 @@ aside > div {
       }
 
       > .editor-node-body {
+        
+        // Highlight the background of the selected/active content
+        &[data-media-type=@{book-media-type}] {
+          background-color: @toc-color-light;
+        }
+        &[data-media-type=@{page-media-type}] {
+          background-color: @module-color-light;
+        }
 
         > [data-media-type=@{book-media-type}] {
-          color: @blue;
+          color: @toc-color;
         }   
         > [data-media-type=@{page-media-type}] {
-          color: @orange;
+          color: @module-editor-color;
         }
    
         .editor-node-title {
