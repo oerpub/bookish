@@ -57,7 +57,7 @@
   <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in" {{#if isGroup}}title="Click to expand/collapse"{{/if}}>
     <i class="icon-content"></i>
     <span class="editor-node-title">
-      <span {{#unless isGroup}}{{#unless selected}}class="btn-link"{{/unless}}{{/unless}}>
+      <span {{#unless isGroup}}{{#if ancestorSelected}}class="btn-link"{{else}}{{#unless selected}}class="btn-link"{{/unless}}{{/if}}{{/unless}}>
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
         {{#if title}}
           {{{title}}}
