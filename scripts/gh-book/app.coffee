@@ -16,7 +16,6 @@ define [
   'cs!gh-book/remote-updater'
   'cs!gh-book/loading'
   'cs!configs/github.coffee'
-  'less!styles/main'
   'less!gh-book/gh-book'
 ], ($, _, Backbone, Marionette, logger, session, allContent, mediaTypes, EpubContainer, XhtmlFile, OpfFile, TocNode, BinaryFile, WelcomeSignInView, remoteUpdater, LoadingView, config) ->
 
@@ -226,23 +225,31 @@ define [
         # Custom routes to configure the Github User and Repo from the browser
         router = new class GithubRouter extends Backbone.Router
 
-          setDefaultRepo = () ->
-            if not session.get('repoName')
-              options = {}
-              options.silent = true if not 'id' and not 'token'
-              session.set config.defaultRepo, options
+          reconfigRepo: (repoUser, repoName, branch='') ->
+            if session.get('repoUser') != repoUser or
+                session.get('repoName') != repoName or
+                session.get('branch') != branch
 
+              session.set
+                repoUser: repoUser
+                repoName: repoName
+                branch:   branch
+              return true
+            return false
 
           routes:
-            'repo/:repoUser/:repoName':         'configRepo'
-            'repo/:repoUser/:repoName/:branch': 'configRepo'
-
             '':             'goDefault'
-            'workspace':    'goWorkspace'
-            'edit/:id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
+            'repo/:repoUser/:repoName(/branch/:branch)': 'goDefault'
+            'repo/:repoUser/:repoName(/branch/:branch)/workspace': 'goWorkspace'
+            'repo/:repoUser/:repoName(/branch/:branch)/edit/*id': 'goEdit' # Edit an existing piece of content (id can be a path)
 
-          _loadFirst: () ->
-            setDefaultRepo()
+          _loadFirst: (repoUser, repoName, branch) ->
+            if not repoName and not session.get('repoName')
+              session.set config.defaultRepo, {}
+            else if repoName
+              # reconfigRepo does nothing if details did not change
+              @reconfigRepo(repoUser, repoName, branch)
+
             promise = onFail(remoteUpdater.start(), 'There was a problem starting the remote updater')
             .then () =>
               return onFail(epubContainer.load(), 'There was a problem loading the repo')
@@ -250,40 +257,46 @@ define [
             App.main.show(new LoadingView {model:epubContainer, promise:promise})
             return promise
 
-          configRepo: (repoUser, repoName, branch='') ->
-            session.set
-              repoUser: repoUser
-              repoName: repoName
-              branch:   branch
-
-            # The app listens to session onChange events and will call .goDefault
-            # It listens to 'change' because the auth view may also change the session
-
+          _navigate: (view) ->
+            branch = session.get('branch')
+            b = ''
+            b = "/branch/#{branch}" if branch
+            @navigate("repo/#{session.get('repoUser')}/#{session.get('repoName')}#{b}/#{view}")
 
           # Delay the route handling until the initial content is loaded
           # TODO: Move this into the controller
-          goWorkspace: () ->
-            @_loadFirst().done () => controller.goWorkspace()
-          goEdit: (id, contextModel=null)    ->
-            @_loadFirst().done () => controller.goEdit(id, contextModel)
-          goDefault: () ->
-            @_loadFirst().done () ->
+          goWorkspace: (repoUser, repoName, branch) ->
+            @_loadFirst(repoUser, repoName, branch).done () =>
+              controller.goWorkspace()
+
+          goEdit: (repoUser, repoName, branch, id, contextModel=null)    ->
+            @_loadFirst(repoUser, repoName, branch).done () =>
+              controller.goEdit(id, contextModel)
+
+          goDefault: (repoUser, repoName, branch) ->
+            _router = @
+            @_loadFirst(repoUser, repoName, branch).done () ->
               require ['cs!gh-book/opf-file'], (OpfFile) ->
                 # Find the first opf file.
                 opf = allContent.findWhere({mediaType: OpfFile.prototype.mediaType})
                 if opf
+                  # Find the 1st leaf node (editable model)
+                  model = opf.findDescendantDFS (model) -> return model.getChildren().isEmpty()
+
                   # The first item in the toc is always the opf file, followed by the
                   # TOC nodes.
-                  controller.goEdit opf.tocNodes.at(1), opf
+                  controller.goEdit model, opf
                 else
                   controller.goWorkspace()
 
+
+        # When the controller navigates, ask our router to update the url.
+        controller.on 'navigate', (route) -> router._navigate route
 
         session.on 'change', () =>
           if not _.isEmpty _.pick(session.changed, ['repoUser', 'repoName', 'branch'])
             remoteUpdater.stop()
             onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
-            router.goDefault()
 
 
         Backbone.history.start

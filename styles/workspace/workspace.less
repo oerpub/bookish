@@ -35,7 +35,8 @@ html, body {
 #container {
   -webkit-box-orient: horizontal;
   box-orient: horizontal;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 
 // Hide the floating toolbar
@@ -49,15 +50,7 @@ html, body {
 
   .content-panel {
     height: calc(~"100% - 75px");
-    background-color: @orange;
-
-    // Round the corners so the handle looks nice
-    -webkit-border-top-left-radius: 20px;
-    -moz-border-radius-topleft:     20px;
-    border-top-left-radius:         20px;
-    -webkit-border-top-right-radius:  20px;
-    -moz-border-radius-topright:      20px;
-    border-top-right-radius:          20px;
+    background-color: @module-editor-color;
 
     .content-title {
       color: white;
@@ -74,7 +67,19 @@ html, body {
       .boxed-group-inner {
         // So boxed-group-inner is scrollable, set the overflow-y
         overflow-y: auto;
+	    background-color: #ccc;
+		  
+	    .content{
+	      // Give the module-editing area the look of a piece of paper
+	      margin: 15px 25px;
+	      border: 1px solid #aaa;
+	      box-shadow: 0 0 10px #999;
+	      background-color: #fff;
+	      padding: 30px;
+	    }
+		
       }
+	
     }
 
   }

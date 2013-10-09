@@ -4,10 +4,22 @@
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
 {{#if isGroup}}
-  <span class="editor-expand-collapse" title="Click to expand/collapse"><i class="icon-content"></i></span>
+  <span class="editor-expand-collapse toggle-expand" title="Click to expand/collapse"><i class="icon-content"></i></span>
 {{/if}}
 
-<button class="btn btn-mini pull-right edit-settings" title="Edit Title"><i class="icon-pencil"></i></button>
+<div class="btn-group pull-right">
+  <button class="btn btn-mini pull-right edit-settings dropdown-toggle"
+          data-toggle="dropdown"
+          title="Edit/rename this {{prettyName}}"><i class="icon-pencil"></i></button>
+  <ul class="dropdown-menu">
+    <li>
+      <button type="button" class="btn btn-link edit-settings-rename">Rename this {{prettyName}}</button>
+    </li>
+    <li>
+      <button type="button" class="btn btn-link edit-settings-edit">Go edit this {{prettyName}}</button>
+    </li>
+  </ul>
+</div>
 {{#if editAction}}
   <span data-media-type="{{#if content}}{{content.mediaType}}{{else}}{{mediaType}}{{/if}}" data-content-id="{{id}}" data-content-title="{{content.title}}" class="edit-action"><i class="icon-content"></i>
     {{! A book title (if set) overrides the module title}}
@@ -40,9 +52,9 @@
 
   </span>
 {{else}}
-  <span class="go-edit" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
+  <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
     <span class="editor-node-title">
-      <span {{#unless isGroup}}class="btn-link"{{/unless}}>
+      <span {{#unless isGroup}}{{#unless selected}}class="btn-link"{{/unless}}{{/unless}}>
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
         {{#if title}}
           {{{title}}}

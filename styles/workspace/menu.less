@@ -1,7 +1,7 @@
 @import "../variables.less";
 
 #menu {
-  overflow: hidden;
+  overflow: visible;
 
   .navbar {
     margin-bottom: 0;
@@ -40,6 +40,11 @@
     width: auto;
     display: inline-block;
     padding-right: 10px;
+  }
+  
+  .semantic-drag-source:before{
+    content: "Drag to add a new ...";
+    display: inline-block;
   }
 
   .ui-flash {

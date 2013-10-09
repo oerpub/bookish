@@ -58,6 +58,7 @@ define [
         @_renderChildren()
       else
         @$el.removeClass('editor-node-expanded')
+
       return result
 
     # Override internal Marionette method.
@@ -128,13 +129,32 @@ define [
     # Pass down the Book so we can look up the overridden title
     itemViewOptions: () -> {container: @collection}
 
-
     onRender: () ->
+      # Dereference if the model is a pointer-node
+      model = @model.dereferencePointer?() or @model
+
+      @$el.toggleClass('active', !!model.get('_selected'))
+
+      # if the user hasn't set the state yet make sure the active file is visible
+      if @model.expanded == undefined
+        hasDescendant = @model.findDescendantBFS (child) ->
+          # Dereference if the child is a pointer-node
+          child = child.dereferencePointer?() or child
+          return child.get('_selected')
+
+        @model.expanded = true if hasDescendant
+
       # Add DnD options to content
       EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
+
+    prettyName: () ->
+      # Translate the mediaType attribute to something nice we can display.
+      # FIXME: If we ever need to translate this, is this a good idea?
+      return "book" if @model.mediaType == 'application/oebps-package+xml'
+      return 'module'
 
     templateHelpers: () ->
       # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
@@ -142,35 +162,44 @@ define [
       #
       # 1. TocPointerNode
       # 2. OpfFile
-      model = @model.dereferencePointer?() or @model.navModel or @model
+      modelOrNav = @model.dereferencePointer?() or @model.navModel or @model
+      model = @model.dereferencePointer?() or @model
 
       return {
-        mediaType: @model.mediaType
-        isGroup: !!(@model.dereferencePointer?() or @model).getChildren
+        selected: model.get('_selected')
+        mediaType: model.mediaType
+        isGroup: !! model.getChildren
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
         # Look up the overridden title
         title: @container?.getTitle?(@model) or @model.get('title')
         # Possibly delegate to the navModel for dirty bits
-        _isDirty: model.get('_isDirty')
-        _hasRemoteChanges: model.get('_hasRemoteChanges')
+        _isDirty: modelOrNav.get('_isDirty')
+        _hasRemoteChanges: modelOrNav.get('_hasRemoteChanges')
+        prettyName: @prettyName()
       }
 
     events:
       # The `.editor-node-body` is needed because `li` elements render differently
       # when there is a space between `<li>` and the first child.
       # `.editor-node-body` ensures there is never a space.
-      'click > .editor-node-body > .editor-expand-collapse': 'toggleExpanded'
-      'click > .editor-node-body > .edit-settings': 'editSettings'
+      'click > .editor-node-body > .toggle-expand': 'toggleExpanded'
       'click > .editor-node-body .go-edit': 'goEdit'
+      'click > .editor-node-body .edit-settings-rename': 'editSettings'
+      'click > .editor-node-body .edit-settings-edit': 'goEdit'
 
     goEdit: () ->
       # Edit the model in the context of this folder/book. Explicitly close
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
-      controller.goEdit(@model, @model.getRoot?())
+      model = @model
+      if not model.getRoot?()
+        # Find the 1st leaf node (editable model)
+        model = model.findDescendantDFS (model) -> return model.getChildren().isEmpty()
+
+      controller.goEdit(model, model.getRoot())
 
 
     editSettings: ->

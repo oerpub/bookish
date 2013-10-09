@@ -43,10 +43,8 @@ define [
           # Keep track of local changes if there is a remote conflict
           @_localNavAdded[model.id] = model
 
-
       @tocNodes.on 'tree:add',    (model, collection, options) => @tocNodes.add model, options
       @tocNodes.on 'tree:remove', (model, collection, options) => @tocNodes.remove model, options
-
 
       @on 'change:title', (model, value, options) =>
         $title = @$xml.find('title')
@@ -359,14 +357,6 @@ define [
         node = new TocPointerNode {root:@, model:model}
         #@tocNodes.add node
       return node
-
-    # When the book opens, find the first non-toc element in the toc and
-    # open its contentView, if it has one.
-    contentView: (callback) ->
-      first = @tocNodes.at(1) # First item is always the toc/nav, we pick the second
-      if first and first.contentView
-        return first.contentView(callback)
-      return null
 
     # Change the sidebar view when editing this
     sidebarView: (callback) ->

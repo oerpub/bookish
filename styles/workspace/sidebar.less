@@ -4,9 +4,6 @@
  * New Styles
  *****************************/
 
-@color-green: @green; // Bootstrap green
-@color-blue: @blue; // Bootstrap blue
-
 .sidebar-container {
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
@@ -27,18 +24,18 @@
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @color-green;
+    background-color: @picker-color;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
   }
-  
+
 
   &.sidebar-toc aside > div {
-    background-color: @color-blue;
+    background-color: @toc-color;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
-  
+
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
@@ -77,9 +74,12 @@
 
 #workspace-container {
   width: 100%;
+  min-width: 1500px;
 
   // workspace minimized
   &.workspace-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -99,6 +99,8 @@
 
   // sidebar minimized (#sidebar is the table of contents
   &.sidebar-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -117,8 +119,10 @@
     }
   }
 
-  // workspace minimized
+  // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
+    min-width: (1500-@aside-width*2+80);
+
     #menu-and-content {
       width: calc(~"100% - 80px");
     }
@@ -188,15 +192,6 @@ aside > div {
 
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
-
-  // Round the corners so the handle looks nice
-  -webkit-border-top-right-radius:  20px;
-  -moz-border-radius-topright:      20px;
-  border-top-right-radius:          20px;
-  -webkit-border-bottom-right-radius:  20px;
-  -moz-border-radius-bottomright:      20px;
-  border-bottom-right-radius:          20px;
-
 
   > .handle { text-shadow: 2px 2px 4px #000; }
 
@@ -287,8 +282,13 @@ aside > div {
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
 
-    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
-    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
+    li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
+
+    li > .editor-node-body > div.open > .btn-mini.pull-right.edit-settings {
+        display: inline-block;
+    } 
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
@@ -313,8 +313,6 @@ aside > div {
 .boxed-group {
   position: relative;
   background: #efefef;
-  padding: 3px;
-  border-radius: 3px;
   margin: 0 0 15px 0;
   height: 100%;
   box-sizing: border-box;
@@ -538,7 +536,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @color-blue;
+    background-color: @toc-color;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
@@ -578,7 +576,6 @@ aside > div {
 
     li {
       white-space: nowrap;
-      color: #333;
       font-size: 1em;
       font-family: Verdana, "DejaVu Sans",Tahoma;
     }
@@ -598,9 +595,10 @@ aside > div {
 
     // Style the (+) or (-) Next to the node if it collapsed or expanded
     li {
-      > .editor-node-body > .editor-expand-collapse {
+      > .editor-node-body > .toggle-expand {
         cursor: pointer;
-
+      }
+      > .editor-node-body > .editor-expand-collapse {
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }
@@ -637,6 +635,29 @@ aside > div {
       }
     }
 
+    li.active {
+      .icon-content:before {
+        color: inherit;
+      }
+
+      > .editor-node-body {
+
+        > [data-media-type=@{book-media-type}] {
+          color: @blue;
+        }   
+        > [data-media-type=@{page-media-type}] {
+          color: @orange;
+        }
+   
+        .editor-node-title {
+          font-weight: bold;
+         
+          small.toc-badge {
+            color: inherit;
+          }
+        }
+      }
+    }
 
     .btn-link {
       vertical-align: top;
