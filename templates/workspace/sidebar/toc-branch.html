@@ -3,7 +3,7 @@
 {{! Includes drop zones and supports nodes that point to content (with ids) and containers (chapter/unit)}}
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
 
-<i class="drag-handle" {{#unless ancestorSelected}}title="{{#if isPicker}}Dragging this to the Table of Contents will make a copy of this content in that book.{{else}}Drag to a different part of the book.{{/if}}"{{/unless}}></i>
+<i class="drag-handle" {{#unless ancestorSelected}}title="{{#if isPicker}}Drag this content into the open book's Table of Contents to use it there also.{{else}}Drag to a different part of the book.{{/if}}"{{/unless}}></i>
 
 {{#if isGroup}}
   <span class="editor-expand-collapse toggle-expand" title="Click to expand/collapse"><i class="icon-content"></i></span>
