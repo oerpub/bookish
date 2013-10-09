@@ -52,7 +52,8 @@
 
   </span>
 {{else}}
-  <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
+  <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in" {{#if title}}title="{{title}}"{{/if}}>
+    <i class="icon-content"></i>
     <span class="editor-node-title">
       <span {{#unless isGroup}}{{#unless selected}}class="btn-link"{{/unless}}{{/unless}}>
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
@@ -62,22 +63,23 @@
           {{id}}
         {{/if}}
       </span>
-
-      {{#if _isDirty}}
-        <small class="toc-badge">
-          <span class="is-dirty" title="This has unsaved changes">
-            <i class="icon-asterisk"></i>
-          </span>
-        </small>
-      {{/if}}
-      {{#if _hasRemoteChanges}}
-        <small class="toc-badge">
-          <span class="has-remote-changes" title="This has been changed by someone else">
-            <i class="icon-refresh"></i>
-          </span>
-        </small>
-      {{/if}}
     </span>
+    
+    {{#if _isDirty}}
+      <small class="toc-badge">
+        <span class="is-dirty" title="This has unsaved changes">
+          <i class="icon-asterisk"></i>
+        </span>
+      </small>
+    {{/if}}
+    {{#if _hasRemoteChanges}}
+      <small class="toc-badge">
+        <span class="has-remote-changes" title="This has been changed by someone else">
+          <i class="icon-refresh"></i>
+        </span>
+      </small>
+    {{/if}}
+    
   </span>
 {{/if}}
 
