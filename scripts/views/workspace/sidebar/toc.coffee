@@ -32,6 +32,7 @@ define [
       model = @model?.navModel or @model
 
       return {
+        isPicker: !@model
         mediaType: @model?.mediaType
         _isDirty: model?.get('_isDirty')
         _hasRemoteChanges: model?.get('_hasRemoteChanges')

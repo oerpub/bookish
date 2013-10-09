@@ -127,7 +127,7 @@ define [
       super(options)
 
     # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> 
+    itemViewOptions: () ->
       model = @model.dereferencePointer?() or @model
       {
         container: @collection
