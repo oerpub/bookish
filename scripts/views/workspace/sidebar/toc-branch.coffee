@@ -127,13 +127,19 @@ define [
       super(options)
 
     # Pass down the Book so we can look up the overridden title
-    itemViewOptions: () -> {container: @collection}
+    itemViewOptions: () ->
+      model = @model.dereferencePointer?() or @model
+      {
+        container: @collection
+        isPicker: @options.isPicker
+        ancestorSelected: model.get('_selected') || @options.ancestorSelected
+      }
 
     onRender: () ->
       # Dereference if the model is a pointer-node
       model = @model.dereferencePointer?() or @model
 
-      @$el.toggleClass('active', !!model.get('_selected'))
+      @$el.toggleClass('active', !!model.get('_selected') && !@options.ancestorSelected)
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined
@@ -145,7 +151,7 @@ define [
         @model.expanded = true if hasDescendant
 
       # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body > *[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body'))
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
@@ -166,7 +172,9 @@ define [
       model = @model.dereferencePointer?() or @model
 
       return {
+        isPicker: @options.isPicker
         selected: model.get('_selected')
+        ancestorSelected: @options.ancestorSelected
         mediaType: model.mediaType
         isGroup: !! model.getChildren
         hasParent: !! @model.getParent?()
