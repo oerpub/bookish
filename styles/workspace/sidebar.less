@@ -24,14 +24,19 @@
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @green;
+    background-color: @picker-color;
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+    
+    .boxed-group-inner{
+      background-color: #f0f0f0; // Make picker background distinct from TOC background.
+    }
+    
   }
 
 
   &.sidebar-toc aside > div {
-    background-color: @blue;
+    background-color: @toc-color;
     > .handle > .handle-text::before          { content: 'Table of Contents'; }
     > .boxed-group > h3 > .title-text::before { content: 'Table of Contents'; }
   }
@@ -74,9 +79,12 @@
 
 #workspace-container {
   width: 100%;
+  min-width: 1500px;
 
   // workspace minimized
   &.workspace-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -96,6 +104,8 @@
 
   // sidebar minimized (#sidebar is the table of contents
   &.sidebar-minimized {
+    min-width: (1500-@aside-width+40);
+
     #menu-and-content {
       width: calc(~"100% - 350px");
     }
@@ -114,8 +124,10 @@
     }
   }
 
-  // workspace minimized
+  // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
+    min-width: (1500-@aside-width*2+80);
+
     #menu-and-content {
       width: calc(~"100% - 80px");
     }
@@ -185,15 +197,6 @@ aside > div {
 
   // Animate the sidebar to slide right (open) when minimized handle is clicked
   .x-slide-sidebar(@aside-width);
-
-  // Round the corners so the handle looks nice
-  -webkit-border-top-right-radius:  20px;
-  -moz-border-radius-topright:      20px;
-  border-top-right-radius:          20px;
-  -webkit-border-bottom-right-radius:  20px;
-  -moz-border-radius-bottomright:      20px;
-  border-bottom-right-radius:          20px;
-
 
   > .handle { text-shadow: 2px 2px 4px #000; }
 
@@ -283,7 +286,9 @@ aside > div {
     > ol ol ol ol     { .x-indent-compensate(3); }
     > ol ol ol ol ol  { .x-indent-compensate(4); }
 
-
+    > h4 {
+      margin: 10px;
+    }
 
     li > .editor-node-body:not(:hover) > div > .edit-settings { display: none; }
     li > .editor-node-body:hover       > div > .edit-settings { display: inline-block; }
@@ -315,8 +320,6 @@ aside > div {
 .boxed-group {
   position: relative;
   background: #efefef;
-  padding: 3px;
-  border-radius: 3px;
   margin: 0 0 15px 0;
   height: 100%;
   box-sizing: border-box;
@@ -342,7 +345,6 @@ aside > div {
   .boxed-group-inner {
     overflow: auto;
     height: calc(~"100% - 82px");
-    padding: 1px 10px;
     background: #fff;
     border: 1px solid #d8d8d8;
     border-top: 1px solid #ccc;
@@ -364,11 +366,10 @@ aside > div {
   nav ol > li,
   .boxed-group-list>li {
     display: block;
-    margin-left: -10px;
+    margin: 0;
     width: 100%;
-    padding: 5px 10px 0;
-    line-height: 23px;
-    border-top: 1px solid #e5e5e5;
+    padding: 0;
+    line-height: normal;
   }
 
   .editor-node-body {
@@ -380,6 +381,7 @@ aside > div {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: bottom;
     /* Max width is set based on the <li> nesting depth */
   }
 
@@ -394,8 +396,6 @@ aside > div {
   nav li .btn-mini.pull-right,
   .context-button {
     position: relative;
-    line-height: 23px;
-    line-height: 1;
     display: inline-block;
     text-decoration: none;
     -webkit-font-smoothing: antialiased;
@@ -540,7 +540,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @blue;
+    background-color: @toc-color;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
@@ -575,7 +575,7 @@ aside > div {
     // Root nodes in the sidebar should have no left margin
     > ol {
       margin: 0;
-      padding-left: 5px;
+      padding: 0;
     }
 
     li {
@@ -603,6 +603,7 @@ aside > div {
         cursor: pointer;
       }
       > .editor-node-body > .editor-expand-collapse {
+        float: left;
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }
@@ -645,12 +646,20 @@ aside > div {
       }
 
       > .editor-node-body {
+        
+        // Highlight the background of the selected/active content
+        &[data-media-type=@{book-media-type}] {
+          background-color: @toc-color-light;
+        }
+        &[data-media-type=@{page-media-type}] {
+          background-color: @module-color-light;
+        }
 
         > [data-media-type=@{book-media-type}] {
-          color: @blue;
+          color: @toc-color;
         }   
         > [data-media-type=@{page-media-type}] {
-          color: @orange;
+          color: @module-editor-color;
         }
    
         .editor-node-title {

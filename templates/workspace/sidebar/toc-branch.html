@@ -1,7 +1,9 @@
-<div class="editor-node-body editor-drop-zone editor-drop-zone-in">
+<div data-media-type="{{mediaType}}" class="editor-node-body editor-drop-zone editor-drop-zone-in">
 {{! Renders a single node in the book editor tree}}
 {{! Includes drop zones and supports nodes that point to content (with ids) and containers (chapter/unit)}}
 {{! The div above MUST be here and MUST NOT have any spaces before it because the 'li' parent will render differently}}
+
+<i class="drag-handle" {{#unless ancestorSelected}}title="{{#if isPicker}}Drag this content into the open book's Table of Contents to use it there also.{{else}}Drag to a different part of the book.{{/if}}"{{/unless}}></i>
 
 {{#if isGroup}}
   <span class="editor-expand-collapse toggle-expand" title="Click to expand/collapse"><i class="icon-content"></i></span>
@@ -13,14 +15,10 @@
           title="Edit/rename this {{prettyName}}"><i class="icon-pencil"></i></button>
   <ul class="dropdown-menu">
     <li>
-      <button type="button" class="btn btn-link edit-settings-rename"
-              data-placement="bottom" data-toggle="tooltip"i
-              title="Rename this {{prettyName}}">Rename this {{prettyName}}</button>
+      <button type="button" class="btn btn-link edit-settings-rename">Rename this {{prettyName}}</button>
     </li>
     <li>
-      <button type="button" class="btn btn-link edit-settings-edit"
-              data-placement="bottom" data-toggle="tooltip"i
-              title="Leave the {{prettyName}} you are currently on and go edit this one">Go edit this {{prettyName}}</button>
+      <button type="button" class="btn btn-link edit-settings-edit">Go edit this {{prettyName}}</button>
     </li>
   </ul>
 </div>
@@ -56,7 +54,8 @@
 
   </span>
 {{else}}
-  <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in"><i class="icon-content"></i>
+  <span class="{{#if isGroup}}toggle-expand{{else}}go-edit{{/if}}" data-media-type="{{mediaType}}" data-content-title="{{title}}" class="no-edit-action editor-drop-zone editor-drop-zone-in" {{#if isGroup}}title="Click to expand/collapse"{{/if}}>
+    <i class="icon-content"></i>
     <span class="editor-node-title">
       <span {{#unless isGroup}}{{#unless selected}}class="btn-link"{{/unless}}{{/unless}}>
         <!-- If the content does not have a title (like an image) or it has not been looked up yet use the path -->
