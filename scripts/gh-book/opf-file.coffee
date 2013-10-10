@@ -7,7 +7,8 @@ define [
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
-], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
+  'cs!gh-book/uuid'
+], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils, uuid) ->
 
   SAVE_DELAY = 10 # ms
 
@@ -15,12 +16,43 @@ define [
   return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
 
+    defaultNav: """
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>undefined</head>
+  <body>
+    <h1>Table of Contents</h1>
+    <nav>
+      <ol></ol>
+    </nav>
+  </body>
+</html>
+"""
+
+    xml: """
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifer="uid">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="uid">siyavula.com.dummy-book-repo.1.0</dc:identifier>
+    <dc:title>IEB Physics Outline Rename</dc:title>
+  </metadata>
+  <manifest></manifest>
+  <spine></spine>
+</package>
+"""
+
     mediaType: 'application/oebps-package+xml'
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
     branch: true # This element will show up in the sidebar listing
 
     initialize: () ->
+      @$xml = $($.parseXML @xml)
+      
+      # Give the content an id if it does not already have one
+      @setNew() if not @id
+      @id ?= "content/#{uuid()}"
+
       super {root:@}
 
       # Contains all entries in the OPF file (including images)
@@ -94,11 +126,18 @@ define [
         id:           relPath # TODO: escape the slashes so it is a valid id
         'media-type': model.mediaType
 
+      if options.properties
+        $item.attr 'properties', options.properties
+        delete options.properties
+
       # Randomly add the item into the manifest.
       # Always appending results in commit conflicts at the bottom of the file
       $manifestChildren = $manifest.children()
-      index = $manifestChildren.length * Math.random()
-      $item.insertBefore($manifestChildren.eq(index))
+      if $manifestChildren.length
+        index = $manifestChildren.length * Math.random()
+        $item.insertBefore($manifestChildren.eq(index))
+      else
+        $manifest.append($item)
       # TODO: Depending on the type add it to the spine for EPUB2
 
       @_markDirty(options, force)
@@ -108,6 +147,22 @@ define [
       @_localAddedItems[model.id] = model
 
     _save: ->
+
+      # this is a new book, set some default elements
+      if not @navModel
+        #create the default nav file
+        @navModel = new XhtmlFile
+        @navModel.set('body', @defaultNav)
+       
+        # add the new navModel to our opf and the allcontent container 
+        @_addItem(@navModel, {properties: 'nav'})
+        allContent.add(@navModel)
+
+        #create empty module for the book 
+        module = new XhtmlFile
+        allContent.add(module)
+        @addChild(module)
+
       clearTimeout(@_savingTimeout)
       @_savingTimeout = setTimeout (() =>
         allContent.save(@navModel, false, true) # include-resources, include-new-files

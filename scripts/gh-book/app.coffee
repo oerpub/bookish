@@ -36,7 +36,11 @@ define [
     # Otherwise, add it to the manifest for all the books (Better safe than sorry)
     switch model.mediaType
       when OpfFile::mediaType
-        epubContainer.addChild(model)
+        # add the opf to the copy of the Epubcontainer
+        # that is in allContent
+        allContent
+          .findWhere({mediaType: EpubContainer::mediaType})
+          .addChild(model)
       else
         allContent.each (book) ->
           book.manifest?.add(model) # Only books have a manifest
@@ -199,6 +203,7 @@ define [
         changedModels = @filter (model) ->
           if contextModel && model != contextModel
             switch model.mediaType
+              when EpubContainer::mediaType then return model.isDirty() # Always add container file if it is dirty
               when OpfFile::mediaType then return model.isDirty() # Always add OPF files
               when XhtmlFile::mediaType
                 return includeNewContent and model.isNew()
