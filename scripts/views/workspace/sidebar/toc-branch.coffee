@@ -139,7 +139,7 @@ define [
       # Dereference if the model is a pointer-node
       model = @model.dereferencePointer?() or @model
 
-      @$el.toggleClass('active', !!model.get('_selected'))
+      @$el.toggleClass('active', !!model.get('_selected') && !@options.ancestorSelected)
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined
