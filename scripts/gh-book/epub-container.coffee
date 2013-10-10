@@ -26,7 +26,7 @@ define [
     initialize: () ->
       @children = new Backbone.Collection()
 
-      @children.on 'change', (collection, options) =>
+      @children.on 'add', (collection, options) =>
         @_markDirty(options, true)
 
       @children.on 'reset', (collection, options) =>
@@ -78,8 +78,7 @@ define [
     # Called by `loadableMixin.reload` when the repo settings change
     reset: () -> @children.reset()
 
-    addChild: (book) ->
-      @children.add(book)
+    addChild: (book) -> @children.add(book)
 
   EpubContainer = EpubContainer.extend loadableMixin
   # All content in the Workspace
