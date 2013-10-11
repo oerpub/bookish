@@ -8,8 +8,8 @@ define [
   'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
   'cs!gh-book/uuid'
-  'hbs!templates/defaults/opf'
-  'hbs!templates/defaults/nav'
+  'hbs!templates/gh-book/defaults/opf'
+  'hbs!templates/gh-book/defaults/nav'
 ], (
   Backbone,
   mediaTypes,
