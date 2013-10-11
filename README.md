@@ -5,6 +5,15 @@ of how the code is organized.
 
 ## Building Yourself
 
+### With Vagrant
+* install [virtualbox](https://www.virtualbox.org/wiki/Downloads)
+* install [vagrant](http://downloads.vagrantup.com/)
+* clone [github book editor](https://github.com/oerpub/github-bookeditor) repo to somewhere
+* inside the repo run `vagrant up` from a command line
+  * there is currently a bug in the build that makes it not run fully on the first pass, the workaround is to log into the vm after running `vagrant up` with `vagrant ssh`, then go into `/vagrant` and run `npm install`. that will finish the build for you
+* vagrant will take a while to configure the new vm when its done you will be able to hit "33.33.33.10" in a web browser and see the editor
+
+### Manually
 1. Download and extract (if necessary)
 2. Run `npm install` or just `bower install` in the directory to download and install dependencies
 3. Start up a webserver
