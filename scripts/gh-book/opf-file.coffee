@@ -130,14 +130,7 @@ define [
         $item.attr 'properties', options.properties
         delete options.properties
 
-      # Randomly add the item into the manifest.
-      # Always appending results in commit conflicts at the bottom of the file
-      $manifestChildren = $manifest.children()
-      if $manifestChildren.length
-        index = $manifestChildren.length * Math.random()
-        $item.insertBefore($manifestChildren.eq(index))
-      else
-        $manifest.append($item)
+      $manifest.append($item)
       # TODO: Depending on the type add it to the spine for EPUB2
 
       @_markDirty(options, force)
