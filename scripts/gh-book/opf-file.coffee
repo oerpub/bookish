@@ -8,7 +8,20 @@ define [
   'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
   'cs!gh-book/uuid'
-], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils, uuid) ->
+  'hbs!templates/defaults/opf'
+  'hbs!templates/defaults/nav'
+], (
+  Backbone,
+  mediaTypes,
+  allContent,
+  loadable,
+  XhtmlFile,
+  TocNode,
+  TocPointerNode,
+  Utils,
+  uuid,
+  defaultOpf,
+  defaultNav) ->
 
   SAVE_DELAY = 10 # ms
 
@@ -16,38 +29,13 @@ define [
   return class PackageFile extends (TocNode.extend loadable)
     serializer = new XMLSerializer()
 
-    defaultNav: """
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head>undefined</head>
-  <body>
-    <h1>Table of Contents</h1>
-    <nav>
-      <ol></ol>
-    </nav>
-  </body>
-</html>
-"""
-
-    xml: """
-<?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifer="uid">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:identifier id="uid">siyavula.com.dummy-book-repo.1.0</dc:identifier>
-    <dc:title>IEB Physics Outline Rename</dc:title>
-  </metadata>
-  <manifest></manifest>
-  <spine></spine>
-</package>
-"""
-
     mediaType: 'application/oebps-package+xml'
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
     branch: true # This element will show up in the sidebar listing
 
     initialize: () ->
-      @$xml = $($.parseXML @xml)
+      @$xml = $($.parseXML defaultOpf())
       
       # Give the content an id if it does not already have one
       @setNew() if not @id
@@ -145,7 +133,7 @@ define [
       if not @navModel
         #create the default nav file
         @navModel = new XhtmlFile
-        @navModel.set('body', @defaultNav)
+        @navModel.set('body', defaultNav())
        
         # add the new navModel to our opf and the allcontent container 
         @_addItem(@navModel, {properties: 'nav'})
