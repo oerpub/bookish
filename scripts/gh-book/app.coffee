@@ -99,7 +99,8 @@ define [
 
     # set which media formats are allowed 
     # at the toplevel of the content
-    OpfFile::toplevel = true
+    for type in EpubContainer::accept
+      mediaTypes.type(type)::toplevel = true
 
     # Views use anchors with hrefs so catch the click and send it to Backbone
     $(document).on 'click', 'a:not([data-bypass]):not([href="#"])', (e) ->
