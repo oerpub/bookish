@@ -11,17 +11,22 @@
   float: left;
   position: relative;
 
-  max-width: @aside-width;
   border-right: @aside-border-width solid #999;
   box-sizing: border-box;
 
-  &.sidebar-workspace .handle{
-    background-color: @picker-color;
-    color: @picker-color-light;
+  &.sidebar-workspace{
+    max-width: @picker-width;
+    .handle {
+      background-color: @picker-color;
+      color: @picker-color-light;
+    }
   }
-  &.sidebar-toc .handle{
-    background-color: @toc-color;
-    color: @toc-color-light;
+  &.sidebar-toc{
+    max-width: @toc-width;
+    .handle{
+      background-color: @toc-color;
+      color: @toc-color-light;
+    }
   }
   
   .handle {
@@ -42,6 +47,7 @@
 
   &.sidebar-workspace aside > div {
   
+    .x-slide-sidebar(@picker-width);
     background-color: #f0f0f0; // Make picker background distinct from TOC background.
     
     > .handle > .handle-text::before          { content: 'Book Picker'; }
@@ -54,6 +60,8 @@
 
 
   &.sidebar-toc aside > div {
+  
+    .x-slide-sidebar(@toc-width);
   /*
     background-color: @toc-color;
     */
@@ -105,10 +113,10 @@
 
   // workspace minimized
   &.workspace-minimized {
-    min-width: (1500-@aside-width+@aside-handle-width);
+    min-width: (1500-@picker-width+@aside-handle-width);
 
     #menu-and-content {
-      width: calc(~"100%" - @aside-width+@aside-handle-width);
+      width: calc(~"100%" - @toc-width+@aside-handle-width);
     }
 
     .sidebar-workspace {
@@ -132,12 +140,12 @@
     }
   }
 
-  // sidebar minimized (#sidebar is the table of contents
+  // sidebar minimized (#sidebar is the table of contents)
   &.sidebar-minimized {
-    min-width: (1500-@aside-width+@aside-handle-width);
+    min-width: (1500-@toc-width+@aside-handle-width);
 
     #menu-and-content {
-      width: calc(~"100%" - @aside-width+@aside-handle-width);
+      width: calc(~"100%" - @picker-width+@aside-handle-width);
     }
 
     .sidebar-toc {
@@ -164,7 +172,7 @@
 
   // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
-    min-width: (1500-@aside-width*2+@aside-handle-width*2);
+    min-width: (1500 - @toc-width - @picker-width + @aside-handle-width*2);
 
     #menu-and-content {
       width: calc(~"100%" - @aside-handle-width*2);
@@ -221,7 +229,8 @@
 
 
 
-@aside-width: 270px;
+@picker-width: 230px;
+@toc-width: 270px;
 @aside-border-width: 1px;
 @aside-handle-width: 30px;
 @aside-handle-width-expanded: 0px;
@@ -235,12 +244,10 @@ aside > div {
   overflow-x: hidden;
 
   // Animate the sidebar to slide right (open) when minimized handle is clicked
-  .x-slide-sidebar(@aside-width);
   .boxed-group {
     //So the vertical bar shows up to the right of this box
 
     background-color: inherit; // GitHub makes this gray by default.
-    width:      (@aside-width - @aside-handle-width-expanded - @aside-border-width);
 
   }
 
@@ -289,31 +296,8 @@ aside > div {
 
   // The Tree (which looks like a list)
   nav {
-    @indent-width: 20px;
-    @compensate-width: 15px;
-    @compensate-start: @aside-width - 110; // Not sure why it is 70...
-
-    .x-indent-compensate(@level) {
-      > li {
-        // Padding on the left
-        // Indent nested lists in this way so:
-        // 1. the horizontal bars stretch across the whole width
-        // 2. edit buttons on the right are still lined up
-        > .editor-node-body /*:first-child*/ { padding-left: (@indent-width * @level); }
-
-        // Compensate on the right (for ellipsis)
-        // for each level in the tree decrease the size of allowable text by how much is indented
-        // so the ellipsis show up in the right place
-        .editor-node-title { max-width: (@compensate-start - @compensate-width * @level); }
-      }
-    }
 
     > ol ol { padding: 0; margin: 0; }
-    > ol              { .x-indent-compensate(0); }
-    > ol ol           { .x-indent-compensate(1); }
-    > ol ol ol        { .x-indent-compensate(2); }
-    > ol ol ol ol     { .x-indent-compensate(3); }
-    > ol ol ol ol ol  { .x-indent-compensate(4); }
 
     > h4 {
       margin: 10px;
@@ -338,6 +322,39 @@ aside > div {
 
 }
 
+// Feed each panel's width to the <ol> mixin below
+aside#workspace > div { // Picker
+  .x-indent-compensate-panel(@picker-width - 70);
+}
+aside#sidebar > div { // TOC
+  .x-indent-compensate-panel(@toc-width - 70);
+}
+// Feed the nesting level of each <ol> to the special padding/width mixin below
+.x-indent-compensate-panel(@cs){
+  nav {  
+    > ol              { .x-indent-compensate(0, @cs); }
+    > ol ol           { .x-indent-compensate(1, @cs); }
+    > ol ol ol        { .x-indent-compensate(2, @cs); }
+    > ol ol ol ol     { .x-indent-compensate(3, @cs); }
+    > ol ol ol ol ol  { .x-indent-compensate(4, @cs); }
+  }
+}
+@indent-width: 20px;
+@compensate-width: 20px;
+.x-indent-compensate(@level, @compensate-start) {
+  > li {
+    // Padding on the left
+    // Indent nested lists in this way so:
+    // 1. the horizontal bars stretch across the whole width
+    // 2. edit buttons on the right are still lined up
+    > .editor-node-body /*:first-child*/ { padding-left: (@indent-width * @level); }
+
+    // Compensate on the right (for ellipsis)
+    // for each level in the tree decrease the size of allowable text by how much is indented
+    // so the ellipsis show up in the right place
+    .editor-node-title { max-width: (@compensate-start - @compensate-width * @level); }
+  }
+}
 
 
 /*************************
