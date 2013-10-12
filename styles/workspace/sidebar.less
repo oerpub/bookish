@@ -41,14 +41,13 @@
   }
 
   &.sidebar-workspace aside > div {
+  
+    background-color: #f0f0f0; // Make picker background distinct from TOC background.
+    
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 {
       background-color: @picker-color;
       > .title-text::before { content: 'Book Picker'; }
-    }
-    
-    .boxed-group-inner{
-      background-color: #f0f0f0; // Make picker background distinct from TOC background.
     }
     
   }
@@ -387,7 +386,6 @@ aside > div {
   .boxed-group-inner {
     overflow: auto;
     height: calc(~"100% - 82px");
-    background: #fff;
     color: #666;
     font-size: 13px;
   }
