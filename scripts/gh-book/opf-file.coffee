@@ -235,6 +235,9 @@ define [
             path = Utils.relativePath(@navModel.id, model.id)
             $node = $('<a></a>')
             .attr('href', path)
+            # Use `.toJSON().title` instead of `.get('title')` to support
+            # TocPointerNodes which inherit their title if it is not overridden
+            .text(model.toJSON().title)
           else
             $node = $('<span></span>')
             $li.attr(model.htmlAttributes or {})
