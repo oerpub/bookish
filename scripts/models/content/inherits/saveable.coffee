@@ -15,6 +15,7 @@ define ['backbone'], (Backbone) ->
 
   INTERNAL_ATTRIBUTES = [
     '_original'
+    '_selected'
     '_isDirty'
     '_hasRemoteChanges'
   ]

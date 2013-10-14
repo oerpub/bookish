@@ -32,6 +32,7 @@ define [
       model = @model?.navModel or @model
 
       return {
+        isPicker: !@model
         mediaType: @model?.mediaType
         _isDirty: model?.get('_isDirty')
         _hasRemoteChanges: model?.get('_hasRemoteChanges')
@@ -39,7 +40,7 @@ define [
 
     # Used by TocBranchView to know which collection to ask for an overridden title
     itemViewOptions: () ->
-      return {container: @collection}
+      return {container: @collection, isPicker: !@model}
 
     # Override internal Marionette method.
     # This method adds a child list item at a given index.

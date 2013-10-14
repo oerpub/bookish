@@ -13,11 +13,40 @@
 }
 
 [data-media-type] {
-  cursor: pointer;
-  > .icon-content { margin-right: 0.25em; }
+  display: block;
+  > .icon-content { margin-right: 0.2em; }
 }
 
-[data-media-type="application/vnd.org.cnx.section"] {
+// The hook to show that you can drag contents.  Appears to left of content on hover.
+.drag-handle{
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.drag-handle:before {
+  content: url(drag-module.png);
+  visibility: hidden;
+  float: left;
+  padding: 0 5px;
+}
+.editor-node-body:hover{
+  > .drag-handle:before {
+    visibility: visible;
+  }
+  &[data-media-type="application/oebps-package+xml"] > .drag-handle:before{
+    visibility: hidden;
+  }
+}
+
+// Make the whole module or division line look linky 
+.go-edit{
+  cursor: pointer;
+}
+[data-media-type="application/xhtml+xml"]:hover .btn-link {
+  color: @linkColorHover;
+  text-decoration: underline;
+}
+
+.toggle-expand {
   cursor: default;
 }
 
@@ -35,7 +64,8 @@ html, body {
 #container {
   -webkit-box-orient: horizontal;
   box-orient: horizontal;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 
 // Hide the floating toolbar
@@ -48,18 +78,9 @@ html, body {
   min-width: 810px;
 
   .content-panel {
-    height: calc(~"100% - 75px");
-    background-color: @orange;
+    background-color: @module-editor-color;
 
-    // Round the corners so the handle looks nice
-    -webkit-border-top-left-radius: 20px;
-    -moz-border-radius-topleft:     20px;
-    border-top-left-radius:         20px;
-    -webkit-border-top-right-radius:  20px;
-    -moz-border-radius-topright:      20px;
-    border-top-right-radius:          20px;
-
-    .content-title {
+    #editor-title-text {
       color: white;
       // same as sidebar handle
       font-size: 18px;
@@ -77,6 +98,7 @@ html, body {
 	    background-color: #ccc;
 		  
 	    .content{
+	      // Give the module-editing area the look of a piece of paper
 	      margin: 15px 25px;
 	      border: 1px solid #aaa;
 	      box-shadow: 0 0 10px #999;
@@ -88,5 +110,11 @@ html, body {
 	
     }
 
+  }
+
+  // close button inside a popover
+  .popover button.close {
+    margin: 0.25em;
+    color: black;
   }
 }

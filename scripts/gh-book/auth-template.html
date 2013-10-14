@@ -20,24 +20,20 @@
 </button>
 {{/if}}
 
-<div class="pull-right">
-  <button id="edit-settings" type="button" class="btn" data-placement="bottom" data-toggle="tooltip" title="Change the Current book that is being edited">
+<div class="btn-group">
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
     <i class="icon-cogs"></i>
-  </button>
-
-  {{#if isAuthenticated}}
-    <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
-         and instead go to the login page directly.
-      -->
-    <button id="sign-out" class="btn">Sign Out</button>
-
-    <span class="name navbar-text">{{id}}</span>
-  {{else}}
-    <!-- Set 'data-bypass' so we don't use the Backbone router to handle the link
-         and instead go to the login page directly.
-      -->
-     <button id="sign-in" class="btn btn-primary">Sign In</button>
-  {{/if}}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu pull-right">
+    {{#if isAuthenticated}}
+      <li><a href="" id="sign-out">Sign Out of "{{id}}"</a></li> 
+    {{else}}
+      <li><a href="" id="sign-in">Sign In</a></li>
+    {{/if}}
+    <li><a href="" id="edit-settings">Change Repository</a></li>
+    <!-- dropdown menu links -->
+  </ul>
 </div>
 
 <!-- Sign in Modal -->
