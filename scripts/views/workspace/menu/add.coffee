@@ -28,9 +28,10 @@ define [
         if not (@model.id in @context.accept) # @model.id is a mediaType
           throw new Error 'BUG: Trying to add a type of content that is not allowed to be in this thing'
 
+      title = prompt('title for the new thing?') || 'Untitled'
+
       # The options passed to the constructor are mostly for TocNode
-      model = new (@model.get('modelType')) {title: UNTITLED, root: @context}
-      model.set('title', UNTITLED)
+      model = new (@model.get('modelType')) {title: title, root: @context}
 
       # Only add Models to `allContent` if they can be saved.
       #

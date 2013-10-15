@@ -66,8 +66,10 @@ define [
       super()
 
       # Give the content an id if it does not already have one
-      @setNew() if not @id
-      @id ?= "content/#{uuid()}"
+      if not @id
+        @setNew()
+        title = @get('title').toLowerCase().replace(/[^a-z0-9]/, '')
+        @id = "content/#{title}-#{uuid()}"
 
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
