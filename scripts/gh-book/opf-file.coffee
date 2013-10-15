@@ -7,7 +7,21 @@ define [
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
   'cs!gh-book/utils'
-], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
+  'cs!gh-book/uuid'
+  'hbs!templates/gh-book/defaults/opf'
+  'hbs!templates/gh-book/defaults/nav'
+], (
+  Backbone,
+  mediaTypes,
+  allContent,
+  loadable,
+  XhtmlFile,
+  TocNode,
+  TocPointerNode,
+  Utils,
+  uuid,
+  defaultOpf,
+  defaultNav) ->
 
   SAVE_DELAY = 10 # ms
 
@@ -21,6 +35,12 @@ define [
     branch: true # This element will show up in the sidebar listing
 
     initialize: () ->
+      @$xml = $($.parseXML defaultOpf())
+      
+      # Give the content an id if it does not already have one
+      @setNew() if not @id
+      @id ?= "content/#{uuid()}"
+
       super {root:@}
 
       # Contains all entries in the OPF file (including images)
@@ -94,11 +114,11 @@ define [
         id:           relPath # TODO: escape the slashes so it is a valid id
         'media-type': model.mediaType
 
-      # Randomly add the item into the manifest.
-      # Always appending results in commit conflicts at the bottom of the file
-      $manifestChildren = $manifest.children()
-      index = $manifestChildren.length * Math.random()
-      $item.insertBefore($manifestChildren.eq(index))
+      if options.properties
+        $item.attr 'properties', options.properties
+        delete options.properties
+
+      $manifest.append($item)
       # TODO: Depending on the type add it to the spine for EPUB2
 
       @_markDirty(options, force)
@@ -108,6 +128,22 @@ define [
       @_localAddedItems[model.id] = model
 
     _save: ->
+
+      # this is a new book, set some default elements
+      if not @navModel
+        #create the default nav file
+        @navModel = new XhtmlFile
+        @navModel.set('body', defaultNav())
+       
+        # add the new navModel to our opf and the allcontent container 
+        @_addItem(@navModel, {properties: 'nav'})
+        allContent.add(@navModel)
+
+        #create empty module for the book 
+        module = new XhtmlFile
+        allContent.add(module)
+        @addChild(module)
+
       clearTimeout(@_savingTimeout)
       @_savingTimeout = setTimeout (() =>
         allContent.save(@navModel, false, true) # include-resources, include-new-files

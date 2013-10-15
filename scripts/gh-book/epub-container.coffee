@@ -15,7 +15,6 @@ define [
   'cs!gh-book/opf-file'
 ], (allContent, Saveable, loadableMixin, treeMixin, OpfFile) ->
 
-
   class EpubContainer extends Saveable
     mediaType: 'application/epub+zip'
     accept: [OpfFile::mediaType]
@@ -26,6 +25,9 @@ define [
 
     initialize: () ->
       @children = new Backbone.Collection()
+
+      @children.on 'add', (collection, options) =>
+        @_markDirty(options, true)
 
       @children.on 'reset', (collection, options) =>
         return if options.loading
@@ -44,9 +46,9 @@ define [
       sha = json.sha
       xmlStr = json.content
 
-      $xml = jQuery(xmlStr)
+      @$xml = jQuery(xmlStr)
       ret = []
-      $xml.find('rootfiles > rootfile').each (i, el) =>
+      @$xml.find('rootfiles > rootfile').each (i, el) =>
         $el = jQuery(el)
         href = $el.attr 'full-path'
         mediaType = $el.attr 'media-type'
@@ -58,7 +60,20 @@ define [
 
       return @children.reset(ret, {loading:true})
 
-    serialize: () -> console.warn('BUG: Do not know how to serialize EPUBContainer yet')
+    serialize: () ->
+      return if not @$xml
+
+      rootfiles = @$xml.find('rootfiles').empty()
+
+      @children.each (child) ->
+        jQuery('<rootfile/>')
+          .attr('media-type', child.mediaType)
+          .attr('full-path', child.id)
+          .attr('version', "1.0")
+          .appendTo(rootfiles)
+
+      serializer = new XMLSerializer()
+      serializer.serializeToString(@$xml.get(0))
 
     # Called by `loadableMixin.reload` when the repo settings change
     reset: () -> @children.reset()
