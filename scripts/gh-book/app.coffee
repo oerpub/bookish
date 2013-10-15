@@ -38,9 +38,7 @@ define [
       when OpfFile::mediaType
         # add the opf to the copy of the Epubcontainer
         # that is in allContent
-        allContent
-          .findWhere({mediaType: EpubContainer::mediaType})
-          .addChild(model)
+        epubContainer.addChild(model)
       else
         allContent.each (book) ->
           book.manifest?.add(model) # Only books have a manifest
@@ -204,7 +202,8 @@ define [
         changedModels = @filter (model) ->
           if contextModel && model != contextModel
             switch model.mediaType
-              when EpubContainer::mediaType then return model.isDirty() # Always add container file if it is dirty
+              # sometimes there is an epubContainer in allContent, this is bad - ignore it
+              when EpubContainer::mediaType then return false
               when OpfFile::mediaType then return model.isDirty() # Always add OPF files
               when XhtmlFile::mediaType
                 return includeNewContent and model.isNew()
@@ -215,6 +214,8 @@ define [
       else
         # Save all the models that have changes
         changedModels = @filter (model) -> model.isDirty()
+
+      changedModels.push epubContainer if epubContainer.isDirty()
 
       writeFiles(changedModels)
 
