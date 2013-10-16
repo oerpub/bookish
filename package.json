@@ -1,14 +1,14 @@
 {
-  "name": "github-book",
-  "version": "0.0.0",
-  "description": "Javascript Book Editor for Github(EPUB3)",
-  "main": "gh-book.js",
+  "name": "atc",
+  "version": "0.0.1",
+  "description": "Authoring Tools Client (Javascript Book Editor)",
+  "main": "./scripts/main.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "print-mock-data": "node ./test/print-mock-data.js",
-    "test": "jasmine-node --verbose --coffee --runWithRequireJs --requireJsSetup ./specs/requirejs-wrapper-template.js  ./specs/",
     "install": "bower install",
     "update": "bower update"
   },
