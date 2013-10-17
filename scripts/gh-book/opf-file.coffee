@@ -401,3 +401,9 @@ define [
           collection: @getChildren()
           model: @
         callback(view)
+
+    contentRedirect: () ->
+      # Instead of editing this, edit the first module in the book
+      first = @tocNodes.at(1) # First item is always the toc/nav, we pick the second
+      return first if first
+      return null 
