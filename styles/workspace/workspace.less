@@ -73,7 +73,7 @@ html, body {
 
 #menu-and-content {
   float: left;
-  width: calc(~"100% - 620px");
+  width: calc(~"100%" - @picker-width+@toc-width);
   height: 100%;
   min-width: 810px;
 
@@ -84,7 +84,7 @@ html, body {
       color: white;
       // same as sidebar handle
       font-size: 18px;
-      text-shadow: 2px 2px 4px black;
+      #module-title-indicator{ font-weight: normal; }
     }
 
     // By default, boxed-group is grey

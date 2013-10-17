@@ -60,7 +60,7 @@ define [
     mediaType: 'application/xhtml+xml'
 
     defaults:
-      title: null
+      title: 'Untitled'
 
     initialize: () ->
       super()

@@ -10,11 +10,6 @@
 .x-media-type-icon('application/oebps-package+xml';      "Book";           @toc-color; "\f02d"); /* icon-book */
 .x-media-type-icon('application/vnd.org.cnx.section';    "book division";  #999;       ""); /* icon-folder-open */
 
-// Hide the "Add Book" dropdown from the workspace
-#workspace {
-  .add-content { display: none; }
-}
-
 #login-advanced-wrapper {
     margin-top: 1em;
     #login-advanced {
@@ -28,7 +23,7 @@
 }
 
 #menu-and-content .content-panel {
-  height: calc(~"100% - 38px");
+  height: calc(~"100% - 33px");
 }
 
 .btn-primary, .btn-group.open .btn-primary.dropdown-toggle{
@@ -38,8 +33,9 @@
 .picker-drag-training-wheel{
   position: absolute;  
   bottom: 0;
-  right: -8px;
+  right: -7px;
   content: url(picker-drag-training-wheel.png);
+  z-index: 2;
 }
 
 nav#workspace-sidebar-toc{

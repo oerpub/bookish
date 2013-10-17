@@ -19,7 +19,7 @@ define [
       toc: '.workspace-sidebar'
 
     events:
-      'click .handle': () ->
+      'click .handle, .boxed-group > h3': () ->
         # what are we?
         name = @$el.parent().attr('id')
         # set minimized class on parent based on element id, this seems really hackish but
@@ -37,6 +37,7 @@ define [
         # This is the Picker/Roots Sidebar
         collection = new Backbone.FilteredCollection(null, {collection:collection})
         collection.setFilter (content)  -> return content.getChildren
+        @filteredMediaTypes.setFilter (type) -> return type.get('modelType')::toplevel
 
       # TODO: Make the collection a FilteredCollection that only shows @model.accepts
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})

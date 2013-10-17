@@ -36,6 +36,8 @@ define [
     # Otherwise, add it to the manifest for all the books (Better safe than sorry)
     switch model.mediaType
       when OpfFile::mediaType
+        # add the opf to the copy of the Epubcontainer
+        # that is in allContent
         epubContainer.addChild(model)
       else
         allContent.each (book) ->
@@ -93,6 +95,10 @@ define [
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
+    # set which media formats are allowed 
+    # at the toplevel of the content
+    for type in EpubContainer::accept
+      mediaTypes.type(type)::toplevel = true
 
     # Views use anchors with hrefs so catch the click and send it to Backbone
     $(document).on 'click', 'a:not([data-bypass]):not([href="#"])', (e) ->
@@ -196,6 +202,8 @@ define [
         changedModels = @filter (model) ->
           if contextModel && model != contextModel
             switch model.mediaType
+              # sometimes there is an epubContainer in allContent, this is bad - ignore it
+              when EpubContainer::mediaType then return false
               when OpfFile::mediaType then return model.isDirty() # Always add OPF files
               when XhtmlFile::mediaType
                 return includeNewContent and model.isNew()
@@ -206,6 +214,8 @@ define [
       else
         # Save all the models that have changes
         changedModels = @filter (model) -> model.isDirty()
+
+      changedModels.push epubContainer if epubContainer.isDirty()
 
       writeFiles(changedModels)
 
