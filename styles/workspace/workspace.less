@@ -79,13 +79,19 @@ html, body {
 
   .content-panel {
     background-color: @module-editor-color;
-
-    #editor-title-text {
-      color: white;
-      // same as sidebar handle
-      font-size: 18px;
-      #module-title-indicator{ font-weight: normal; }
+    
+    .content-title {
+      height: @panel-heading-height;
+      line-height: @panel-heading-line-height;
+      
+      #editor-title-text {
+        color: @panel-heading-color;
+        font-size: @panel-heading-size;
+        #module-title-indicator{ font-weight: normal; }
+      }
+    
     }
+  
 
     // By default, boxed-group is grey
     .boxed-group {
@@ -95,7 +101,8 @@ html, body {
       .boxed-group-inner {
         // So boxed-group-inner is scrollable, set the overflow-y
         overflow-y: auto;
-	    background-color: #ccc;
+        background-color: #ccc;
+        position: relative;
 		  
 	    .content{
 	      // Give the module-editing area the look of a piece of paper
