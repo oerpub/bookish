@@ -372,16 +372,21 @@ aside#sidebar > div { // TOC
 
   >h3, .heading {
     cursor: pointer;
-    font-size: 14px;
-    // Copying "Editor: [module title]" style, for the most part
-    color: #fff;
-    margin: 0;
-    line-height: 20px;
-    height: 30px;
-    font-family: Verdana, 'DejaVu Sans', Tahoma;
-    padding-top: 8px;
-    padding-left: 20px;
+    font-size: @panel-heading-size;
+    color: @panel-heading-color;
+    height: @panel-heading-height;
+    font-family: @panel-heading-font;
+    margin: 0; // undo default h3
+    line-height: @panel-heading-line-height;
+    font-weight: @panel-heading-weight;
     padding-right: @aside-handle-width; // to account for "closer" icon
+
+    .title-text {
+      color: @panel-heading-color;
+      display: block;
+      padding: @panel-heading-padding;
+    }   
+
   }
   
   .add-content{

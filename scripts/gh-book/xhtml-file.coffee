@@ -62,12 +62,13 @@ define [
     defaults:
       title: 'Untitled'
 
-    initialize: () ->
-      super()
+    initialize: (options) ->
+      super(options)
 
       # Give the content an id if it does not already have one
-      @setNew() if not @id
-      @id ?= "content/#{uuid()}"
+      if not @id
+        @setNew()
+        @id = "content/#{uuid(@get('title'))}#{options.extension || '.html'}"
 
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
