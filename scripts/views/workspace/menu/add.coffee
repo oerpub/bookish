@@ -44,7 +44,7 @@ define [
         @context.addChild(model)
 
       # Begin editing certain media as soon as they are added.
-      model.addAction?()
+      model.addAction?(@context)
 
   return class AddView extends Marionette.CompositeView
     initialize: (options) ->
