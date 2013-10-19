@@ -42,8 +42,7 @@ define [
       # Give the content an id if it does not already have one
       if not @id
         @setNew()
-        title = @get('title').toLowerCase().replace(/[^a-z0-9]/, '')
-        @id = "content/#{title}-#{uuid()}.opf"
+        @id = "content/#{uuid(@get('title'))}.opf"
 
       super options
 
@@ -147,7 +146,7 @@ define [
         allContent.add(@navModel)
 
         #create empty module for the book 
-        module = new XhtmlFile {title: @get('title')+'-module1'}
+        module = new XhtmlFile {title: 'module1'}
         allContent.add(module)
         @addChild(module)
 
