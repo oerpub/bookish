@@ -69,9 +69,6 @@ define [
             # Change the contents but do not update the Aloha editable area
             @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-        Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
-          updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
-
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
 
@@ -79,6 +76,9 @@ define [
           @$el.addClass('aloha-root-editable')
           @$el.mahalo?()
           @$el.aloha()
+
+          Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
+            updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
 
           # Wait until Aloha is started before loading MathJax.
           MathJax?.Hub.Configured()
