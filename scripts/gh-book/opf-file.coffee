@@ -33,15 +33,18 @@ define [
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
     branch: true # This element will show up in the sidebar listing
+    
+    initialize: (options) ->
+      options.root = @
 
-    initialize: () ->
-      @$xml = $($.parseXML defaultOpf())
+      @$xml = $($.parseXML defaultOpf(options))
       
       # Give the content an id if it does not already have one
-      @setNew() if not @id
-      @id ?= "content/#{uuid()}"
+      if not @id
+        @setNew()
+        @id = "content/#{uuid(@get('title'))}.opf"
 
-      super {root:@}
+      super options
 
       # Contains all entries in the OPF file (including images)
       @manifest = new Backbone.Collection()
@@ -96,6 +99,9 @@ define [
       @_localNavAdded = {}
       @_localTitlesChanged = {}
 
+      # save opf files on creation
+      @_save() if @_isNew
+
     # Add an `<item>` to the OPF.
     # Called from `@manifest.add` and `@resolveSaveConflict`
     _addItem: (model, options={}, force=true) ->
@@ -132,7 +138,7 @@ define [
       # this is a new book, set some default elements
       if not @navModel
         #create the default nav file
-        @navModel = new XhtmlFile
+        @navModel = new XhtmlFile {title: @get('title'), extension: '-nav.html'}
         @navModel.set('body', defaultNav())
        
         # add the new navModel to our opf and the allcontent container 
@@ -140,7 +146,7 @@ define [
         allContent.add(@navModel)
 
         #create empty module for the book 
-        module = new XhtmlFile
+        module = new XhtmlFile {title: 'module1'}
         allContent.add(module)
         @addChild(module)
 
