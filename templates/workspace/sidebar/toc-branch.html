@@ -9,10 +9,15 @@
   <span class="editor-expand-collapse toggle-expand" title="Click to expand/collapse"><i class="icon-content"></i></span>
 {{/if}}
 
-<div class="btn-group pull-right">
-  <button class="btn btn-mini pull-right edit-settings dropdown-toggle"
-          data-toggle="dropdown"
-          title="Edit/rename this {{prettyName}}"><i class="icon-pencil"></i></button>
+<div class="pull-right dropdown module-controls">
+  {{#if hasParent}} {{#unless selected}} {{#unless childIsSelected}}
+  <a href="#" class="pull-right delete-module" title="Delete this {{prettyName}}">
+    <i class="icon-remove"></i>
+  </a>
+  {{/unless}} {{/unless}} {{/if}}
+  <a href="#" class="pull-right edit-settings dropdown-toggle" data-toggle="dropdown" title="Edit/rename this {{prettyName}}">
+    <i class="icon-pencil"></i>
+  </a>
   <ul class="dropdown-menu">
     <li>
       <button type="button" class="btn btn-link edit-settings-rename">Rename this {{prettyName}}</button>

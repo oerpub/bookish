@@ -173,6 +173,7 @@ define [
 
       return {
         isPicker: @options.isPicker
+        childIsSelected: @model.findDescendantBFS (child) -> (child.dereferencePointer?() or child).get('_selected')
         selected: model.get('_selected')
         ancestorSelected: @options.ancestorSelected
         mediaType: model.mediaType
@@ -194,8 +195,19 @@ define [
       # `.editor-node-body` ensures there is never a space.
       'click > .editor-node-body > .toggle-expand': 'toggleExpanded'
       'click > .editor-node-body .go-edit': 'goEdit'
+      'click > .editor-node-body .delete-module': 'deleteModule'
       'click > .editor-node-body .edit-settings-rename': 'editSettings'
       'click > .editor-node-body .edit-settings-edit': 'goEdit'
+
+    deleteModule: (e) ->
+      e.preventDefault()
+
+      return if not confirm('Are you sure you want to delete this?')
+
+      if @model.getParent()
+        @model.getParent().removeChild(@model)
+      else
+        # TODO - delete book (https://www.pivotaltracker.com/story/show/58351296)
 
     goEdit: () ->
       # Edit the model in the context of this folder/book. Explicitly close
