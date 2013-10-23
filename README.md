@@ -51,4 +51,13 @@ Check the `./docs` directory to read through the different modules.
 License
 -------
 
-This software is subject to the provisions of the GNU Affero General Public License Version 3.0 (AGPL). See license.txt for details. Copyright (c) 2013 Rice University
+This software is subject to the provisions of the GNU Affero General Public License Version 3.0 (AGPL). See license.txt for details. 
+
+Copyright
+---------
+Code contributed by Rice University employees and contractors is Copyright (c) 2013 Rice University 
+Code contributed by contractors to the OERPUB project is Copyright (c) 2013 Kathi Fletcher
+
+Funding
+-------
+Development by the OERPUB project was funded by the Shuttleworth Foundation, through a fellowship and project funds granted to Kathi Fletcher. 

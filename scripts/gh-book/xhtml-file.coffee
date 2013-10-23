@@ -123,7 +123,7 @@ define [
     # This promise is resolved once the file is parsed so we know which images to load
     _imagesLoaded: new $.Deferred()
     _loadComplex: (originalPromise) ->
-      return @_imagesLoaded
+      return $.when(@_imagesLoaded, originalPromise)
 
     parse: (json) ->
       html = json.content
