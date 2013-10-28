@@ -312,7 +312,8 @@ define [
               if opf
                 opf.load().done () ->
                   # When that book is loaded, edit it.
-                  controller.goEdit opf
+                  model = opf.findDescendantDFS (model) -> model.getChildren().isEmpty()
+                  controller.goEdit model, opf
 
         Backbone.history.start
           pushState: false
