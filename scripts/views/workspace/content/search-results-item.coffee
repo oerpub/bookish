@@ -30,16 +30,15 @@ define [
         id: @model.id or @model.cid
         mediaType: @model.mediaType
         isLoaded: @isLoaded
-        isDirty: @model.isDirty()
       }
 
     initialize: () ->
-      @listenTo(@model, 'dirty change sync', @render)
+      @listenTo(@model, 'change sync', @render)
       @listenTo(@, 'render show', @startUpdateTimer)
 
     onRender: () ->
       # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.children('*[data-media-type]'))
+      EnableDnD.enableContentDnD(@model, @$el.children('*[data-media-type]'), @$el)
 
     # Stop updating the timer when the view is detached
     onClose: () -> @keepUpdating = false

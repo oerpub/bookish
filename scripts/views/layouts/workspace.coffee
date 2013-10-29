@@ -1,45 +1,34 @@
 define [
   'marionette'
+  'cs!session'
+  'cs!views/workspace/menu/auth'
   'hbs!templates/layouts/workspace'
-], (Marionette, workspaceTemplate) ->
+], (Marionette, session, AuthView, workspaceTemplate) ->
 
   # This layout looks as follows:
   #
-  #     |    [menu: Home, Toolbar, Signin/Signout]    |
-  #     | ------------------------------------------- |
-  #     |                                             |
-  #     | ----------- | --------- | ------------------|
-  #     |          X  |        X  |                   |
-  #     |             |           |                   |
-  #     | [workspace] | [sidebar] | [content]         |
-  #     |             |           |                   |
-  #     | ----------- | --------- | ------------------|
-  #
-  # The `minimized` class is added to the `*-container`
-  # element when the `X` is pressed.
-  #
-  # Collapsing the views this way is done because:
-  #
-  # - CSS transitions can be applied to move the view
-  # - The controller only needs to show/close a view to change the current Book pane (`sidebar`)
-  #   it does not need to know about the current expanded/collapsed state of the pane
+  #     | ---------------------------------------------------------------- |
+  #     |                                                                  |
+  #     | ----------- | --------- | -------------------------------------- |
+  #     |          X  |        X  | [menu: Home, Toolbar, Signin/Signout]  |
+  #     |             |           |                                        |
+  #     | [workspace] | [sidebar] | [content]                              |
+  #     |             |           |                                        |
+  #     | ----------- | --------- | -------------------------------------- |
   #
   return class Workspace extends Marionette.Layout
     template: workspaceTemplate
 
     regions:
-      content: '#content'
-      menu: '#menu'
-      sidebar: '#sidebar'
-      workspace: '#workspace'
+      workspace:  '#workspace'
+      sidebar:    '#sidebar'
+      menu:       '#menu'
+      content:    '#content'
+      auth:       '#workspace-auth'
 
-    events:
-      'click #workspace-container > .close': 'minimizeWorkspace'
-      'click #sidebar-container > .close':   'minimizeSidebar'
+    onShow: () ->
+      @auth.show(new AuthView {model: session})
 
-    initialize: () ->
-      @workspace.on 'show', => @$('#workspace-container').removeClass('minimized')
-      @sidebar.on   'show', => @$('#sidebar-container').removeClass('minimized')
 
-    minimizeWorkspace: () -> @$('#workspace-container').toggleClass('minimized')
-    minimizeSidebar: () -> @$('#sidebar-container').toggleClass('minimized')
+    showWorkspace: (b) -> # There is some other code that calls this and should be removed
+    showToc: (b) ->       # There is some other code that calls this and should be removed

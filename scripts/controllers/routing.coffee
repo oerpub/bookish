@@ -8,7 +8,7 @@ define [
   'marionette'
   'cs!collections/content'
   'cs!views/layouts/workspace'
-  ], (Marionette, allContent, WorkspaceLayout) ->
+], (Marionette, allContent, WorkspaceLayout) ->
 
 
   # Only reason to extend Backbone.Router is to get the @navigate method
@@ -30,9 +30,9 @@ define [
 
     # There is a cyclic dependency between the controller and the ToC tree because
     # the user can click an item in the ToC to `goEdit`.
-    _showWorkspacePane: (TocView) ->
+    _showWorkspacePane: (SidebarView) ->
       if not @layout.workspace.currentView
-        @layout.workspace.show(new TocView {model:allContent})
+        @layout.workspace.show(new SidebarView {collection:allContent})
 
 
     # Show Workspace
@@ -42,9 +42,9 @@ define [
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
         'cs!views/layouts/workspace/menu'
-        'cs!views/workspace/sidebar/toc'
+        'cs!views/layouts/workspace/sidebar'
         'cs!views/workspace/content/search-results'
-        ], (menuLayout, TocView, SearchResultsView) =>
+        ], (menuLayout, SidebarView, SearchResultsView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -52,7 +52,7 @@ define [
         allContent.load()
         .fail(() => alert 'Problem loading workspace. Please refresh and try again')
         .done () =>
-          @_showWorkspacePane(TocView)
+          @_showWorkspacePane(SidebarView)
           @layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
@@ -72,8 +72,8 @@ define [
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
         'cs!views/layouts/workspace/menu'
-        'cs!views/workspace/sidebar/toc'
-        ], (menuLayout, TocView) =>
+        'cs!views/layouts/workspace/sidebar'
+        ], (menuLayout, SidebarView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -97,16 +97,25 @@ define [
           else
 
             # Always show the workspace pane
-            @_showWorkspacePane(TocView)
+            @_showWorkspacePane(SidebarView)
 
             # load editor views
 
             # Force the sidebar if a contextModel is passed in
             if contextModel
-              contextModel.sidebarView((view) => if view then @layout.sidebar.show(view))
-            else if model.sidebarView
-              # Some models do not change the sidebar (like Module)
-              model.sidebarView((view) => if view then @layout.sidebar.show(view))
+              # Only change the view if there is nothing there or if the model differs
+              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
+                contextView = new SidebarView
+                  model: contextModel
+
+                @layout.sidebar.show(contextView)
+            # Some models do not change the sidebar because they cannot contain children (like Module)
+            else if model.getChildren
+              # Only change the view if there is nothing there or if the model differs
+              if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != model
+                modelView = new SidebarView
+                  model: model
+                @layout.sidebar.show(modelView)
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 

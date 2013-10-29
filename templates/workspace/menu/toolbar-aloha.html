@@ -15,10 +15,6 @@
   <!-- ================= -->
   <!--  Toolbar Buttons  -->
   <!-- ================= -->
-  <div class="btn-group">
-    <button class="btn action undo" rel="tooltip" title="Undo"><i class="icon-undo"></i></button>
-    <button class="btn action redo" rel="tooltip" title="Redo"><i class="icon-repeat"></i></button>
-  </div>
 
   <div class="btn-group headings">
     <button class="btn currentHeading" rel="tooltip" title="Text Heading">Nothing</button>
@@ -37,8 +33,8 @@
     <button class="btn action strong" rel="tooltip" title="Bold"><i class="icon-bold"></i></button>
     <button class="btn action emphasis" rel="tooltip" title="Italics"><i class="icon-italic"></i></button>
     <button class="btn action underline" rel="tooltip" title="Underline"><i class="icon-underline"></i></button>
-    <button class="btn action superscript" rel="tooltip" title="Superscript"><i class="icon-superscript"></i></button>
-    <button class="btn action subscript" rel="tooltip" title="Subscript"><i class="icon-subscript"></i></button>
+    <button class="btn action superscript" rel="tooltip" title="Superscript">A<sup>S</sup></button>
+    <button class="btn action subscript" rel="tooltip" title="Subscript">A<sub>S</sub></button>
   </div>
 
   <div class="btn-group">
@@ -62,17 +58,21 @@
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-      <li class="disabled"><button class="action addrowbefore">Add Row Before</button></li>
-      <li class="disabled"><button class="action addrowafter">Add Row After</button></li>
-      <li class="disabled"><button class="action addcolumnbefore">Add Column Before</button></li>
-      <li class="disabled"><button class="action addcolumnafter">Add Column After</button></li>
-      <li class="disabled"><button class="action addheaderrow">Add Header Row</button></li>
-      <li class="disabled"><button class="action deleterow">Delete Row</button></li>
-      <li class="disabled"><button class="action deletecolumn">Delete Column</button></li>
-      <li class="disabled"><button class="action deletetable">Delete Table</button></li>
+      <li class="disabled"><a href="#" class="action addrowbefore">Add Row Before</a></li>
+      <li class="disabled"><a href="#" class="action addrowafter">Add Row After</a></li>
+      <li class="disabled"><a href="#" class="action addcolumnbefore">Add Column Before</a></li>
+      <li class="disabled"><a href="#" class="action addcolumnafter">Add Column After</a></li>
+      <li class="disabled"><a href="#" class="action addheaderrow">Add Header Row</a></li>
+      <li class="disabled"><a href="#" class="action deleterow">Delete Row</a></li>
+      <li class="disabled"><a href="#" class="action deletecolumn">Delete Column</a></li>
+      <li class="disabled"><a href="#" class="action deletetable">Delete Table</a></li>
     </ul>
-    <button class="btn action insertMath" rel="tooltip" title="Insert Math">x<sup>2</sup></button>
+    <button class="btn action insertMath" rel="tooltip" title="Insert Math">x<sup>2+1</sup></button>
   </div>
 
+  <div class="btn-group">
+    <button class="btn action copy" style="display: none" title="Copy Section"><i class="icon-copy"></i> Section</button>
+    <button class="btn action paste" style="display: none" title="Paste"><i class="icon-paste"></i></button>
+  </div>
 <!-- / ".btn-toolbar" -->
 </span>

@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "main": "scripts/main.js",
   "dependencies": {
+    "octokit": "0.9.6",
+    "jsSHA": "Caligatio/jsSHA#release-1.42",
     "requirejs": "2.1.6",
     "requirejs-text": "2.0.7",
     "require-cs": "0.4.4",
@@ -20,7 +22,9 @@
     "backbone": "1.0.0",
     "backbone.marionette": "v1.0.3",
     "aloha-editor": "oerpub/Aloha-Editor#master",
-    "bootstrap": "v2.3.2"
+    "bootstrap": "v2.3.2",
+    "filtered-collection": "dlikhten/filtered-collection",
+    "jsdifflib": "philschatz/jsdifflib#master"
   },
   "ignore": [
     "**/.*",

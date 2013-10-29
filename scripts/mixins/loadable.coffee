@@ -6,6 +6,17 @@
 define ['jquery'], ($) ->
 
   loadableMixin =
+
+    # Since `load` checks isNew and the presence of an `id` may not be enough
+    # allow a way to set `isNew()` to be true
+    isNew: () ->
+      # Something is new if _isNew == true/false or it does not have an id or url
+      return @_isNew if @_isNew?
+      # need to check if @url is a static string ('/workspace') and not a function (new Module)
+      hasStaticUrl = @url and typeof(@url) != 'function'
+      return !(@id or hasStaticUrl)
+    setNew: () -> @_isNew = true
+
     # Returns a promise.
     # If this has not been fully populated it will be fetched exactly once
     load: () ->
@@ -36,7 +47,7 @@ define ['jquery'], ($) ->
 
     # Force a `Backbone.Collection` or `Backbone.Model` to reload its contents.
     # If in the middle of a `load` it waits until the load completes.
-    # Returns a Promise when the reload complates.
+    # Returns a Promise when the reload completes.
     reload: () ->
       # Finish reloading if loading has already started
       if @_loading
@@ -45,8 +56,25 @@ define ['jquery'], ($) ->
           return @reload()
 
       else
+        oldContent = @serialize()
         # For collections reset the contents to nothing
         @reset?()
-        return @load()
+        return @load().then () =>
+
+          if oldContent != @serialize()
+
+            isDirty = @onReloaded(oldContent)
+            @set {_hasRemoteChanges: true, _isDirty: isDirty} , {parse:true}
+
+          else
+            # Otherwise, clear the bits just to be safe
+            @set {_hasRemoteChanges: false, _isDirty: false} , {parse:true}
+
+
+    # Hook to merge local unsaved changes into the remotely-updated model
+    # `oldContent` the serialized content before remote content was fetched
+    onReloaded: (oldContent) ->
+      console.warn 'BUG: onReload SHOULD be implemented by subclasses'
+      return false # Does **not** have local changes
 
   return loadableMixin

@@ -34,7 +34,7 @@ define [
             mediaType: model.mediaType
             title: title
 
-        model.trigger('change')
+        model.trigger('change', model, {})
 
       return @
 
@@ -62,6 +62,9 @@ define [
       # When something is added/removed from a Folder or Book mark the Folder/Book as Dirty
       contents.on 'add remove', (model, collection, options) => @_markDirty(options)
       contents.on 'reset',      (collection, options)        => @_markDirty(options)
+      contents.on 'change',     (model, options)             =>
+        if !options.parse
+          @_markDirty(options, true) # force==true because changing the overridden title does not actually mark the model as changed
 
       @load()
 

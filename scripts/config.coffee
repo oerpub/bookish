@@ -4,6 +4,15 @@ require.config
   # # Configure Library Locations
   paths:
 
+    jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
+    # Filter the Book Picker by mediaType
+    'filtered-collection': "#{BOWER}/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection"
+
+    # Include the diff library
+    difflib: "#{BOWER}/jsdifflib/difflib"
+    diffview: "#{BOWER}/jsdifflib/diffview"
+
+
     mathjax: 'http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
 
     # ## Template and Style paths
@@ -61,6 +70,10 @@ require.config
   # when the library is done loading (for jQuery plugins this can be `jQuery`)
   shim:
 
+    # jsSHA does not use requirejs so use the global
+    jsSHA:
+      exports: 'jsSHA'
+
     # ## Core Libraries
     underscore:
       exports: '_'
@@ -101,9 +114,7 @@ require.config
       deps: ['jquery', 'mathjax', 'cs!configs/aloha', 'bootstrapModal', 'bootstrapPopover']
       exports: 'Aloha'
       init: ($) ->
-        # FIXME: replace global 'jQuery' below with local '$' defined above
-        jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
-
+        $.browser.version = 10000 # Hack to fix aloha-editor's version checking
         return Aloha
 
     mathjax:
@@ -114,6 +125,11 @@ require.config
         MathJax.Hub.Startup.onload()
         return MathJax
 
+    # Configure the diff library
+    difflib:  {exports:'difflib'}
+    diffview:
+      deps: ["css!#{BOWER}/jsdifflib/diffview"]
+      exports:'diffview'
 
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).

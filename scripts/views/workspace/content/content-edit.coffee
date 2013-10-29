@@ -7,6 +7,6 @@ define [
   # -------
   return class ContentEditView extends AlohaEditView
     modelKey: 'body'
-
+    
     # **NOTE:** This template is not wrapped in an element
     template: contentEditTemplate

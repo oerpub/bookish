@@ -36,6 +36,12 @@ define ['jquery'], ($) ->
       map:
         '*':
           'semanticblock/semanticblock-plugin': 'semanticblock/lib/semanticblock-plugin'
+          'ui/ui': 'toolbar/toolbar-plugin'
+
+      waitSeconds: 42
+
+    bundles:
+      ghbook: '../../../../scripts/aloha'
 
     plugins:
       # All the plugins we use in Aloha
@@ -43,16 +49,23 @@ define ['jquery'], ($) ->
         'oer/toolbar'
         'common/ui'
         'common/format'
-        'common/paste'
         'common/block'
         'common/list'
-        'common/table'
+        'oer/table'
         'extra/draganddropfiles'
         'common/image'
         'oer/overlay'
         'oer/math'
         'oer/assorted'
+        'ghbook/image'
         'oer/note'
+        'oer/example'
+        'oer/exercise'
+        'oer/quotation'
+        'oer/equation'
+        'oer/definition'
+        'oer/multipart'
+        'oer/copy'
       ]
 
       # This whole thing is what's needed to:
@@ -96,11 +109,26 @@ define ['jquery'], ($) ->
               $img.removeClass 'aloha-image-uploading'
               console.log 'Updated Image src as a result of upload'
 
+      note: [
+        { label: 'Note',      cls: 'note', hasTitle: true }
+        { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' }
+        { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
+        { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
+        { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
+        { label: 'Teacher\'s Guide', cls: 'note', hasTitle: true, type: 'teachers-guide' }
+      ]
       block:
+        dragdrop: "1"
+        rootTags: ['span', 'div', 'figure']
         defaults:
           '.default-block': {}
-          figure:
-            'aloha-block-type': 'EditableImageBlock'
+      copy:
+        path: () ->
+          # The path of the current document can be determined from the hash
+          decodeURIComponent /^#edit(\/[^|]+)/.exec(window.location.hash)[1]
+
+    smartContentChange:
+      idle: 2000
 
   # In case some module wants the config object return it.
   return @Aloha

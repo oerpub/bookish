@@ -1,17 +1,23 @@
 @import "../variables.less";
 
 #menu {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 41px;
-  left: 0;
-  overflow: hidden;
+  .navbar {
+    margin-bottom: 0;
+  }
 
   .nav-home {
     font-size: 1.25em;
     vertical-align: middle;
     color: @linkColor;
+  }
+
+  .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar-form {
+    margin-left: 5px;
   }
 
   .nav-home:hover {
@@ -26,4 +32,12 @@
   .name {
     margin-left: 10px;
   }
+
+  .semantic-drag-source > * {
+    margin-left: 0;
+    width: auto;
+    display: inline-block;
+    padding-right: 10px;
+  }
+
 }

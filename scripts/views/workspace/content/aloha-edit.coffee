@@ -6,56 +6,75 @@ define [
 
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
-    template: () -> throw 'BUG: You need to specify a template, modelKey, and optionally alohaOptions'
+    template: () -> throw 'BUG: You need to specify a template, modelKey'
     modelKey: null
-    alohaOptions: null
+    aloha: null
 
     templateHelpers: () ->
       return {isLoaded: @isLoaded}
 
     initialize: () ->
-      @isLoaded = false
-      @model.load().done () =>
-        @isLoaded = true
-        @render()
+      @isLoaded = @model.isNew()
+
+      @initalRender = new $.Deferred()
+      @contentLoaded = new $.Deferred()
+      @modelLoaded = @model.load()
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
 
-        alohaId = @$el.attr('id')
-        # Sometimes Aloha hasn't loaded up yet
-        if alohaId and @$el.parents().get(0)
-          alohaEditable = Aloha.getEditableById(alohaId)
-          editableBody = alohaEditable.getContents()
-          if value isnt editableBody then alohaEditable.setContents(value)
-        else
-          @$el.empty().append(value)
+        if @model.get(@modelKey)?.length
+          # FIXME: SHould **not** depend on the state of the promise.
+          if 'resolved' == @contentLoaded.state()
+            if @model.isDirty()
+              console.log('Discarding local changes because of remote commit')
+            else
+              console.log('Updating local content because of remote changes (but there were no local changes)')
+            @render()
+          else
+            @contentLoaded.resolve()
 
+
+      # if content is already present change will never fire
+      # so check that and conditionally finish the content loading as well
+      @modelLoaded.done =>
+        @contentLoaded.resolve() if @model.get(@modelKey)?.length
+
+      # this is the trigger for actually showing content and enabling editing
+      $.when(@modelLoaded, @contentLoaded, @initalRender).done =>
+        @isLoaded = true
+        @render()
 
     onRender: () ->
-      # Auto save after the user has stopped making changes
-      updateModelAndSave = =>
-        alohaId = @$el.attr('id')
-        # Sometimes Aloha hasn't loaded up yet
-        # Only save when the editable has changed
-        if alohaId
+      # update model after the user has stopped making changes
+
+      if @isLoaded
+        updateModel = =>
+          alohaId = @$el.attr('id')
           alohaEditable = Aloha.getEditableById(alohaId)
-          editableBody = alohaEditable.getContents()
-          # Change the contents but do not update the Aloha editable area
-          @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-      # Once Aloha has finished loading enable
-      @$el.addClass('disabled')
-      Aloha.ready =>
-        # Wait until Aloha is started before loading MathJax.
-        MathJax?.Hub.Configured()
+          if alohaEditable
+            editableBody = alohaEditable.getContents()
+            editableBody = editableBody.trim() # Trim for idempotence
+            # Change the contents but do not update the Aloha editable area
+            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-        @$el.aloha(@alohaOptions)
-        @$el.removeClass('disabled')
+        Aloha.bind 'aloha-smart-content-changed', (evt, d) =>
+          updateModel() if d.editable.obj.is(@$el)
 
-        # Grr, the `aloha-smart-content-changed` can only be listened to globally
-        # (via `Aloha.bind`) instead of on each editable.
-        #
-        # This is problematic when we have multiple Aloha editors on a page.
-        # Instead, autosave after some period of inactivity.
-        @$el.on('blur', updateModelAndSave)
+
+        # Once Aloha has finished loading enable
+        @$el.addClass('disabled')
+
+        Aloha.ready =>
+          @$el.addClass('aloha-root-editable')
+          @$el.mahalo?()
+          @$el.aloha()
+
+          # Wait until Aloha is started before loading MathJax.
+          MathJax?.Hub.Configured()
+
+          # reenable everything
+          @$el.removeClass('disabled')
+
+      @initalRender.resolve()

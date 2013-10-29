@@ -30,7 +30,7 @@ define ['backbone'], (Backbone) ->
         #
 
         # Remove the child if it is already attached somewhere
-        child._tree_parent.removeChild(child) if child._tree_parent and child._tree_parent != @
+        child._tree_parent.removeChild(child, options) if child._tree_parent and child._tree_parent != @
 
         child._tree_parent = @
         child._tree_root = @_tree_root
@@ -57,7 +57,9 @@ define ['backbone'], (Backbone) ->
       trickleEvents 'tree:change'
 
 
-    newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
+    newNode: (options) ->
+      throw new Error 'BUG: Only the root can create new Pointer Nodes' if @ == @getRoot()
+      throw new Error 'BUG: Subclass must implement this method'
 
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
@@ -69,11 +71,11 @@ define ['backbone'], (Backbone) ->
         root = parent
       return root
 
-    removeChild: (model) ->
+    removeChild: (model, options) ->
       children = @getChildren()
       throw 'BUG: child is not in this node' if not (children.contains(model) or children.get(model.id))
       model = children.get(model.id) if !children.contains(model)
-      children.remove(model)
+      children.remove(model, options)
 
     addChild: (model, at=0) ->
       children = @getChildren()

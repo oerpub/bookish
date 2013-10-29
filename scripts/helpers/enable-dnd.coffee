@@ -37,7 +37,9 @@ define [
         top: 0
         left: 0
       helper: (evt) ->
-        title = model.get('title') or ''
+        # Use `.toJSON().title` instead of `.get('title')` to support
+        # TocPointerNodes which inherit their title if it is not overridden
+        title = model.toJSON().title or ''
         shortTitle = title.substring(0, 20)
         if title.length > 20 then shortTitle += '...'
 
@@ -76,6 +78,11 @@ define [
             $drag = ui.draggable
             $drop = $(evt.target)
 
+            # drop is/can-be a child of the current element.
+            # If there is a child with `*[data-media-type]` then use it instead
+            if not $drop.is('*[data-media-type]')
+              $drop = $drop.children('*[data-media-type]')
+
             # Find the model representing the id that was dragged
             drag = $drag.data 'editor-model'
             drop = $drop.data 'editor-model'
@@ -85,13 +92,13 @@ define [
             setTimeout(delay, 10)
 
   return {
-    enableContentDnD: (model, $content) ->
+    enableContentDnD: (model, $dragContent, $dropContent) ->
       # Since we use jqueryui's draggable which is loaded when Aloha loads
       # delay until Aloha is finished loading
       Aloha.ready =>
-        enableContentDragging(model, $content)
+        enableContentDragging(model, $dragContent)
 
-      enableDrop model, $content, model.accept, (drag, drop) ->
+      enableDrop model, $dropContent, model.accept, (drag, drop) ->
         # If the model is already in the tree then remove it
         # If the model is in the same collection but at a different index then
         #   account for the model being removed
@@ -106,7 +113,7 @@ define [
       throw 'BUG: model MUST have a parent' if not parent
       $content.data('editor-model', model)
 
-      index = parent.getChildren().indexOf(model)
       enableDrop model, $content, parent.accept, (drag, drop) ->
+        index = parent.getChildren().indexOf(model)
         parent.addChild drag, index+1
   }

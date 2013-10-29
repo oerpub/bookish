@@ -3,11 +3,10 @@ define [
   'cs!collections/media-types'
   'cs!controllers/routing'
   'cs!session'
-  'cs!views/workspace/menu/auth'
   'cs!views/workspace/menu/add'
-  'cs!views/workspace/menu/toolbar-search'
+  'cs!views/workspace/menu/toolbar-aloha'
   'hbs!templates/layouts/workspace/menu'
-], (Marionette, mediaTypes, controller, session, AuthView, AddView, toolbarView, menuTemplate) ->
+], (Marionette, mediaTypes, controller, session, AddView, toolbarView, menuTemplate) ->
 
   _toolbar = null
 
@@ -20,8 +19,6 @@ define [
     goWorkspace: () -> controller.goWorkspace()
 
     regions:
-      add: '#workspace-menu-add'
-      auth: '#workspace-menu-auth'
       toolbar: '#workspace-menu-toolbar'
 
     onRender: () ->
@@ -30,9 +27,8 @@ define [
     showView: (view) ->
       _toolbar = view or toolbarView
 
-      @add.show(new AddView {collection:mediaTypes})
-      @auth.show(new AuthView {model: session})
-      @toolbar.show(_toolbar)
+      if _toolbar != @toolbar.currentView
+        @toolbar.show(_toolbar)
 
     showToolbar: (view) ->
       @showView(view or toolbarView)

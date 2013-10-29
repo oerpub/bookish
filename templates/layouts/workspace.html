@@ -1,15 +1,35 @@
 <div id="{{layout}}">
-  <nav id="menu"></nav>
-
   <section id="container">
-    <aside id="workspace-container" class="minimized">
-      <button type="button" class="close" data-dismiss="alert">&#x00d7;<!-- X --></button>
-      <div id="workspace"></div>
-    </aside>
-    <aside id="sidebar-container" class="minimized">
-      <button type="button" class="close" data-dismiss="alert">&#x00d7;<!-- X --></button>
-      <div id="sidebar"></div>
-    </aside>
-    <div id="content"></div>
+    <div id="workspace-container">
+      <div class="sidebar-container sidebar-workspace">
+        <aside id="workspace" class="green"></aside>
+      </div>
+      <div class="sidebar-container sidebar-toc">
+        <aside id="sidebar" class="blue"></aside>
+      </div>
+      <div id="menu-and-content" class="orange">
+        <div>
+          <div id="workspace-auth" style="margin-bottom: 10px;">
+            {{! Auth View }}
+          </div>
+        </div>
+
+        <div class="content-panel">
+          <div class="content-title">
+            <span id="editor-title-text">
+              Editor:
+              <span id="module-title-indicator"></span>
+            </span>
+          </div>
+          <div class="boxed-group">
+
+            <div id="menu" class="content-toolbar"></div>
+            <div class="boxed-group-inner">
+              <div id="content" class="content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </div>

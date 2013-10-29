@@ -18,27 +18,38 @@ define [
       else
         @collection = allContent
 
+
+      # When the model updates, re-render the view
+      if @model
+        @listenTo @model, 'change:title', (model, value, options) =>
+          @render() # FIXME: reimplement renderModelOnly() from toc-branch
+
+      super(options)
+
+
     templateHelpers: () ->
-      return {mediaType: @model?.mediaType}
+      # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
+      model = @model?.navModel or @model
+
+      return {
+        mediaType: @model?.mediaType
+        _isDirty: model?.get('_isDirty')
+        _hasRemoteChanges: model?.get('_hasRemoteChanges')
+      }
 
     # Used by TocBranchView to know which collection to ask for an overridden title
     itemViewOptions: () ->
       return {container: @collection}
 
-    # Override Marionette's showCollection()
-    showCollection: () ->
-      if @collection.branches
-        data = @collection.branches()
+    # Override internal Marionette method.
+    # This method adds a child list item at a given index.
+    appendHtml: (cv, iv, index)->
+      $container = @getItemViewContainer(cv)
+      $prevChild = $container.children().eq(index)
+      if $prevChild[0]
+        iv.$el.insertBefore($prevChild)
       else
-        data = @collection.models
-
-      _.each data, (item, index) =>
-        @addItemView(item, TocBranchView, index)
-
-    # We also need to override addItemView()
-    addItemView: (item, ItemView, index) ->
-      if item.branch or @showNodes
-        super(item, ItemView, index)
+        $container.append(iv.el)
 
     events:
       'click .editor-content-title': 'changeTitle'
@@ -46,4 +57,4 @@ define [
     changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
       if title then @model.set('title', title)
-      @render()
+      @render() # FIXME: reimplement renderModelOnly() from toc-branch
