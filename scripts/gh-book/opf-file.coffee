@@ -3,10 +3,10 @@ define [
   'cs!collections/media-types'
   'cs!collections/content'
   'cs!mixins/loadable'
+  'cs!models/utils'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
-  'cs!gh-book/utils'
   'cs!gh-book/uuid'
   'hbs!templates/gh-book/defaults/opf'
   'hbs!templates/gh-book/defaults/nav'
@@ -15,10 +15,10 @@ define [
   mediaTypes,
   allContent,
   loadable,
+  Utils,
   XhtmlFile,
   TocNode,
   TocPointerNode,
-  Utils,
   uuid,
   defaultOpf,
   defaultNav) ->
