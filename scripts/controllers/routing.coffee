@@ -102,7 +102,7 @@ define [
             # these are needed on the next render as a pointers to things
             # Always use the dereferenced node because content can be in more than one book
             @_currentModel = model.dereferencePointer?() or model
-            @_currentContext = contextModel.dereferencePointer?() or contextModel
+            @_currentContext = contextModel?.dereferencePointer?() or contextModel
 
             # this is needed right now to render the workspace
             @_currentContext?.set('_selected', true)
