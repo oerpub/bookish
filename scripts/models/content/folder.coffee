@@ -70,6 +70,7 @@ define [
       return isDirty
 
     onSaved: () ->
+      super()
       @_localContentsAdded = {}
 
     _save: () -> console.log "ERROR: Autosave not implemented"
