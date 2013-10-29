@@ -213,9 +213,9 @@ define [
 
 
     editSettings: ->
-      model = @model.dereferencePointer?() or @model
-
-      title = prompt('Edit Title:', model.getTitle?(@container) or model.get('title'))
-      if title then model.setTitle?(@container, title) or model.set('title', title)
+      # Use `.toJSON().title` instead of `.get('title')` to support
+      # TocPointerNodes which inherit their title if it is not overridden
+      title = prompt('Edit Title:', @model.toJSON().title)
+      if title then @model.set('title', title)
 
       @renderModelOnly()
