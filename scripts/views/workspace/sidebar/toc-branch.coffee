@@ -213,7 +213,9 @@ define [
 
 
     editSettings: ->
-      title = prompt('Edit Title:', @model.getTitle?(@container) or @model.get('title'))
-      if title then @model.setTitle?(@container, title) or @model.set('title', title)
+      model = @model.dereferencePointer?() or @model
+
+      title = prompt('Edit Title:', model.getTitle?(@container) or model.get('title'))
+      if title then model.setTitle?(@container, title) or model.set('title', title)
 
       @renderModelOnly()
