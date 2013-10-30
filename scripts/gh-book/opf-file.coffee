@@ -33,13 +33,13 @@ define [
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
     branch: true # This element will show up in the sidebar listing
-    
+
     initialize: (options) ->
       options.root = @
 
 
       @$xml = $($.parseXML defaultOpf(options))
-      
+
       # Give the content an id if it does not already have one
       if not @id
         @setNew()
@@ -163,7 +163,7 @@ define [
         @_addItem(@navModel, {properties: 'nav'})
         allContent.add(@navModel)
 
-        #create empty module for the book 
+        #create empty module for the book
         module = new XhtmlFile {title: 'module1'}
         allContent.add(module)
         @addChild(module)
