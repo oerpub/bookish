@@ -233,7 +233,7 @@ define [
     newNode: (options) ->
       model = options.model
       node = @tocNodes.get model.id
-      if !node
+      if not node
         node = new TocPointerNode {root:@, model:model, title:options.title}
         #@tocNodes.add node
       return node
