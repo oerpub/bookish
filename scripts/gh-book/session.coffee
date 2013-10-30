@@ -28,8 +28,9 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
       promise = client.getLogin()
       promise.done () =>
-        @set config
+        @set config, {silent: true}
         @_client = client
+        @checkCanCollaborate()
       return promise
 
     _reloadClient: () ->
