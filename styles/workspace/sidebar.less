@@ -28,10 +28,10 @@
       color: @toc-color-light;
     }
   }
-  
+
   .handle {
     > i.expand-collapse {
-      // The icon's width is set to @aside-handle-width, so when the panel's open (with handle width:0), 
+      // The icon's width is set to @aside-handle-width, so when the panel's open (with handle width:0),
       // move the icon over by that much so that it's in the same position on top of the panel heading
       right: @aside-handle-width;
     }
@@ -46,16 +46,16 @@
   }
 
   &.sidebar-workspace aside > div {
-  
+
     .x-slide-sidebar(@picker-width);
     background-color: #f0f0f0; // Make picker background distinct from TOC background.
-    
+
     > .handle > .handle-text::before          { content: 'Book Picker'; }
     > .boxed-group > h3 {
       background-color: @picker-color;
       > .title-text::before { content: 'Book Picker'; }
     }
-    
+
   }
 
 
@@ -136,7 +136,7 @@
         width: @aside-handle-width;
         > i.expand-collapse{
           right: 0;
-          &::before { content: "\f138"; /* icon-chevron-sign-right */ }  
+          &::before { content: "\f138"; /* icon-chevron-sign-right */ }
         }
         .handle-text {
           // Turn the text on when the panel is closed
@@ -166,7 +166,7 @@
         width: @aside-handle-width;
         > i.expand-collapse{
           right: 0;
-          &::before { content: "\f138"; /* icon-chevron-sign-right */ }  
+          &::before { content: "\f138"; /* icon-chevron-sign-right */ }
         }
         .handle-text {
           // Turn the text on when the panel is closed
@@ -316,7 +316,7 @@ aside > div {
 
     li > .editor-node-body > div.open > .module-controls > a {
         display: inline-block;
-    } 
+    }
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
@@ -339,7 +339,7 @@ aside#sidebar > div { // TOC
 }
 // Feed the nesting level of each <ol> to the special padding/width mixin below
 .x-indent-compensate-panel(@cs){
-  nav {  
+  nav {
     > ol              { .x-indent-compensate(0, @cs); }
     > ol ol           { .x-indent-compensate(1, @cs); }
     > ol ol ol        { .x-indent-compensate(2, @cs); }
@@ -395,30 +395,30 @@ aside#sidebar > div { // TOC
       color: @panel-heading-color;
       display: block;
       padding: @panel-heading-padding;
-    }   
+    }
 
   }
-  
+
   .add-content{
     text-align: right;
     margin: 5px 10px;
     padding-bottom: 5px;
     border-bottom: 1px solid #ccc;
-    
+
       // Also, make it right-align so it does not bleed to the right of the sidebar
       .btn-group ul.dropdown-menu {
         left: inherit; // Bootstrap aligns it left:0; by default
         right: 0;
-        
+
         button {
           width: 100%;
           text-align: left;
         }
-        
+
       }
-      
+
   }
-  
+
   .boxed-group-inner {
     overflow: auto;
     height: calc(~"100% - 82px");
@@ -695,7 +695,7 @@ aside#sidebar > div { // TOC
       }
 
       > .editor-node-body {
-        
+
         // Highlight the background of the selected/active content
         &[data-media-type=@{book-media-type}] {
           background-color: @toc-color-light;
@@ -706,14 +706,14 @@ aside#sidebar > div { // TOC
 
         > [data-media-type=@{book-media-type}] {
           color: @toc-color;
-        }   
+        }
         > [data-media-type=@{page-media-type}] {
           color: @module-editor-color;
         }
-   
+
         .editor-node-title {
           font-weight: bold;
-         
+
           small.toc-badge {
             color: inherit;
           }
