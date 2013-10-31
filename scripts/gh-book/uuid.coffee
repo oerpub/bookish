@@ -8,8 +8,8 @@ define [], () ->
     return uuid() if not seed
 
     prefix = seed.toLowerCase()
-      .replace(' ', '-')
-      .replace(/[^a-z0-9\-]/, '') # prevent any weird characters from slipping through
+      .replace(/[ ]+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '') # prevent any weird characters from slipping through
     
     return "#{prefix}-#{uuid()}" # add the random uuid on the back for uniqueness 
 
