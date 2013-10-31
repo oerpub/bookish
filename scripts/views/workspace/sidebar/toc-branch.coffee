@@ -15,6 +15,8 @@ define [
     initialize: (options) ->
 
       if @model
+        # Trigger a load so a partially populated model may "fill up"
+        @model.load?()
         @listenTo @model, 'change', (model, collection, options) => @renderModelOnly()
 
       if @collection
@@ -151,7 +153,9 @@ define [
         @model.expanded = true if hasDescendant
 
       # Add DnD options to content
-      EnableDnD.enableContentDnD(@model, @$el.find('> .editor-node-body'))
+      $dropNode = @$el.find('> .editor-node-body')
+      $dragNode = $dropNode.find('> *[data-media-type]')
+      EnableDnD.enableContentDnD(@model, $dragNode, $dropNode)
 
       if @model.getParent?()
         EnableDnD.enableDropAfter(@model, @model.getParent(), @$el.find('> .editor-drop-zone-after'))
@@ -181,8 +185,6 @@ define [
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
-        # Look up the overridden title
-        title: @container?.getTitle?(@model) or @model.get('title')
         # Possibly delegate to the navModel for dirty bits
         _isDirty: modelOrNav.get('_isDirty')
         _hasRemoteChanges: modelOrNav.get('_hasRemoteChanges')
@@ -223,7 +225,10 @@ define [
 
 
     editSettings: ->
-      title = prompt('Edit Title:', @model.getTitle?(@container) or @model.get('title'))
-      if title then @model.setTitle?(@container, title) or @model.set('title', title)
+      # Use `.toJSON().title` instead of `.get('title')` to support
+      # TocPointerNodes which inherit their title if it is not overridden
+      title = prompt('Edit Title:', @model.toJSON().title)
+      if title and title != @model.toJSON().title
+        @model.set('title', title)
 
       @renderModelOnly()

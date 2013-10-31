@@ -75,6 +75,11 @@ define [
         Aloha.ready =>
           @$el.addClass('aloha-root-editable')
           @$el.mahalo?()
+
+          # resset some of the state of our root element so aloha doesn't freak out
+          @$el.removeClass('aloha-block-blocklevel-sortable')
+          @$el.removeData()
+
           @$el.aloha()
 
           Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
