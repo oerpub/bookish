@@ -7,7 +7,7 @@ define [
   'cs!gh-book/uuid'
   'cs!models/content/inherits/saveable'
   'cs!mixins/tree'
-  'gh-book/path'
+  'models/path'
 ], (Backbone, _, $, allContent, XhtmlFile, uuid, SaveableModel, treeMixin, Path) ->
 
   mediaType = 'application/vnd.org.cnx.section'
