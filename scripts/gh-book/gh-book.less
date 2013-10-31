@@ -40,3 +40,68 @@
 nav#workspace-sidebar-toc{
   padding-bottom: 111px; // 81px from the training wheel image, not really sure why ~30px extra is needed
 }
+
+@font-face {
+  font-family: OERPUBFont;
+  src: url('oerpubfont.woff'), url('oerpubfont.eot');
+} 
+
+#menu .navbar {
+
+  [class^="icon-"], [class*=" icon-"] {
+    font-family: OERPUBFont;
+    vertical-align: center;
+  }
+  .icon-paste{ /* No custom icon for paste yet */
+    font-family: FontAwesome;
+  }
+  .icon-bold:before {
+    content: "\e010";
+  }
+  .icon-italic:before {
+    content: "\e00e";
+  }
+  .icon-underline:before {
+    content: "\e003";
+  }
+  .icon-superscript:before {
+    content: "\e008";
+  }
+  .icon-superscript *:before {
+    content: "";
+  }
+  .icon-subscript:before {
+    content: "\e009";
+  }
+  .icon-subscript *:before {
+    content: "";
+  }
+  .icon-link:before {
+    content: "\e00d";
+  }
+  .icon-list-ul:before {
+    content: "\e006";
+  }
+  .icon-list-ol:before {
+    content: "\e00b";
+  }
+  .icon-indent-right:before {
+    content: "\e002";
+  }
+  .icon-indent-left:before {
+    content: "\e001";
+  }
+  .icon-picture:before {
+    content: "\e000";
+  }
+  .icon-table:before {
+    content: "\e004";
+  }
+  .icon-math:before {
+    content: "\e00c";
+  }
+  .icon-math *:before {
+    content: "";
+  }
+
+}
