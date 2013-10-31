@@ -99,7 +99,6 @@ define [
     # Used in `_parseNavModel`.
     onParseNavEntry: (model, title) -> # no-op
 
-
     parse: (json) ->
       body = json.body
       # Remove the body since we parse it manually
