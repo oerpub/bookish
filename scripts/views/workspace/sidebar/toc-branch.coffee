@@ -145,7 +145,7 @@ define [
 
       # if the user hasn't set the state yet make sure the active file is visible
       if @model.expanded == undefined
-        hasDescendant = @model.findDescendantBFS (child) ->
+        hasDescendant = @model.findDescendantBFS? (child) ->
           # Dereference if the child is a pointer-node
           child = child.dereferencePointer?() or child
           return child.get('_selected')
@@ -177,7 +177,7 @@ define [
 
       return {
         isPicker: @options.isPicker
-        childIsSelected: @model.findDescendantBFS (child) -> (child.dereferencePointer?() or child).get('_selected')
+        childIsSelected: @model.findDescendantBFS? (child) -> (child.dereferencePointer?() or child).get('_selected')
         selected: model.get('_selected')
         ancestorSelected: @options.ancestorSelected
         mediaType: model.mediaType
@@ -219,9 +219,9 @@ define [
       model = @model
       if not model.getRoot?()
         # Find the 1st leaf node (editable model)
-        model = model.findDescendantDFS (model) -> return model.getChildren().isEmpty()
+        model = model.findDescendantDFS? (model) -> return model.getChildren().isEmpty()
 
-      controller.goEdit(model, model.getRoot())
+      controller.goEdit(model, model.getRoot?())
 
 
     editSettings: ->
