@@ -21,13 +21,6 @@
       color: @picker-color-light;
     }
   }
-  &.sidebar-toc{
-    max-width: @toc-width;
-    .handle{
-      background-color: @toc-color;
-      color: @toc-color-light;
-    }
-  }
 
   .handle {
     > i.expand-collapse {
@@ -60,8 +53,13 @@
 
 
 
-  .x-sidebar-color-and-title(@color, @title) {
-    > .handle > .handle-text::before { content: @title; }
+  .x-sidebar-color-and-title(@title, @color, @light-color) {
+    > .handle {
+      background-color: @color;
+      color: @light-color;
+
+      > .handle-text::before { content: @title; }
+    }
     > .boxed-group > h3 {
       background-color: @color;
 
@@ -69,15 +67,19 @@
     }
   }
 
-  &.sidebar-toc aside > div {
 
-    .x-slide-sidebar(@toc-width);
+  &.sidebar-toc {
+    max-width: @toc-width;
 
-    &[data-media-type="application/oebps-package+xml"]      { .x-sidebar-color-and-title(@toc-color,    'Table of Contents'); }
-    &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title(@toc-color,    'Table of Contents'); }
-    &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title(@folder-color, 'Folder Contents'); }
+    aside > div {
+
+      .x-slide-sidebar(@toc-width);
+
+      &[data-media-type=@{book-media-type}]                   { .x-sidebar-color-and-title('Table of Contents', @toc-color, @toc-color-light); }
+      &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title('Table of Contents', @toc-color, @toc-color-light); }
+      &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title('Folder Contents'  , @folder-color, @folder-color-light); }
+    }
   }
-
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
