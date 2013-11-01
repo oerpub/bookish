@@ -11,8 +11,9 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
         if not _.isEmpty _.pick @.changed, ['token', 'id', 'password']
           @_reloadClient()
 
-        # If any of the repo settings change then check if the user can still collaborate
-        else if not _.isEmpty _.pick @.changed, ['repoUser', 'repoName', 'id', 'token', 'password']
+        # If any of the repo settings change then check if the user can still
+        # collaborate
+        else if not _.isEmpty _.pick @.changed, ['repoUser', 'repoName']
           @checkCanCollaborate()
 
     authenticate: (config) ->
