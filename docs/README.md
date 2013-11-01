@@ -33,7 +33,18 @@
 - `onReloaded()`
 - `onSaved()`
 
-## Remote updater
+# Singletons
+
+## All Content Collection
+
+Stores all loadable/saveable models
+
+## Root (EpubContainer or Workspace)
+
+- `accepts` instance variable contains array of mediatypes
+- `save()` optional method (defined in `EpubContainer` but unused in `Workspace`)
+
+## Remote Updater
 
 - refers to set of models (`allContent` Singleton)
 - fires `reloaded` on models
