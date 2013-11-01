@@ -4,8 +4,8 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
   class GithubSession extends Backbone.Model
     initialize: () ->
-      @_reloadClient()
-
+      # The session will be (re-)initialised when the app sets our login
+      # details, or if it is changed.
       @on 'change', () =>
         # If any authentication info has changed then reload the client
         if not _.isEmpty _.pick @.changed, ['token', 'id', 'password']
