@@ -107,11 +107,11 @@
 
 #workspace-container {
   width: 100%;
-  min-width: 1500px;
+  min-width: @workspace-min-width;
 
   // workspace minimized
   &.workspace-minimized {
-    min-width: (1500-@picker-width+@aside-handle-width);
+    min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
 
     #menu-and-content {
       width: calc(~"100%" - @toc-width+@aside-handle-width);
@@ -140,7 +140,7 @@
 
   // sidebar minimized (#sidebar is the table of contents)
   &.sidebar-minimized {
-    min-width: (1500-@toc-width+@aside-handle-width);
+    min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
 
     #menu-and-content {
       width: calc(~"100%" - @picker-width+@aside-handle-width);
@@ -170,7 +170,7 @@
 
   // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
-    min-width: (1500 - @toc-width - @picker-width + @aside-handle-width*2);
+    min-width: (@workspace-min-width - @toc-width - @picker-width + @aside-handle-width*2);
 
     #menu-and-content {
       width: calc(~"100%" - @aside-handle-width*2);
@@ -233,6 +233,7 @@
 @aside-handle-width: 30px;
 @aside-handle-width-expanded: 0px;
 @boxed-group-header-height: 42px;
+@workspace-min-width: (800 + @picker-width + @toc-width + @aside-border-width*2); // ~800 for new semantics width plus some breathing room just in case
 
 aside > div {
 
