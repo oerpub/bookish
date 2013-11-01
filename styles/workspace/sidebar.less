@@ -233,7 +233,8 @@
 @aside-handle-width: 30px;
 @aside-handle-width-expanded: 0px;
 @boxed-group-header-height: 42px;
-@workspace-min-width: (800 + @picker-width + @toc-width + @aside-border-width*2); // ~800 for new semantics width plus some breathing room just in case
+@menu-and-content-min-width: 800px;
+@workspace-min-width: (@menu-and-content-min-width + @picker-width + @toc-width);
 
 aside > div {
 
