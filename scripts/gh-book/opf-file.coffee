@@ -3,10 +3,10 @@ define [
   'cs!collections/media-types'
   'cs!collections/content'
   'cs!mixins/loadable'
+  'cs!models/utils'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
-  'cs!gh-book/utils'
   'cs!gh-book/uuid'
   'hbs!templates/gh-book/defaults/opf'
   'hbs!templates/gh-book/defaults/nav'
@@ -15,10 +15,10 @@ define [
   mediaTypes,
   allContent,
   loadable,
+  Utils,
   XhtmlFile,
   TocNode,
   TocPointerNode,
-  Utils,
   uuid,
   defaultOpf,
   defaultNav) ->
@@ -33,13 +33,13 @@ define [
     accept: [XhtmlFile::mediaType, TocNode::mediaType]
 
     branch: true # This element will show up in the sidebar listing
-    
+
     initialize: (options) ->
       options.root = @
 
 
       @$xml = $($.parseXML defaultOpf(options))
-      
+
       # Give the content an id if it does not already have one
       if not @id
         @setNew()
@@ -163,7 +163,7 @@ define [
         @_addItem(@navModel, {properties: 'nav'})
         allContent.add(@navModel)
 
-        #create empty module for the book 
+        #create empty module for the book
         module = new XhtmlFile {title: 'module1'}
         allContent.add(module)
         @addChild(module)

@@ -5,10 +5,11 @@ define [
   'cs!collections/content'
   'cs!collections/media-types'
   'cs!models/content/book'
+  'cs!models/content/book-toc-node'
   'cs!models/content/folder'
   'cs!models/content/module'
   'less!styles/main.less'
-], (Backbone, Marionette, session, allContent, mediaTypes, Book, Folder, Module) ->
+], (Backbone, Marionette, session, allContent, mediaTypes, Book, BookTocNode, Folder, Module) ->
 
   app = new Marionette.Application()
 
@@ -21,6 +22,7 @@ define [
 
     # Register all the mediaTypes used
     mediaTypes.add Book
+    mediaTypes.add BookTocNode
     mediaTypes.add Folder
     mediaTypes.add Module
 
@@ -53,7 +55,12 @@ define [
         model = queue.shift()
         model.save()
         .fail((err) -> throw err)
-        .done () -> saveNextItem(queue)
+        .done () ->
+          # Fire the onSave event on all the saved model
+          # TODO: This code exists in multiple places; it should be consolidated
+          model.onSaved?()
+
+          saveNextItem(queue)
 
       # Save all the models that have changes
       changedModels = @filter (model) -> model.isDirty()

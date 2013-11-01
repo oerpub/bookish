@@ -2,46 +2,19 @@ define [
   'backbone'
   'underscore'
   'jquery'
+  'cs!models/content/toc-node'
   'cs!collections/content'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/uuid'
-  'cs!models/content/inherits/saveable'
-  'cs!mixins/tree'
-  'gh-book/path'
-], (Backbone, _, $, allContent, XhtmlFile, uuid, SaveableModel, treeMixin, Path) ->
+  'models/path'
+], (Backbone, _, $, TocNode, allContent, XhtmlFile, uuid, Path) ->
 
   mediaType = 'application/vnd.org.cnx.section'
 
-  # Mixin the tree before so TocNode can override `addChild`
-  SaveableTree = SaveableModel.extend(treeMixin)
-
-  return class TocNode extends SaveableTree # Extend SaveableModel so you can get the isDirty for saving
+  return class NavTocNode extends TocNode
 
     mediaType: mediaType
     accept: [mediaType, XhtmlFile::mediaType]
-
-    initialize: (options) ->
-      super(options)
-      # Chapter nodes have their title passed in as an option (TODO: should be an attribute.... grr)
-      if options.title
-        @set('title', options.title, {parse:true})
-      @htmlAttributes = options.htmlAttributes or {}
-
-      @on 'change:title', (model, value, options) =>
-        @trigger 'tree:change', model, @, options
-
-      @_initializeTreeHandlers(options)
-
-    # Prevent the asterisk since TocNode elements are not actually Saveable (but OPF is)
-    # TODO: Fix this once the editor can create new OPF files
-    isNew: () -> false
-
-    # Views rely on the mediaType to be set in here
-    # TODO: Fix it in the view's `templateHelpers`
-    toJSON: () ->
-      json = super()
-      json.mediaType = @mediaType
-      return json
 
     # Defined in `mixins/tree`
     addChild: (model, at) ->
@@ -81,7 +54,7 @@ define [
             # dropped next to whatever document is the navmodel.
             srcPath = Path.dirname(realModel.id)
             dstPath = Path.dirname(root.navModel.id)
-            json.id = Path.normpath(dstPath + '/' + uuid())
+            json.id = Path.normpath(dstPath + '/' + uuid(newTitle))
 
             if json.body and srcPath != dstPath
               $elements = $(json.body)
