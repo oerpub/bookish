@@ -47,10 +47,10 @@
     display: inline-block;
   }
 
-  .ui-flash {
+  .ui-flash { /* !importants because other stylings of these elements have more specific selectors (this class is ephemeral in any case) */
     background-image: none;
-    background-color: blue;
-    color: white;
+    background-color: blue !important;
+    color: white !important;
     font-weight: bold;
   }
 
