@@ -21,7 +21,7 @@ define ['backbone'], (Backbone) ->
 
       @_tree_root = options.root
 
-      @_tree_children = new Backbone.Collection()
+      @_tree_children = options.children or new Backbone.Collection()
 
       @_tree_children.on 'add', (child, collection, options) =>
         # Parent is useful for DnD but since we don't use a `TocNode`

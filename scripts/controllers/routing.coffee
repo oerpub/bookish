@@ -13,6 +13,8 @@ define [
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
 
+    setRootNode: (@rootNode) ->
+
     # For all the views ensure there is a layout.
     # There is a cyclic dependency between the controller and `menuLayout`
     # because `menuLayout` has a "Home" button.
@@ -31,7 +33,7 @@ define [
     # the user can click an item in the ToC to `goEdit`.
     _showWorkspacePane: (SidebarView) ->
       if not @layout.workspace.currentView
-        @layout.workspace.show(new SidebarView {collection:allContent})
+        @layout.workspace.show(new SidebarView {model:@rootNode})
 
 
     # Show Workspace

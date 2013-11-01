@@ -4,12 +4,13 @@ define [
   'cs!session'
   'cs!collections/content'
   'cs!collections/media-types'
+  'cs!models/workspace-root'
   'cs!models/content/book'
   'cs!models/content/book-toc-node'
   'cs!models/content/folder'
   'cs!models/content/module'
   'less!styles/main.less'
-], (Backbone, Marionette, session, allContent, mediaTypes, Book, BookTocNode, Folder, Module) ->
+], (Backbone, Marionette, session, allContent, mediaTypes, workspaceRoot, Book, BookTocNode, Folder, Module) ->
 
   app = new Marionette.Application()
 
@@ -31,6 +32,8 @@ define [
     require ['cs!controllers/routing', 'cs!routers/router'], (controller) =>
       # set the main div for all the layouts
       controller.main = @main
+
+      controller.setRootNode(workspaceRoot)
 
       # The controller fires a navigate event, the app then updates the url
       # as it sees fit.

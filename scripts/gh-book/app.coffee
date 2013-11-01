@@ -95,7 +95,7 @@ define [
     mediaTypes.add BinaryFile, {mediaType:'image/png'}
     mediaTypes.add BinaryFile, {mediaType:'image/jpeg'}
 
-    # set which media formats are allowed 
+    # set which media formats are allowed
     # at the toplevel of the content
     for type in EpubContainer::accept
       mediaTypes.type(type)::toplevel = true
@@ -232,6 +232,8 @@ define [
         # Tell the controller which region to put all the views/layouts in
         controller.main = App.main
 
+        controller.setRootNode(epubContainer)
+
         # Custom routes to configure the Github User and Repo from the browser
         router = new class GithubRouter extends Backbone.Router
 
@@ -308,12 +310,12 @@ define [
             onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
             .done () ->
               # Get the first book from the epub
-              opf = epubContainer.children.at(0)
+              opf = epubContainer.getChildren().at(0)
               if opf
                 opf.load().done () ->
                   # When that book is loaded, edit it.
                   model = opf.findDescendantDFS (model) -> model.getChildren().isEmpty()
-                  controller.goEdit model, opf
+                  controller.goEdit(model, opf)
 
         Backbone.history.start
           pushState: false
