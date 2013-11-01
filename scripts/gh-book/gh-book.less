@@ -48,29 +48,76 @@ nav#workspace-sidebar-toc{
 
 #menu .navbar {
 
+  .iconset {
+  
+    position: relative;
+    
+    & + .iconset {
+      margin-left: 5px;
+      padding-left: 10px;
+    }
+  
+    & + .iconset:before { /* "Pipe" to separate groups of buttons (done this way so it doesn't need to be as tall) */
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 15%;
+      width: 1px;
+      height: 70%;
+      border-left: 1px solid #aaa;
+    }
+
+    .btn {
+      border-radius: 0;
+      border: 1px solid transparent;
+      box-shadow: none;
+      background-image: none;
+      background-color: transparent;
+      color: #000;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+    
+      &.dropdown-toggle {
+        width: auto;
+        padding: 0 6px;
+      }
+      &:hover{
+        background-color: rgba(175,220,246,0.4);
+        border-color: #bbb;
+      }
+      &.active {
+        border-color: #bbb;
+        background-color: transparent;
+        * {
+          color: #1b86d2;
+        }
+      }
+    
+    }
+  
+  }
+  
+  .btn.disabled, .btn[disabled] {
+    background-color: transparent;
+    opacity: 1;
+  }
+  .btn.disabled *, .btn[disabled] *{ /* The bootstrap looks more active than disabled */
+    opacity: .3;
+  }
+  .btn.disabled:hover, .btn[disabled]:hover{
+    background-color: transparent;
+    border-color: transparent;
+  }
+  
   [class^="icon-"], [class*=" icon-"] {
     font-family: OERPUBFont;
-    vertical-align: center;
     font-size: 22px;
+    line-height: 34px;
   }
   .icon-paste{ /* No custom icon for paste yet */
     font-family: FontAwesome;
     font-size: 14px;
-  }
-  .btn.strong, 
-  .btn.emphasis, 
-  .btn.underline, 
-  .btn.superscript, 
-  .btn.subscript, 
-  .btn.insertLink, 
-  .btn.unorderedList, 
-  .btn.orderedList, 
-  .btn.outdentList, 
-  .btn.indentList, 
-  .btn.insertImage-oer, 
-  .btn.createTable, 
-  .btn.insertMath {
-    padding: 2px 8px 0;
   }
   
   .icon-bold:before {
