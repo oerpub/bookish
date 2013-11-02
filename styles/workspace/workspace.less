@@ -79,9 +79,10 @@ html, body {
   min-width: 810px;
 
   .content-panel {
-    background-color: @module-editor-color;
+    background-color: @editor-background-color;
 
     .content-title {
+      background-color: @module-editor-color;
       height: @panel-heading-height;
       line-height: @panel-heading-line-height;
 
@@ -102,12 +103,11 @@ html, body {
       .boxed-group-inner {
         // So boxed-group-inner is scrollable, set the overflow-y
         overflow-y: auto;
-        background-color: #ccc;
         position: relative;
 
 	    .content{
 	      // Give the module-editing area the look of a piece of paper
-	      margin: 15px 25px;
+	      margin: 15px @content-lr-padding;
 	      border: 1px solid #aaa;
 	      box-shadow: 0 0 10px #999;
 	      background-color: #fff;
