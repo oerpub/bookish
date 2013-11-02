@@ -18,7 +18,6 @@
     max-width: @picker-width;
     .handle {
       background-color: @picker-color;
-      color: @picker-color-light;
     }
   }
 
@@ -30,9 +29,12 @@
     }
     // On hover, "brighten" text and give icon a slight bump
     &:hover {
-      color: #fff;
       > i.expand-collapse {
+        opacity: 1;
         margin-left: -1px;
+      }
+      > .handle-text {
+        opacity: 1;
       }
     }
     > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
@@ -52,11 +54,9 @@
   }
 
 
-
-  .x-sidebar-color-and-title(@title, @color, @light-color) {
+  .x-sidebar-color-and-title(@title, @color) {
     > .handle {
       background-color: @color;
-      color: @light-color;
 
       > .handle-text::before { content: @title; }
     }
@@ -75,9 +75,9 @@
 
       .x-slide-sidebar(@toc-width);
 
-      &[data-media-type=@{book-media-type}]                   { .x-sidebar-color-and-title('Table of Contents', @toc-color, @toc-color-light); }
-      &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title('Table of Contents', @toc-color, @toc-color-light); }
-      &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title('Folder Contents'  , @folder-color, @folder-color-light); }
+      &[data-media-type=@{book-media-type}]                   { .x-sidebar-color-and-title('Table of Contents', @toc-color); }
+      &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title('Table of Contents', @toc-color); }
+      &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title('Folder Contents'  , @folder-color); }
     }
   }
 }
@@ -282,10 +282,12 @@ aside > div {
       width: @aside-handle-width;
       text-align: center;
       margin: .5em 0;
+      opacity: .85;
     }
 
     > .handle-text {
 
+      opacity: .85;
       .x-rotate(90deg, left bottom);
 
       // Hide the text if the sidebar is showing
