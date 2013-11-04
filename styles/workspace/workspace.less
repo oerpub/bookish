@@ -9,7 +9,7 @@
 .x-media-type-icon(@media-type; @add-title; @color; @char) {
   @mt-selector: ~"[data-media-type='@{media-type}']";
   @{mt-selector} > .icon-content::before { color: @color; content: @char; }
-  @{mt-selector} > .add-content-title::before { content: "New " @add-title; color: black; }
+  @{mt-selector} > .add-content-title::before { content: @add-title; color: black; }
 }
 
 [data-media-type] {
@@ -37,7 +37,7 @@
   }
 }
 
-// Make the whole module or division line look linky 
+// Make the whole module or division line look linky
 .go-edit{
   cursor: pointer;
 }
@@ -50,11 +50,12 @@
   cursor: default;
 }
 
-.x-media-type-icon('application/xhtml+xml';              "Content";   #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.module';     "Module";    #00c; "\f0f6"); /* icon-file-alt */
-.x-media-type-icon('application/vnd.org.cnx.collection'; "Book";      #c00; "\f02d"); /* icon-book */
-.x-media-type-icon('application/vnd.org.cnx.folder';     "Folder";    #999; "\f07c"); /* icon-folder-open */
-.x-media-type-icon('application/vnd.org.cnx.container';  "Container"; #999; "\f114"); /* icon-folder-close-alt */
+.x-media-type-icon('application/xhtml+xml';              "New Content";   #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.module';     "New Module";    #00c; "\f0f6"); /* icon-file-alt */
+.x-media-type-icon('application/vnd.org.cnx.collection'; "New Book";      #c00; "\f02d"); /* icon-book */
+.x-media-type-icon('application/vnd.org.cnx.folder';     "New Folder";    #999; "\f07c"); /* icon-folder-open */
+.x-media-type-icon('application/vnd.org.cnx.container';  "New Container"; #999; "\f114"); /* icon-folder-close-alt */
+.x-media-type-icon('application/vnd.org.cnx.section';    "New Chapter";   #999; "\f114"); /* icon-folder-close-alt */
 
 html, body {
   height: 100%;
@@ -75,23 +76,24 @@ html, body {
   float: left;
   width: calc(~"100%" - @picker-width+@toc-width);
   height: 100%;
-  min-width: 810px;
+  min-width: @menu-and-content-min-width;
 
   .content-panel {
-    background-color: @module-editor-color;
-    
+    background-color: @editor-background-color;
+
     .content-title {
+      background-color: @module-editor-color;
       height: @panel-heading-height;
       line-height: @panel-heading-line-height;
-      
+
       #editor-title-text {
         color: @panel-heading-color;
         font-size: @panel-heading-size;
         #module-title-indicator{ font-weight: normal; }
       }
-    
+
     }
-  
+
 
     // By default, boxed-group is grey
     .boxed-group {
@@ -101,20 +103,19 @@ html, body {
       .boxed-group-inner {
         // So boxed-group-inner is scrollable, set the overflow-y
         overflow-y: auto;
-        background-color: #ccc;
         position: relative;
-		  
+
 	    .content{
 	      // Give the module-editing area the look of a piece of paper
-	      margin: 15px 25px;
+	      margin: 15px @content-lr-padding;
 	      border: 1px solid #aaa;
 	      box-shadow: 0 0 10px #999;
 	      background-color: #fff;
 	      padding: 30px;
 	    }
-		
+
       }
-	
+
     }
 
   }

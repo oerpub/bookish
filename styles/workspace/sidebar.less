@@ -107,11 +107,11 @@
 
 #workspace-container {
   width: 100%;
-  min-width: 1500px;
+  min-width: @workspace-min-width;
 
   // workspace minimized
   &.workspace-minimized {
-    min-width: (1500-@picker-width+@aside-handle-width);
+    min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
 
     #menu-and-content {
       width: calc(~"100%" - @toc-width+@aside-handle-width);
@@ -140,7 +140,7 @@
 
   // sidebar minimized (#sidebar is the table of contents)
   &.sidebar-minimized {
-    min-width: (1500-@toc-width+@aside-handle-width);
+    min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
 
     #menu-and-content {
       width: calc(~"100%" - @picker-width+@aside-handle-width);
@@ -170,7 +170,7 @@
 
   // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
-    min-width: (1500 - @toc-width - @picker-width + @aside-handle-width*2);
+    min-width: (@workspace-min-width - @toc-width - @picker-width + @aside-handle-width*2);
 
     #menu-and-content {
       width: calc(~"100%" - @aside-handle-width*2);
@@ -233,6 +233,8 @@
 @aside-handle-width: 30px;
 @aside-handle-width-expanded: 0px;
 @boxed-group-header-height: 42px;
+@menu-and-content-min-width: 800px;
+@workspace-min-width: (@menu-and-content-min-width + @picker-width + @toc-width);
 
 aside > div {
 
@@ -413,7 +415,7 @@ aside#sidebar > div { // TOC
   
   .boxed-group-inner {
     overflow: auto;
-    height: calc(~"100% - 82px");
+    height: calc(~"100% - 87px");
     color: #666;
     font-size: 13px;
   }
@@ -499,6 +501,10 @@ aside#sidebar > div { // TOC
 }
 
 
+#menu-and-content .boxed-group-inner {
+  padding-top: 41px; /* To allow space for semantic draggables */
+  margin-top: -41px;
+}
 
 
 

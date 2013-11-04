@@ -18,10 +18,6 @@
     padding-right: 0;
   }
 
-  .navbar-form {
-    margin-left: 5px;
-  }
-
   .nav-home:hover {
     color: @linkColorHover;
     text-decoration: underline;
@@ -35,23 +31,65 @@
     margin-left: 10px;
   }
 
-  .semantic-drag-source > * {
-    margin-left: 0;
-    width: auto;
-    display: inline-block;
-    padding-right: 10px;
-  }
-  
-  .semantic-drag-source:before{
-    content: "Drag to add a new ...";
-    display: inline-block;
+  .semantic-drag-source-wrapper {
+    position: relative;
+    z-index: 3;
+    padding: 0 @content-lr-padding;
+    background-color: @editor-background-color;
+    width: calc(~"100% - 20px" - @content-lr-padding*2); /* ~"20px" to account for scrollbar */
+    
+    .semantic-drag-source {
+      border-bottom: 1px solid #aaa;
+      box-shadow: 0px 8px 6px -6px #9f9f9f;
+      font-size: 12px;
+      
+      &:before {
+        content: "Drag to add a new ...";
+        display: inline-block;
+      }
+      
+      & > * {
+        margin-left: 0;
+        width: auto;
+        display: inline-block;
+        padding-right: 10px;
+      }
+    }
   }
 
-  .ui-flash {
+  .ui-flash { /* !importants because other stylings of these elements have more specific selectors (this class is ephemeral in any case) */
     background-image: none;
-    background-color: blue;
-    color: white;
+    background-color: blue !important;
+    color: white !important;
     font-weight: bold;
   }
 
+  .icon-superscript, 
+  .icon-superscript sup, 
+  .icon-subscript, 
+  .icon-subscript sub, 
+  .icon-math, 
+  .icon-math sup {
+    font-family: sans-serif;
+  }
+  .icon-superscript:before, 
+  .icon-subscript:before {
+    content: "A";
+  }
+  .icon-superscript sup:before, 
+  .icon-subscript sub:before {
+    content: "S";
+  }
+  .icon-math:before {
+    content: "x";
+  }
+  .icon-math sup:before {
+    content: "2+1";
+  }
+
+  .btn-group.headings .currentHeading { 
+    width: 9em; // Make constant width so the icons don't move around so much. 9em is approximate width of longest current option, "SubSubHeading"
+    text-align: left;
+  }
+  
 }
