@@ -65,7 +65,7 @@ define ['backbone'], (Backbone) ->
     # Perform a Breadth First Search, returning the first element that matches
     findDescendantBFS: (compare) ->
       #Check children first and then descendants
-      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendantBFS(compare)
+      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendantBFS?(compare)
 
     # Perform a Depth First Search, returning the first element that matches
     findDescendantDFS: (compare) ->
@@ -78,7 +78,7 @@ define ['backbone'], (Backbone) ->
       # because `.find` returns the element, not what was returned to find
       @getChildren().each (node) ->
         return if ret # if something is found, stop searching
-        found = node.findDescendantDFS(compare)
+        found = node.findDescendantDFS?(compare)
         ret = found
       return ret
 

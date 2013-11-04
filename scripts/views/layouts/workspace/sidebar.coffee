@@ -28,7 +28,7 @@ define [
 
     onShow: () ->
       model = @model
-      collection = @collection or model.getChildren()
+      collection = @collection or model.getChildren?()
 
       if model
         # This is a tree sidebar
