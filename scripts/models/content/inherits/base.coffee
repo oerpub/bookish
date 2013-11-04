@@ -26,6 +26,12 @@ define [
 
     mediaType: 'application/vnd.org.cnx.module'
 
+    # Modules, Books, and Folders all need to send a `mediaType`
+    toJSON: () ->
+      json = super()
+      json.mediaType = @mediaType
+      return json
+
     getTitle: (container) ->
       if @unique
         title = @get('title')
