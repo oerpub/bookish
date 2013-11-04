@@ -413,7 +413,7 @@ aside#sidebar > div { // TOC
   
   .boxed-group-inner {
     overflow: auto;
-    height: calc(~"100% - 82px");
+    height: calc(~"100% - 87px");
     color: #666;
     font-size: 13px;
   }
@@ -499,6 +499,10 @@ aside#sidebar > div { // TOC
 }
 
 
+#menu-and-content .boxed-group-inner {
+  padding-top: 41px; /* To allow space for semantic draggables */
+  margin-top: -41px;
+}
 
 
 
