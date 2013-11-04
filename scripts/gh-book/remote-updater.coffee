@@ -34,10 +34,10 @@ define [
       return @_runningPromise
 
     stop: () ->
+      @keepUpdating = false
       promise = @_runningPromise or (new $.Deferred()).resolve(@)
 
       return promise.always () =>
-        @keepUpdating = false
         @lastSeenSha = null
 
 
