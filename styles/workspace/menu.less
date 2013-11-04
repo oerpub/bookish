@@ -57,11 +57,34 @@
     }
   }
 
-  .ui-flash {
+  .ui-flash { /* !importants because other stylings of these elements have more specific selectors (this class is ephemeral in any case) */
     background-image: none;
-    background-color: blue;
-    color: white;
+    background-color: blue !important;
+    color: white !important;
     font-weight: bold;
+  }
+
+  .icon-superscript, 
+  .icon-superscript sup, 
+  .icon-subscript, 
+  .icon-subscript sub, 
+  .icon-math, 
+  .icon-math sup {
+    font-family: sans-serif;
+  }
+  .icon-superscript:before, 
+  .icon-subscript:before {
+    content: "A";
+  }
+  .icon-superscript sup:before, 
+  .icon-subscript sub:before {
+    content: "S";
+  }
+  .icon-math:before {
+    content: "x";
+  }
+  .icon-math sup:before {
+    content: "2+1";
   }
 
   .btn-group.headings .currentHeading { 
