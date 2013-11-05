@@ -192,20 +192,31 @@ define [
 
       # Wait until the remoteUpdater has stopped so the settings object does not
       # switch mid-way while updating
-      remoteUpdater.stop().always () =>
+      auth = @
+      remoteUpdater.stop().always () ->
 
-        # Silently clear the settings first.
-        # This way listeners are **forced** to update and reload when
-        # "Save Settings" is clicked.
-        #
-        # The reason for **forcing** a reload is because this modal is also shown
-        # when there is a connection problem loading the workspace.
-        @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+        repoUser = auth.$el.find('#repo-user').val()
+        repoName = auth.$el.find('#repo-name').val()
+        branch = auth.$el.find('#repo-branch').val() # '' means default branch
 
-        @model.set
-          repoUser: @$el.find('#repo-user').val()
-          repoName: @$el.find('#repo-name').val()
-          branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
+        # First check validity of the new repo details.
+        repo = session.getClient().getRepo(repoUser, repoName)
+        repo.getBranches().fail () ->
+          auth.editSettingsModal()
+        .then (branches) ->
+          if branch != '' and branches.indexOf(branch) < 0
+            auth.editSettingsModal()
+          else
+            # Silently clear the settings first. This forces a reload even if
+            # the user leaves the settings unchanged.  The reason for
+            # **forcing** a reload is because this modal is also shown when
+            # there is a connection problem loading the workspace.
+            auth.model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
 
-        remoteUpdater.start().done () =>
-          @model.trigger 'settings-changed'
+            auth.model.set
+              repoUser: repoUser
+              repoName: repoName
+              branch: branch
+
+            remoteUpdater.start().done () =>
+              auth.model.trigger 'settings-changed'
