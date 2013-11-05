@@ -6,7 +6,10 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
     initialize: () ->
       # The session will be (re-)initialised when the app sets our login
       # details, or if it is changed.
-      @on 'change', () =>
+      @on 'change', (s, options) =>
+        # Internal signal not to reload. Used by authenticate below.
+        return if options and options.noreload
+
         # If any authentication info has changed then reload the client
         if not _.isEmpty _.pick @.changed, ['token', 'id', 'password']
           @_reloadClient()
@@ -29,7 +32,7 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
       promise = client.getLogin()
       promise.done () =>
-        @set config, {silent: true}
+        @set config, {noreload: true}
         @_client = client
         @checkCanCollaborate()
       return promise
