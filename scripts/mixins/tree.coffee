@@ -57,7 +57,9 @@ define ['backbone'], (Backbone) ->
       trickleEvents 'tree:change'
 
 
-    newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
+    newNode: (options) ->
+      throw new Error 'BUG: Only the root can create new Pointer Nodes' if @ == @getRoot()
+      throw new Error 'BUG: Subclass must implement this method'
 
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
