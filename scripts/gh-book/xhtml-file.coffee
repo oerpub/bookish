@@ -82,7 +82,7 @@ define [
       #   $head = jQuery("<div class='unwrap-me'>#{head}</div>")
 
       #   $head.children('title').text(value)
-      #   @set 'head', $head[0].innerHTML, options
+      #   @set 'head', $head.html(), options
 
       @on 'change:body', (model, value, options) =>
         $body = jQuery("<div class='unwrap-me'></div>")
@@ -111,7 +111,7 @@ define [
 
           # $img.attr('data-src', attrs.id) TODO: Aloha keeps stripping this attribute off.
 
-        @set('body', $body[0].innerHTML.trim())
+        @set('body', $body.html().trim())
 
 
     # Since the titles are purely cosmetic do not mark the model as dirty
@@ -219,7 +219,7 @@ define [
           console.error "ERROR: Manifest missing image file #{path}"
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          @set 'body', $body.html().trim(), {parse:true, loading:true} if counter == 0
           deferred.resolve()
           return
 
@@ -234,7 +234,7 @@ define [
 
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          @set 'body', $body.html().trim(), {parse:true, loading:true} if counter == 0
           deferred.resolve()
         .fail ->
           counter--
@@ -289,8 +289,8 @@ define [
 
         $img.replaceWith $imgHolder
 
-      headHtml = $head[0].innerHTML.trim()
-      bodyHtml = $body[0].innerHTML.trim()
+      headHtml = $head.html().trim()
+      bodyHtml = $body.html().trim()
 
       # The text currently contains `<prefiximg ... ></prefiximg>`
       # To make the `<img>` valid XHTML (self-closing like `<img/>`)
