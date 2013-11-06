@@ -197,26 +197,26 @@ define [
 
         repoUser = auth.$el.find('#repo-user').val()
         repoName = auth.$el.find('#repo-name').val()
-        branch = auth.$el.find('#repo-branch').val() # '' means default branch
+        branchName = auth.$el.find('#repo-branch').val() # '' means default branch
 
-        # First check validity of the new repo details.
+        # First check validity of the new repo details. Do this by attempting
+        # to read META-INFO/container.xml, which should exist for all real
+        # books.
         repo = session.getClient().getRepo(repoUser, repoName)
-        repo.getBranches().fail () ->
+        branch = branchName and repo.getBranch(branchName) or repo.getDefaultBranch()
+        branch.read('META-INF/container.xml').fail () ->
           auth.editSettingsModal()
-        .then (branches) ->
-          if branch != '' and branches.indexOf(branch) < 0
-            auth.editSettingsModal()
-          else
-            # Silently clear the settings first. This forces a reload even if
-            # the user leaves the settings unchanged.  The reason for
-            # **forcing** a reload is because this modal is also shown when
-            # there is a connection problem loading the workspace.
-            auth.model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+        .then () ->
+          # Silently clear the settings first. This forces a reload even if
+          # the user leaves the settings unchanged.  The reason for
+          # **forcing** a reload is because this modal is also shown when
+          # there is a connection problem loading the workspace.
+          auth.model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
 
-            auth.model.set
-              repoUser: repoUser
-              repoName: repoName
-              branch: branch
+          auth.model.set
+            repoUser: repoUser
+            repoName: repoName
+            branch: branchName
 
-            remoteUpdater.start().done () =>
-              auth.model.trigger 'settings-changed'
+          remoteUpdater.start().done () =>
+            auth.model.trigger 'settings-changed'
