@@ -61,9 +61,9 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
 
     getClient: () ->
       if not @_client
+        console?.warn('Using anonymous access for the GithUb API')
         @_client = new Github({})
         @set('canCollaborate', false)
-        console and console.warn('Using anonymous access for the GithUb API')
       return @_client 
 
     getRepo: () ->
