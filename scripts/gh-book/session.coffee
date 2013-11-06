@@ -60,7 +60,11 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
           @set('canCollaborate', canCollaborate)
 
     getClient: () ->
-      return @_client or throw 'BUG: Client was not loaded yet'
+      if not @_client
+        @_client = new Github({})
+        @set('canCollaborate', false)
+        console and console.warn('Using anonymous access for the GithUb API')
+      return @_client 
 
     getRepo: () ->
       repoUser = @get('repoUser')
