@@ -8,7 +8,7 @@ define ['underscore', 'backbone', 'github'], (_, Backbone, Github) ->
       # details, or if it is changed.
       @on 'change', (s, options) =>
         # Internal signal not to reload. Used by authenticate below.
-        return if options and options.noreload
+        return if options?.noreload
 
         # If any authentication info has changed then reload the client
         if not _.isEmpty _.pick @.changed, ['token', 'id', 'password']
