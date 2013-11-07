@@ -21,9 +21,12 @@ define [
       'application/vnd.org.cnx.module' # Module
     ]
 
-    # Used to fetch/save the content.
-    # TODO: move the URL pattern to a separate file so it is configurable
-    url: () -> "/content/#{@id}"
+    # TODO: Folders should **NOT** reside in `/content`
+    url: () ->
+      if @id
+        return "/content/#{@id}"
+      else
+        return '/content/'
 
     initialize: (options) ->
 
@@ -51,7 +54,10 @@ define [
       children = json.contents.map (id) =>
         model = allContent.get(id)
         throw new Error 'BUG: id not found when loading folder' if not model
-        return @newNode {model:model}
+        # Do not make a pointer to the content because it may be a book
+        # and the book needs to be able to expand its children (model.getChildren() needs to work)
+        #return @newNode {model:model}
+        return model
       @getChildren().reset(children, {parse:true})
 
       delete json.contents
@@ -67,6 +73,7 @@ define [
       return isDirty
 
     onSaved: () ->
+      super()
       @_localContentsAdded = {}
 
     _save: () -> console.log "ERROR: Autosave not implemented"
@@ -101,3 +108,11 @@ define [
       model = options.model
       node = new TocPointerNode {root:@, model:model, passThroughChanges:true}
       return node
+
+    addChild: (model, at) ->
+      # Dereference the pointer, create a new pointer, and **then** add it
+      model = model.dereferencePointer?() or model
+      # Do not make a pointer to the content because it may be a book
+      # and the book needs to be able to expand its children (model.getChildren() needs to work)
+      # model = @newNode {model:model}
+      super(model, at)
