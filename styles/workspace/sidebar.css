@@ -1,0 +1,474 @@
+/* Bootstrap Variables */
+/*****************************
+ * New Styles
+ *****************************/
+.sidebar-container {
+  overflow-x: hidden;
+  float: left;
+  position: relative;
+  max-width: 310px;
+}
+.sidebar-container .handle > i.expand-collapse {
+  left: 3px;
+}
+.sidebar-container .handle:hover > i.expand-collapse {
+  left: 2px;
+}
+.sidebar-container .handle > i.expand-collapse::before {
+  content: "\f137";
+  /* icon-chevron-sign-left */
+}
+.sidebar-container.sidebar-workspace aside > div {
+  background-color: #46a546;
+}
+.sidebar-container.sidebar-workspace aside > div > .handle > .handle-text::before {
+  content: 'Book Picker';
+}
+.sidebar-container.sidebar-workspace aside > div > .boxed-group > h3 > .title-text::before {
+  content: 'Book Picker';
+}
+.sidebar-container.sidebar-toc aside > div {
+  background-color: #049cdb;
+}
+.sidebar-container.sidebar-toc aside > div > .handle > .handle-text::before {
+  content: 'Table of Contents';
+}
+.sidebar-container.sidebar-toc aside > div > .boxed-group > h3 > .title-text::before {
+  content: 'Table of Contents';
+}
+#workspace-container {
+  width: 100%;
+}
+#workspace-container.workspace-minimized #menu-and-content {
+  width: calc(100% - 350px);
+}
+#workspace-container.workspace-minimized .sidebar-workspace {
+  width: 40px;
+}
+#workspace-container.workspace-minimized .sidebar-workspace .boxed-group {
+  max-width: 0;
+  visibility: hidden;
+  overflow-x: hidden;
+}
+#workspace-container.workspace-minimized .sidebar-workspace .handle > i.expand-collapse::before {
+  content: "\f138";
+  /* icon-chevron-sign-right */
+}
+#workspace-container.sidebar-minimized #menu-and-content {
+  width: calc(100% - 350px);
+}
+#workspace-container.sidebar-minimized .sidebar-toc {
+  width: 40px;
+}
+#workspace-container.sidebar-minimized .sidebar-toc .boxed-group {
+  max-width: 0;
+  visibility: hidden;
+  overflow-x: hidden;
+}
+#workspace-container.sidebar-minimized .sidebar-toc .handle > i.expand-collapse::before {
+  content: "\f138";
+  /* icon-chevron-sign-right */
+}
+#workspace-container.workspace-minimized.sidebar-minimized #menu-and-content {
+  width: calc(100% - 80px);
+}
+#workspace-container.workspace-minimized.sidebar-minimized .sidebar-workspace,
+#workspace-container.workspace-minimized.sidebar-minimized .sidebar-toc {
+  width: 40px;
+}
+#workspace-container.workspace-minimized.sidebar-minimized .sidebar-workspace .boxed-group,
+#workspace-container.workspace-minimized.sidebar-minimized .sidebar-toc .boxed-group {
+  max-width: 0;
+  visibility: hidden;
+  overflow-x: hidden;
+}
+#main {
+  height: inherit;
+}
+#main > div {
+  height: inherit;
+}
+#main > div #sign-in-modal {
+  height: initial;
+}
+#main > div > div {
+  height: inherit;
+}
+#main > div > div > #container {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container > div.sidebar-container {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container > div.sidebar-container > aside {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container > div.sidebar-container > aside > div {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container > div.sidebar-container > aside > div > .boxed-group {
+  height: inherit;
+}
+#main > div > div > #container > #workspace-container > div.sidebar-container > aside > div > .boxed-group > .boxed-group-inner {
+  height: inherit;
+}
+aside > div {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  width: 310px;
+  -webkit-transition: width 0.1s ease-out;
+  -moz-transition: width 0.1s ease-out;
+  -o-transition: width 0.1s ease-out;
+  transition: width 0.1s ease-out;
+  -webkit-border-top-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  border-top-right-radius: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  -moz-border-radius-bottomright: 20px;
+  border-bottom-right-radius: 20px;
+}
+aside > div > .handle {
+  text-shadow: 2px 2px 4px #000;
+}
+aside > div .boxed-group {
+  background-color: inherit;
+  width: 277px;
+}
+aside > div .boxed-group > h3 .add-content {
+  float: right;
+}
+aside > div .boxed-group > h3 .add-content .btn-group ul.dropdown-menu {
+  left: inherit;
+  right: 0;
+}
+aside > div > .handle {
+  max-width: 25px;
+}
+aside > div > .handle > i.expand-collapse {
+  position: relative;
+}
+aside > div > .handle {
+  width: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  position: absolute;
+  top: 0px;
+  right: 5px;
+  vertical-align: top;
+  font-size: 18px;
+  font-weight: normal;
+  color: white;
+}
+aside > div > .handle > .handle-text {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+  -webkit-transform-origin: left;
+  -moz-transform-origin: left;
+  -ms-transform-origin: left;
+  -o-transform-origin: left;
+  transform-origin: left;
+  display: block;
+  position: relative;
+  top: -25px;
+  left: 10px;
+}
+aside > div nav > ol ol {
+  padding: 0;
+  margin: 0;
+}
+aside > div nav > ol > li > .editor-node-body {
+  padding-left: 0px;
+}
+aside > div nav > ol > li .editor-node-title {
+  max-width: 200px;
+}
+aside > div nav > ol ol > li > .editor-node-body {
+  padding-left: 20px;
+}
+aside > div nav > ol ol > li .editor-node-title {
+  max-width: 185px;
+}
+aside > div nav > ol ol ol > li > .editor-node-body {
+  padding-left: 40px;
+}
+aside > div nav > ol ol ol > li .editor-node-title {
+  max-width: 170px;
+}
+aside > div nav > ol ol ol ol > li > .editor-node-body {
+  padding-left: 60px;
+}
+aside > div nav > ol ol ol ol > li .editor-node-title {
+  max-width: 155px;
+}
+aside > div nav > ol ol ol ol ol > li > .editor-node-body {
+  padding-left: 80px;
+}
+aside > div nav > ol ol ol ol ol > li .editor-node-title {
+  max-width: 140px;
+}
+aside > div nav li > .editor-node-body:not(:hover) > .edit-settings {
+  display: none;
+}
+aside > div nav li > .editor-node-body:hover > .edit-settings {
+  display: inline-block;
+}
+aside > div nav li.editor-node-expanded > .editor-node-body {
+  margin-bottom: 6px;
+}
+/*************************
+ * GitHub Styles
+ *************************/
+.boxed-group {
+  position: relative;
+  background: #efefef;
+  padding: 3px;
+  border-radius: 3px;
+  margin: 0 0 15px 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+.boxed-group > h3 {
+  line-height: 20px;
+}
+.boxed-group > h3,
+.boxed-group .heading {
+  background-color: #e0e0e0;
+  background-image: -moz-linear-gradient(#fafafa, #e0e0e0);
+  background-image: -webkit-linear-gradient(#fafafa, #e0e0e0);
+  background-image: linear-gradient(#fafafa, #e0e0e0);
+  background-repeat: repeat-x;
+  margin: 0;
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+  border: 1px solid #d8d8d8;
+  border-bottom: none;
+  padding: 10px 10px 11px 10px;
+  font-size: 14px;
+  text-shadow: 0 1px 0 #fff;
+}
+.boxed-group .boxed-group-inner {
+  overflow: auto;
+  height: calc(100% - 82px);
+  padding: 1px 10px;
+  background: #fff;
+  border: 1px solid #d8d8d8;
+  border-top: 1px solid #ccc;
+  border-bottom-left-radius: 1px;
+  border-bottom-right-radius: 1px;
+  color: #666;
+  font-size: 13px;
+}
+.boxed-group nav > ol,
+.boxed-group .boxed-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.boxed-group nav ol > li,
+.boxed-group .boxed-group-list > li {
+  display: block;
+  margin-left: -10px;
+  width: 100%;
+  padding: 5px 10px 0;
+  line-height: 23px;
+  border-top: 1px solid #e5e5e5;
+}
+.boxed-group .editor-node-body {
+  white-space: nowrap;
+}
+.boxed-group nav ol > li a,
+.boxed-group .editor-node-title {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Max width is set based on the <li> nesting depth */
+
+}
+.boxed-group nav li .btn-mini.pull-right,
+.boxed-group .boxed-group-list > li .minibutton {
+  float: right;
+  margin: -1px 0 0 10px;
+}
+.boxed-group nav li .btn-mini.pull-right,
+.boxed-group .context-button {
+  position: relative;
+  line-height: 23px;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+}
+.boxed-group nav li .btn-mini.pull-right,
+.boxed-group .minibutton {
+  padding: 0 10px;
+  line-height: 24px;
+  box-shadow: none;
+  outline: none;
+}
+.boxed-group nav li .btn-mini.pull-right,
+.boxed-group .button,
+.boxed-group .minibutton {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  background-color: #eaeaea;
+  background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+  background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+  background-image: linear-gradient(#fafafa, #eaeaea);
+  background-repeat: repeat-x;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  border-bottom-color: #c5c5c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+}
+.boxed-group nav li .btn-mini.pull-right:before,
+.boxed-group .context-button:before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  /*content: "\f02f";*/
+
+  display: block;
+  padding: 0;
+  font-size: 16px;
+  line-height: 16px;
+}
+/****************************************
+ * OLD crufty stuff starts here
+ ****************************************/
+.pickerswitch {
+  cursor: pointer;
+}
+#greenpicker {
+  position: absolute;
+  left: 0;
+  top: 32px;
+  width: 30px;
+  bottom: 0;
+  background-color: #f0f0f0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+  display: none;
+  visibility: hidden;
+}
+#greenpicker:hover {
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  background-color: #1FB04C;
+  background-image: url(td-open-01.png);
+}
+#bluepicker {
+  position: absolute;
+  width: 29px;
+  left: 0;
+  top: 32px;
+  bottom: 0;
+  border-left: 1px solid #999;
+  background-color: #f0f0f0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+  display: none;
+}
+#bluepicker:hover {
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  background-color: #049cdb;
+  background-image: url(td-open-01.png);
+}
+#container {
+  min-width: 100px;
+  border-right: 1px solid #ccc;
+  /* Slide the sidebar off screen when hiding it */
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#container ol ol a {
+  color: #333333;
+}
+#container ol ol ol a {
+  color: #555555;
+}
+#container #workspace-sidebar-toc > ol {
+  margin: 0;
+  padding-left: 5px;
+}
+#container #workspace-sidebar-toc li {
+  white-space: nowrap;
+  color: #333;
+  font-size: 1em;
+  font-family: Verdana, "DejaVu Sans", Tahoma;
+}
+#container #workspace-sidebar-toc li {
+  list-style-type: none;
+}
+#container #workspace-sidebar-toc li[data-media-type='application/vnd.org.cnx.collection'] {
+  background-color: #fafafa;
+}
+#container #workspace-sidebar-toc li[data-media-type='application/vnd.org.cnx.collection'] li {
+  list-style-type: decimal;
+  list-style-position: inside;
+}
+#container #workspace-sidebar-toc li > .editor-node-body > .editor-expand-collapse {
+  cursor: pointer;
+}
+#container #workspace-sidebar-toc li > .editor-node-body > .editor-expand-collapse:hover {
+  background-color: #ccc;
+}
+#container #workspace-sidebar-toc li > .editor-node-body > .editor-expand-collapse:not([data-media-type]) > i {
+  width: 0.5em;
+}
+#container #workspace-sidebar-toc li > .editor-node-body > .editor-expand-collapse > .icon-content::before {
+  content: "\f0da";
+  /* icon-caret-right */
+
+}
+#container #workspace-sidebar-toc li > ol {
+  display: none;
+}
+#container #workspace-sidebar-toc li.editor-node-expanded > .editor-node-body > .editor-expand-collapse > .icon-content::before {
+  content: "\f0d7";
+  /* icon-caret-down */
+
+}
+#container #workspace-sidebar-toc li.editor-node-expanded > ol {
+  display: block;
+}
+#container #workspace-sidebar-toc .editor-node-after {
+  min-height: 6px;
+}
+#container #workspace-sidebar-toc .editor-node-title.autogenerated-text {
+  color: #666;
+}
+#container #workspace-sidebar-toc .editor-node-title small.toc-badge {
+  font-size: 70%;
+  color: #999;
+}
+#container #workspace-sidebar-toc .btn-link {
+  vertical-align: top;
+}

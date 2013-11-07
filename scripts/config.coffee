@@ -4,13 +4,8 @@ require.config
   # # Configure Library Locations
   paths:
 
-    # Change some of the models for the Application to use github and EPUB
-    app: 'gh-book/app'
-    github: "#{BOWER}/octokit/octokit"
-    'collections/content': 'gh-book/content'
-    'views/workspace/menu/auth': 'gh-book/auth'
-    session: 'gh-book/session'
     jsSHA: "#{BOWER}/jsSHA/src/sha_dev" # Calculate the sha1 hash for resources
+    # Filter the Book Picker by mediaType
     'filtered-collection': "#{BOWER}/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection"
 
     # Include the diff library
@@ -118,8 +113,8 @@ require.config
     aloha:
       deps: ['jquery', 'mathjax', 'cs!configs/aloha', 'bootstrapModal', 'bootstrapPopover']
       exports: 'Aloha'
-      init: () ->
-        jQuery.browser.version = 10000 # Hack to fix aloha-editor's version checking
+      init: ($) ->
+        $.browser.version = 10000 # Hack to fix aloha-editor's version checking
         return Aloha
 
     mathjax:

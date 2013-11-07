@@ -10,6 +10,7 @@ define [
   'cs!views/layouts/workspace'
 ], (Marionette, allContent, WorkspaceLayout) ->
 
+
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
 
