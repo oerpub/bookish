@@ -11,9 +11,6 @@ define [
 
   Backbone.Events.trigger = _.wrap Backbone.Events.trigger, (originalTrigger) ->
     args = _.toArray(arguments).slice(1)
-    
-    # TODO: It may be worth considering calling toJSON() on an object if the
-    #       function exists, and logging it after dropping the body field
 
     # TODO: It may be worth considering calling toJSON() on an object if the
     #       function exists, and logging it after dropping the body field
