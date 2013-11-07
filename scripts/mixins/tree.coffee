@@ -57,7 +57,9 @@ define ['backbone'], (Backbone) ->
       trickleEvents 'tree:change'
 
 
-    newNode: (options) -> throw 'BUG: Only the root can create new Pointer Nodes'
+    newNode: (options) ->
+      throw new Error 'BUG: Only the root can create new Pointer Nodes' if @ == @getRoot()
+      throw new Error 'BUG: Subclass must implement this method'
 
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
@@ -65,7 +67,7 @@ define ['backbone'], (Backbone) ->
     # Perform a Breadth First Search, returning the first element that matches
     findDescendantBFS: (compare) ->
       #Check children first and then descendants
-      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendantBFS(compare)
+      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendantBFS?(compare)
 
     # Perform a Depth First Search, returning the first element that matches
     findDescendantDFS: (compare) ->
@@ -78,7 +80,7 @@ define ['backbone'], (Backbone) ->
       # because `.find` returns the element, not what was returned to find
       @getChildren().each (node) ->
         return if ret # if something is found, stop searching
-        found = node.findDescendantDFS(compare)
+        found = node.findDescendantDFS?(compare)
         ret = found
       return ret
 

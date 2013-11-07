@@ -298,7 +298,7 @@ define [
       @getChildren().forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
       # Trim the HTML and put newlines between elements
-      html =  $wrapper[0].innerHTML
+      html =  $wrapper.html()
       html = html.replace(/></g, '>\n<')
       return html
 
