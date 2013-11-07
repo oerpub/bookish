@@ -22,14 +22,15 @@ define [
         $loadingText = @$el.find('#loading-text')
         $loadingBar = @$el.find('#loading-bar')
 
-        switch msg.type
-          when 'start'  then total++    ; $loadingText.text("Loading #{msg.path}")
-          when 'end'    then complete++ ; $loadingText.text("Loaded #{ msg.path}")
+        if msg
+          switch msg.type
+            when 'start'  then total++    ; $loadingText.text("Loading #{msg.path}")
+            when 'end'    then complete++ ; $loadingText.text("Loaded #{ msg.path}")
 
-        setTimeout (() =>
-          percentage = 100 * complete / total
-          $loadingBar.attr('style', "width: #{percentage}%;")
-        ), 1
+          setTimeout (() =>
+            percentage = 100 * complete / total
+            $loadingBar.attr('style', "width: #{percentage}%;")
+          ), 1
 
       promise.fail (msg) =>
         $loadingText = @$el.find('#loading-text')

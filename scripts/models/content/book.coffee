@@ -99,7 +99,6 @@ define [
     # Used in `_parseNavModel`.
     onParseNavEntry: (model, title) -> # no-op
 
-
     parse: (json) ->
       body = json.body
       # Remove the body since we parse it manually
@@ -107,11 +106,20 @@ define [
       @_parseNavModel(body)
       return json
 
+    # This specifies the mediaType of new Toc entries that do not exist in allContent yet.
+    # It is used when the GitHub book Navigation file is updated before the OPF file is.
+    # It is unused by `atc`.
+    # Used in `_parseNavModel`.
+    newModelMediaType: Module::mediaType
+    # This method is given a Toc entry and the title in the Toc.
+    # Optionally, the method can assign the title to the Toc entry.
+    # It is unused by `atc`.
+    # Used in `_parseNavModel`.
+    onParseNavEntry: (model, title) -> # no-op
 
     _parseNavModel: (bodyHtml) ->
       $body = $(bodyHtml)
       $body = $('<div></div>').append $body
-
 
       # Generate a tree of the ToC
       recBuildTree = (collection, $rootOl, contextPath) =>
@@ -216,7 +224,7 @@ define [
       @getChildren().forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
       # Trim the HTML and put newlines between elements
-      html =  $wrapper[0].innerHTML
+      html =  $wrapper.html()
       html = html.replace(/></g, '>\n<')
       return html
 
@@ -246,7 +254,7 @@ define [
     newNode: (options) ->
       model = options.model
       node = @tocNodes.get model.id
-      if !node
+      if not node
         node = new TocPointerNode {root:@, model:model, title:options.title}
         #@tocNodes.add node
       return node

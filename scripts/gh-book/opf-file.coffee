@@ -3,11 +3,25 @@ define [
   'cs!collections/media-types'
   'cs!collections/content'
   'cs!mixins/loadable'
+  'cs!models/utils'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/toc-node'
   'cs!gh-book/toc-pointer-node'
-  'cs!models/utils'
-], (Backbone, mediaTypes, allContent, loadable, XhtmlFile, TocNode, TocPointerNode, Utils) ->
+  'cs!gh-book/uuid'
+  'hbs!templates/gh-book/defaults/opf'
+  'hbs!templates/gh-book/defaults/nav'
+], (
+  Backbone,
+  mediaTypes,
+  allContent,
+  loadable,
+  Utils,
+  XhtmlFile,
+  TocNode,
+  TocPointerNode,
+  uuid,
+  defaultOpf,
+  defaultNav) ->
 
   SAVE_DELAY = 10 # ms
 
@@ -20,9 +34,19 @@ define [
 
     branch: true # This element will show up in the sidebar listing
 
-    initialize: () ->
-      # For TocNode, let it know this is the root
-      super {root:@}
+    initialize: (options) ->
+      options.root = @
+
+
+      @$xml = $($.parseXML defaultOpf(options))
+
+      # Give the content an id if it does not already have one
+      if not @id
+        @setNew()
+        @id = "content/#{uuid(@get('title'))}.opf"
+
+     # For TocNode, let it know this is the root
+      super options
 
       # Contains all entries in the OPF file (including images)
       @manifest = new Backbone.Collection()
@@ -87,6 +111,9 @@ define [
       @_localNavAdded = {}
       @_localTitlesChanged = {}
 
+      # save opf files on creation
+      @_save() if @_isNew
+
     # Add an `<item>` to the OPF.
     # Called from `@manifest.add` and `@resolveSaveConflict`
     _addItem: (model, options={}, force=true) ->
@@ -105,11 +132,11 @@ define [
         id:           relPath # TODO: escape the slashes so it is a valid id
         'media-type': model.mediaType
 
-      # Randomly add the item into the manifest.
-      # Always appending results in commit conflicts at the bottom of the file
-      $manifestChildren = $manifest.children()
-      index = $manifestChildren.length * Math.random()
-      $item.insertBefore($manifestChildren.eq(index))
+      if options.properties
+        $item.attr 'properties', options.properties
+        delete options.properties
+
+      $manifest.append($item)
       # TODO: Depending on the type add it to the spine for EPUB2
 
       @_markDirty(options, force)
@@ -125,6 +152,22 @@ define [
     #
     # Reason for SAVE_DELAY: a "move" is 2 operations, `remove` followed by `add`
     _save: ->
+
+      # this is a new book, set some default elements
+      if not @navModel
+        #create the default nav file
+        @navModel = new XhtmlFile {title: @get('title'), extension: '-nav.html'}
+        @navModel.set('body', defaultNav())
+
+        # add the new navModel to our opf and the allcontent container
+        @_addItem(@navModel, {properties: 'nav'})
+        allContent.add(@navModel)
+
+        #create empty module for the book
+        module = new XhtmlFile {title: 'module1'}
+        allContent.add(module)
+        @addChild(module)
+
       clearTimeout(@_savingTimeout)
       @_savingTimeout = setTimeout (() =>
         allContent.save(@navModel, false, true) # include-resources, include-new-files
@@ -235,6 +278,9 @@ define [
             path = Utils.relativePath(@navModel.id, model.id)
             $node = $('<a></a>')
             .attr('href', path)
+            # Use `.toJSON().title` instead of `.get('title')` to support
+            # TocPointerNodes which inherit their title if it is not overridden
+            .text(model.toJSON().title)
           else
             $node = $('<span></span>')
             $li.attr(model.htmlAttributes or {})
@@ -252,7 +298,7 @@ define [
       @getChildren().forEach (child) => recBuildList($navOl, child)
       $nav.append($navOl)
       # Trim the HTML and put newlines between elements
-      html =  $wrapper[0].innerHTML
+      html =  $wrapper.html()
       html = html.replace(/></g, '>\n<')
       return html
 

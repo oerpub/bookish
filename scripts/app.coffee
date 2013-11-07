@@ -32,6 +32,10 @@ define [
       # set the main div for all the layouts
       controller.main = @main
 
+      # The controller fires a navigate event, the app then updates the url
+      # as it sees fit.
+      controller.on 'navigate', (route) -> controller.navigate route
+
       if not Backbone.History.started
         Backbone.history.start
           #pushState: true

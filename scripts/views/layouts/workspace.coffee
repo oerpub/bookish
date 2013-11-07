@@ -28,7 +28,3 @@ define [
 
     onShow: () ->
       @auth.show(new AuthView {model: session})
-
-
-    showWorkspace: (b) -> # There is some other code that calls this and should be removed
-    showToc: (b) ->       # There is some other code that calls this and should be removed

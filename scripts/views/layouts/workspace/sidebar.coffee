@@ -19,7 +19,7 @@ define [
       toc: '.workspace-sidebar'
 
     events:
-      'click .handle': () ->
+      'click .handle, .boxed-group > h3': () ->
         # what are we?
         name = @$el.parent().attr('id')
         # set minimized class on parent based on element id, this seems really hackish but
@@ -28,7 +28,7 @@ define [
 
     onShow: () ->
       model = @model
-      collection = @collection or model.getChildren()
+      collection = @collection or model.getChildren?()
 
       if model
         # This is a tree sidebar
@@ -37,6 +37,7 @@ define [
         # This is the Picker/Roots Sidebar
         collection = new Backbone.FilteredCollection(null, {collection:collection})
         collection.setFilter (content)  -> return content.getChildren
+        @filteredMediaTypes.setFilter (type) -> return type.get('modelType')::toplevel
 
         @filteredMediaTypes.setFilter (type) ->
           # Filter the types to exclude Chapters and other non-loadable content
@@ -47,16 +48,12 @@ define [
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})
       @toc.show(new TocView {model:model, collection:collection})
 
-    onWindowResize: () ->
-
     onRender: () ->
       # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page
       $window = $(window)
-      $window.on('resize', @onWindowResize.bind(@))
-      @onWindowResize()
 
-      # Add a class on the element so we can style it as a Folder or as a ToC
-      if @model
-        @$el.attr('data-media-type', @model.mediaType)
-      else
-        @$el.removeAttr('data-media-type')
+    # Sticking to American spelling here
+    maximize: () ->
+      name = @$el.parent().attr('id')
+      @$el.parents('#workspace-container').removeClass(name+'-minimized')
+      return @

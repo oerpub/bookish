@@ -58,6 +58,7 @@ define [
 
     templateHelpers: () ->
       return {
+        hasRepo: !!@model.getRepo()
         isDirty: @isDirty
         isAuthenticated: !! (@model.get('password') or @model.get('token'))
       }
@@ -206,4 +207,5 @@ define [
           repoName: @$el.find('#repo-name').val()
           branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
 
-        remoteUpdater.start()
+        remoteUpdater.start().done () =>
+          @model.trigger 'settings-changed'

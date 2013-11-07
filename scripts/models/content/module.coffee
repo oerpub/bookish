@@ -28,7 +28,7 @@ define [
       language: navigator?.language or navigator?.userLanguage or 'en'
 
     # Begin editing this medium as soon as it is added
-    addAction: () -> controller.goEdit(@)
+    addAction: (context) -> controller.goEdit(@, context)
 
     # Change the content view when editing this
     contentView: (callback) ->

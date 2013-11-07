@@ -60,14 +60,15 @@ define [
     mediaType: 'application/xhtml+xml'
 
     defaults:
-      title: null
+      title: 'Untitled'
 
-    initialize: () ->
-      super()
+    initialize: (options) ->
+      super(options)
 
       # Give the content an id if it does not already have one
-      @setNew() if not @id
-      @id ?= "content/#{uuid()}"
+      if not @id
+        @setNew()
+        @id = "content/#{uuid(@get('title'))}#{options.extension || '.html'}"
 
       # Clear that the title on the model has changed
       # so it does not get saved unnecessarily.
@@ -81,7 +82,7 @@ define [
       #   $head = jQuery("<div class='unwrap-me'>#{head}</div>")
 
       #   $head.children('title').text(value)
-      #   @set 'head', $head[0].innerHTML, options
+      #   @set 'head', $head.html(), options
 
       @on 'change:body', (model, value, options) =>
         $body = jQuery("<div class='unwrap-me'></div>")
@@ -110,7 +111,7 @@ define [
 
           # $img.attr('data-src', attrs.id) TODO: Aloha keeps stripping this attribute off.
 
-        @set('body', $body[0].innerHTML.trim())
+        @set('body', $body.html().trim())
 
 
     # Since the titles are purely cosmetic do not mark the model as dirty
@@ -122,7 +123,7 @@ define [
     # This promise is resolved once the file is parsed so we know which images to load
     _imagesLoaded: new $.Deferred()
     _loadComplex: (originalPromise) ->
-      return @_imagesLoaded
+      return $.when(@_imagesLoaded, originalPromise)
 
     parse: (json) ->
       html = json.content
@@ -218,7 +219,7 @@ define [
           console.error "ERROR: Manifest missing image file #{path}"
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          @set 'body', $body.html().trim(), {parse:true, loading:true} if counter == 0
           deferred.resolve()
           return
 
@@ -233,7 +234,7 @@ define [
 
           counter--
           # Set `parse:true` so the dirty flag for saving is not set
-          @set 'body', $body[0].innerHTML.trim(), {parse:true, loading:true} if counter == 0
+          @set 'body', $body.html().trim(), {parse:true, loading:true} if counter == 0
           deferred.resolve()
         .fail ->
           counter--
@@ -288,8 +289,8 @@ define [
 
         $img.replaceWith $imgHolder
 
-      headHtml = $head[0].innerHTML.trim()
-      bodyHtml = $body[0].innerHTML.trim()
+      headHtml = $head.html().trim()
+      bodyHtml = $body.html().trim()
 
       # The text currently contains `<prefiximg ... ></prefiximg>`
       # To make the `<img>` valid XHTML (self-closing like `<img/>`)

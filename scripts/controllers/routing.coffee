@@ -8,8 +8,7 @@ define [
   'marionette'
   'cs!collections/content'
   'cs!views/layouts/workspace'
-  ], (Marionette, allContent, WorkspaceLayout) ->
-
+], (Marionette, allContent, WorkspaceLayout) ->
 
   # Only reason to extend Backbone.Router is to get the @navigate method
   return new class AppController extends Marionette.AppRouter
@@ -56,8 +55,8 @@ define [
           @layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
-          # Update the URL without triggering the router
-          @navigate('workspace')
+          # Update the URL
+          @trigger 'navigate', 'workspace'
 
 
     # Edit existing content
@@ -83,23 +82,36 @@ define [
           if typeof model is 'string'
             [model, contextModel] = model.split('|')
             # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-            model = decodeURIComponent(model)
+            model = decodeURI(model)
             model = allContent.get(model)
 
             if contextModel
               # Un-escape the `model.id` because a piece of content may have `/` in it (github uses these)
-              contextModel = decodeURIComponent(contextModel)
+              contextModel = decodeURI(contextModel)
               contextModel = allContent.get(contextModel)
 
           # Redirect to workspace if model does not exist
           if not model
             @goWorkspace()
           else
+            # reset the old highlight state if there was one
+
+            @_currentModel?.set('_selected', false)
+            @_currentContext?.set('_selected', false)
+
+            # these are needed on the next render as a pointers to things
+            # Always use the dereferenced node because content can be in more than one book
+            @_currentModel = model.dereferencePointer?() or model
+            @_currentContext = contextModel?.dereferencePointer?() or contextModel
+
+            # this is needed right now to render the workspace
+            @_currentContext?.set('_selected', true)
 
             # Always show the workspace pane
             @_showWorkspacePane(SidebarView)
 
-            # load editor views
+            # set more granular file selected flags to be used in ToC
+            @_currentModel.set('_selected', true) # Need to set it on the dereferenced pointer
 
             # Force the sidebar if a contextModel is passed in
             if contextModel
@@ -109,6 +121,7 @@ define [
                   model: contextModel
 
                 @layout.sidebar.show(contextView)
+                contextView.maximize()
             # Some models do not change the sidebar because they cannot contain children (like Module)
             else if model.getChildren
               # Only change the view if there is nothing there or if the model differs
@@ -116,6 +129,7 @@ define [
                 modelView = new SidebarView
                   model: model
                 @layout.sidebar.show(modelView)
+                modelView.maximize()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 
@@ -126,7 +140,7 @@ define [
 
             # URL-escape the `model.id` because a piece of content may have `/` in it (github uses these)
             contextPath = ''
-            contextPath = "|#{encodeURIComponent(contextModel.id or contextModel.cid)}" if contextModel
+            contextPath = "|#{encodeURI(contextModel.id or contextModel.cid)}" if contextModel
 
-            # Update the URL without triggering the router
-            @navigate("edit/#{encodeURIComponent(model.id or model.cid)}#{contextPath}")
+            # Update the URL
+            @trigger 'navigate', "edit/#{encodeURI(model.id or model.cid)}#{contextPath}"

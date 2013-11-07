@@ -125,7 +125,10 @@ define ['jquery'], ($) ->
       copy:
         path: () ->
           # The path of the current document can be determined from the hash
-          decodeURIComponent /^#edit(\/[^|]+)/.exec(window.location.hash)[1]
+          decodeURI RegExp('^#repo/[^/]*/[^/]*(/branch/[^/]*)?/edit(/[^|]*)').exec(window.location.hash)[2]
+
+    smartContentChange:
+      idle: 2000
 
     smartContentChange:
       idle: 2000

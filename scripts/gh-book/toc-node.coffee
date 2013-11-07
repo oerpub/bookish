@@ -6,7 +6,7 @@ define [
   'cs!collections/content'
   'cs!gh-book/xhtml-file'
   'cs!gh-book/uuid'
-  'gh-book/path'
+  'models/path'
 ], (Backbone, _, $, TocNode, allContent, XhtmlFile, uuid, Path) ->
 
   mediaType = 'application/vnd.org.cnx.section'
@@ -54,7 +54,7 @@ define [
             # dropped next to whatever document is the navmodel.
             srcPath = Path.dirname(realModel.id)
             dstPath = Path.dirname(root.navModel.id)
-            json.id = Path.normpath(dstPath + '/' + uuid())
+            json.id = Path.normpath(dstPath + '/' + uuid(newTitle))
 
             if json.body and srcPath != dstPath
               $elements = $(json.body)

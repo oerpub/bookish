@@ -60,6 +60,9 @@ define [
   # Defines drop zones based on `model.accepts()` media types
   # `onDrop` takes 2 arguments: `drag` and `drop`.
   enableDrop = (model, $content, accepts, onDrop) ->
+
+    $content.data('editor-model', model)
+
     # Since we use jqueryui's draggable which is loaded when Aloha loads
     # delay until Aloha is finished loading
     Aloha.ready =>
@@ -111,8 +114,6 @@ define [
     # This zone is based on the parent model's `accepts()` media types
     enableDropAfter: (model, parent, $content) ->
       throw 'BUG: model MUST have a parent' if not parent
-      $content.data('editor-model', model)
-
       enableDrop model, $content, parent.accept, (drag, drop) ->
         index = parent.getChildren().indexOf(model)
         parent.addChild drag, index+1
