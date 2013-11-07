@@ -307,7 +307,7 @@ define [
         # The Welcome view fires a settings-changed event on it's model if
         # the user changes the repo/branch.
         session.on 'settings-changed', () ->
-          onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
+          promise = onFail(epubContainer.reload(), 'There was a problem re-loading the repo')
           .done () ->
             # Get the first book from the epub
             opf = epubContainer.getChildren().at(0)
@@ -316,6 +316,9 @@ define [
                 # When that book is loaded, edit it.
                 model = opf.findDescendantDFS (model) -> model.getChildren().isEmpty()
                 controller.goEdit model, opf
+
+          # Show the loading view while we load the new repo
+          App.main.show(new LoadingView {model:epubContainer, promise:promise})
 
         Backbone.history.start
           pushState: false

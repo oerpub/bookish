@@ -192,20 +192,31 @@ define [
 
       # Wait until the remoteUpdater has stopped so the settings object does not
       # switch mid-way while updating
-      remoteUpdater.stop().always () =>
+      auth = @
+      remoteUpdater.stop().always () ->
 
-        # Silently clear the settings first.
-        # This way listeners are **forced** to update and reload when
-        # "Save Settings" is clicked.
-        #
-        # The reason for **forcing** a reload is because this modal is also shown
-        # when there is a connection problem loading the workspace.
-        @model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
+        repoUser = auth.$el.find('#repo-user').val()
+        repoName = auth.$el.find('#repo-name').val()
+        branchName = auth.$el.find('#repo-branch').val() # '' means default branch
 
-        @model.set
-          repoUser: @$el.find('#repo-user').val()
-          repoName: @$el.find('#repo-name').val()
-          branch:   @$el.find('#repo-branch').val() # can be '' which means use the default branch
+        # First check validity of the new repo details. Do this by attempting
+        # to read META-INFO/container.xml, which should exist for all real
+        # books.
+        repo = session.getClient().getRepo(repoUser, repoName)
+        branch = branchName and repo.getBranch(branchName) or repo.getDefaultBranch()
+        branch.read('META-INF/container.xml').fail () ->
+          auth.editSettingsModal()
+        .then () ->
+          # Silently clear the settings first. This forces a reload even if
+          # the user leaves the settings unchanged.  The reason for
+          # **forcing** a reload is because this modal is also shown when
+          # there is a connection problem loading the workspace.
+          auth.model.set {repoUser:'', repoName:'', branch:''}, {silent:true}
 
-        remoteUpdater.start().done () =>
-          @model.trigger 'settings-changed'
+          auth.model.set
+            repoUser: repoUser
+            repoName: repoName
+            branch: branchName
+
+          remoteUpdater.start().done () =>
+            auth.model.trigger 'settings-changed'
