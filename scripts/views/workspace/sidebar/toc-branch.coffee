@@ -220,6 +220,8 @@ define [
       if not model.getRoot?()
         # Find the 1st leaf node (editable model)
         model = model.findDescendantDFS? (model) -> return model.getChildren().isEmpty()
+        # if @model does not have `.findDescendantDFS` then use the original model
+        model = model or @model
 
       controller.goEdit(model, model.getRoot?())
 

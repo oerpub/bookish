@@ -11,8 +11,12 @@ define [
   return class Sidebar extends Marionette.Layout
     template: sidebarTemplate
 
-    initialize: () ->
+    initialize: (options) ->
       @filteredMediaTypes = new Backbone.FilteredCollection(null, {collection:mediaTypes})
+      @collection = new Backbone.FilteredCollection(null, {collection:@model.getChildren()})
+
+      # Filter the "Add" button by what the model accepts
+      @filteredMediaTypes.setFilter (type) => return type.id in @model.accept
 
     regions:
       addContent: '.add-content'
@@ -31,12 +35,7 @@ define [
       collection = @collection or model.getChildren?()
 
       if model
-        # This is a tree sidebar
-        @filteredMediaTypes.setFilter (type) -> return type.id in model.accept
       else
-        # This is the Picker/Roots Sidebar
-        collection = new Backbone.FilteredCollection(null, {collection:collection})
-        collection.setFilter (content)  -> return content.getChildren
         @filteredMediaTypes.setFilter (type) -> return type.get('modelType')::toplevel
 
       # TODO: Make the collection a FilteredCollection that only shows @model.accepts
@@ -44,8 +43,11 @@ define [
       @toc.show(new TocView {model:model, collection:collection})
 
     onRender: () ->
-      # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page
-      $window = $(window)
+      # Add a class on the element so we can style it as a Folder or as a ToC
+      if @model
+        @$el.attr('data-media-type', @model.mediaType)
+      else
+        @$el.removeAttr('data-media-type')
 
     # Sticking to American spelling here
     maximize: () ->

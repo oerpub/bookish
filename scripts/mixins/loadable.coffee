@@ -33,9 +33,6 @@ define ['jquery'], ($) ->
         @_loading.fail (err) =>
           # Since we failed clear the promise so we can try again later.
           @_loading = null
-          @trigger('load:fail', err)
-        @_loading.done () =>
-          @trigger('load:done')
 
       return @_loading
 

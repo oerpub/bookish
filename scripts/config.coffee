@@ -131,6 +131,10 @@ require.config
       deps: ["css!#{BOWER}/jsdifflib/diffview"]
       exports:'diffview'
 
+    'filtered-collection':
+      deps: ['backbone']
+
+
   # Handlebars Requirejs Plugin Configuration
   # This configures `requirejs` plugins (used when loading templates `'hbs!...'`).
   hbs:
