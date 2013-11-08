@@ -19,3 +19,7 @@ define [
       content.setFilter (model) => return model.mediaType in [Book::mediaType, Folder::mediaType]
 
       @_initializeTreeHandlers {root:@, children:content}
+
+    # Just return the node; for a Book this would return options.model wrapped in a TocPointerNode
+    newNode: (options) ->
+      return options.model
