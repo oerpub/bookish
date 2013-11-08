@@ -15,6 +15,9 @@ define [
     # TODO: It may be worth considering calling toJSON() on an object if the
     #       function exists, and logging it after dropping the body field
 
+    # TODO: It may be worth considering calling toJSON() on an object if the
+    #       function exists, and logging it after dropping the body field
+
     if isEnabled
       if _.isArray(args)
         log = []
