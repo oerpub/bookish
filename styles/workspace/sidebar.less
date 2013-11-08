@@ -342,6 +342,9 @@ aside > div {
 
 }
 
+// Workspace Picker should not have a title so hide it
+aside#workspace #workspace-sidebar-toc > h4 { display: none; }
+
 // Feed each panel's width to the <ol> mixin below
 aside#workspace > div { // Picker
   .x-indent-compensate-panel(@picker-width - 70);

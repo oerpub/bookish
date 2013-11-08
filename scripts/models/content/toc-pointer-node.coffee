@@ -1,4 +1,4 @@
-define ['cs!./toc-node'], (TocNode) ->
+define ['underscore', 'cs!./toc-node'], (_, TocNode) ->
 
   class TocPointerNode extends TocNode
     mediaType: 'application/BUG-mediaType-not-set' # This will get overridden to be whatever this node points to
@@ -27,7 +27,14 @@ define ['cs!./toc-node'], (TocNode) ->
       if options.passThroughChanges
         @on 'change:title', (model, value, options) => @model.set('title', value, options)
 
-      @model.on 'all', () => @trigger.apply @, arguments
+      @model.on 'all', () =>
+        # Since some views use filteredCollection (which uses the `model` argument in the event handler, splice in the pointer)
+        # This causes problems when filteredCollection tries to keep its collection in sync.
+        # Replace the 2nd arg (the @model) with the pointer (@)
+        args = _.toArray(arguments)
+        throw new Error 'BUG: Expecting 2nd argument to be the model this pointer points to' if @model != args[1]
+        args.splice(1, 1, @)
+        @trigger.apply @, args
 
       # Set the title on the model if an overridden one has not been set (github-book "shortcut")
       # TODO: see how the github-book works with these 2 lines commented: @set('title', @model.get('title')) if not options.title
