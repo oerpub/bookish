@@ -121,6 +121,7 @@ define [
       $body = $(bodyHtml)
       $body = $('<div></div>').append $body
 
+
       # Generate a tree of the ToC
       recBuildTree = (collection, $rootOl, contextPath) =>
         $rootOl.children('li').each (i, li) =>

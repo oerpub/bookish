@@ -39,11 +39,6 @@ define [
         collection.setFilter (content)  -> return content.getChildren
         @filteredMediaTypes.setFilter (type) -> return type.get('modelType')::toplevel
 
-        @filteredMediaTypes.setFilter (type) ->
-          # Filter the types to exclude Chapters and other non-loadable content
-          return type.get('modelType')::load
-
-
       # TODO: Make the collection a FilteredCollection that only shows @model.accepts
       @addContent.show(new AddView {context:model, collection:@filteredMediaTypes})
       @toc.show(new TocView {model:model, collection:collection})
