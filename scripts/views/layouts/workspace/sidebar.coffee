@@ -44,8 +44,11 @@ define [
       @toc.show(new TocView {model:model, collection:collection})
 
     onRender: () ->
-      # Update the width/height of main so we can have Scrollable boxes that vertically stretch the entire page
-      $window = $(window)
+      # Add a class on the element so we can style it as a Folder or as a ToC
+      if @model
+        @$el.attr('data-media-type', @model.mediaType)
+      else
+        @$el.removeAttr('data-media-type')
 
     # Sticking to American spelling here
     maximize: () ->
