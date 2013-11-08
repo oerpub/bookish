@@ -58,6 +58,20 @@
 
   }
 
+  &.sidebar-workspace{
+    max-width: @picker-width;
+    .handle {
+      background-color: @picker-color;
+      color: @picker-color-light;
+    }
+  }
+  &.sidebar-toc{
+    max-width: @toc-width;
+    .handle{
+      background-color: @toc-color;
+      color: @toc-color-light;
+    }
+  }
 
   &.sidebar-toc aside > div {
 
@@ -323,9 +337,6 @@ aside > div {
   }
 
 }
-
-// Workspace Picker should not have a title so hide it
-aside#workspace #workspace-sidebar-toc > h4 { display: none; }
 
 // Feed each panel's width to the <ol> mixin below
 aside#workspace > div { // Picker

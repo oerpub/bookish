@@ -130,8 +130,5 @@ define ['jquery'], ($) ->
     smartContentChange:
       idle: 2000
 
-    smartContentChange:
-      idle: 2000
-
   # In case some module wants the config object return it.
   return @Aloha
