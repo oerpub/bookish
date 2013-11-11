@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'marionette'
   'aloha'
   #'mathjax'
-], (Marionette, Aloha) ->
+], ($, Marionette, Aloha) ->
 
   return class AlohaEditView extends Marionette.ItemView
     # **NOTE:** This template is not wrapped in an element
@@ -45,6 +46,15 @@ define [
         @isLoaded = true
         @render()
 
+    # Stop auto-setting when the view closes
+    onClose: () ->
+      # This is the same as Aloha.unbind, the difference is that Aloha.unbind
+      # asks requirejs to load aloha/jquery first, causing the actual unbind
+      # to be deferred. Of course, Murhpy's Law dictates that it will only
+      # execute after we bound a new handler below, leaving us with no handler
+      # at all.
+      $(Aloha, 'body').off 'aloha-smart-content-changed.updatemodel'
+
     onRender: () ->
       # update model after the user has stopped making changes
 
@@ -59,17 +69,21 @@ define [
             # Change the contents but do not update the Aloha editable area
             @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
-        Aloha.bind 'aloha-smart-content-changed', (evt, d) =>
-          updateModel() if d.editable.obj.is(@$el)
-
-
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
 
         Aloha.ready =>
           @$el.addClass('aloha-root-editable')
           @$el.mahalo?()
+
+          # resset some of the state of our root element so aloha doesn't freak out
+          @$el.removeClass('aloha-block-blocklevel-sortable')
+          @$el.removeData()
+
           @$el.aloha()
+
+          Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
+            updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
 
           # Wait until Aloha is started before loading MathJax.
           MathJax?.Hub.Configured()

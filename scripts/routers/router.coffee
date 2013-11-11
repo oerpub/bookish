@@ -9,4 +9,4 @@ define [
     appRoutes:
       '':             'goWorkspace' # Show the workspace list of content
       'workspace':    'goWorkspace'
-      'edit/:id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)
+      'edit/*id':     'goEdit' # Edit an existing piece of content (id can be a URL-encoded path)

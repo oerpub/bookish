@@ -21,7 +21,7 @@ define ['backbone'], (Backbone) ->
 
       @_tree_root = options.root
 
-      @_tree_children = new Backbone.Collection()
+      @_tree_children = options.children or new Backbone.Collection()
 
       @_tree_children.on 'add', (child, collection, options) =>
         # Parent is useful for DnD but since we don't use a `TocNode`
@@ -63,6 +63,26 @@ define ['backbone'], (Backbone) ->
 
     getParent:   () -> @_tree_parent
     getChildren: () -> @_tree_children or throw 'BUG! This node has no children. Call _initializeTreeHandlers ?'
+
+    # Perform a Breadth First Search, returning the first element that matches
+    findDescendantBFS: (compare) ->
+      #Check children first and then descendants
+      return @getChildren().find(compare) or @getChildren().find (node) -> node.findDescendantBFS?(compare)
+
+    # Perform a Depth First Search, returning the first element that matches
+    findDescendantDFS: (compare) ->
+      # Base case
+      return @ if compare(@)
+      # Search through the children. If one is found that matches
+      # then stop searching and return it (bubbling it up)
+      ret = null
+      # Not as simple as: `@getChildren().find (node) -> node.findDescendantDFS(compare)`
+      # because `.find` returns the element, not what was returned to find
+      @getChildren().each (node) ->
+        return if ret # if something is found, stop searching
+        found = node.findDescendantDFS?(compare)
+        ret = found
+      return ret
 
     getRoot: () ->
       root = null

@@ -4,10 +4,6 @@
  * New Styles
  *****************************/
 
-@color-green: @green; // Bootstrap green
-@color-blue: @blue; // Bootstrap blue
-@color-gray: #999; // same as the folder icon
-
 .sidebar-container {
   // When .minimized, the bar is moved left (negative number) so it "appears" to slide left
   // Other sidebars may actually be to the left so clip to the left
@@ -15,35 +11,81 @@
   float: left;
   position: relative;
 
-  // Add a little spacing between the sidebars so they appear to float
+  border-right: @aside-border-width solid #999;
+  box-sizing: border-box;
 
-  max-width: 310px;
+  &.sidebar-workspace{
+    max-width: @picker-width;
+    .handle {
+      background-color: @picker-color;
+    }
+  }
 
   .handle {
-    > i.expand-collapse { left: 3px; }
-    &:hover > i.expand-collapse {
-      left: 2px;
+    > i.expand-collapse {
+      // The icon's width is set to @aside-handle-width, so when the panel's open (with handle width:0),
+      // move the icon over by that much so that it's in the same position on top of the panel heading
+      right: @aside-handle-width;
+    }
+    // On hover, "brighten" text and give icon a slight bump
+    &:hover {
+      > i.expand-collapse {
+        opacity: 1;
+        margin-left: -1px;
+      }
+      > .handle-text {
+        opacity: 1;
+      }
     }
     > i.expand-collapse::before { content: "\f137"; /* icon-chevron-sign-left */ }
   }
 
   &.sidebar-workspace aside > div {
-    background-color: @color-green;
+
+    .x-slide-sidebar(@picker-width);
+    background-color: #f0f0f0; // Make picker background distinct from TOC background.
+
     > .handle > .handle-text::before          { content: 'Book Picker'; }
-    > .boxed-group > h3 > .title-text::before { content: 'Book Picker'; }
+    > .boxed-group > h3 {
+      background-color: @picker-color;
+      > .title-text::before { content: 'Book Picker'; }
+    }
+
   }
 
-  .x-sidebar-color-and-title(@color, @title) {
-    background-color: @color;
-    > .handle > .handle-text::before          { content: @title; }
-    > .boxed-group > h3 > .title-text::before { content: @title; }
+  &.sidebar-workspace{
+    max-width: @picker-width;
+    .handle {
+      background-color: @picker-color;
+    }
   }
 
-  &.sidebar-toc aside > div {
-    &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title(@color-blue, 'Table of Contents'); }
-    &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title(@color-gray, 'Folder Contents'); }
+  .x-sidebar-color-and-title(@title, @color) {
+    > .handle {
+      background-color: @color;
+
+      > .handle-text::before { content: @title; }
+    }
+    > .boxed-group > h3 {
+      background-color: @color;
+
+      > .title-text::before { content: @title; }
+    }
   }
 
+
+  &.sidebar-toc {
+    max-width: @toc-width;
+
+    aside > div {
+
+      .x-slide-sidebar(@toc-width);
+
+      &[data-media-type=@{book-media-type}]                   { .x-sidebar-color-and-title('Table of Contents', @toc-color); }
+      &[data-media-type="application/vnd.org.cnx.collection"] { .x-sidebar-color-and-title('Table of Contents', @toc-color); }
+      &[data-media-type="application/vnd.org.cnx.folder"]     { .x-sidebar-color-and-title('Folder Contents'  , @folder-color); }
+    }
+  }
 }
 
 .x-filter-gradient(@orient, @start-color, @end-color) {
@@ -75,41 +117,53 @@
   transition:         width 0.1s ease-out;
 }
 
-
 .x-sidebar-handle-hover(@normal-width, @hover-width) {
   text-shadow: 2px 2px 4px #000;
 }
 
 #workspace-container {
   width: 100%;
+  min-width: @workspace-min-width;
 
   // workspace minimized
   &.workspace-minimized {
+    min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
+
     #menu-and-content {
-      width: calc(~"100% - 350px");
+      width: calc(~"100%" - @toc-width+@aside-handle-width);
     }
 
     .sidebar-workspace {
-      width: 40px;
+      width: @aside-handle-width;
       .boxed-group {
         max-width: 0;
         visibility: hidden;
         overflow-x: hidden;
       }
       .handle {
-        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+        width: @aside-handle-width;
+        > i.expand-collapse{
+          right: 0;
+          &::before { content: "\f138"; /* icon-chevron-sign-right */ }
+        }
+        .handle-text {
+          // Turn the text on when the panel is closed
+          display: block;
+        }
       }
     }
   }
 
-  // sidebar minimized (#sidebar is the table of contents
+  // sidebar minimized (#sidebar is the table of contents)
   &.sidebar-minimized {
+    min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
+
     #menu-and-content {
-      width: calc(~"100% - 350px");
+      width: calc(~"100%" - @picker-width+@aside-handle-width);
     }
 
     .sidebar-toc {
-      width: 40px;
+      width: @aside-handle-width;
       .boxed-group {
         max-width: 0;
         visibility: hidden;
@@ -117,20 +171,30 @@
       }
 
       .handle {
-        > i.expand-collapse::before { content: "\f138"; /* icon-chevron-sign-right */ }
+        width: @aside-handle-width;
+        > i.expand-collapse{
+          right: 0;
+          &::before { content: "\f138"; /* icon-chevron-sign-right */ }
+        }
+        .handle-text {
+          // Turn the text on when the panel is closed
+          display: block;
+        }
       }
     }
   }
 
-  // workspace minimized
+  // workspace and sidebar minimized
   &.workspace-minimized.sidebar-minimized {
+    min-width: (@workspace-min-width - @toc-width - @picker-width + @aside-handle-width*2);
+
     #menu-and-content {
-      width: calc(~"100% - 80px");
+      width: calc(~"100%" - @aside-handle-width*2);
     }
 
     .sidebar-workspace,
     .sidebar-toc {
-      width: 40px;
+      width: @aside-handle-width;
       .boxed-group {
         max-width: 0;
         visibility: hidden;
@@ -164,8 +228,7 @@
                 > .boxed-group {
                   height: inherit;
                   > .boxed-group-inner {
-                    // The height is calculated elsewhere as 100% - headingLineHeight - sidebarPaddingTop
-                    // height: inherit;
+                    height: inherit;
                   }
                 }
               }
@@ -180,10 +243,14 @@
 
 
 
-@aside-width: 310px;
-@aside-handle-width: 20px;
-@aside-handle-width-expanded: 25px;
+@picker-width: 230px;
+@toc-width: 270px;
+@aside-border-width: 1px;
+@aside-handle-width: 30px;
+@aside-handle-width-expanded: 0px;
 @boxed-group-header-height: 42px;
+@menu-and-content-min-width: 800px;
+@workspace-min-width: (@menu-and-content-min-width + @picker-width + @toc-width);
 
 aside > div {
 
@@ -193,108 +260,75 @@ aside > div {
   overflow-x: hidden;
 
   // Animate the sidebar to slide right (open) when minimized handle is clicked
-  .x-slide-sidebar(@aside-width);
-
-  // Round the corners so the handle looks nice
-  -webkit-border-top-right-radius:  20px;
-  -moz-border-radius-topright:      20px;
-  border-top-right-radius:          20px;
-  -webkit-border-bottom-right-radius:  20px;
-  -moz-border-radius-bottomright:      20px;
-  border-bottom-right-radius:          20px;
-
-
-  > .handle { text-shadow: 2px 2px 4px #000; }
-
   .boxed-group {
     //So the vertical bar shows up to the right of this box
 
     background-color: inherit; // GitHub makes this gray by default.
-    width:      (@aside-width - @aside-handle-width-expanded - 8);
 
-    // Make the Add button float right
-    > h3 .add-content {
-      float: right;
-
-      // Also, make it right-align so it does not bleed to the right of the sidebar
-      .btn-group ul.dropdown-menu {
-        left: inherit; // Bootstrap aligns it left:0; by default
-        right: 0;
-      }
-    }
-  }
-
-  // Change the expand/collapse icon for the handle
-  > .handle {
-    max-width: 25px;
-
-    > i.expand-collapse {
-      position: relative;
-    }
   }
 
   // The vertical bar to pull-in/out the sidebar
   > .handle {
-    width: @aside-handle-width;
+    width: @aside-handle-width-expanded;
+    height: 100%; // make whole bar clickable
     white-space: nowrap;
     cursor: pointer;
     position: absolute;
     top: 0px;
-    right: 5px;
-
-    // So it shows up to the left of the .boxed-group
-    vertical-align: top;
-
-    font-size: (@aside-handle-width - 2px);
+    right: 0;
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+    font-size: 1.2em;
     font-weight: normal;
     color: white;
 
+    // Change the expand/collapse icon for the handle
+    > i.expand-collapse {
+      position: relative;
+      display: block;
+      width: @aside-handle-width;
+      text-align: center;
+      margin: .5em 0;
+      opacity: .85;
+    }
+
     > .handle-text {
 
-      .x-rotate(90deg, left);
+      opacity: .85;
+      .x-rotate(90deg, left bottom);
 
-      // After rotating the text line it up to be above the vertical bar
-      display: block;
+      // Hide the text if the sidebar is showing
+      display: none;
 
       // Move the start of text just below the expand/collapse icon
       position: relative;
-      top: -25px;
-      left: 10px;
+      left: 0;
+      top: -@aside-handle-width;
+      height: @aside-handle-width;
+      line-height: @aside-handle-width;
+      letter-spacing: 1px;
     }
 
   }
 
   // The Tree (which looks like a list)
   nav {
-    @indent-width: 20px;
-    @compensate-width: 15px;
-    @compensate-start: @aside-width - 110; // Not sure why it is 70...
-
-    .x-indent-compensate(@level) {
-      > li {
-        // Padding on the left
-        // Indent nested lists in this way so:
-        // 1. the horizontal bars stretch across the whole width
-        // 2. edit buttons on the right are still lined up
-        > .editor-node-body /*:first-child*/ { padding-left: (@indent-width * @level); }
-
-        // Compensate on the right (for ellipsis)
-        // for each level in the tree decrease the size of allowable text by how much is indented
-        // so the ellipsis show up in the right place
-        .editor-node-title { max-width: (@compensate-start - @compensate-width * @level); }
-      }
-    }
 
     > ol ol { padding: 0; margin: 0; }
-    > ol              { .x-indent-compensate(0); }
-    > ol ol           { .x-indent-compensate(1); }
-    > ol ol ol        { .x-indent-compensate(2); }
-    > ol ol ol ol     { .x-indent-compensate(3); }
-    > ol ol ol ol ol  { .x-indent-compensate(4); }
 
+    > h4 {
+      margin: 10px;
+    }
 
-    li > .editor-node-body:not(:hover) > .edit-settings { display: none; }
-    li > .editor-node-body:hover       > .edit-settings { display: inline-block; }
+    li > .editor-node-body:not(:hover) > div.module-controls > a { display: none; }
+    li > .editor-node-body:hover       > div.module-controls > a { display: inline-block; }
+
+    li.active > div > div.module-controls > .delete-module { display: none; }
+
+    li > .editor-node-body > div.open > .module-controls > a {
+        display: inline-block;
+    }
 
     // When a list item is expanded there is no dropzone just below it to add padding
     // so manually add in some padding
@@ -308,18 +342,41 @@ aside > div {
 
 }
 
+// Workspace Picker should not have a title so hide it
+aside#workspace #workspace-sidebar-toc > h4 { display: none; }
 
-
-.sidebar-container .boxed-group > .boxed-group-inner {
-  // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
-  // h3 = sidebar heading
-  height: calc(~"100% - 44px");
+// Feed each panel's width to the <ol> mixin below
+aside#workspace > div { // Picker
+  .x-indent-compensate-panel(@picker-width - 70);
 }
+aside#sidebar > div { // TOC
+  .x-indent-compensate-panel(@toc-width - 70);
+}
+// Feed the nesting level of each <ol> to the special padding/width mixin below
+.x-indent-compensate-panel(@cs){
+  nav {
+    > ol              { .x-indent-compensate(0, @cs); }
+    > ol ol           { .x-indent-compensate(1, @cs); }
+    > ol ol ol        { .x-indent-compensate(2, @cs); }
+    > ol ol ol ol     { .x-indent-compensate(3, @cs); }
+    > ol ol ol ol ol  { .x-indent-compensate(4, @cs); }
+  }
+}
+@indent-width: 20px;
+@compensate-width: 20px;
+.x-indent-compensate(@level, @compensate-start) {
+  > li {
+    // Padding on the left
+    // Indent nested lists in this way so:
+    // 1. the horizontal bars stretch across the whole width
+    // 2. edit buttons on the right are still lined up
+    > .editor-node-body /*:first-child*/ { padding-left: (@indent-width * @level); }
 
-
-.content-panel .boxed-group > .boxed-group-inner {
-  // 90px = .auth:height + .orange-title:height + .toolbar:height
-  height: calc(~"100% - 90px");
+    // Compensate on the right (for ellipsis)
+    // for each level in the tree decrease the size of allowable text by how much is indented
+    // so the ellipsis show up in the right place
+    .editor-node-title { max-width: (@compensate-start - @compensate-width * @level); }
+  }
 }
 
 
@@ -332,8 +389,6 @@ aside > div {
 .boxed-group {
   position: relative;
   background: #efefef;
-  padding: 3px;
-  border-radius: 3px;
   margin: 0 0 15px 0;
   height: 100%;
   box-sizing: border-box;
@@ -341,33 +396,47 @@ aside > div {
   >h3 { line-height: 20px; }
 
   >h3, .heading {
-    background-color: #e0e0e0;
-    background-image: -moz-linear-gradient(#fafafa, #e0e0e0);
-    background-image: -webkit-linear-gradient(#fafafa, #e0e0e0);
-    background-image: linear-gradient(#fafafa, #e0e0e0);
-    background-repeat: repeat-x;
-    margin: 0;
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
-    border: 1px solid #d8d8d8;
-    border-bottom: none;
-    padding: 10px 10px 11px 10px;
-    font-size: 14px;
-    text-shadow: 0 1px 0 #fff;
+    cursor: pointer;
+    font-size: @panel-heading-size;
+    color: @panel-heading-color;
+    height: @panel-heading-height;
+    font-family: @panel-heading-font;
+    margin: 0; // undo default h3
+    line-height: @panel-heading-line-height;
+    font-weight: @panel-heading-weight;
+    padding-right: @aside-handle-width; // to account for "closer" icon
+
+    .title-text {
+      color: @panel-heading-color;
+      display: block;
+      padding: @panel-heading-padding;
+    }
+
+  }
+
+  .add-content{
+    text-align: right;
+    margin: 5px 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+
+      // Also, make it right-align so it does not bleed to the right of the sidebar
+      .btn-group ul.dropdown-menu {
+        left: inherit; // Bootstrap aligns it left:0; by default
+        right: 0;
+
+        button {
+          width: 100%;
+          text-align: left;
+        }
+
+      }
+
   }
 
   .boxed-group-inner {
     overflow: auto;
-    // 44px = h3:lineheight + h3:padding-top + h3:padding-bottom + .sidebar_padding-top
-    // h3 = sidebar heading
-    // height: calc(~"100% - 44px");
-    // height needs to be special-cased for the sidebar box and the content box
-    padding: 1px 10px;
-    background: #fff;
-    border: 1px solid #d8d8d8;
-    border-top: 1px solid #ccc;
-    border-bottom-left-radius: 1px;
-    border-bottom-right-radius: 1px;
+    height: calc(~"100% - 87px");
     color: #666;
     font-size: 13px;
   }
@@ -376,7 +445,6 @@ aside > div {
   .boxed-group-list {
     list-style: none;
     margin: 0;
-
     padding: 0;
   }
 
@@ -384,11 +452,10 @@ aside > div {
   nav ol > li,
   .boxed-group-list>li {
     display: block;
-    margin-left: -10px;
+    margin: 0;
     width: 100%;
-    padding: 5px 10px 0;
-    line-height: 23px;
-    border-top: 1px solid #e5e5e5;
+    padding: 0;
+    line-height: normal;
   }
 
   .editor-node-body {
@@ -400,57 +467,38 @@ aside > div {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: bottom;
     /* Max width is set based on the <li> nesting depth */
   }
 
-
-  nav li .btn-mini.pull-right,
   .boxed-group-list>li .minibutton {
     float: right;
     margin: -1px 0 0 10px;
   }
 
-
-  nav li .btn-mini.pull-right,
+  nav li .module-controls > a,
   .context-button {
     position: relative;
-    line-height: 23px;
-    line-height: 1;
     display: inline-block;
     text-decoration: none;
     -webkit-font-smoothing: antialiased;
   }
 
 
-  nav li .btn-mini.pull-right,
+  nav li .module-controls > a,
   .minibutton {
-    padding: 0 10px;
-    line-height: 24px;
+    padding: 0 5px 0 0;
     box-shadow: none;
-
     outline: none;
   }
 
-  nav li .btn-mini.pull-right,
+  nav li .module-controls > a,
   .button, .minibutton {
     position: relative;
     display: inline-block;
-    //padding: 7px 15px;
-    //font-size: 13px;
     font-weight: bold;
     color: #333;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
     white-space: nowrap;
-    background-color: #eaeaea;
-    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
-    background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
-    background-image: linear-gradient(#fafafa, #eaeaea);
-    background-repeat: repeat-x;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    border-bottom-color: #c5c5c5;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    vertical-align: middle;
     cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -461,8 +509,6 @@ aside > div {
     -webkit-appearance: none;
   }
 
-
-  nav li .btn-mini.pull-right:before,
   .context-button:before {
     position: absolute;
     top: 3px;
@@ -473,11 +519,13 @@ aside > div {
     font-size: 16px;
     line-height: 16px;
   }
-
-
 }
 
 
+#menu-and-content .boxed-group-inner {
+  padding-top: 41px; /* To allow space for semantic draggables */
+  margin-top: -41px;
+}
 
 
 
@@ -560,7 +608,7 @@ aside > div {
     -moz-transition: all 0.1s ease-in-out;
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    background-color: @color-blue;
+    background-color: @toc-color;
     background-image: url(td-open-01.png);
   }
   z-index:1000;
@@ -594,13 +642,12 @@ aside > div {
   #workspace-sidebar-toc {
     // Root nodes in the sidebar should have no left margin
     > ol {
-      margin: 0;
-      padding-left: 5px;
+      margin: 10px 0 0;
+      padding: 0;
     }
 
     li {
       white-space: nowrap;
-      color: #333;
       font-size: 1em;
       font-family: Verdana, "DejaVu Sans",Tahoma;
     }
@@ -620,9 +667,11 @@ aside > div {
 
     // Style the (+) or (-) Next to the node if it collapsed or expanded
     li {
-      > .editor-node-body > .editor-expand-collapse {
+      > .editor-node-body > .toggle-expand {
         cursor: pointer;
-
+      }
+      > .editor-node-body > .editor-expand-collapse {
+        float: left;
         &:hover { background-color: #ccc; }
         &:not([data-media-type]) > i { width: 0.5em; }
       }
@@ -659,6 +708,37 @@ aside > div {
       }
     }
 
+    li.active {
+      .icon-content:before {
+        color: inherit;
+      }
+
+      > .editor-node-body {
+
+        // Highlight the background of the selected/active content
+        &[data-media-type=@{book-media-type}] {
+          background-color: @toc-color-light;
+        }
+        &[data-media-type=@{page-media-type}] {
+          background-color: @module-color-light;
+        }
+
+        > [data-media-type=@{book-media-type}] {
+          color: @toc-color;
+        }
+        > [data-media-type=@{page-media-type}] {
+          color: @module-editor-color;
+        }
+
+        .editor-node-title {
+          font-weight: bold;
+
+          small.toc-badge {
+            color: inherit;
+          }
+        }
+      }
+    }
 
     .btn-link {
       vertical-align: top;

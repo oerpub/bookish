@@ -53,7 +53,7 @@
   background-image: url(book-04.png);
 }
 
-#toc-title-text, #editor-title-text, #pickerhover, #pickertext {
+#toc-title-text, #pickerhover, #pickertext {
     display: block;
     padding: .4em 1em .4em 30px;
     display: block;
@@ -71,7 +71,24 @@
 }
 
 #editor-title-text {
+  font-family: @panel-heading-font;
+  display: block;
+  padding: @panel-heading-padding;
+  font-weight: @panel-heading-weight;
+  overflow: hidden;
   white-space: nowrap;
+}
+#workspace-auth {
+  display: block;
+  width: 250px;
+  float: right;
+  padding-right: 25px;
+  padding-top: 5px;
+  text-align: right;
+
+  .modal {
+    text-align: left;
+  }
 }
 
 #pickerhover {
@@ -89,6 +106,8 @@
   .navbar-inner {
 
     // OERPUB Toolbar specific
+    padding-left: @content-lr-padding;
+    padding-right: @content-lr-padding;
 
     /* fallback */
     background-color: #D4D5D5;

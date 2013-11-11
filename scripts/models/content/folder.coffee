@@ -21,9 +21,7 @@ define [
       'application/vnd.org.cnx.module' # Module
     ]
 
-    # Used to fetch/save the content.
-    # TODO: move the URL pattern to a separate file so it is configurable
-    # TODO: This is copy/pasta from BookModel; remove it
+    # TODO: Folders should **NOT** reside in `/content`
     url: () ->
       if @id
         return "/content/#{@id}"

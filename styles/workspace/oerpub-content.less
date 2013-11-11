@@ -3,30 +3,27 @@
 #content {
 
   .layout-root {
-    h1 {
-      color:#336699;
-      height: 30px;
-      padding:0 0 .1em;
-      border:0 solid #336699;
-      border-bottom-width:1px;
-      border-right-width:1px;
-      font-weight:bold;
-      font-size:1.5em;
-      letter-spacing:-1px;
-      line-height:1.5em;
+    h1, h2, h3, h4, h5, h6 {
+      color: #336699;
+      padding: 0;
+      font-weight: bold;
+      font-size: 1.7em;
+      letter-spacing: -1px;
+      margin: 0 0 10px; /* i.e. same as paragraphs */
+      line-height: normal;
+      height: auto;
     }
 
     h2, h3, h4, h5, h6 {
-      color:#336699;
-      padding:0 0 .1em;
-      border:0 solid #336699;
-      border-bottom-width:1px;
-      border-right-width:1px;
-      font-weight:bold;
-      font-size:1em;
-      margin:0;
-      letter-spacing:-1px;
-      line-height:1.5em;
+      letter-spacing: normal;
+      font-size: 1em;
+    }
+
+    h2 { 
+      font-size: 1.3em;
+    }
+    h3{
+      font-size: 1.05em;
     }
 
     a {
@@ -229,9 +226,6 @@
       font-family:courier, courier new, monospace;
       font-size:1em;
     }
-    code blockquote, blockquote code {
-      font-style:normal;
-    }
     .cnx_label code {
       text-transform:none;
     }
@@ -248,12 +242,8 @@
       font-size:1.18em;
     }
     blockquote {
-      font-style:italic;
       margin:1em 3em;
       line-height:normal;
-    }
-    .quote-source {
-      font-style:normal;
     }
     .quote-header {
       margin:1em 3em -.75em;
@@ -267,7 +257,7 @@
     cite, i.emphasis .cite-title i {
       font-style:normal;
     }
-    i em, i cite, .foreign cite, .foreign em, blockquote em, blockquote cite {
+    i em, i cite, .foreign cite, .foreign em {
       font-style:italic;
     }
     .normal {
@@ -282,10 +272,10 @@
     .cnxn-target {
       text-transform:capitalize;
     }
-    i .foreign, .foreign i, blockquote i, blockquote .foreign, i blockquote, .foreign blockquote {
+    i .foreign, .foreign i {
       font-style:normal;
     }
-    .foreign, blockquote i .foreign, blockquote .foreign i {
+    .foreign {
       font-style:italic;
     }
     .lensinfo a {

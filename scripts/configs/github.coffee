@@ -1,5 +1,5 @@
 define [], () ->
  defaultRepo:
    repoUser: 'oerpub'
-   repoName: 'textbook-demo'
-   branch: 'master'
+   repoName: 'demo-book'
+   branch: ''
