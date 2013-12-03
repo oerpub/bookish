@@ -4,9 +4,14 @@
   require({
     paths: {
       cs: '../bower_components/require-cs/cs',
-      'coffee-script': '../bower_components/coffee-script/index'
+      'coffee-script': '../bower_components/coffee-script/index',
+      jquery: '../bower_components/jquery/jquery',
+      mockjax: '../bower_components/jquery-mockjax/jquery.mockjax'
+    },
+    shim: {
+      mockjax: ['jquery']
     }
-  }, ['cs!config']);
+  }, ['cs!../test/demo-mock', 'cs!config']);
 
   /* If an error occurs in requirejs then change the loading HTML. */
   require.onError = function (err) {

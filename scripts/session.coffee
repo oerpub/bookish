@@ -6,16 +6,16 @@ define ['backbone'], (Backbone) ->
     url: '/me'
 
     login: () ->
-      @fetch
-        success: (model, response, options) =>
-          # Logged in
-          @set('user', response)
+      # Hardcoded user
+      @set 'user',
+        "middlename": "Harper"
+        "lastname": "Lee"
+        "user_id": "1d9224a5-6900-40f8-99b8-6333175acbb7"
+        "firstname": "Nelle"
+        "email": null
 
-          _authenticated = true
-          @trigger('login')
-
-        error: (model, response, options) ->
-          console.log 'Failed to load session.'
+      _authenticated = true
+      @trigger('login')
 
     logout: () ->
       @reset()

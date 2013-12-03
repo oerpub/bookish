@@ -44,37 +44,5 @@ define [
           #pushState: true
           root: app.root
 
-
-    # Monkeypatch in the Saver
-    allContent_save = (options) ->
-      # Save serially.
-      # Pull the next model off the queue and save it.
-      # When saving has completed, save the next model.
-      saveNextItem = (queue) =>
-        if not queue.length
-          options?.success?()
-          return
-
-        model = queue.shift()
-        model.save()
-        .fail((err) -> throw err)
-        .done () ->
-          # Fire the onSave event on all the saved model
-          # TODO: This code exists in multiple places; it should be consolidated
-          model.onSaved?()
-
-          saveNextItem(queue)
-
-      # Save all the models that have changes
-      changedModels = @filter (model) -> model.isDirty()
-
-      # Reverse so new modules are added before new collections
-      changedModels.reverse()
-
-      saveNextItem(changedModels)
-
-
-    allContent.save = allContent_save.bind(allContent)
-
     session.login()
   return app
