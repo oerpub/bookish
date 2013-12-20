@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  /* Load relative URLs based on the CSS file containing url() instead of the root LESS file */
+  window.less = {
+    relativeUrls: true
+  };
+
   require({
     baseUrl: '../scripts/',
 

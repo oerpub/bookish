@@ -9,6 +9,14 @@ define [
   'cs!models/utils'
 ], (_, Backbone, allContent, Module, loadable, TocNode, TocPointerNode, Utils) ->
 
+  # Copy/Pasta from Saveable.coffee
+  INTERNAL_ATTRIBUTES = [
+    '_original'
+    '_selected'
+    '_isDirty'
+    '_hasRemoteChanges'
+  ]
+
   return class BookModel extends (TocNode.extend loadable)
     mediaType: 'application/vnd.org.cnx.collection'
     accept: [Module::mediaType, TocNode::mediaType]
@@ -69,7 +77,11 @@ define [
 
       @tocNodes.on 'add remove tree:change', (model, collection, options) =>
         setNavModel(options)
-      @tocNodes.on 'change reset', (collection, options) =>
+      # Explicitly enumerate the change properties to listen to so `_selected` does not trigger the node to be marked dirty
+      @tocNodes.on 'change reset', (model, options) =>
+        # Do not mark dirty if only "_*" attributes are changed
+        return if _.isEmpty _.omit(model.changedAttributes?(), INTERNAL_ATTRIBUTES)
+
         setNavModel(options)
 
       # These store the added items since last successful save.
@@ -251,6 +263,10 @@ define [
       @_localNavAdded = {}
       @_localTitlesChanged = {}
 
+
+    getRoot: () -> @
+    # Prevent the whole workspace from loading up in the book sidebar when a Module is clicked in the picker
+    getParent: () -> null
 
     newNode: (options) ->
       model = options.model

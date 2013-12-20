@@ -15,6 +15,10 @@ define [
       super(options)
 
       content = new Backbone.FilteredCollection(null, {collection:allContent})
+
+      # Allow `.add` to be called on filtered collections (for new Books)
+      content.add = allContent.add.bind(allContent)
+
       # Filter the Workspace sidebar to only contain Book and Folder
       content.setFilter (model) => return model.mediaType in [Book::mediaType, Folder::mediaType]
 

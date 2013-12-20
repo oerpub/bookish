@@ -1,10 +1,13 @@
 define [
   'jquery'
+  'underscore'
   'marionette'
+  'cs!gh-book/opf-file'
   'cs!controllers/routing'
   'cs!helpers/enable-dnd'
+  'cs!collections/content'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, Marionette, controller, EnableDnD, tocBranchTemplate) ->
+], ($, _, Marionette, OpfFile, controller, EnableDnD, allContent, tocBranchTemplate) ->
 
   # This class introduces a `renderModelOnly()` method that will
   # re-render only the Model part of the CompositeView.
@@ -185,6 +188,7 @@ define [
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
+        canRemove: !! @model.removeMe
         # Possibly delegate to the navModel for dirty bits
         _isDirty: modelOrNav.get('_isDirty')
         _hasRemoteChanges: modelOrNav.get('_hasRemoteChanges')
@@ -203,13 +207,34 @@ define [
 
     deleteModule: (e) ->
       e.preventDefault()
-
       return if not confirm('Are you sure you want to delete this?')
 
-      if @model.getParent()
-        @model.getParent().removeChild(@model)
-      else
-        # TODO - delete book (https://www.pivotaltracker.com/story/show/58351296)
+      if @model.removeMe
+        model = @model.dereferencePointer?() or @model
+        parent = @model.getParent()
+        parent = parent?.dereferencePointer?() or parent
+        root = @model.getRoot?()
+
+        @model.removeMe()
+
+        # If the model we're deleting is selected, or any child node inside it
+        # is selected, we need to open the nearest alternative node instead
+        if model.get('_selected') or model.findDescendantBFS?((child) -> (child.dereferencePointer?() or child).get('_selected'))
+
+          if parent
+            # node has a parent, find the first child of the node and edit it. if the parent
+            # is now empty module pane will be emptied as well
+            next = parent.findDescendantDFS((model) -> return model.getChildren().isEmpty())
+            controller.goEdit(next, root)
+          else
+            # redirect to first book. The .without() is necessary because
+            # OpfFile::removeMe requires EpubContainer on the fly and this
+            # causes the delete operation to be async, which means at this
+            # point in the code the book might not be deleted yet, which breaks
+            # things when you delete the first book.
+            firstBook = _.findWhere allContent.without(this.model),
+              mediaType: OpfFile.prototype.mediaType
+            controller.goEdit(firstBook, firstBook)
 
     goEdit: () ->
       # Edit the model in the context of this folder/book. Explicitly close

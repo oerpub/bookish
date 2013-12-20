@@ -19,8 +19,6 @@ define ['backbone'], (Backbone) ->
       throw 'BUG: Missing root' if not options.root
       #throw 'BUG: Missing title or model' if not options.title
 
-      @_tree_root = options.root
-
       @_tree_children = options.children or new Backbone.Collection()
 
       @_tree_children.on 'add', (child, collection, options) =>
@@ -33,12 +31,10 @@ define ['backbone'], (Backbone) ->
         child._tree_parent.removeChild(child, options) if child._tree_parent and child._tree_parent != @
 
         child._tree_parent = @
-        child._tree_root = @_tree_root
         @trigger 'tree:add', child, collection, options
 
       @_tree_children.on 'remove', (child, collection, options) =>
         delete child._tree_parent
-        delete child._tree_root
         @trigger 'tree:remove', child, collection, options
 
       @_tree_children.on 'change', (child, options) =>
@@ -115,11 +111,9 @@ define ['backbone'], (Backbone) ->
       # Before adding the model make sure it's a Tree Node (does it have `._tree_children`.
       # If not, wrap it in a node
       if ! (model._tree_children)
-        model = @_tree_root.newNode {model:model}
+        model = (@getRoot() or @).newNode {model:model}
 
       children.add(model, {at:at})
-      # When moving from one book to another make sure the root is set
-      model._tree_root = @_tree_root
 
 
   return treeMixin

@@ -28,7 +28,7 @@ define [
 
       # Make sure the menu is loaded
       # TODO: This can be removed if the "Home" button (and click event) are moved into this layout
-      @layout.menu.show(menuLayout) if not @layout.menu.currentView
+      @layout.menu.show(menuLayout) if menuLayout and not @layout.menu.currentView
 
     # There is a cyclic dependency between the controller and the ToC tree because
     # the user can click an item in the ToC to `goEdit`.
@@ -74,8 +74,9 @@ define [
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
         'cs!views/layouts/workspace/menu'
-        'cs!views/layouts/workspace/sidebar'
-        ], (menuLayout, SidebarView) =>
+        'cs!views/layouts/workspace/bookshelf'
+        'cs!views/layouts/workspace/table-of-contents'
+        ], (menuLayout, BookshelfView, TocView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -111,7 +112,7 @@ define [
             @_currentContext?.set('_selected', true)
 
             # Always show the workspace pane
-            @_showWorkspacePane(SidebarView)
+            @_showWorkspacePane(BookshelfView)
 
             # set more granular file selected flags to be used in ToC
             @_currentModel.set('_selected', true) # Need to set it on the dereferenced pointer
@@ -120,7 +121,7 @@ define [
             if contextModel
               # Only change the view if there is nothing there or if the model differs
               if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
-                contextView = new SidebarView
+                contextView = new TocView
                   model: contextModel
 
                 @layout.sidebar.show(contextView)
@@ -129,10 +130,12 @@ define [
             else if model.getChildren
               # Only change the view if there is nothing there or if the model differs
               if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != model
-                modelView = new SidebarView
+                modelView = new TocView
                   model: model
                 @layout.sidebar.show(modelView)
                 modelView.maximize()
+
+            @layout.content.reset()
 
             model.contentView((view) => if view then @layout.content.show(view)) if model.contentView
 

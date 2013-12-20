@@ -17,9 +17,16 @@ define [
     initialize: () ->
       @isLoaded = @model.isNew()
 
-      @initalRender = new $.Deferred()
+      @initialRender = new $.Deferred()
       @contentLoaded = new $.Deferred()
       @modelLoaded = @model.load()
+      @editorLoaded = new $.Deferred()
+
+      # When editor is finally created, resolve a promise. This is the same as
+      # Aloha.unbind, but avoids race condition.
+      $(Aloha, 'body').off('aloha-editable-created.aloha-edit')
+      .on 'aloha-editable-created.aloha-edit',  (evt, editable) =>
+        @editorLoaded.resolve() if editable.obj.is('.aloha-root-editable')
 
       @listenTo @model, "change:#{@modelKey}", (model, value, options) =>
         return if options.internalAlohaUpdate
@@ -42,7 +49,7 @@ define [
         @contentLoaded.resolve() if @model.get(@modelKey)?.length
 
       # this is the trigger for actually showing content and enabling editing
-      $.when(@modelLoaded, @contentLoaded, @initalRender).done =>
+      $.when(@modelLoaded, @contentLoaded, @initialRender).done =>
         @isLoaded = true
         @render()
 
@@ -54,6 +61,13 @@ define [
       # execute after we bound a new handler below, leaving us with no handler
       # at all.
       $(Aloha, 'body').off 'aloha-smart-content-changed.updatemodel'
+
+      # Kill old editable, otherwise they accumulate on Aloha.editables.
+      @$el.mahalo?()
+
+      # reset some of the state of our root element so aloha doesn't freak out
+      @$el.removeClass('aloha-block-blocklevel-sortable')
+      @$el.removeData()
 
     onRender: () ->
       # update model after the user has stopped making changes
@@ -71,16 +85,8 @@ define [
 
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
-
         Aloha.ready =>
-          @$el.addClass('aloha-root-editable')
-          @$el.mahalo?()
-
-          # resset some of the state of our root element so aloha doesn't freak out
-          @$el.removeClass('aloha-block-blocklevel-sortable')
-          @$el.removeData()
-
-          @$el.aloha()
+          @$el.addClass('aloha-root-editable').aloha()
 
           Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
             updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
@@ -90,5 +96,5 @@ define [
 
           # reenable everything
           @$el.removeClass('disabled')
-
-      @initalRender.resolve()
+      else
+        @initialRender.resolve()

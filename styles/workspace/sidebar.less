@@ -210,7 +210,7 @@
   > div {
     height: inherit;
     // If this node is the signin modal then do not stretch it vertically
-    #sign-in-modal { height: initial; }
+    .modal { height: initial; }
 
     > div {
       height: inherit;
@@ -323,8 +323,6 @@ aside > div {
 
     li > .editor-node-body:not(:hover) > div.module-controls > a { display: none; }
     li > .editor-node-body:hover       > div.module-controls > a { display: inline-block; }
-
-    li.active > div > div.module-controls > .delete-module { display: none; }
 
     li > .editor-node-body > div.open > .module-controls > a {
         display: inline-block;

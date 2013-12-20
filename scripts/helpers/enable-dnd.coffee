@@ -36,6 +36,7 @@ define [
       cursorAt:
         top: 0
         left: 0
+      delay: 250
       helper: (evt) ->
         # Use `.toJSON().title` instead of `.get('title')` to support
         # TocPointerNodes which inherit their title if it is not overridden

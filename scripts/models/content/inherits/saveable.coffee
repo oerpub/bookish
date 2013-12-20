@@ -62,10 +62,12 @@ define ['backbone'], (Backbone) ->
           @set(attrs)
 
     onSaved: () ->
+      # Set _isNew before calling `@set(...)` because the Save button will render when `@set()` is called but not when `@isNew` is changed
+      # and `@isDirty()` returns `@_isNew or get('_isDirty')`
+      @_isNew = false # Set in loadable
+
       # If the content was just added, squirrel away the content into _ooriginal for visual Diffing later
       @set
         _original: @serialize?()
         _hasRemoteChanges: false
         _isDirty: false
-
-      @_isNew = false # Set in loadable

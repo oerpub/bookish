@@ -105,19 +105,19 @@ html, body {
         overflow-y: auto;
         position: relative;
 
-	    .content{
-	      // Give the module-editing area the look of a piece of paper
-	      margin: 15px @content-lr-padding;
-	      border: 1px solid #aaa;
-	      box-shadow: 0 0 10px #999;
-	      background-color: #fff;
-	      padding: 30px;
-	    }
-
+	      .content{
+	        // Give the module-editing area the look of a piece of paper
+	        margin: 15px @content-lr-padding;
+	        background-color: #fff;
+       
+          &:not(:empty) {
+            border: 1px solid #aaa;
+            box-shadow: 0 0 10px #999;
+            padding: 30px;
+          }
+	      }
       }
-
     }
-
   }
 
   // close button inside a popover
