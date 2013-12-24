@@ -78,6 +78,9 @@
   overflow: hidden;
   white-space: nowrap;
 }
+#repo-buttons {
+  display: none; // overidden below
+}
 #workspace-auth {
   display: block;
   width: 300px;
@@ -88,6 +91,11 @@
 
   .modal {
     text-align: left;
+  }
+  // Show repo buttons only if the view is rendered in the workspace-auth
+  // region
+  #repo-buttons {
+    display: block;
   }
 }
 
