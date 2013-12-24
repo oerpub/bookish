@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  /* We need to tell less to use relative paths very early on */
+  window.less = {
+    relativeUrls: true
+  };
+
   require({
     paths: {
       cs: '../bower_components/require-cs/cs',

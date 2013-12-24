@@ -74,7 +74,8 @@ html, body {
 
 #menu-and-content {
   float: left;
-  width: calc(~"100%" - @picker-width+@toc-width);
+  width: calc(~"100%" - @picker-width+@toc-width+2);
+  width: -moz-calc(~"100%" - @picker-width+@toc-width+2);
   height: 100%;
   min-width: @menu-and-content-min-width;
 

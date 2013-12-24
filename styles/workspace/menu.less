@@ -37,6 +37,7 @@
     padding: 0 @content-lr-padding;
     background-color: @editor-background-color;
     width: calc(~"100% - 20px" - @content-lr-padding*2); /* ~"20px" to account for scrollbar */
+    width: -moz-calc(~"100% - 20px" - @content-lr-padding*2);
 
     .semantic-drag-source {
       border-bottom: 1px solid #aaa;

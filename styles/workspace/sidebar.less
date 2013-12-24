@@ -130,7 +130,8 @@
     min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
 
     #menu-and-content {
-      width: calc(~"100%" - @toc-width+@aside-handle-width);
+      width: calc(~"100%" - @toc-width+@aside-handle-width+2);
+      width: -moz-calc(~"100%" - @toc-width+@aside-handle-width+2);
     }
 
     .sidebar-workspace {
@@ -159,7 +160,8 @@
     min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
 
     #menu-and-content {
-      width: calc(~"100%" - @picker-width+@aside-handle-width);
+      width: calc(~"100%" - @picker-width+@aside-handle-width+2);
+      width: -moz-calc(~"100%" - @picker-width+@aside-handle-width+2);
     }
 
     .sidebar-toc {
@@ -189,7 +191,8 @@
     min-width: (@workspace-min-width - @toc-width - @picker-width + @aside-handle-width*2);
 
     #menu-and-content {
-      width: calc(~"100%" - @aside-handle-width*2);
+      width: calc(~"100%" - @aside-handle-width*2+2);
+      width: -moz-calc(~"100%" - @aside-handle-width*2+2);
     }
 
     .sidebar-workspace,
@@ -435,6 +438,7 @@ aside#sidebar > div { // TOC
   .boxed-group-inner {
     overflow: auto;
     height: calc(~"100% - 87px");
+    height: -moz-calc(~"100% - 87px");
     color: #666;
     font-size: 13px;
   }
