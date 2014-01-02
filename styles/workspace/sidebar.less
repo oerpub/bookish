@@ -45,10 +45,10 @@
     .x-slide-sidebar(@picker-width);
     background-color: #f0f0f0; // Make picker background distinct from TOC background.
 
-    > .handle > .handle-text::before          { content: 'Book Picker'; }
+    > .handle > .handle-text::before          { content: 'Bookshelf'; }
     > .boxed-group > h3 {
       background-color: @picker-color;
-      > .title-text::before { content: 'Book Picker'; }
+      > .title-text::before { content: 'Bookshelf'; }
     }
 
   }
@@ -415,27 +415,36 @@ aside#sidebar > div { // TOC
 
   }
 
-  .add-content{
+  .header {
     text-align: right;
-    margin: 5px 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ccc;
 
-      // Also, make it right-align so it does not bleed to the right of the sidebar
-      .btn-group ul.dropdown-menu {
-        left: inherit; // Bootstrap aligns it left:0; by default
-        right: 0;
+    > * {
+      vertical-align: middle;
+      display: inline-block; 
+    }    
 
-        button {
-          width: 100%;
-          text-align: left;
+    .add-content{
+      text-align: right;
+      margin: 5px 10px;
+ 
+        // Also, make it right-align so it does not bleed to the right of the sidebar
+        .btn-group ul.dropdown-menu {
+          left: inherit; // Bootstrap aligns it left:0; by default
+          right: 0;
+ 
+          button {
+            width: 100%;
+            text-align: left;
+          }
+ 
         }
-
-      }
-
+ 
+    }
   }
 
   .boxed-group-inner {
+    border-top: 1px solid #ccc;
+    padding-top: 5px;
     overflow: auto;
     height: calc(~"100% - 87px");
     height: -moz-calc(~"100% - 87px");
@@ -642,6 +651,17 @@ aside#sidebar > div { // TOC
 
 
   #workspace-sidebar-toc {
+  
+    .editor-content-title {
+      cursor: default;
+      .icon-pencil {
+        font-size: 13px;
+      }
+      &:not(:hover) .icon-pencil{
+        visibility: hidden;
+      }
+    }
+    
     // Root nodes in the sidebar should have no left margin
     > ol {
       margin: 10px 0 0;
