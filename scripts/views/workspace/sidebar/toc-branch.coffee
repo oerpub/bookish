@@ -2,12 +2,12 @@ define [
   'jquery'
   'underscore'
   'marionette'
-  'cs!gh-book/opf-file'
+  'cs!models/content/toc-node'
   'cs!controllers/routing'
   'cs!helpers/enable-dnd'
   'cs!collections/content'
   'hbs!templates/workspace/sidebar/toc-branch'
-], ($, _, Marionette, OpfFile, controller, EnableDnD, allContent, tocBranchTemplate) ->
+], ($, _, Marionette, TocNode, controller, EnableDnD, allContent, tocBranchTemplate) ->
 
   # This class introduces a `renderModelOnly()` method that will
   # re-render only the Model part of the CompositeView.
@@ -232,8 +232,8 @@ define [
             # causes the delete operation to be async, which means at this
             # point in the code the book might not be deleted yet, which breaks
             # things when you delete the first book.
-            firstBook = _.findWhere allContent.without(this.model),
-              mediaType: OpfFile.prototype.mediaType
+            firstBook = _.find allContent.without(this.model), (m) ->
+              m instanceof TocNode
             controller.goEdit(firstBook, firstBook)
 
     goEdit: () ->
