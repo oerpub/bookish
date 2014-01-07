@@ -63,11 +63,7 @@ define [
       $(Aloha, 'body').off 'aloha-smart-content-changed.updatemodel'
 
       # Kill old editable, otherwise they accumulate on Aloha.editables.
-      @$el.mahalo?()
-
-      # reset some of the state of our root element so aloha doesn't freak out
-      @$el.removeClass('aloha-block-blocklevel-sortable')
-      @$el.removeData()
+      Aloha.getEditableById(@$el.attr('id')).destroy()
 
     onRender: () ->
       # update model after the user has stopped making changes
@@ -85,8 +81,16 @@ define [
 
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
+
         Aloha.ready =>
-          @$el.addClass('aloha-root-editable').aloha()
+          @$el.addClass('aloha-root-editable')
+          @$el.mahalo?()
+
+          # resset some of the state of our root element so aloha doesn't freak out
+          @$el.removeClass('aloha-block-blocklevel-sortable')
+          @$el.removeData()
+
+          @$el.aloha()
 
           Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
             updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
