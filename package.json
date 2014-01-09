@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "server": "http-server .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "print-mock-data": "node ./test/print-mock-data.js",
     "install": "bower install",
@@ -19,7 +20,8 @@
     "backbone": "~1.0",
     "jquery": "~1.8",
     "coffee-script": "~1.6",
-    "jasmine-node": "~1.10"
+    "jasmine-node": "~1.10",
+    "http-server": "~0.6.1"
   },
   "devDependencies": {
     "docco": "~0.4.0"
