@@ -5,10 +5,12 @@
 # There is a cyclic dependency between this and various views (`->` means "depends on"):
 # controller -> layout -> WorkspaceView -> WorkspaceItemView -> controller (because clicking an item will begin editing)
 define [
+  'underscore'
   'marionette'
   'cs!collections/content'
+  'cs!models/content/toc-node'
   'cs!views/layouts/workspace'
-], (Marionette, allContent, WorkspaceLayout) ->
+], (_, Marionette, allContent, TocNode, WorkspaceLayout) ->
 
 
   # Only reason to extend Backbone.Router is to get the @navigate method
@@ -44,9 +46,10 @@ define [
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
         'cs!views/layouts/workspace/menu'
-        'cs!views/layouts/workspace/sidebar'
+        'cs!views/layouts/workspace/bookshelf'
+        'cs!views/layouts/workspace/table-of-contents'
         'cs!views/workspace/content/search-results'
-        ], (menuLayout, SidebarView, SearchResultsView) =>
+        ], (menuLayout, BookshelfView, TocView, SearchResultsView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -54,8 +57,17 @@ define [
         allContent.load()
         .fail(() => alert 'Problem loading workspace. Please refresh and try again')
         .done () =>
-          @_showWorkspacePane(SidebarView)
-          @layout.sidebar.close()
+          #@_showWorkspacePane(SidebarView)
+          @_showWorkspacePane(BookshelfView)
+
+          # Find the first TocNode and show that in the Toc panel
+          firstBook = _.find allContent.without(this.model), (m) ->
+            m instanceof TocNode
+          tocView = new TocView
+            model: firstBook
+
+          @layout.sidebar.show(tocView)
+          #@layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
           # Update the URL
