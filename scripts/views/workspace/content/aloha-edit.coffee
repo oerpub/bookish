@@ -63,7 +63,7 @@ define [
       $(Aloha, 'body').off 'aloha-smart-content-changed.updatemodel'
 
       # Kill old editable, otherwise they accumulate on Aloha.editables.
-      Aloha.getEditableById(@$el.attr('id')).destroy()
+      @$el.mahalo?()
 
     onRender: () ->
       # update model after the user has stopped making changes
