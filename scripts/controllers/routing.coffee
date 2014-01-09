@@ -44,9 +44,9 @@ define [
       # To prevent cyclic dependencies, load the views once the app has loaded.
       require [
         'cs!views/layouts/workspace/menu'
-        'cs!views/layouts/workspace/sidebar'
+        'cs!views/layouts/workspace/bookshelf'
         'cs!views/workspace/content/search-results'
-        ], (menuLayout, SidebarView, SearchResultsView) =>
+        ], (menuLayout, BookshelfView, SearchResultsView) =>
 
         @_ensureLayout(menuLayout)
 
@@ -54,7 +54,7 @@ define [
         allContent.load()
         .fail(() => alert 'Problem loading workspace. Please refresh and try again')
         .done () =>
-          @_showWorkspacePane(SidebarView)
+          @_showWorkspacePane(BookshelfView)
           @layout.sidebar.close()
           @layout.content.show(new SearchResultsView {collection:allContent})
 
