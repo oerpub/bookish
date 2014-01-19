@@ -50,11 +50,11 @@ define ['jquery'], ($) ->
         'common/list'
         'oer/table'
         'extra/draganddropfiles'
-        'common/image'
         'oer/overlay'
         'oer/math'
         'oer/assorted'
         'ghbook/image'
+        'common/image'
         'oer/semanticblock'
         'oer/note'
         'oer/example'
@@ -120,6 +120,8 @@ define ['jquery'], ($) ->
         rootTags: ['span', 'div', 'figure']
         defaults:
           '.default-block': {}
+      image:
+        handles: 'se'
       copy:
         path: () ->
           # The path of the current document can be determined from the hash
