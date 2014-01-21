@@ -9,6 +9,16 @@ define [
   'hbs!templates/workspace/sidebar/toc-branch'
 ], ($, _, Marionette, TocNode, controller, EnableDnD, allContent, tocBranchTemplate) ->
 
+
+  PRETTY_NAMES = {
+    'application/oebps-package+xml': 'book'
+    'application/xhtml+xml': 'module'
+
+    'application/vnd.org.cnx.collection': 'book'
+    'application/vnd.org.cnx.folder': 'folder'
+    'application/vnd.org.cnx.module': 'module'
+  }
+
   # This class introduces a `renderModelOnly()` method that will
   # re-render only the Model part of the CompositeView.
   #
@@ -166,8 +176,7 @@ define [
     prettyName: () ->
       # Translate the mediaType attribute to something nice we can display.
       # FIXME: If we ever need to translate this, is this a good idea?
-      return "book" if @model.mediaType == 'application/oebps-package+xml'
-      return 'module'
+      return PRETTY_NAMES[@model.mediaType] or 'UNKNOWN_PRETTY_NAME'
 
     templateHelpers: () ->
       # For a book, show the ToC unsaved/remotely-changed icons (in the navModel, instead of the OPF file)
