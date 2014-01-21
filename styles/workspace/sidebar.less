@@ -128,11 +128,6 @@
   body.workspace-minimized & {
     min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
 
-    #menu-and-content {
-      width: calc(~"100%" - @toc-width+@aside-handle-width+2);
-      width: -moz-calc(~"100%" - @toc-width+@aside-handle-width+2);
-    }
-
     .sidebar-workspace {
       width: @aside-handle-width;
       .boxed-group {
@@ -158,11 +153,6 @@
   // The sidebar-minimized class is on the <body> so the content can shift using a margin-left
   body.sidebar-minimized & {
     min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
-
-    #menu-and-content {
-      width: calc(~"100%" - @picker-width+@aside-handle-width+2);
-      width: -moz-calc(~"100%" - @picker-width+@aside-handle-width+2);
-    }
 
     .sidebar-toc {
       width: @aside-handle-width;
@@ -392,24 +382,24 @@ aside#sidebar > div { // TOC
 
     > * {
       vertical-align: middle;
-      display: inline-block; 
-    }    
+      display: inline-block;
+    }
 
     .add-content{
       margin: 5px 10px;
- 
+
         // Also, make it right-align so it does not bleed to the right of the sidebar
         .btn-group ul.dropdown-menu {
           left: inherit; // Bootstrap aligns it left:0; by default
           right: 0;
- 
+
           button {
             width: 100%;
             text-align: left;
           }
- 
+
         }
- 
+
     }
   }
 
@@ -639,7 +629,7 @@ aside#sidebar > div { // TOC
 
 
   #workspace-sidebar-toc {
-  
+
     .editor-content-title {
       cursor: default;
       .icon-pencil {
@@ -649,7 +639,7 @@ aside#sidebar > div { // TOC
         visibility: hidden;
       }
     }
-    
+
     // Root nodes in the sidebar should have no left margin
     > ol {
       margin: 10px 0 0;
