@@ -48,6 +48,8 @@ define ['jquery'], ($) ->
         'common/format'
         'common/block'
         'common/list'
+        'common/contenthandler'
+        'common/paste'
         'oer/table'
         'extra/draganddropfiles'
         'common/image'
@@ -64,6 +66,7 @@ define ['jquery'], ($) ->
         'oer/definition'
         'oer/multipart'
         'oer/copy'
+        'oer/cleanup'
       ]
 
       # This whole thing is what's needed to:
@@ -127,6 +130,11 @@ define ['jquery'], ($) ->
 
     smartContentChange:
       idle: 2000
+
+    contentHandler:
+      insertHtml: [ 'cleanup' ]
+      initEditable: []
+      getContents: []
 
   # In case some module wants the config object return it.
   return @Aloha
