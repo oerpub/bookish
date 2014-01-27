@@ -10,6 +10,7 @@
   overflow-x: hidden;
   float: left;
   position: relative;
+  z-index: 1000; // Show above the content (if the window is narrow)
 
   border-right: @aside-border-width solid #999;
   box-sizing: border-box;
@@ -76,6 +77,7 @@
 
   &.sidebar-toc {
     max-width: @toc-width;
+    background-color: white;
 
     aside > div {
 
@@ -126,13 +128,9 @@
   min-width: @workspace-min-width;
 
   // workspace minimized
-  &.workspace-minimized {
+  // The workspace-minimized class is on the <body> so the content can shift using a margin-left
+  body.workspace-minimized & {
     min-width: (@workspace-min-width - @picker-width + @aside-handle-width);
-
-    #menu-and-content {
-      width: calc(~"100%" - @toc-width+@aside-handle-width+2);
-      width: -moz-calc(~"100%" - @toc-width+@aside-handle-width+2);
-    }
 
     .sidebar-workspace {
       width: @aside-handle-width;
@@ -156,13 +154,9 @@
   }
 
   // sidebar minimized (#sidebar is the table of contents)
-  &.sidebar-minimized {
+  // The sidebar-minimized class is on the <body> so the content can shift using a margin-left
+  body.sidebar-minimized & {
     min-width: (@workspace-min-width - @toc-width + @aside-handle-width);
-
-    #menu-and-content {
-      width: calc(~"100%" - @picker-width+@aside-handle-width+2);
-      width: -moz-calc(~"100%" - @picker-width+@aside-handle-width+2);
-    }
 
     .sidebar-toc {
       width: @aside-handle-width;
@@ -187,7 +181,7 @@
   }
 
   // workspace and sidebar minimized
-  &.workspace-minimized.sidebar-minimized {
+  body.workspace-minimized.sidebar-minimized & {
     min-width: (@workspace-min-width - @toc-width - @picker-width + @aside-handle-width*2);
 
     #menu-and-content {
@@ -209,20 +203,16 @@
 
 // All the height:inherit to be able to scroll inside the ToC
 #main {
-  height: inherit;
   > div {
-    height: inherit;
     // If this node is the signin modal then do not stretch it vertically
     .modal { height: initial; }
 
     > div {
-      height: inherit;
       > #container { // a <section>
-        height: inherit;
         > #workspace-container { // a <div>
-          height: inherit;
           > div.sidebar-container {  // alternatively, set this to height:100%;
-            height: inherit;
+            position: fixed;
+            min-height: 30px;
             > aside { // #sidebar .     alternatively, set this to height:100%;
               height: inherit;
 
@@ -252,7 +242,6 @@
 @aside-handle-width: 30px;
 @aside-handle-width-expanded: 0px;
 @boxed-group-header-height: 42px;
-@menu-and-content-min-width: 800px;
 @workspace-min-width: (@menu-and-content-min-width + @picker-width + @toc-width);
 
 aside > div {
@@ -420,25 +409,25 @@ aside#sidebar > div { // TOC
 
     > * {
       vertical-align: middle;
-      display: inline-block; 
-    }    
+      display: inline-block;
+    }
 
     .add-content{
       text-align: right;
       margin: 5px 10px;
- 
+
         // Also, make it right-align so it does not bleed to the right of the sidebar
         .btn-group ul.dropdown-menu {
           left: inherit; // Bootstrap aligns it left:0; by default
           right: 0;
- 
+
           button {
             width: 100%;
             text-align: left;
           }
- 
+
         }
- 
+
     }
   }
 
@@ -539,10 +528,32 @@ aside#sidebar > div { // TOC
 }
 
 
+// Shift the content based on which sidebars are maximized
+#menu-and-content {
+  // Sidebar Maximized
+  body.workspace-minimized:not(.sidebar-minimized) & { &, .content-title { margin-left: @toc-width + @aside-handle-width; } }
+  // Workspace Maximized
+  body.sidebar-minimized:not(.workspace-minimized) & { &, .content-title { margin-left: @picker-width + @aside-handle-width; } }
+  // Both Minimized
+  body.workspace-minimized.sidebar-minimized & { &, .content-title { margin-left: @aside-handle-width * 2; } }
+  // Both Maximized
+  &, .content-title {
+    margin-left: @toc-width + @picker-width;
+  }
+}
 
+// The sidebar-workspace does not need to shift because it is left-most
+.sidebar-workspace {
+  //margin-left: @picker-width;
+}
 
-
-
+// Shift the ToC based on if the workspace is maximized
+.sidebar-toc {
+  // Workspace Minimized
+  body.workspace-minimized & { margin-left: @aside-handle-width; }
+  // Workspace Maximized
+  margin-left: @picker-width;
+}
 
 
 
@@ -651,7 +662,7 @@ aside#sidebar > div { // TOC
 
 
   #workspace-sidebar-toc {
-  
+
     .editor-content-title {
       cursor: default;
       .icon-pencil {
@@ -661,7 +672,7 @@ aside#sidebar > div { // TOC
         visibility: hidden;
       }
     }
-    
+
     // Root nodes in the sidebar should have no left margin
     > ol {
       margin: 10px 0 0;
