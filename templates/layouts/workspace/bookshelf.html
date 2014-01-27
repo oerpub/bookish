@@ -14,3 +14,180 @@
   <i class="expand-collapse icon-"></i><!-- icon-chevron-sign-left/right -->
   <span class="handle-text">{{! Table of Contents}}</span>
 </h3>
+
+<!-- book metadata modal -->
+<div id="edit-book-modal" class="modal hide fade" tabindex="-1" role="dialog" style="width: 660px;">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="diffs-modal-label">Edit the authors and other metadata on this book</h3>
+  </div>
+  <div class="modal-body" style="max-height: 435px;">
+
+    <form>
+      <h4 style="display:inline-block;">Title (required):</h4>
+      <h4 style="display:inline-block;" class="toc-color" data-edit-toggle>
+        <span data-title>title title title</span>
+        <small><em>click to edit</em></small>
+      </h4>
+      <input
+        type="text"
+        name="title"
+        style="display: none;"
+        class="input-xlarge">
+    </form>
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#metadata-about" data-toggle="tab">About</a></li>
+      <li><a href="#metadata-authors" data-toggle="tab">Authors</a></li>
+      <li><a href="#metadata-summary" data-toggle="tab">Summary</a></li>
+    </ul>
+
+    <form class="form-horizontal">
+      <div class="tab-content">
+        <div class="tab-pane active" id="metadata-about" style="width: 560px;">
+          <div class="control-group">
+            <label class="control-label"> Subject </label>
+            <div class="controls">
+              <input
+                type="text"
+                name="subject"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"> Language </label>
+            <div class="controls">
+              <select name="language">
+                {{#each languages}}
+                  <option value="{{@key}}">{{this}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"> Keywords </label>
+            <div class="controls">
+              <input
+                type="text"
+                name="keywords"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"> Google Analytics </label>
+            <div class="controls">
+              <input type="text" name="analytics">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"> Licence </label>
+            <div class="controls">
+              <select name="rights">
+                <option value="">Choose a license</option>
+                <option value="http://creativecommons.org/licenses/by/3.0/">
+                  Creative Commons Attribution - CC-BY</option>
+                <option value="http://creativecommons.org/licenses/by-nd/3.0/">
+                  Creative Commons Attribution-NoDerivs - CC BY-ND</option>
+                <option value="http://creativecommons.org/licenses/by-sa/3.0/">
+                  Creative Commons Attribution-ShareAlike - CC BY-SA</option>
+                <option value="http://creativecommons.org/licenses/by-nc/3.0/">
+                  Creative Commons Attribution-NonCommercial - CC BY-NC</option>
+                <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+                  Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>
+                <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">
+                  Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>
+                <option value="http://creativecommons.org/publicdomain/">
+                  Public domain</option>
+                <option>other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="metadata-authors">
+          <div class="control-group">
+            <label class="control-label">Authors</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="authors"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Copyright Holders</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="rights-holders"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Publisher (optional)</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="publishers"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Editors (optional)</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="editors"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Translators (optional)</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="translators"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Illustrator (optional)</label>
+            <div class="controls">
+              <input
+                type="text"
+                name="illustrators"
+                data-role="tagsinput"
+                placeholder="Use comma, or tab to separate   "
+              >
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="metadata-summary">
+          <div class="control-group">
+            <label class="control-label">Summary</label>
+            <div class="controls">
+              <textarea name="description" rows="10" class="span5"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn" data-tab-next>Next</button>
+  </div>
+</div>
