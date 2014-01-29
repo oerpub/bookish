@@ -20,9 +20,10 @@ define [
       }
 
     editBook: (book) ->
-      console.log book
 
       modal = $('#edit-book-modal').modal {show:true}
+      modal.find('input,select,textarea').each -> $(@).val('')
+      modal.find('select[name="language"]').val('en')
 
       modal.find('[data-role="tagsinput"]').tagsinput({
         confirmKeys: [13, 188, 9]

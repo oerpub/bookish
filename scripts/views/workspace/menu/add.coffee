@@ -19,8 +19,16 @@ define [
     showCreateModal: ->
       modal = $('#create-book-modal')
       submit = modal.find('button[data-submit]')
-     
-      submit.off('click').click(@addItem)
+      form = modal.find('form')
+
+      modal.find('input').val('')
+ 
+      submit.off('click').click -> form.submit()
+
+      form.off('submit').submit (e) =>
+        e.preventDefault()
+        modal.modal 'hide'
+        @addItem()
 
       modal.modal {show:true}
 
