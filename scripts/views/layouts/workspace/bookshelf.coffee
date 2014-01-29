@@ -64,13 +64,13 @@ define [
             rights: rights
             rightsUrl: rightsUrl
             dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
-            subject: modal.find('[name="subject"]').val().split(',')
-            keywords: modal.find('[name="keywords"]').val().split(',')
-            rightsHolders: modal.find('[name="rights-holders"]').val().split(',')
-            authors: modal.find('[name="authors"]').val().split(',')
-            publishers: modal.find('[name="publishers"]').val().split(',')
-            editors: modal.find('[name="editors"]').val().split(',')
-            translators: modal.find('[name="translators"]').val().split(',')
-            illustrators: modal.find('[name="illustrators"]').val().split(',')
+            subject: modal.find('[name="subject"]').val().split(',').filter (i) -> i
+            keywords: modal.find('[name="keywords"]').val().split(',').filter (i) -> i
+            rightsHolders: modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
+            authors: modal.find('[name="authors"]').val().split(',').filter (i) -> i
+            publishers: modal.find('[name="publishers"]').val().split(',').filter (i) -> i
+            editors: modal.find('[name="editors"]').val().split(',').filter (i) -> i
+            translators: modal.find('[name="translators"]').val().split(',').filter (i) -> i
+            illustrators: modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
 
           modal.modal('hide')
