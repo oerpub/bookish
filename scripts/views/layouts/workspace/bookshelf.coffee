@@ -11,6 +11,10 @@ define [
     template: bookshelfTemplate
 
     initialize: (options) ->
+      @events['click #edit-book-modal [data-cancel]'] = (e) ->
+        e.preventDefault()
+        if confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')
+          $('#edit-book-modal').modal('hide')
       super(options)
 
     templateHelpers: () ->
