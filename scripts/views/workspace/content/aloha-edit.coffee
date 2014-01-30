@@ -97,7 +97,8 @@ define [
           @$el.aloha()
 
           Aloha.bind 'aloha-smart-content-changed.updatemodel', (evt, d) =>
-            updateModel() if d.editable.obj.is(@$el) or $.contains @$el[0], d.editable.obj[0]
+            updateModel() if d.triggerType != 'blur' and \
+              (d.editable.obj.is(@$el) or $.contains(@$el[0], d.editable.obj[0]))
 
           # Wait until Aloha is started before loading MathJax.
           MathJax?.Hub.Configured()
