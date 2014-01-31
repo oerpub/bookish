@@ -46,7 +46,7 @@ define [
       # if content is already present change will never fire
       # so check that and conditionally finish the content loading as well
       @modelLoaded.done =>
-        @contentLoaded.resolve() if @model.get(@modelKey)?.length
+        @contentLoaded.resolve()
 
       # this is the trigger for actually showing content and enabling editing
       $.when(@modelLoaded, @contentLoaded, @initialRender).done =>
