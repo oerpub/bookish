@@ -23,12 +23,14 @@
         Rename this {{prettyName}}
       </a>
     </li>
+    {{#if canEditMetadata }}
     <li>
       <a class="edit-settings-metadata">
         <i class="icon-pencil"></i>
         Edit description/authors 
       </a>
     </li>
+    {{/if}}
     {{#if canRemove}}
       <li>
         <a class="delete-module">

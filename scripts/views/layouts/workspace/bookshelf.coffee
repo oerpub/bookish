@@ -2,10 +2,11 @@ define [
   'cs!views/layouts/workspace/sidebar'
   'hbs!templates/layouts/workspace/bookshelf'
   'cs!configs/languages'
+  'underscore'
   'bootstrapModal'
   'bootstrapTab'
   'bootstrapTags'
-], (Sidebar, bookshelfTemplate, languages) ->
+], (Sidebar, bookshelfTemplate, languages, _) ->
 
   return class BookshelfSidebar extends Sidebar
     template: bookshelfTemplate
@@ -24,14 +25,32 @@ define [
       }
 
     editBook: (book) ->
+      console.log book.get('subject'), book
 
       modal = $('#edit-book-modal').modal {show:true}
-      modal.find('input,select,textarea').each -> $(@).val('')
-      modal.find('select[name="language"]').val('en')
+      modal.find('.nav.nav-tabs li:first a').click()
 
-      modal.find('[data-role="tagsinput"]').tagsinput({
-        confirmKeys: [13, 188, 9]
-      })
+      modal.find('[name="title"]').val(book.get('title'))
+      modal.find('[name="language"]').val(book.get('language'))
+      modal.find('[name="description"]').val(book.get('description'))
+      modal.find('[name="language"]').val(book.get('language') || 'en')
+      modal.find('[name="rights"]').val(book.get('rightsUrl'))
+
+      modal.find('[data-role="tagsinput"]').each ->
+        $(@).tagsinput({
+          confirmKeys: [13, 188, 9]
+        }) unless $(@).data('tagsinput')
+        $(@).tagsinput('removeAll')
+
+      _.each book.get('subject'), (subject) -> modal.find('[name="subject"]').tagsinput('add', subject)
+      _.each book.get('keywords'), (keyword) -> modal.find('[name="keywords"]').tagsinput('add', keyword)
+      _.each book.get('rightsHolders'), (rightsHolder) -> modal.find('[name="rights-holders"]').tagsinput('add', rightsHolder)
+      _.each book.get('authors'), (author) -> modal.find('[name="authors"]').tagsinput('add', author)
+      _.each book.get('publishers'), (publisher) -> modal.find('[name="publishers"]').tagsinput('add', publisher)
+      _.each book.get('editors'), (editor) -> modal.find('[name="editors"]').tagsinput('add', editor)
+      _.each book.get('translators'), (translator) -> modal.find('[name="translators"]').tagsinput('add', translator)
+      _.each book.get('illustrators'), (illustrator) -> modal.find('[name="illustrators"]').tagsinput('add', illustrator)
+
       modal.find('[data-edit-toggle]').click ->
         $(this).hide().siblings('input').show().focus()
       .siblings('input').blur ->

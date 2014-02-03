@@ -194,6 +194,7 @@ define [
         ancestorSelected: @options.ancestorSelected
         mediaType: model.mediaType
         isGroup: !! model.getChildren
+        canEditMetadata: !! @model.triggerMetadataEdit?
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
@@ -213,6 +214,12 @@ define [
       'click > .editor-node-body .delete-module': 'deleteModule'
       'click > .editor-node-body .edit-settings-rename': 'editSettings'
       'click > .editor-node-body .edit-settings-edit': 'goEdit'
+      'click > .editor-node-body .edit-settings-metadata': 'editMetadata'
+
+    editMetadata: (e) ->
+      e.preventDefault()
+      model = @model.dereferencePointer?() or @model
+      model.triggerMetadataEdit?()
 
     deleteModule: (e) ->
       e.preventDefault()
