@@ -67,6 +67,7 @@ define ['jquery'], ($) ->
         'oer/multipart'
         'oer/copy'
         'oer/cleanup'
+        'oer/assessment'
       ]
 
       # This whole thing is what's needed to:
