@@ -13,7 +13,9 @@ require.config
     difflib: "#{BOWER}/jsdifflib/difflib"
     diffview: "#{BOWER}/jsdifflib/diffview"
 
-
+    # Loads MathJax from the CDN.
+    # To disable MathJax (for development without internet) see
+    # the `aloha` section in the `shim` section below.
     mathjax: 'http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured'
 
     # ## Template and Style paths
@@ -117,6 +119,7 @@ require.config
       exports: 'Select2'
 
     aloha:
+      # To disable MathJax comment out the `mathjax` entry in `deps` below.
       deps: ['jquery', 'mathjax', 'cs!configs/aloha', 'bootstrapModal', 'bootstrapPopover']
       exports: 'Aloha'
       init: ($) ->
@@ -152,6 +155,10 @@ require.config
     templateExtension: 'html'
 
   waitSeconds: 42
+
+  less:
+    relativeUrls: true,
+    logLevel: 1
 
 # # Load and run the application
 define ['cs!app'], (app) ->
