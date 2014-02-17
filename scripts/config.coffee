@@ -55,6 +55,8 @@ require.config
     bootstrapTooltip: "#{BOWER}/bootstrap/js/bootstrap-tooltip"
     bootstrapTransition: "#{BOWER}/bootstrap/js/bootstrap-transition"
     bootstrapTypeahead: "#{BOWER}/bootstrap/js/bootstrap-typeahead"
+    bootstrapTags: "#{BOWER}/bootstrapTags/dist/bootstrap-tagsinput.min"
+    bootstrapTagsCss: "#{BOWER}/bootstrapTags/dist/bootstrap-tagsinput"
 
     # ## Handlebars Dependencies
     Handlebars: "#{BOWER}/require-handlebars-plugin/Handlebars"
@@ -109,6 +111,7 @@ require.config
     bootstrapTooltip: ['jquery']
     bootstrapTransition: ['jquery']
     bootstrapTypeahead: ['jquery']
+    bootstrapTags: ['jquery', 'css!bootstrapTagsCss']
 
     # Select2
     select2:
@@ -152,6 +155,10 @@ require.config
     templateExtension: 'html'
 
   waitSeconds: 42
+
+  less:
+    relativeUrls: true,
+    logLevel: 1
 
 # # Load and run the application
 define ['cs!app'], (app) ->
