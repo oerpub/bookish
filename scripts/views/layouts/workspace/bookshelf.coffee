@@ -25,8 +25,6 @@ define [
       }
 
     editBook: (book) ->
-      console.log book.get('subject'), book
-
       modal = $('#edit-book-modal').modal {show:true}
       modal.find('.nav.nav-tabs li:first a').click()
 
@@ -51,9 +49,9 @@ define [
       _.each book.get('translators'), (translator) -> modal.find('[name="translators"]').tagsinput('add', translator)
       _.each book.get('illustrators'), (illustrator) -> modal.find('[name="illustrators"]').tagsinput('add', illustrator)
 
-      modal.find('[data-edit-toggle]').click ->
+      modal.find('[data-edit-toggle]').off('click').click ->
         $(this).hide().siblings('input').show().focus()
-      .siblings('input').blur ->
+      .siblings('input').off('blur').blur ->
         $(this).hide().siblings('[data-edit-toggle]').show().find('[data-title]').text($(this).val())
 
       modal.find('a[data-toggle="tab"]').on('shown', (e) ->
@@ -66,7 +64,7 @@ define [
       # populate book data in the form
       modal.find('input[name="title"]').val(book.get('title')).blur()
 
-      modal.find('[data-tab-next]').click ->
+      modal.find('[data-tab-next]').off('click').click ->
         next = modal.find('.nav li.active').next()
 
         if next.length
