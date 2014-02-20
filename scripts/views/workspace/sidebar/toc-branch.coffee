@@ -15,6 +15,7 @@ define [
     'application/xhtml+xml': 'module'
 
     'application/vnd.org.cnx.collection': 'book'
+    'application/vnd.org.cnx.section': 'book division'
     'application/vnd.org.cnx.folder': 'folder'
     'application/vnd.org.cnx.module': 'module'
   }
