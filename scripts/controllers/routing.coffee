@@ -130,6 +130,8 @@ define [
             @_currentModel.set('_selected', true) # Need to set it on the dereferenced pointer
 
             # Force the sidebar if a contextModel is passed in
+            @layout.sidebar.reset()
+
             if contextModel
               # Only change the view if there is nothing there or if the model differs
               if !@layout.sidebar.currentView or @layout.sidebar.currentView.model != contextModel
@@ -138,6 +140,7 @@ define [
 
                 @layout.sidebar.show(contextView)
                 contextView.maximize()
+                
             # Some models do not change the sidebar because they cannot contain children (like Module)
             else if model.getChildren
               # Only change the view if there is nothing there or if the model differs
