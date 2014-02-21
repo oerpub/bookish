@@ -259,7 +259,7 @@ define [
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
       model = @model
-      if not model.getRoot?()
+      if model.getChildren?().length
         # Find the 1st leaf node (editable model)
         model = model.findDescendantDFS? (model) -> return model.getChildren().isEmpty()
         # if @model does not have `.findDescendantDFS` then use the original model
