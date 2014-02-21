@@ -53,7 +53,12 @@ define [
         $container.append(iv.el)
 
     events:
-      'click .editor-content-title': 'changeTitle'
+      'click .toc-edit-rename': 'changeTitle'
+      'click .toc-edit-metadata': 'editMetadata'
+
+    editMetadata: (e) ->
+      e.preventDefault()
+      @model.triggerMetadataEdit?()
 
     changeTitle: () ->
       title = prompt('Enter a new Title', @model.get('title'))
