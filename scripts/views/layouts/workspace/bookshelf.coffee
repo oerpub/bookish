@@ -11,13 +11,6 @@ define [
   return class BookshelfSidebar extends Sidebar
     template: bookshelfTemplate
 
-    initialize: (options) ->
-      @events['click #edit-book-modal [data-cancel]'] = (e) ->
-        e.preventDefault()
-        if confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')
-          $('#edit-book-modal').modal('hide')
-      super(options)
-
     templateHelpers: () ->
 
       return {
@@ -56,43 +49,47 @@ define [
 
       modal.find('a[data-toggle="tab"]').on('shown', (e) ->
         if $(e.target).parents('li').next().length
-          modal.find('[data-tab-next]').text('Next')
+          modal.find('[data-tab-next]').show()
         else
-          modal.find('[data-tab-next]').text('Save')
+          modal.find('[data-tab-next]').hide()
       )
     
-      # populate book data in the form
-      modal.find('input[name="title"]').val(book.get('title')).blur()
+      modal.find('[data-cancel]').off('click').click ->
+        if confirm('Are you sure you want to close without saving? The title, authors, and other information about this book will retain their previous values.')
+          modal.modal('hide')
 
       modal.find('[data-tab-next]').off('click').click ->
         next = modal.find('.nav li.active').next()
+        next.find('a').click() if next.length
 
-        if next.length
-          next.find('a').click()
+      # populate book data in the form
+      modal.find('input[name="title"]').val(book.get('title')).blur()
+
+      modal.find('[data-save]').off('click').click ->
+
+        rightsUrl = modal.find('[name="rights"]').val()
+
+        if rightsUrl.length
+          rights = modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
         else
-          rightsUrl = modal.find('[name="rights"]').val()
+          rights = ''
 
-          if rightsUrl.length
-            rights = modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
-          else
-            rights = ''
+        now = new Date()
 
-          now = new Date()
+        book.set
+          title: modal.find('[name="title"]').val()
+          description: modal.find('[name="description"]').val()
+          language: modal.find('[name="language"]').val()
+          rights: rights
+          rightsUrl: rightsUrl
+          dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
+          subject: modal.find('[name="subject"]').val().split(',').filter (i) -> i
+          keywords: modal.find('[name="keywords"]').val().split(',').filter (i) -> i
+          rightsHolders: modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
+          authors: modal.find('[name="authors"]').val().split(',').filter (i) -> i
+          publishers: modal.find('[name="publishers"]').val().split(',').filter (i) -> i
+          editors: modal.find('[name="editors"]').val().split(',').filter (i) -> i
+          translators: modal.find('[name="translators"]').val().split(',').filter (i) -> i
+          illustrators: modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
 
-          book.set
-            title: modal.find('[name="title"]').val()
-            description: modal.find('[name="description"]').val()
-            language: modal.find('[name="language"]').val()
-            rights: rights
-            rightsUrl: rightsUrl
-            dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
-            subject: modal.find('[name="subject"]').val().split(',').filter (i) -> i
-            keywords: modal.find('[name="keywords"]').val().split(',').filter (i) -> i
-            rightsHolders: modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
-            authors: modal.find('[name="authors"]').val().split(',').filter (i) -> i
-            publishers: modal.find('[name="publishers"]').val().split(',').filter (i) -> i
-            editors: modal.find('[name="editors"]').val().split(',').filter (i) -> i
-            translators: modal.find('[name="translators"]').val().split(',').filter (i) -> i
-            illustrators: modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
-
-          modal.modal('hide')
+        modal.modal('hide')
