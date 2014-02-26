@@ -12,7 +12,7 @@
     "require-less": "guybedford/require-less#master",
     "require-handlebars-plugin": "f35a00080cce34ab8b5181247524972aef33e1d0",
     "requirejs-plugins": "v1.0.2",
-    "font-awesome": "v4.0.3",
+    "font-awesome": "v3.1.1",
     "select2": "3.4.1",
     "jasmine": "v1.3.1",
     "jquery-mockjax": "v1.5.2",
