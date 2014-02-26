@@ -19,3 +19,85 @@
 .editor-drop-zone-hover {
   background-color: #ccc;
 }
+
+/* Overrides of Bootstrap dialog styling */
+
+.modal-header {
+  border-radius: 6px 6px 0 0;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+  h3 { /* Reduce size of header */
+    line-height: normal;
+    font-size: 1em;
+    font-weight: normal;
+  }
+}
+.close {
+  line-height: @baseFontSize;
+  opacity: .4;
+}
+.modal-body{
+  padding-bottom: 0;
+}
+.modal-footer {
+  background-color: transparent;
+  border-top-width: 0;
+}
+form{
+  margin: 0;
+}
+
+/* Overrides of Boostrap form styling */
+
+.form-horizontal { /* Use a table-like layout instead of fixed-width spacing */
+  .control-group {
+    margin-bottom: 10px;
+    display: table-row;
+  }
+  .control-label {
+    text-align: left;
+    width: auto;
+    display: table-cell;
+    float: none;
+    padding: 4px 20px 10px 0;
+    vertical-align: top;
+  }
+  .controls {
+    display: table-cell;
+    padding: 0 0 10px;
+    margin-left: 0;
+  }
+}
+.bootstrap-tagsinput {
+  margin-bottom: 0;
+}
+
+/* Overrides of Bootstrap tab styling */
+
+.nav-tabs {
+  margin-bottom: 0;
+  border-bottom-width: 0;
+}
+.nav-tabs > li > a {
+  border-radius: 0;
+  font-size: @fontSizeSmall;
+  padding: 5px 15px;
+  color: @gray;
+  margin: 0 -1px 0 0;
+  background-color: #f9f9f9;
+}
+.nav-tabs > li > a:hover, 
+.nav-tabs > li > a:focus {
+  border-color: #ccc;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover,
+.nav-tabs > .active > a:focus {
+  border-color: @grayLight;
+  border-bottom-color: transparent;
+  position: relative; /* so it's "on top" */
+}
+.tab-content{ 
+  border: 1px solid @grayLight;
+  padding: 15px;
+}
