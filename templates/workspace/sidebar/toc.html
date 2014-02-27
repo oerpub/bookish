@@ -1,42 +1,29 @@
 <nav id="workspace-sidebar-toc" data-type="toc">
   {{#if mediaType}}
-    <div class="dropdown">
-      <h4 data-media-type="{{mediaType}}" class="dropdown" data-toggle="dropdown">
-        <i class="icon-content"></i>
-        <span title="Click to Change Title" class="editor-content-title">
-          {{title}} <i class="icon-chevron-sign-down"></i>
-        </span>
-
-        {{#if _isDirty}}
-          <small class="toc-badge">
-            <span class="is-dirty" title="This has unsaved changes">
-              <i class="icon-asterisk"></i>
-            </span>
-          </small>
-        {{/if}}
-        {{#if _hasRemoteChanges}}
-          <small class="toc-badge">
-            <span class="has-remote-changes" title="This has been changed by someone else">
-              <i class="icon-refresh"></i>
-            </span>
-          </small>
-        {{/if}}
-      </h4>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="toc-edit-rename">
-            <i class="icon-pencil"></i>
-            Rename this {{prettyName}}
-          </a>
-        </li>
-        <li>
-          <a class="toc-edit-metadata">
-            <i class="icon-pencil"></i>
-            Edit authors, license, etc.
-          </a>
-        </li>
-      </ul>
-    </div>
+    {{#if title}}
+      <div class="dropdown">
+        <h4 data-media-type="{{mediaType}}" class="dropdown" data-toggle="dropdown">
+          <i class="icon-content"></i>
+          <span title="Click to Change Title" class="editor-content-title">
+            {{title}} <i class="icon-chevron-sign-down"></i>
+          </span>
+        </h4>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="toc-edit-rename">
+              <i class="icon-pencil"></i>
+              Rename this {{prettyName}}
+            </a>
+          </li>
+          <li>
+            <a class="toc-edit-metadata">
+              <i class="icon-pencil"></i>
+              Edit authors, license, etc.
+            </a>
+          </li>
+        </ul>
+      </div>
+    {{/if}}
   {{/if}}
   <ol></ol>
 </nav>
