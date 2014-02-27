@@ -253,7 +253,11 @@ define [
               m instanceof TocNode
             controller.goEdit(firstBook, firstBook)
 
-    goEdit: () ->
+    goEdit: (e) ->
+      e.preventDefault()
+
+      return if (@model.dereferencePointer?() or @model).get('_selected')
+
       # Edit the model in the context of this folder/book. Explicitly close
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
