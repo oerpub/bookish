@@ -68,7 +68,11 @@ form{
     margin-left: 0;
   }
 }
-.bootstrap-tagsinput {
+div.bootstrap-tagsinput {
+/* I'm only adding the div to div.bootstrap-tagsinput because this is apparently getting pulled in before the original 
+.bootstrap-tagsinput styling, and I know Phil abhors !important, but I simply don't know enough about structure of 
+what's getting pulled in where and why, so feel free to change things so that these customizations get pulled in last, 
+avoiding the need to add extra stuff to the selectors to artificially create higher specificity.  Thanks. --Max */
   margin-bottom: 0;
 }
 
