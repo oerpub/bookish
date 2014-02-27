@@ -26,6 +26,10 @@ define [
         metadata
 
       @listenTo @model, "change:head", (model, value, options) =>
-        Aloha.settings.plugins.metadata.supplement = @model.get('head')
+        # sometimes there is no head. which is dumb.
+        if @model.get('head')
+          Aloha.settings.plugins.metadata.supplement = @model.get('head')
+        else
+          Aloha.settings.plugins.metadata.supplement = "<title>" + @model.get("title") + "</title>"
 
       super()
