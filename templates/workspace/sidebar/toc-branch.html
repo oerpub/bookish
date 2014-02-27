@@ -10,9 +10,11 @@
 {{/if}}
 
 <div class="pull-right dropdown module-controls">
-  <a href="#" class="pull-right edit-settings-edit" title="Go Edit this {{prettyName}}">
-    <i class="icon-circle-arrow-right"></i>
-  </a>
+  {{#unless selected}} 
+    <a href="#" class="pull-right edit-settings-edit" title="Go edit this {{prettyName}}">
+      <i class="icon-circle-arrow-right"></i>
+    </a>
+  {{/unless}}
   <a href="#" class="pull-right edit-settings dropdown-toggle" data-toggle="dropdown" title="Options for this {{prettyName}}">
     <i class="icon-chevron-sign-down"></i>
   </a>
