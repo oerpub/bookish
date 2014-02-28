@@ -472,7 +472,6 @@ aside#sidebar > div { // TOC
   .editor-node-body {
     white-space: nowrap;
   }
-  nav ol > li a,
   .editor-node-title {
     display: inline-block;
     overflow: hidden;
@@ -654,10 +653,11 @@ aside#sidebar > div { // TOC
   
     .editor-content-title {
       cursor: default;
-      .icon-pencil {
+      i {
         font-size: 13px;
+        cursor: pointer;
       }
-      &:not(:hover) .icon-pencil{
+      &:not(:hover) i{
         visibility: hidden;
       }
     }

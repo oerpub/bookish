@@ -10,21 +10,37 @@
 {{/if}}
 
 <div class="pull-right dropdown module-controls">
-  {{#if canRemove}}
-  <a href="#" class="pull-right delete-module" title="Delete this {{prettyName}}">
-    <i class="icon-remove"></i>
-  </a>
-  {{/if}}
-  <a href="#" class="pull-right edit-settings dropdown-toggle" data-toggle="dropdown" title="Edit/rename this {{prettyName}}">
-    <i class="icon-pencil"></i>
+  {{#unless selected}} 
+    <a href="#" class="pull-right edit-settings-edit" title="Go edit this {{prettyName}}">
+      <i class="icon-circle-arrow-right"></i>
+    </a>
+  {{/unless}}
+  <a href="#" class="pull-right edit-settings dropdown-toggle" data-toggle="dropdown" title="Options for this {{prettyName}}">
+    <i class="icon-chevron-sign-down"></i>
   </a>
   <ul class="dropdown-menu">
     <li>
-      <button type="button" class="btn btn-link edit-settings-rename">Rename this {{prettyName}}</button>
+      <a class="edit-settings-rename">
+        <i class="icon-pencil"></i>
+        Rename this {{prettyName}}
+      </a>
     </li>
+    {{#if canEditMetadata }}
     <li>
-      <button type="button" class="btn btn-link edit-settings-edit">Go edit this {{prettyName}}</button>
+      <a class="edit-settings-metadata">
+        <i class="icon-pencil"></i>
+        Edit authors, license, etc.
+      </a>
     </li>
+    {{/if}}
+    {{#if canRemove}}
+      <li>
+        <a class="delete-module">
+          <i class="icon-remove"></i>
+          Delete this {{prettyName}}
+        </a>
+      </li>
+    {{/if}}
   </ul>
 </div>
 {{#if editAction}}
