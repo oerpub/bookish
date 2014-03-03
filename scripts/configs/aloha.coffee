@@ -49,7 +49,7 @@ define ['jquery'], ($) ->
         'common/block'
         'common/list'
         'common/contenthandler'
-        'common/paste'
+        'oer/paste'
         'oer/table'
         'extra/draganddropfiles'
         'oer/overlay'

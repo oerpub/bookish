@@ -11,13 +11,6 @@ define [
   return class BookshelfSidebar extends Sidebar
     template: bookshelfTemplate
 
-    initialize: (options) ->
-      @events['click #edit-book-modal [data-cancel]'] = (e) ->
-        e.preventDefault()
-        if confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')
-          $('#edit-book-modal').modal('hide')
-      super(options)
-
     templateHelpers: () ->
 
       return {
@@ -25,8 +18,6 @@ define [
       }
 
     editBook: (book) ->
-      console.log book.get('subject'), book
-
       modal = $('#edit-book-modal').modal {show:true}
       modal.find('.nav.nav-tabs li:first a').click()
 
@@ -51,50 +42,54 @@ define [
       _.each book.get('translators'), (translator) -> modal.find('[name="translators"]').tagsinput('add', translator)
       _.each book.get('illustrators'), (illustrator) -> modal.find('[name="illustrators"]').tagsinput('add', illustrator)
 
-      modal.find('[data-edit-toggle]').click ->
+      modal.find('[data-edit-toggle]').off('click').click ->
         $(this).hide().siblings('input').show().focus()
-      .siblings('input').blur ->
+      .siblings('input').off('blur').blur ->
         $(this).hide().siblings('[data-edit-toggle]').show().find('[data-title]').text($(this).val())
 
       modal.find('a[data-toggle="tab"]').on('shown', (e) ->
         if $(e.target).parents('li').next().length
-          modal.find('[data-tab-next]').text('Next')
+          modal.find('[data-tab-next]').show()
         else
-          modal.find('[data-tab-next]').text('Save')
+          modal.find('[data-tab-next]').hide()
       )
     
+      modal.find('[data-cancel]').off('click').click ->
+        if confirm('Are you sure you want to close without saving? The title, authors, and other information about this book will retain their previous values.')
+          modal.modal('hide')
+
+      modal.find('[data-tab-next]').off('click').click ->
+        next = modal.find('.nav li.active').next()
+        next.find('a').click() if next.length
+
       # populate book data in the form
       modal.find('input[name="title"]').val(book.get('title')).blur()
 
-      modal.find('[data-tab-next]').click ->
-        next = modal.find('.nav li.active').next()
+      modal.find('[data-save]').off('click').click ->
 
-        if next.length
-          next.find('a').click()
+        rightsUrl = modal.find('[name="rights"]').val()
+
+        if rightsUrl.length
+          rights = modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
         else
-          rightsUrl = modal.find('[name="rights"]').val()
+          rights = ''
 
-          if rightsUrl.length
-            rights = modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
-          else
-            rights = ''
+        now = new Date()
 
-          now = new Date()
+        book.set
+          title: modal.find('[name="title"]').val()
+          description: modal.find('[name="description"]').val()
+          language: modal.find('[name="language"]').val()
+          rights: rights
+          rightsUrl: rightsUrl
+          dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
+          subject: modal.find('[name="subject"]').val().split(',').filter (i) -> i
+          keywords: modal.find('[name="keywords"]').val().split(',').filter (i) -> i
+          rightsHolders: modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
+          authors: modal.find('[name="authors"]').val().split(',').filter (i) -> i
+          publishers: modal.find('[name="publishers"]').val().split(',').filter (i) -> i
+          editors: modal.find('[name="editors"]').val().split(',').filter (i) -> i
+          translators: modal.find('[name="translators"]').val().split(',').filter (i) -> i
+          illustrators: modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
 
-          book.set
-            title: modal.find('[name="title"]').val()
-            description: modal.find('[name="description"]').val()
-            language: modal.find('[name="language"]').val()
-            rights: rights
-            rightsUrl: rightsUrl
-            dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
-            subject: modal.find('[name="subject"]').val().split(',').filter (i) -> i
-            keywords: modal.find('[name="keywords"]').val().split(',').filter (i) -> i
-            rightsHolders: modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
-            authors: modal.find('[name="authors"]').val().split(',').filter (i) -> i
-            publishers: modal.find('[name="publishers"]').val().split(',').filter (i) -> i
-            editors: modal.find('[name="editors"]').val().split(',').filter (i) -> i
-            translators: modal.find('[name="translators"]').val().split(',').filter (i) -> i
-            illustrators: modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
-
-          modal.modal('hide')
+        modal.modal('hide')

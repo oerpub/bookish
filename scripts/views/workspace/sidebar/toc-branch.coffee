@@ -15,6 +15,7 @@ define [
     'application/xhtml+xml': 'module'
 
     'application/vnd.org.cnx.collection': 'book'
+    'application/vnd.org.cnx.section': 'book division'
     'application/vnd.org.cnx.folder': 'folder'
     'application/vnd.org.cnx.module': 'module'
   }
@@ -252,13 +253,17 @@ define [
               m instanceof TocNode
             controller.goEdit(firstBook, firstBook)
 
-    goEdit: () ->
+    goEdit: (e) ->
+      e.preventDefault()
+
+      return if (@model.dereferencePointer?() or @model).get('_selected')
+
       # Edit the model in the context of this folder/book. Explicitly close
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
       model = @model
-      if not model.getRoot?()
+      if model.getChildren?().length
         # Find the 1st leaf node (editable model)
         model = model.findDescendantDFS? (model) -> return model.getChildren().isEmpty()
         # if @model does not have `.findDescendantDFS` then use the original model
