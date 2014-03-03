@@ -50,8 +50,10 @@ define [
       modal.find('a[data-toggle="tab"]').on('shown', (e) ->
         if $(e.target).parents('li').next().length
           modal.find('[data-tab-next]').show()
+          modal.find('[data-save]').removeClass('btn-primary')
         else
           modal.find('[data-tab-next]').hide()
+          modal.find('[data-save]').addClass('btn-primary')
       )
     
       modal.find('[data-cancel]').off('click').click ->
