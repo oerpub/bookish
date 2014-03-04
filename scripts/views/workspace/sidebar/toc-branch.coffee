@@ -15,6 +15,7 @@ define [
     'application/xhtml+xml': 'module'
 
     'application/vnd.org.cnx.collection': 'book'
+    'application/vnd.org.cnx.section': 'book division'
     'application/vnd.org.cnx.folder': 'folder'
     'application/vnd.org.cnx.module': 'module'
   }
@@ -194,6 +195,7 @@ define [
         ancestorSelected: @options.ancestorSelected
         mediaType: model.mediaType
         isGroup: !! model.getChildren
+        canEditMetadata: !! @model.triggerMetadataEdit?
         hasParent: !! @model.getParent?()
         hasChildren: !! @model.getChildren?()?.length
         isExpanded: @expanded
@@ -213,6 +215,12 @@ define [
       'click > .editor-node-body .delete-module': 'deleteModule'
       'click > .editor-node-body .edit-settings-rename': 'editSettings'
       'click > .editor-node-body .edit-settings-edit': 'goEdit'
+      'click > .editor-node-body .edit-settings-metadata': 'editMetadata'
+
+    editMetadata: (e) ->
+      e.preventDefault()
+      model = @model.dereferencePointer?() or @model
+      model.triggerMetadataEdit?()
 
     deleteModule: (e) ->
       e.preventDefault()
@@ -245,13 +253,17 @@ define [
               m instanceof TocNode
             controller.goEdit(firstBook, firstBook)
 
-    goEdit: () ->
+    goEdit: (e) ->
+      e.preventDefault()
+
+      return if (@model.dereferencePointer?() or @model).get('_selected')
+
       # Edit the model in the context of this folder/book. Explicitly close
       # the picker. This is initiated from here because at this point we're
       # certain that the request to edit was initiated by a click in the
       # toc/picker.
       model = @model
-      if not model.getRoot?()
+      if model.getChildren?().length
         # Find the 1st leaf node (editable model)
         model = model.findDescendantDFS? (model) -> return model.getChildren().isEmpty()
         # if @model does not have `.findDescendantDFS` then use the original model
@@ -265,6 +277,6 @@ define [
       # TocPointerNodes which inherit their title if it is not overridden
       title = prompt('Edit Title:', @model.toJSON().title)
       if title and title != @model.toJSON().title
-        @model.set('title', title)
+        (@model.dereferencePointer?() or @model).set('title', title)
 
       @renderModelOnly()

@@ -21,11 +21,11 @@
     <button type="button" class="close" data-cancel aria-hidden="true">×</button>
     <h3 id="diffs-modal-label">Edit the authors and other metadata on this book</h3>
   </div>
-  <div class="modal-body" style="max-height: 435px;">
+  <div class="modal-body" style="max-height: 400px;">
 
-    <form>
+    <form style="margin-bottom: 10px;">
       <h4 style="display:inline-block;">Title (required):</h4>
-      <h4 style="display:inline-block;" class="toc-color" data-edit-toggle>
+      <h4 style="display:inline-block;" data-edit-toggle>
         <span data-title>title title title</span>
         <small><em>click to edit</em></small>
       </h4>
@@ -44,7 +44,7 @@
 
     <form class="form-horizontal">
       <div class="tab-content">
-        <div class="tab-pane active" id="metadata-about" style="width: 560px;">
+        <div class="tab-pane active" id="metadata-about">
           <div class="control-group">
             <label class="control-label"> Subject </label>
             <div class="controls">
@@ -181,7 +181,8 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-cancel>Close</button>
-    <button class="btn" data-tab-next>Next</button>
+    <button class="btn" data-cancel>Close without saving</button>
+    <button class="btn" data-save>Close and save</button>
+    <button class="btn btn-primary" data-tab-next>Next</button>
   </div>
 </div>

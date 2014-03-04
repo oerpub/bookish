@@ -22,6 +22,10 @@ define [
       @$el.parent().parent().parent().parent().find(
         '#module-title-indicator').text(@model.get('title'))
 
+      @listenTo @model, "change:title", =>
+        @$el.parent().parent().parent().parent().find(
+          '#module-title-indicator').text(@model.get('title'))
+
       # Focus the editor. This has to be done here, because @$el isn't attached
       # to the DOM before this. We also have to wait until the content is
       # loaded and the editor is actually activated.

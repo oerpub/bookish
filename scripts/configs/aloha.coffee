@@ -68,6 +68,7 @@ define ['jquery'], ($) ->
         'oer/copy'
         'oer/cleanup'
         'oer/media-embed'
+        'oer/metadata'
       ]
 
       # This whole thing is what's needed to:
