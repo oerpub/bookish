@@ -277,6 +277,6 @@ define [
       # TocPointerNodes which inherit their title if it is not overridden
       title = prompt('Edit Title:', @model.toJSON().title)
       if title and title != @model.toJSON().title
-        @model.set('title', title)
+        (@model.dereferencePointer?() or @model).set('title', title)
 
       @renderModelOnly()
