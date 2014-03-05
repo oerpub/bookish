@@ -67,6 +67,7 @@ define ['jquery'], ($) ->
         'oer/multipart'
         'oer/copy'
         'oer/cleanup'
+        'oer/metadata'
         'oer/undoredo'
       ]
 
