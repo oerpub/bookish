@@ -35,7 +35,8 @@ define [
           # Place the cursor at the beginning of the editor
           range = Aloha.createRange()
           range.setStart alohaEditable.obj[0], 0
-          range.setEnd alohaEditable.obj[0], 0
+          range.setEnd alohaEditable.obj[0], 1
+          range.collapse()
           Aloha.getSelection().removeAllRanges()
           Aloha.getSelection().addRange(range)
 
