@@ -32,24 +32,20 @@ define [
       $.when(@edit.currentView.editorLoaded, @edit.currentView.contentLoaded).done () =>
         alohaEditable = Aloha.getEditableById @edit.currentView.$el.attr('id')
         if alohaEditable
-          # Place the cursor at the beginning of the editor
-          range = Aloha.createRange()
-          range.setStart alohaEditable.obj[0], 0
-          range.setEnd alohaEditable.obj[0], 1
-          range.collapse()
-          Aloha.getSelection().removeAllRanges()
-          Aloha.getSelection().addRange(range)
+          # Find first non-metadata top-level element in the editable
+          first = alohaEditable.obj.find('> :not([data-type])').first()[0]
 
-          #Activate it
+          if first
+            # Now do it again, using Aloha rangy wrapper
+            range = Aloha.createRange()
+            range.setStart first, 0
+            range.setEnd first, 0
+            Aloha.getSelection().removeAllRanges()
+            Aloha.getSelection().addRange(range)
+
+
+          #Activate the editable
           alohaEditable.activate()
-
-          # Update Aloha's idea of the current selection. This is here so any
-          # plugin that uses Aloha.Selection will work correctly.
-          range = new GENTICS.Utils.RangeObject()
-          range.startContainer = range.endContainer = alohaEditable.obj[0]
-          range.startOffset = range.endOffset = 0
-          Aloha.Selection.rangeObject = range
-          Aloha.Selection.updateSelection()
 
     onClose: () ->
       # Clear the title of the edited content
