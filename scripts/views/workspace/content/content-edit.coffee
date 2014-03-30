@@ -12,6 +12,9 @@ define [
     template: contentEditTemplate
 
     initialize: () ->
+      # CAVEAT: initialize is called every time a module is opened, so
+      # we're modifying the aloha config on every module open. That is not
+      # problematic, but it can be done more efficiently.
       Aloha.settings.plugins.metadata = Aloha.settings.plugins.metadata || {}
       Aloha.settings.plugins.metadata.supplement = ''
 
@@ -26,13 +29,19 @@ define [
         metadata
 
       @listenTo @model, "change:title", (model, value, options) =>
-        Aloha.settings.plugins.metadata.extendMetadata({title: value}) if not options.triggeredByMetadata
-
+        if not options.triggeredByMetadata
+          Aloha.require('metadata/metadata-plugin').extendMetadata
+            title: value
+      
       @listenTo @model, "change:head", (model, value, options) =>
         # sometimes there is no head. which is dumb.
         if @model.get('head')
           Aloha.settings.plugins.metadata.supplement = @model.get('head')
         else
           Aloha.settings.plugins.metadata.supplement = "<title>" + @model.get("title") + "</title>"
+
+      # Tell the metadata plugin how to get the initial title
+      Aloha.settings.plugins.metadata.getInitialMetadata = () =>
+        return { title: @model.get('title') }
 
       super()
