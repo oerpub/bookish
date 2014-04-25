@@ -76,12 +76,22 @@ define [
         updateModel = =>
           alohaId = @$el.attr('id')
           alohaEditable = Aloha.getEditableById(alohaId)
-
           if alohaEditable
-            editableBody = alohaEditable.getContents()
-            editableBody = editableBody.trim() # Trim for idempotence
-            # Change the contents but do not update the Aloha editable area
-            @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
+            Aloha.require ['aloha/pluginmanager', 'aloha/ephemera'], (PluginManager, Ephemera) =>
+              # Since we know that ContentHandlerManager is configured with no
+              # plugins for getContent, we can skip the extremely inefficient
+              # translation to html and back, and just go straight to the
+              # serializer.
+              #editableBody = alohaEditable.getContents()
+              serializer = Aloha.Editable.getContentSerializer()
+              clone = alohaEditable.obj[0].cloneNode(true)
+              clone = Ephemera.prune(clone)
+              PluginManager.makeClean($(clone))
+              editableBody = serializer(clone)
+
+              editableBody = editableBody.trim() # Trim for idempotence
+              # Change the contents but do not update the Aloha editable area
+              @model.set(@modelKey, editableBody, {internalAlohaUpdate: true})
 
         # Once Aloha has finished loading enable
         @$el.addClass('disabled')
