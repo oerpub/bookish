@@ -13,7 +13,7 @@
     "update": "bower update"
   },
   "dependencies": {
-    "bower": "~1.0",
+    "bower": "~1.1",
     "requirejs": "~2.1",
     "cs": "git://github.com/jrburke/require-cs.git",
     "backbone": "~1.0",
