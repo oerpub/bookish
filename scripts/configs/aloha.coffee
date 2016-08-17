@@ -58,7 +58,7 @@ define ['jquery'], ($) ->
         'ghbook/image'
         'common/image'
         'oer/semanticblock'
-        'oer/note'
+        # 'oer/note'
         'oer/example'
         'oer/exercise'
         'oer/quotation'
