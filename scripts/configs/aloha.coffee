@@ -70,6 +70,7 @@ define ['jquery'], ($) ->
         'oer/figure'
         'oer/media-embed'
         'oer/metadata'
+        'oer/undoredo'
       ]
 
       # This whole thing is what's needed to:
