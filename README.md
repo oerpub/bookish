@@ -7,7 +7,7 @@ of how the code is organized.
 
 1. Download and extract (if necessary)
 2. Run `npm install` or just `bower install` in the directory to download and install dependencies
-3. Start up a webserver
+3. Start up a webserver by running `npm run server` (uses `http-server`)
 
 
 ## Building Documentation
