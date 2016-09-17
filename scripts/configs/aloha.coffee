@@ -67,8 +67,8 @@ define ['jquery'], ($) ->
         'oer/multipart'
         'oer/copy'
         'oer/cleanup'
-        'oer/figure'
-        'oer/media-embed'
+        # 'oer/figure'
+        # 'oer/media-embed'
         'oer/metadata'
       ]
 
@@ -114,12 +114,12 @@ define ['jquery'], ($) ->
               console.log 'Updated Image src as a result of upload'
 
       note: [
-        { label: 'Note',      cls: 'note', hasTitle: true }
-        { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' }
-        { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
-        { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
-        { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
-        { label: 'Teacher\'s Guide', cls: 'note', hasTitle: true, type: 'teachers-guide' }
+        { label: 'Note',      typeClass: 'note', hasTitle: true }
+        { label: 'Aside',     typeClass: 'note', hasTitle: true, dataType: 'aside' }
+        { label: 'Warning',   typeClass: 'note', hasTitle: true, dataType: 'warning' }
+        { label: 'Tip',       typeClass: 'note', hasTitle: true, dataType: 'tip' }
+        { label: 'Important', typeClass: 'note', hasTitle: true, dataType: 'important' }
+        { label: 'Teacher\'s Guide', typeClass: 'note', hasTitle: true, dataType: 'teachers-guide' }
       ]
       block:
         dragdrop: "1"
